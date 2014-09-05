@@ -1,0 +1,77 @@
+Project Title
+Matching skeletons using multiple Kinects
+
+Research Question
+Design and evaluate an application using multiple Kinects to track two or more people.
+
+Background (Previous findings)
+
+Intelligent sensor-scheduling for multi-kinect-tracking [1]
+	-
+Histograms of oriented gradients for human detection [5]
+	-Evaluate local histograms of image gradient orientations
+		-image gradient is a directional change in the intensity or color in an image [Wikipedia]
+Tracking people within groups with RGB-D data [2]
+	-HOG-based people detection [5]
+	-sub-clustering of depth data
+A color histogram based people tracking system [3]
+	-Uses color histogram intersection
+	-Histogram intersection value normalized by the total number of pixels in the histogram of the separated person (yields a score between 0 and 1)
+
+Tasks
+-Kinect calibration
+-Setup
+	-The distance between the Kinects and their orientations (FOV)
+	-Two basic setups: 1) One in the front and one in the back or 2) one on the left and one on the right
+-Read literature and identify algorithms to use. Alternatively, come up with my own algorithm after reading the literature
+-Use the Kinect Studio (or the Recording API) to make recordings of multiple users walking around and creating occlusions
+	-Multiple recordings, each addressing an issue
+	-Use the recordings to demonstrate the program is working (detailed in Aims and Objects)
+	-Sample recordings:
+		-One person walking from left to right, leaving the FOV of one Kinect into that of another (i.e. extending the Kinect FOV)
+		-Two people walking toward each other from the opposite end (i.e. resolve occlusion)
+		-More to come
+
+Aims and Objectives
+-Literature review
+-Calibration (with test targets in some position visible to all the Kinects)
+-Recognize a single user using two Kinects
+-Track a single user using two Kinects
+-Track two users using two Kinects
+	-Addresses the problem of occlusion and random movements
+-Track two users reliably regardless of the placement of the Kinects (within some boundary)
+-Evaluate the system
+-Calibration-free (automated calibration, without test targets)
+-Track up to six users reliably
+-Track up to six users reliably in different environments (e.g. brightness)
+-Evaluate the tracking system for six users
+-Track up to six users reliably using three machines, each with its own Kinect, in a local network (One additional machine runs the tracking algorithm)
+-Evaluate the distributed tracking system
+
+Potential approaches
+-To do
+
+Additional information
+Recordable Data Sources (using Kinect Studio v2)
+1. Infrared 13 MB/s
+2. Depth 13 MB/s
+3. BodyFrame (Record only)
+4. BodyIndex (Record only)
+5. Color 120 MB/s (Not in public preview)
+6. Audio 32 KB/s
+
+Applications
+Multiple users to control the facial expressions of their respective virtual avatars [4]
+Possible: blood oxygenation level of multiple people
+
+Requirements
+Two or more Kinects (May require additional PCs if using more than two Kinects)
+Large space (For development and testing purposes)
+
+References
+
+[1] Intelligent sensor-scheduling for multi-kinect-tracking. Friedberger, S.; Zea, A.; Hanebeck, U.D. 2012.
+[2] Tracking people within groups with RGB-D data. Matteo M.; Filippo, B.; Emanuele, M. 2012.
+[3] A color histogram based people tracking system. Lu, W; Tan, Y.P. 2001.
+[4] Realtime performance-based facial animation. Thibaut, W.; Sofien, B.; Hao, L.; Mark, P. 2011.
+[5] Histograms of oriented gradients for human detection. Dalal, N. and Triggs, B. 2005.
