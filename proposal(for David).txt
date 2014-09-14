@@ -11,9 +11,23 @@ Intelligent sensor-scheduling for multi-kinect-tracking [1]
 Histograms of oriented gradients for human detection [5]
 	-Evaluate local histograms of image gradient orientations
 		-image gradient is a directional change in the intensity or color in an image [Wikipedia]
+		-image window divided into small spatial regions (cells), create a histogram of gradient directions over the pixels of the cell
+		-contrast-normalize the local histograms
+		-normalized descriptor blocks = HOG
+		-use linear SVM to do person/non-person classification
+	-Scale-invariant feature transform (SIFT)
+		-detect & describe local features in images
 Tracking people within groups with RGB-D data [2]
-	-HOG-based people detection [5]
-	-sub-clustering of depth data
+	-look at real-time performance for mobile platforms
+	-System overview
+		-RGB-D data -> voxel grid filter -> ground plane removal -> 3D clustering -> people detection -> detections
+		-detections -> likelihoods computation -> joint likelihood data association -> HOG-based initializer -> tracks
+
+	-detection-track done through a maximization of a joint likelihood composed by motion, color appearance and people detection confidence
+
+	-voxel grid filter
+		
+
 A color histogram based people tracking system [3]
 	-Uses color histogram intersection
 	-Histogram intersection value normalized by the total number of pixels in the histogram of the separated person (yields a score between 0 and 1)
