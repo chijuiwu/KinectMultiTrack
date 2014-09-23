@@ -53,9 +53,9 @@
 
 \section{Description}
 
-Real time detecting and tracking multiple people have been achieved in systems that use RGB-D data\cite{track_rgbd}, shape analysis, stereo and intensity images\cite{w4s}, and appearance-based tracking\cite{track_robust}, just to name a few. Kinect is an inexpensive sensor that produces depth, RGB, infrared, and audio streams at high frame rates.
+Real time detecting and tracking multiple people have been achieved in systems that use RGB-D data\cite{track_rgbd}, shape analysis, stereo and intensity images\cite{w4s}, and appearance-based tracking\cite{track_robust}, just to name a few. Kinect is an inexpensive sensor that produces depth, RGB, infrared, and audio streams at high frame rates. The current work will build on top of Kinect's existing skeleton detection and tracking system.
 
-The goal of the project is to design and evaluate an application that uses multiple Kinects to track moving people in real-time. Using multiple Kinects has the advantage of a larger field of view, potentially from different angles, used to capture more information about the people in sight. On the other hand, necessary Kinect calibration and data synchronization introduce additional complexity. The tracking algorithm should be accurate and robust. It should also resolve the common problem of occlusion in detection and tracking.
+The goal of the project is to design and evaluate an application that uses multiple Kinects to track moving people in real-time. Using multiple Kinects has the advantage of a larger field of view, potentially from different angles, used to capture more information about the people in sight. On the other hand, necessary Kinect calibration and data synchronization will introduce additional complexity. The tracking algorithm should be accurate and robust. It should also resolve the common problem of occlusion in detection and tracking.
 
 Some applications of tracking multiple people include surveillance\cite{surveillance}, tracking with mobile robots\cite{mobile}, facial animation of digital avatars\cite{facial_animation}, and the possibility of monitoring their blood oxygenation levels.
 
@@ -78,7 +78,7 @@ The objectives are ordered by the difficulty of the tasks. They should be comple
 \item Recognize a single user (Match the skeletons from different Kinects)
 \item Track a single user (Extend the Kinect's field of view)
 \item Track two users (Specify the positions of the Kinects)
-\item Evaluate the current system (Applies to further updates)
+\item Evaluate the current system (Also applies to further objectives)
 \item Automate the calibration process without using a test target
 \item Track six users reliably in constraint test environment
 \item Track six users who have various poses and interactions
@@ -93,7 +93,7 @@ The objectives are ordered by the difficulty of the tasks. They should be comple
 
 \section{Ethics}
 
-Kinect is a commercial off-the-shelf hardware that has been approved for use worldwide. To help the researcher develop and verify the software, the project requires many recordings of one or more moving people. There is a small risk that people will exhibit inappropriate behaviour towards one another during the recording sessions. In such cases, the session will be immediately terminated. Participants will be required to sign a consent form, and they may leave the recording session at anytime without giving any reason. The recordings will be stored in an anonymous format and only accessible to the researcher. The researcher will also incentivize the participants with sweets.
+Kinect is a commercial off-the-shelf hardware that has been approved for use worldwide. To help the researcher develop and verify the software, the project will require many recordings of one or more moving people. There is a small risk that people will exhibit inappropriate behaviour towards one another during the recording sessions. In such cases, the session will be immediately terminated. Participants will be required to sign a consent form, and they may leave the recording session at anytime without giving any reason. The recordings will be stored in an anonymous format and only be accessible to the researcher. The researcher will also incentivize the participants with sweets.
 
 \section{Resources}
 
