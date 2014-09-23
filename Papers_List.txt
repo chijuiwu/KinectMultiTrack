@@ -1,0 +1,16 @@
+Real Time Robust Human Detection and Tracking System
+[http://goo.gl/0QkKtA]
+
+Fusion of Multiple Tracking Algorithms for Robust People Tracking
+http://goo.gl/TQFqfU
+
+Tracking Multiple People using Laser and Vision
+http://goo.gl/lRpLMP
+
+Tracking Groups of People
+http://goo.gl/zLpN0h
+
+Tracking loose-limbed people
+http://goo.gl/kGrFVC
+
+Inferring body pose without tracking body parts

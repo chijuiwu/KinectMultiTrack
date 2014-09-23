@@ -6,6 +6,25 @@ Design and evaluate an application using multiple Kinects to track two or more p
 
 Background (Previous findings)
 
+Pfinder: Real-Time Tracking of the Human Body
+	-statistical model of color and shape to segment a person from a background scene
+
+W4S Real-Time System for Detecting and Tracking People in 2 1/2 D
+-stereo, shape analysis and tracking, models of people's appearance
+-overcome errors and ambiguities arise in dynamic image analysis
+	-instability in segmentation processes over time
+	-splitting of objects due to coincidental alignment of objects parts with similarly colored background regions
+	-work with visible monochromatic video sources (designed for outdoor surveillance)
+	-model background scene and detect foreground regions in the intensity image and the disparity image
+	-stereo-based detectio handles sudden change in illumination
+
+Tracking Groups of People
+	-regions, people, and groups
+	-color-based tracking system
+	-background subtraction:
+		
+
+
 Intelligent sensor-scheduling for multi-kinect-tracking [1]
 	-
 Histograms of oriented gradients for human detection [5]

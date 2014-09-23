@@ -7,6 +7,8 @@
 \usepackage{amsmath,amsfonts,amsthm} % Math packages
 \usepackage[pdftex]{graphicx}	
 \usepackage{url}
+\usepackage{hyperref}
+\usepackage{apacite}
 
 \usepackage{sectsty}
 \allsectionsfont{\centering \normalfont\scshape}
@@ -19,8 +21,9 @@
 \fancyfoot[R]{\thepage}
 \renewcommand{\headrulewidth}{0pt}
 \renewcommand{\footrulewidth}{0pt}
-\setlength{\headheight}{13.6pt}
-
+\setlength{\headheight}{10pt}
+\setlength\textheight{650pt}
+\setlength{\footskip}{50pt}
 
 \numberwithin{equation}{section}
 \numberwithin{figure}{section}
@@ -29,106 +32,85 @@
 \newcommand{\horrule}[1]{\rule{\linewidth}{#1}}
 
 \title{
+		\vspace{-7ex}
 		\usefont{OT1}{bch}{b}{n}
-		\normalfont \normalsize \textsc{School of random department names} \\ [25pt]
-		\horrule{0.5pt} \\[0.4cm]
-		\huge This is the title of the template report \\
-		\horrule{2pt} \\[0.5cm]
+		\normalfont \normalsize \textsc{School of Computer Science, University of St Andrews} \\ [25pt]
+		\horrule{0.5pt} \\[0.2cm]
+		\huge Tracking People using Multiple Kinects: Description, Objectives, Ethics, Resources \\
+		\horrule{2pt} \\[0.2cm]
+		\vspace{-2ex}
 }
 \author{
 		\normalfont \normalsize
         Chi-Jui Wu\\[-3pt] \normalsize
+        {cjw21@st-andrews.ac.uk}\\[-3pt] \normalsize
         \today
 }
 \date{}
 
 \begin{document}
 \maketitle
+
 \section{Description}
+
+Real time detecting and tracking multiple people have been achieved in systems that use RGB-D data\cite{track_rgbd}, shape analysis, stereo and intensity images\cite{w4s}, and appearance-based tracking\cite{track_robust}, just to name a few. Kinect is an inexpensive sensor that produces depth, RGB, infrared, and audio streams at high frame rates.
+
+The goal of the project is to design and evaluate an application that uses multiple Kinects to track moving people in real-time. Using multiple Kinects has the advantage of a larger field of view, potentially from different angles, used to capture more information about the people in sight. On the other hand, necessary Kinect calibration and data synchronization introduce additional complexity. The tracking algorithm should be accurate and robust. It should also resolve the common problem of occlusion in detection and tracking.
+
+Some applications of tracking multiple people include surveillance\cite{surveillance}, tracking with mobile robots\cite{mobile}, facial animation of digital avatars\cite{facial_animation}, and the possibility of monitoring their blood oxygenation levels.
 
 \section{Objectives}
 
+The objectives are ordered by the difficulty of the tasks. They should be completed using two Kinects, unless explicitly stated otherwise.
+
 \begin{enumerate}
--Literature review
--Calibration (with test targets in some position visible to all the Kinects)
--Recognize a single user using two Kinects
--Track a single user using two Kinects
--Track two users using two Kinects
-	-Addresses the problem of occlusion and random movements
--Track two users reliably regardless of the placement of the Kinects (within some boundary)
--Evaluate the system
--Calibration-free (automated calibration, without test targets)
--Track up to six users reliably
--Track up to six users reliably in different environments (e.g. brightness)
--Evaluate the tracking system for six users
--Track up to six users reliably using three machines, each with its own Kinect, in a local network (One additional machine runs the tracking algorithm)
--Evaluate the distributed tracking system
+\item Literature review
+	\begin{itemize}
+		\item Identify the state of the art techniques in people tracking using RGB, depth, and infrared data
+		\item Identify the limitations of the current approaches
+		\item Identify important algorithms that can be incorporated to the current work.
+	\end{itemize}
+\item Calibrate the Kinects using a test target
+\item Synchronize the Kinects input from two different machines (May not be able to use two Kinect v2 on the same machine using the current SDK)
+	\begin{itemize}
+		\item RGB, infrared and depth
+	\end{itemize}
+\item Recognize a single user (Match the skeletons from different Kinects)
+\item Track a single user (Extend the Kinect's field of view)
+\item Track two users (Specify the positions of the Kinects)
+\item Evaluate the current system (Applies to further updates)
+\item Automate the calibration process without using a test target
+\item Track six users reliably in constraint test environment
+\item Track six users who have various poses and interactions
+\item Track six users in different indoor environments
+	\begin{itemize}
+		\item brightness
+		\item various occlusion objects (Partial and full occlusion)
+		\item simulated physical office and home space
+	\end{itemize}
+\item Track six users in outdoor environments
 \end{enumerate}
 
 \section{Ethics}
+
+Kinect is a commercial off-the-shelf hardware that has been approved for use worldwide. To help the researcher develop and verify the software, the project requires many recordings of one or more moving people. There is a small risk that people will exhibit inappropriate behaviour towards one another during the recording sessions. In such cases, the session will be immediately terminated. Participants will be required to sign a consent form, and they may leave the recording session at anytime without giving any reason. The recordings will be stored in an anonymous format and only accessible to the researcher. The researcher will also incentivize the participants with sweets.
+
 \section{Resources}
-\begin{enumerate}
-	\item Two Kinect v2
-	\item A large space that can accommodate at least six people
-	\item Third item in a list
-\end{enumerate}
 
-\begin{align} 
-	\begin{split}
-	(x+y)^3 	&= (x+y)^2(x+y)\\
-					&=(x^2+2xy+y^2)(x+y)\\
-					&=(x^3+2x^2y+xy^2) + (x^2y+2xy^2+y^3)\\
-					&=x^3+3x^2y+3xy^2+y^3
-	\end{split}					
-\end{align}
-Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies 
-
-\subsection{Heading on level 2 (subsection)}
-Lorem ipsum dolor sit amet, consectetuer adipiscing elit. 
-\begin{align}
-	A = 
-	\begin{bmatrix}
-	A_{11} & A_{21} \\
-  	A_{21} & A_{22}
-	\end{bmatrix}
-\end{align}
-Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem.
-
-\subsubsection{Heading on level 3 (subsubsection)}
-Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim.
-
-\paragraph{Heading on level 4 (paragraph)}
-Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. 
-
-
-\section{Lists}
-
-\subsection{Example for list (3*itemize)}
 \begin{itemize}
-	\item First item in a list 
+	\item Two Kinect for Windows v2
 		\begin{itemize}
-		\item First item in a list 
-			\begin{itemize}
-			\item First item in a list 
-			\item Second item in a list 
-			\end{itemize}
-		\item Second item in a list 
+			\item Note: May require additional Kinects and computers with 3.0 USB ports
 		\end{itemize}
-	\item Second item in a list 
+	\item A large space to accommodate at least six people
+		\begin{itemize}
+			\item To make recordings of moving people, for development, testing, and demonstration purposes
+		\end{itemize}
 \end{itemize}
 
-\subsection{Example for list (enumerate)}
+The supervisor will provide all of the items above.
 
-%%% End document
+\bibliographystyle{apacite}
+\bibliography{report}
+
 \end{document}
-
-
-
-
-Objectives
-
-Ethics
-
-Project Resources
-
--Kinect v2
