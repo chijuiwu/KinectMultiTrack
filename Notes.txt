@@ -6,6 +6,33 @@ Design and evaluate an application using multiple Kinects to track two or more p
 
 Background (Previous findings)
 
+High Performance Object Detection by Collaborative Learning of Joint Ranking of Granules Features
+	-people detection	
+
+Exploring supporters and distracters in unconstrained environments
+	-visual tracker
+
+Persistent People Tracking and Face Capture Over a Wide Area
+	-single PTZ camera
+	-HD facial images enable biometric analysis
+	-multiple cameras with non-overlapping fields of view
+
+	-Problems: maintain identities of people when they move from one camera to another
+	-low quality images
+
+	-detect and track people in zoomed-out mode, then selects, using a scheduler, a person to zoom in.
+	-come back later to resolve person-to-person, face-to-person and face-to-face data association problem
+
+	-tracking-by-detection + visual tracking
+	-camera scheduling
+		-
+s
+Coded Exposure Photography: Motion Deblurring using Fluttered Shutter
+	-
+
+Accurate Motion Deblurring using Camera Motion Tracking and Scene Depth
+	-Deblur using depth sensor (Kinect) and IMU sensor with the camera
+
 Pfinder: Real-Time Tracking of the Human Body
 	-statistical model of color and shape to segment a person from a background scene
 
