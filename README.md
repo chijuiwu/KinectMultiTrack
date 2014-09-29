@@ -1,8 +1,10 @@
-KinectMultiUserTracking
+Tracking People using Multiple Kinects
 =======================
 
-This repository documents my, Chi-Jui Wu, Seniour Honours Project at the University of St Andrews
+This repository documents my, Chi-Jui Wu, Seniour Honours Project at the University of St Andrews.
 
-## Proposal
+The goal of the project is to develop and evaluate an algorithm that uses multiple Kinects to track moving people in different environments.
 
-XXX
+## Working on...
+
+Literature review
