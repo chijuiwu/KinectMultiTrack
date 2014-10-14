@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{4671B7D1-72C3-4468-A273-5E02134D0CDD}</ProjectGuid>
+    <ProjectGuid>{B5E5572A-3AF3-4A84-A337-C12DDD899007}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Chaos</RootNamespace>
