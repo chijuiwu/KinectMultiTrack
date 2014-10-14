@@ -1,10 +1,16 @@
 Tracking People using Multiple Kinects
 =======================
 
-This repository documents my, Chi-Jui Wu, Seniour Honours Project at the University of St Andrews.
+This repository is a showcase of my, Chi-Jui Wu, Seniour Honours Project in the School of Computer Science, University of St Andrews.
 
-The goal of the project is to develop and evaluate an algorithm that uses multiple Kinects to track moving people in different environments.
+The goal of the project is to develop and evaluate an algorithm to track people using Multiple Kinects. The algorithm should resolve the problem of occlusion and be used in different environments.
 
 ## Working on...
 
-Literature review
+* Literature review (Draft due 14th October, 2014)
+* Kinect calibration
+
+## Done
+
+* DOER and Ethics (26th September, 2014)
+* Presentation (8th October, 2014)
