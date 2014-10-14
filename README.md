@@ -7,7 +7,7 @@ The goal of the project is to develop and evaluate an algorithm to track people 
 
 ## Problem
 
-![occlusion_problem](https://raw.githubusercontent.com/cjw-charleswu/Chaos/master/Deliverables/Presentation/occlusion.JPG =600x)
+![occlusion_problem](https://raw.githubusercontent.com/cjw-charleswu/Chaos/master/Deliverables/Presentation/occlusion.JPG)
 
 ## Working on...
 
