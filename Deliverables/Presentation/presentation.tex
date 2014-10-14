@@ -170,11 +170,19 @@ A low-cost sensor for motion capturing and tracking
 
 \begin{frame}
 \frametitle{Why use multiple Kinect?}
+\begin{columns}[c]
+\column{.45\textwidth}
 \begin{itemize}
 	\item Resolve the problem of occlusion
 	\item Reconstruct 3D human models
 	\item Human activity monitoring and prediction
 \end{itemize}
+\column{.5\textwidth}
+\begin{figure}
+\includegraphics[width=0.8\linewidth]{multiple_kinects}
+\newline{\tiny An image of multiple Kinects taken by another Kinect.\par}
+\end{figure}
+\end{columns}
 \end{frame}
 
 \begin{frame}
@@ -280,7 +288,7 @@ Paper: Tracking people within groups using RGB-D data \cite{rgbd}
 \frametitle{Challenges}
 \begin{itemize}
 	\item Kinect calibration
-	\item Merge different views into a new world view
+	\item Merge different views into a single view
 	\item Reduce the noise in depth data
 	\item Real-time tracking
 \end{itemize}
