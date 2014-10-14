@@ -5,14 +5,16 @@ This repository is a showcase of my, Chi-Jui Wu, Seniour Honours Project in the 
 
 The goal of the project is to develop and evaluate an algorithm to track people using Multiple Kinects. The algorithm should resolve the problem of occlusion and be used in different environments.
 
-![occlusion_problem](https://raw.githubusercontent.com/cjw-charleswu/Chaos/master/Deliverables/Presentation/occlusion.JPG)
+## Problem
+
+![occlusion_problem](https://raw.githubusercontent.com/cjw-charleswu/Chaos/master/Deliverables/Presentation/occlusion.JPG =600x)
 
 ## Working on...
 
 * Literature review (Draft due 14th October, 2014)
 * Kinect calibration
 
-## Done
+## Completed...
 
 * DOER and Ethics (26th September, 2014)
 * Presentation (8th October, 2014)
