@@ -1,0 +1,8 @@
+Last Week:
+Presentation to the SACHI
+
+Next Week:
+Literature review draft due next Tuesday 2pm
+Get started coding:
+	-get two Kinects working
+	-display streams same time same PC

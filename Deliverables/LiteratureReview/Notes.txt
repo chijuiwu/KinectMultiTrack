@@ -1,0 +1,347 @@
+Project Title
+Matching skeletons using multiple Kinects
+
+Research Question
+Design and evaluate an application using multiple Kinects to track two or more people.
+
+Background (Previous findings)
+
+Markerless Motion Capture using multiple Color-Depth Sensors
+
+Tracking using RGB-D data
+-sub-clustering
+	-height map for every cluster
+	-find local maxima within the height map
+	-discard local maxima that are too close to the ground
+	-a sub-cluster is created for every maximum
+
+Human detection using depth information by Kinect
+
+1. Filter depth data
+	-median filter
+
+2. 2D chamfer distance matching
+	-use edge information in the depth array to find possible regions that may contain a person
+	-eliminate edges whose sizes are smaller than a certain threshold
+	-distance transform (distances to the closest data pixels in the edge image - lower the value the better the match)
+	-match a head template to the resulted edge map
+	-translating and positioning the template at various location
+3. 3D model fitting
+	-find the parameters of the head
+	-build a 3D model
+	-whether a the region is actually a head
+	-extract body contours
+	-region growing algorithm to find whole body contours
+	-segmentat the body and the objects that are connected to it
+4. Tracking
+	-in RGB color of the same object in different time frames should be similar
+	-in depth measure the movements of the objects in a 3D space
+	-find coordinates and speed of each detected person
+	-assume the coordinates and speed change smmothly
+	-find the match with the least energy score
+
+Intelligent multi-camera video surveillance: A review
+
+Enhanced Computer Vision with Microsoft Kinect Sensor: A Review
+
+Exploring Context Information for Inter-Camera Multiple Target Tracking
+	-inter-camera multiple target tracking (with NON-overlapping fields of view)
+	-spatio-temporal context and relative appearance context
+	-exploit certain kinds of context information for inter-camera multiple target tracking
+
+	-spatio-temporal context:
+		-samples for discriminative appearance learning
+			-learn to distinguish different people
+
+	-relative appearance context
+		-models inter-object appearance similarities for people walking in proximity
+		-disambiguate individual appearance matching across cameras
+
+	-inter-camera tracking problems
+		-appearance may change due to illumination variations and pose changes (the cameras' FOV may not overlap)
+		-prediction of motion of people across camera is unreliable (blind area between cameras)
+	
+	-match snapshots across camera = person re-identification
+		1. Reference-based person re-identification
+		2. Person re-identification by symmetry-driven accumulation of local features
+		3. Unsupervised salience learning for person re-identification
+		4. Person re-identification by probabilistic relative distance comparison
+		5. Transfer re-identification: From person to set-based verification
+		6. Person Re-identification: What Features Are Important?
+		- involve building a strong appearance model to match the same person in different views
+		-or learning a distance metric to maximize differences between different people
+
+	-people walk in groups
+		-visual context
+		-imaging conditions within cameras in a short period of time are similar, hence the appearance differences between pairs of people in proximity under two views are similar
+
+	-connectivity between entry zones and exit zones in multiple cameras is learned
+		1. Object tracking across non-overlapping views by learning inter-camera transfer models
+		2. Bridging the gaps between cameras
+
+	-related work
+		1. Intelligent multi-camera video surveillance: A review
+			-appearance information
+				-size, color, texture
+			-spatio-temporal information
+				-transition time, velocity, entry zone, exit zone
+		-Dealing with illumination variations across camera
+			-color transformation matrix (Tracking objects across camera by incrementally learning inter-camera color calibration and patterns of activity)
+			-brightness transfer function (Tracking across multiple cameras with disjoint views)
+			-learned via training samples
+		-Texture and shape features
+			1. Inter-camera association of multi-target tracks by on-line learned appearance affinity models
+			2. Boosting clusters of samples for sequence matching in camera networks
+			-performance of appearance matching increased when using multiple cues
+		-correspondences of tracks solved by the Hungarian algorithm (maximization problem?)
+
+	-this paper
+		-RGB color histograms and histogram of gradients (HOG)
+		-color normalization to mitigate influences of color variations across cameras
+		-target-specific discriminative appearance models learned from samples collected using spatio-temporal context
+		-other color, texture and shape descriptors can be added to improve performance
+		-able to distinguish visually very similar targets through discriminative appearance learning and relative appearance context from groups of people
+
+	-Tracking
+		-affinity of two tracks is determined based on the appearance affinity and spatio-temporal affinity
+
+	Online Sample Collection
+		-based on the tracker proposed in Multi-target tracking by on-line learned discriminative appearance models
+		-one target cannot appear at different locations at one time
+			-choose positive and negative samples (within and across cameras)
+
+	Discriminative Appearance Learning
+		-discrimative two very similar targets
+		
+		-color normalization (to compensate for color variations between cameras)
+			1. Color transfer between images
+		-appearance representation robust to illumination changes
+			-first image of one camera used as reference target image
+			-all other images are transformed to have similar characteristics of that image
+		-RGB to lαβ to RGB
+		-[Maths]
+		-color differences between views are reduced which improves the performance of individual appearance matching across cameras
+
+		-appearance descriptors
+		-RGB histogram and HOG an image patche of different locations and scales
+		-RGB histogram on normalized image - single channel histograms -> a single color descriptor
+		-HOG to obtain shape information
+		-similarities of RGB color histogram and HOG histogram between two image pataches evaluated by correlation coefficients
+
+		-Discriminative appearance learning
+		-to learn a model which determins the affinity score between two tracks from different views
+		-the larger the output the more likely that these two tracks represent the same target in two views
+		-affinity model as a combination of the similarity measurements
+		-[Maths]
+		-Adaboost algorithm to learn the weights of a local descriptor in a region (learns features that are most discriminative in comparing images)
+		-for two tracks, under two views, the largest affinity score between randomly sampled instances is chosen as the affinity score between two tracks
+		-train target-specific coefficients for each target
+
+		-Relative appearance context learning
+		-use group information to improve tracking
+			1. Improving multi-target tracking via social grouping
+			2. Associating groups of people
+				problems:
+				-appearance of a group is non-rigid
+				-people swap positions while walking
+		-proposes "neighboring set" for inter-camera multi-target tracking
+			-for each person enters/exits one zone, the neighboring set of that person is defined as other people who have also enter/exit this zone in a time window
+			-two cameras are not far apart, the same set of people tend to re-appear in the neighboring camera
+				-can be used to disambiguate individual appearance matching
+		-models inter-object appearance similarities between the query person and the people in the neighboring set
+		-[Maths]
+		-assume the appearance differences between pairs of people in a group under two views are similar
+		-people who are spatially close to the target should contribute more to appearance matching than those who are far apart
+
+		-Track association
+		-[Maths and matrices]
+		-matrix able to incorporate all situations that could happen between tracks in two non-overlapping FOVs
+		-probability of someone exists camera A and enters camera B
+		-Hungarian algorithm to find optimal assignment of association
+
+		-Evaluation (for inter-camera tracking)
+		1.Inter-camera association of multi-target tracks by on-line learned appearance
+		-links exist but missing in tracking
+		-links do not exist but shown in tracking
+		-someone leaves one camera and returns to the same camera but missing in tracking
+		-someone leaves one camera and does not return to the same camera but shown in tracking
+
+		-previous work
+			-ratio of people tracked correctly to the total number of people traveling across cameras
+
+		-Campus 1 Dataset
+		-852 * 480, 25 minutes
+		-three outdoor cameras with non-overlapping FOVs
+		-inter-object occlusion
+		-people transit between cameras
+		-206 crossing transitions and 15 returning transitions
+		-group information provides useful visual context for inter-camera tracking
+		-color normalization improves the performance of appearance matching
+		-finds correct associations between targets in a crowded scene
+
+		-Campus 2 Dataset
+		-two cameras, widely separated, 320 * 240, 11 minutes of 13860 frames
+		-35 crossing transitions
+		-color and shape information combined yields better performance of appearance matching
+
+		-Conclusion
+		-inter-camera multiple target tracking using context information from videos
+		-spatio-temporal + relative appearance context
+		-color histogram + HOG can distinguish visually very similar targets
+
+High Performance Object Detection by Collaborative Learning of Joint Ranking of Granules Features
+	-people detection	
+
+Exploring supporters and distracters in unconstrained environments
+	-visual tracker
+
+Face Detection with the Modified Census transform
+	-face detection at 20fps on 640 * 480 images
+	-less than 45 degrees out-of-plane rotation
+
+Persistent People Tracking and Face Capture Over a Wide Area
+	-single PTZ camera
+	-HD facial images enable biometric analysis
+	-multiple cameras with non-overlapping fields of view
+
+	-Problems: maintain identities of people when they move from one camera to another
+	-low quality images
+
+	-detect and track people in zoomed-out mode, then selects, using a scheduler, a person to zoom in.
+	-come back later to resolve person-to-person, face-to-person and face-to-face data association problem
+
+	-tracking-by-detection + visual tracking
+	-camera scheduling
+		-zoom-in on people who are moving towards the camera
+		-constantly switching between the two modes
+	-person-to-person association
+		-match data from zoom-in to after zoom-in (affinity determined by location & appearance similarity)
+	-face detection (Face Detection with the Modified Census transform)
+	-face-to-face
+		-face detection responses which belong to the same person are linked together
+		-color & LBP histograms
+			-LBP: local binary patterns
+				-gray-scale - look at intensity difference of nearby local pixels
+				-Face Description with Local Binary Patterns: Application to Face Recognition
+				-Extended local binary patterns for texture classification
+	-face-to-person
+		-combine all of the stuff
+
+	-people tracking across multiple cameras
+		-spatio-temporal context and relative appearance context
+		-discriminative appearance model learned by Adaboost algorithm
+			-sequentially training a new model based on the erros of the previous models
+			-combined classifer as sum of each weighted classifer
+			-train a weighted classifier, compute predictions & weighted error rate & coefficients, and update weights
+			-Viola-Jones face detection algorithm
+		-inter-object appearance similarities used in context models
+			-the appearance differences between pairs of people in proximity under multiple views are similar
+
+Coded Exposure Photography: Motion Deblurring using Fluttered Shutter
+	-
+
+Accurate Motion Deblurring using Camera Motion Tracking and Scene Depth
+	-Deblur using depth sensor (Kinect) and IMU sensor with the camera
+
+Pfinder: Real-Time Tracking of the Human Body
+	-statistical model of color and shape to segment a person from a background scene
+
+W4S Real-Time System for Detecting and Tracking People in 2 1/2 D
+-stereo, shape analysis and tracking, models of people's appearance
+-overcome errors and ambiguities arise in dynamic image analysis
+	-instability in segmentation processes over time
+	-splitting of objects due to coincidental alignment of objects parts with similarly colored background regions
+	-work with visible monochromatic video sources (designed for outdoor surveillance)
+	-model background scene and detect foreground regions in the intensity image and the disparity image
+	-stereo-based detectio handles sudden change in illumination
+
+Tracking Groups of People
+	-regions, people, and groups
+	-color-based tracking system
+	-background subtraction:
+		
+
+
+Intelligent sensor-scheduling for multi-kinect-tracking [1]
+	-
+Histograms of oriented gradients for human detection [5]
+	-Evaluate local histograms of image gradient orientations
+		-image gradient is a directional change in the intensity or color in an image [Wikipedia]
+		-image window divided into small spatial regions (cells), create a histogram of gradient directions over the pixels of the cell
+		-contrast-normalize the local histograms
+		-normalized descriptor blocks = HOG
+		-use linear SVM to do person/non-person classification
+	-Scale-invariant feature transform (SIFT)
+		-detect & describe local features in images
+Tracking people within groups with RGB-D data [2]
+	-look at real-time performance for mobile platforms
+	-System overview
+		-RGB-D data -> voxel grid filter -> ground plane removal -> 3D clustering -> people detection -> detections
+		-detections -> likelihoods computation -> joint likelihood data association -> HOG-based initializer -> tracks
+
+	-detection-track done through a maximization of a joint likelihood composed by motion, color appearance and people detection confidence
+
+	-voxel grid filter
+		
+
+A color histogram based people tracking system [3]
+	-Uses color histogram intersection
+	-Histogram intersection value normalized by the total number of pixels in the histogram of the separated person (yields a score between 0 and 1)
+
+Tasks
+-Kinect calibration
+-Setup
+	-The distance between the Kinects and their orientations (FOV)
+	-Two basic setups: 1) One in the front and one in the back or 2) one on the left and one on the right
+-Read literature and identify algorithms to use. Alternatively, come up with my own algorithm after reading the literature
+-Use the Kinect Studio (or the Recording API) to make recordings of multiple users walking around and creating occlusions
+	-Multiple recordings, each addressing an issue
+	-Use the recordings to demonstrate the program is working (detailed in Aims and Objects)
+	-Sample recordings:
+		-One person walking from left to right, leaving the FOV of one Kinect into that of another (i.e. extending the Kinect FOV)
+		-Two people walking toward each other from the opposite end (i.e. resolve occlusion)
+		-More to come
+
+Aims and Objectives
+-Literature review
+-Calibration (with test targets in some position visible to all the Kinects)
+-Recognize a single user using two Kinects
+-Track a single user using two Kinects
+-Track two users using two Kinects
+	-Addresses the problem of occlusion and random movements
+-Track two users reliably regardless of the placement of the Kinects (within some boundary)
+-Evaluate the system
+-Calibration-free (automated calibration, without test targets)
+-Track up to six users reliably
+-Track up to six users reliably in different environments (e.g. brightness)
+-Evaluate the tracking system for six users
+-Track up to six users reliably using three machines, each with its own Kinect, in a local network (One additional machine runs the tracking algorithm)
+-Evaluate the distributed tracking system
+
+Potential approaches
+-To do
+
+Additional information
+Recordable Data Sources (using Kinect Studio v2)
+1. Infrared 13 MB/s
+2. Depth 13 MB/s
+3. BodyFrame (Record only)
+4. BodyIndex (Record only)
+5. Color 120 MB/s (Not in public preview)
+6. Audio 32 KB/s
+
+Applications
+Multiple users to control the facial expressions of their respective virtual avatars [4]
+Possible: blood oxygenation level of multiple people
+
+Requirements
+Two or more Kinects (May require additional PCs if using more than two Kinects)
+Large space (For development and testing purposes)
+
+References
+
+[1] Intelligent sensor-scheduling for multi-kinect-tracking. Friedberger, S.; Zea, A.; Hanebeck, U.D. 2012.
+[2] Tracking people within groups with RGB-D data. Matteo M.; Filippo, B.; Emanuele, M. 2012.
+[3] A color histogram based people tracking system. Lu, W; Tan, Y.P. 2001.
+[4] Realtime performance-based facial animation. Thibaut, W.; Sofien, B.; Hao, L.; Mark, P. 2011.
+[5] Histograms of oriented gradients for human detection. Dalal, N. and Triggs, B. 2005.
