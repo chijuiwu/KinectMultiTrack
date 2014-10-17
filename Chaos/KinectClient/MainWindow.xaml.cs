@@ -20,10 +20,14 @@ namespace KinectClient
     /// </summary>
     public partial class MainWindow : Window
     {
+        public static const String host = "138.251.213.248";
+        public static const int port = 12345;
+
         public MainWindow()
         {
             InitializeComponent();
-
+            KinectClient client = new KinectClient(host, port);
+            client.Start();
         }
     }
 }
