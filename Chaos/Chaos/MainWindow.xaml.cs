@@ -20,9 +20,13 @@ namespace Chaos
     /// </summary>
     public partial class MainWindow : Window
     {
+        public const int port = 12345;
+
         public MainWindow()
         {
             InitializeComponent();
+            KinectServer server = new KinectServer(12345);
+            server.Start();
         }
     }
 }

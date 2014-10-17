@@ -13,15 +13,15 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace KinectClient
+namespace KinectSocket
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
-        public static const String host = "138.251.213.248";
-        public static const int port = 12345;
+        public const String host = "138.251.213.248";
+        public const int port = 12345;
 
         public MainWindow()
         {
