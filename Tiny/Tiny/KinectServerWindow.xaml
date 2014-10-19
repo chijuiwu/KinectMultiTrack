@@ -1,0 +1,13 @@
+﻿<Window x:Class="Tiny.KinectServerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="KinectServerWindow" Height="350" Width="525">
+    <Grid>
+        <Viewbox HorizontalAlignment="Left" Height="231" Margin="29,33,0,0" VerticalAlignment="Top" Width="203"/>
+        <Label Content="ColorStream" HorizontalAlignment="Left" Margin="95,7,0,0" VerticalAlignment="Top"/>
+        <Viewbox HorizontalAlignment="Left" Height="231" Margin="279,33,0,0" VerticalAlignment="Top" Width="215"/>
+        <Label Content="SkeletonStream" HorizontalAlignment="Left" Margin="347,10,0,0" VerticalAlignment="Top"/>
+
+
+    </Grid>
+</Window>

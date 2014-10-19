@@ -13,20 +13,21 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Chaos
+namespace Tiny
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class KinectServerWindow : Window
     {
-        public const int port = 12345;
+        private const int port = 12345;
+        private KinectServer server;
 
-        public MainWindow()
+        public KinectServerWindow()
         {
             InitializeComponent();
-            KinectServer server = new KinectServer(12345);
-            server.Start();
+            this.server = new KinectServer(KinectServerWindow.port);
+            this.server.Start();
         }
     }
 }
