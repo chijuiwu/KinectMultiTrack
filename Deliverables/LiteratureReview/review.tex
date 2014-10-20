@@ -51,26 +51,49 @@
 }
 \date{}
 
-
-%%% Begin document
 \begin{document}
 \maketitle
 
 \section{Project}
 
-The current project proposes an algorithm for tracking people using multiple Kinects. The algorithm would enable applications to reliably track targets' position, movement, and appearance in realtime. It would also capture fine-grained spatial and visual information of the targets. Reliable trackers for a large number of people have been developed, but 
+The current project proposes an algorithm for tracking people using multiple Kinects. The proposed algorithm would reliably track targets' appearance, position, and movement in realtime. [Tracking people using other technologies]. The algorithm would be suited to applications  that require people tracking, including gesture recognition, motion prediction, medical monitoring, and survelliance.
 
-who what where why when
+\subsection{Contributions}
 
-\subsection{Problem}
+\subsubsection{Problem of Occlusion}
+
+Real world environments are dynamic. Occlusion occurs when the tracked target is hidden by other objects in the field of view of one or more cameras. There are two types of occlusions. Static occlusion refers to stationary objects, and it can be accounted by placing cameras at locations that encapsulate the entire world view. Dynamic occlusion arises from the interactions of targets in the environment, such as two person walking past each other. The project aims to resolve both types of occlusion using multiple Kinects. 
+
+The problem of occlusion is illustrated in Figure \ref{fig:occlusion_problem}. The first camera
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=0.8\textwidth]{occlusion}
+    \caption{The problem of occlusion}
+    \label{fig:occlusion_problem}
+\end{figure}
 
 \subsection{Kinect}
+
+Kinect is a low-cost sensor for motion capturing and tracking.
 
 \section{Infrared}
 
 \section{RGB}
 
+\subsection{Normalization}
+
+Color normalization is applied in every algorithm which compares RGB images. Normalization provides a way that 
+
+\subsection{Color histogram}
+
+\subsection{Histogram of gradients (HOG)}
+
+\subsection{Scale-invariant feature transform (SIFT)}
+
 \section{Depth}
+
+
 
 \section{Multiple Kinects}
 
