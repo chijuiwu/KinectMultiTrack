@@ -275,6 +275,7 @@ Histograms of oriented gradients for human detection [5]
 		-use linear SVM to do person/non-person classification
 	-Scale-invariant feature transform (SIFT)
 		-detect & describe local features in images
+
 Tracking people within groups with RGB-D data [2]
 	-look at real-time performance for mobile platforms
 	-System overview
@@ -347,3 +348,12 @@ References
 [3] A color histogram based people tracking system. Lu, W; Tan, Y.P. 2001.
 [4] Realtime performance-based facial animation. Thibaut, W.; Sofien, B.; Hao, L.; Mark, P. 2011.
 [5] Histograms of oriented gradients for human detection. Dalal, N. and Triggs, B. 2005.
+
+
+HOD:
+
+
+The raw depth values have a lot of noise, and a small change in one depth value for objects that far away may yield significant differences in metric depth. The raw depth images are processed to minimize noise and account for nonlinearity in the depth values. 
+
+Detection methods use HOG with incremental scales. However, depth information can guide HOD to make informed scale search.
+

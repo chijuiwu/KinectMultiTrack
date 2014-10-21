@@ -1,0 +1,9 @@
+Haar-like features
+
+People Detection in RGB-D Data:
+1. Eq1
+2. HOD
+3. Equal Error Rate
+
+Tracking people within groups with RGB-D data:
+three-term joint likelihood for limiting drifts and ID switches
