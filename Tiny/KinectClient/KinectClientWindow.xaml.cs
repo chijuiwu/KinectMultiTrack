@@ -29,13 +29,30 @@ namespace KinectSocket
         private KinectClient client;
         private Thread kinectStreamThread;
 
+        private KinectSensor kinectSensor = null;
+        private BodyFrameReader bodyFrameReader = null;
+
         public KinectClientWindow()
         {
             InitializeComponent();
             this.client = new KinectClient(localhost, kinectServerPort);
 
-            //this.kinectStreamThread = new Thread(new ThreadStart(this.StartKinectStream));
-            //this.kinectStreamThread.Start();
+            this.InitializeKinect();
+
+            this.kinectStreamThread = new Thread(new ThreadStart(this.StartKinectStream));
+            this.kinectStreamThread.Start();
+        }
+
+        private void InitializeKinect()
+        {
+            this.kinectSensor = KinectSensor.GetDefault();
+            this.bodyFrameReader = this.kinectSensor.BodyFrameSource.OpenReader();
+            this.kinectSensor.IsAvailableChanged += this.kinectSensor_IsAvailableChanged;
+        }
+
+        private void kinectSensor_IsAvailableChanged(object sender, IsAvailableChangedEventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         private void StartKinectStream()
@@ -46,7 +63,7 @@ namespace KinectSocket
             {
                 if (streamInterval.ElapsedMilliseconds >= 2000)
                 {
-                    this.client.SpawnKinectBodySocket();
+                    //this.client.SpawnKinectBodySocket();
                     streamInterval.Restart();
                 }
             }

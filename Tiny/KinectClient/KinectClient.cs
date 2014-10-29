@@ -8,6 +8,8 @@ using System.Net.Sockets;
 using System.Diagnostics;
 using System.Threading;
 using Microsoft.Kinect;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 namespace KinectSocket
 {
@@ -32,7 +34,8 @@ namespace KinectSocket
 
         private void SendKinectBodyData(object bodies)
         {
-            if (bodies i)
+            Debug.Assert(bodies.GetType() == typeof(Body[]));
+
             try
             {
                 TcpClient connectionToServer = new TcpClient();
@@ -40,9 +43,8 @@ namespace KinectSocket
                 NetworkStream clientStream = connectionToServer.GetStream();
 
                 Console.WriteLine("Kinect Client: Sending Skeleton...");
-                string skeleton = "Skeleton";
-                byte[] message = Encoding.ASCII.GetBytes(skeleton);
-                clientStream.Write(message, 0, message.Length);
+                byte[] bodyInBinary = this.ObjectToByteArray(bodies);
+                clientStream.Write(bodyInBinary, 0, bodyInBinary.Length);
                 clientStream.Flush();
 
                 while (!clientStream.DataAvailable) ;
@@ -63,6 +65,19 @@ namespace KinectSocket
             {
                 Console.WriteLine("Kinect Client: Exception...");
                 Console.WriteLine(e.Message);
+            }
+        }
+
+        // Convert any object to byte[]
+        // Source: http://stackoverflow.com/questions/4865104/convert-any-object-to-a-bytes
+        private byte[] ObjectToByteArray(Object obj)
+        {
+            if (obj == null) return null;
+            BinaryFormatter bf = new BinaryFormatter();
+            using(MemoryStream ms = new MemoryStream())
+            {
+                bf.Serialize(ms, obj);
+                return ms.ToArray();
             }
         }
     }
