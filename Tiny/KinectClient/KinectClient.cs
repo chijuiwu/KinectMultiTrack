@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Diagnostics;
 using System.Threading;
+using Microsoft.Kinect;
 
 namespace KinectSocket
 {
@@ -23,14 +24,15 @@ namespace KinectSocket
             this.endPoint = new IPEndPoint(IPAddress.Parse(this.host), this.port);
         }
 
-        public void SpawnKinectStreamThread()
+        public void SpawnKinectBodySocket(Body[] bodies)
         {
-            Thread kinectStreamThread = new Thread(new ThreadStart(this.SendKinectData));
-            kinectStreamThread.Start();
+            Thread kinectStreamThread = new Thread(new ParameterizedThreadStart(this.SendKinectBodyData));
+            kinectStreamThread.Start((object)bodies);
         }
 
-        private void SendKinectData()
+        private void SendKinectBodyData(object bodies)
         {
+            if (bodies i)
             try
             {
                 TcpClient connectionToServer = new TcpClient();

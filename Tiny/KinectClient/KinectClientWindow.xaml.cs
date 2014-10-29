@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Threading;
 using System.Diagnostics;
+using Microsoft.Kinect;
 
 namespace KinectSocket
 {
@@ -33,8 +34,8 @@ namespace KinectSocket
             InitializeComponent();
             this.client = new KinectClient(localhost, kinectServerPort);
 
-            this.kinectStreamThread = new Thread(new ThreadStart(this.StartKinectStream));
-            this.kinectStreamThread.Start();
+            //this.kinectStreamThread = new Thread(new ThreadStart(this.StartKinectStream));
+            //this.kinectStreamThread.Start();
         }
 
         private void StartKinectStream()
@@ -45,7 +46,7 @@ namespace KinectSocket
             {
                 if (streamInterval.ElapsedMilliseconds >= 2000)
                 {
-                    this.client.SpawnKinectStreamThread();
+                    this.client.SpawnKinectBodySocket();
                     streamInterval.Restart();
                 }
             }
