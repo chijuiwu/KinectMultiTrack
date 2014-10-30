@@ -1,4 +1,4 @@
-﻿<Window x:Class="KinectSocket.KinectClientWindow"
+﻿<Window x:Class="KinectClient.KinectClientWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="KinectClientWindow"
@@ -15,15 +15,17 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        
-        <Label Grid.Row="0" Grid.Column="0" Content="Body Stream" HorizontalAlignment="Center" VerticalAlignment="Top" RenderTransformOrigin="-0.079,0.5" Margin="0" FontWeight="Bold" FontSize="16" FontFamily="Microsoft Sans Serif"/>
-        
-        <Viewbox Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center">
-            <Image Source="{Binding ImageSource}" Stretch="UniformToFill" />
+
+        <Label Grid.Row="0" Content="Body Stream" HorizontalAlignment="Center" VerticalAlignment="Top" RenderTransformOrigin="-0.079,0.5" Margin="0" FontWeight="Bold" FontSize="16" FontFamily="Microsoft Sans Serif"/>
+
+        <Viewbox Grid.Row="1" HorizontalAlignment="Center">
+            <Image Source="{Binding BodyStreamImageSource}" Stretch="UniformToFill" />
         </Viewbox>
+
+        <StatusBar Grid.Row="2" Name="KinectStatusBar" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Background="White" Foreground="{StaticResource MediumGreyBrush}">
+            <StatusBarItem Content="{Binding KinectStatusText}" FontWeight="Bold" FontSize="16" FontFamily="Microsoft Sans Serif" />
+        </StatusBar>
     </Grid>
 </Window>

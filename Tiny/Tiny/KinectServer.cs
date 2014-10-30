@@ -43,22 +43,34 @@ namespace Tiny
         {
             TcpClient server = (TcpClient)obj;
             NetworkStream serverStream = server.GetStream();
-            
-            while (!serverStream.DataAvailable);
 
-            byte[] bytes = new byte[server.Available];
-            serverStream.Read(bytes, 0, bytes.Length);
-            string message = Encoding.ASCII.GetString(bytes, 0, bytes.Length);
-            IPEndPoint endPoint = (IPEndPoint)server.Client.RemoteEndPoint;
-            Console.WriteLine("Kinect Server: Received " + message + " from: " + endPoint);
+            while (true)
+            {
+                try
+                {
+                    if (!server.Connected) break;
 
-            string okay = "Okay";
-            byte[] response = Encoding.ASCII.GetBytes(okay);
-            serverStream.Write(response, 0, response.Length);
-            serverStream.Flush();
+                    while (!serverStream.DataAvailable) ;
 
-            serverStream.Close();
-            server.Close();
+                    byte[] bytes = new byte[server.Available];
+                    serverStream.Read(bytes, 0, bytes.Length);
+                    string message = Encoding.ASCII.GetString(bytes, 0, bytes.Length);
+                    IPEndPoint endPoint = (IPEndPoint)server.Client.RemoteEndPoint;
+                    Console.WriteLine("Kinect Server: Received " + message + " from: " + endPoint);
+
+                    string okay = "Okay";
+                    byte[] response = Encoding.ASCII.GetBytes(okay);
+                    serverStream.Write(response, 0, response.Length);
+                    serverStream.Flush();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Kinect Server: Exception when communicating with the client...");
+                    Console.WriteLine(e.Message);
+                    serverStream.Close();
+                    server.Close();
+                }
+            }
         }
     }
 }
