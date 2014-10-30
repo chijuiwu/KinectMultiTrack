@@ -1,8 +1,29 @@
 ﻿<Window x:Class="KinectSocket.KinectClientWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="KinectClientWindow" Height="350" Width="525">
-    <Grid>
+        Title="KinectClientWindow"
+        Height="600" Width="700"
+        Loaded="KinectClientWindow_Loaded"
+        Closing="KinectClientWindow_Closing">
+    <Window.Resources>
+        <SolidColorBrush x:Key="MediumGreyBrush" Color="#ff6e6e6e" />
+        <SolidColorBrush x:Key="KinectPurpleBrush" Color="#ff52318f" />
+        <SolidColorBrush x:Key="KinectBlueBrush" Color="#ff00BCF2" />
+    </Window.Resources>
+
+    <Grid Margin="10 10 10 10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
         
+        <Label Grid.Row="0" Grid.Column="0" Content="Body Stream" HorizontalAlignment="Center" VerticalAlignment="Top" RenderTransformOrigin="-0.079,0.5" Margin="0" FontWeight="Bold" FontSize="16" FontFamily="Microsoft Sans Serif"/>
+        
+        <Viewbox Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center">
+            <Image Source="{Binding ImageSource}" Stretch="UniformToFill" />
+        </Viewbox>
     </Grid>
 </Window>

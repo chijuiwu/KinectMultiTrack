@@ -26,15 +26,15 @@ namespace KinectSocket
             this.endPoint = new IPEndPoint(IPAddress.Parse(this.host), this.port);
         }
 
-        public void SpawnKinectBodySocket(Body[] bodies)
+        public void SpawnKinectBodySocket(BodyFrame bodyFrame)
         {
             Thread kinectStreamThread = new Thread(new ParameterizedThreadStart(this.SendKinectBodyData));
-            kinectStreamThread.Start((object)bodies);
+            kinectStreamThread.Start((object)bodyFrame);
         }
 
-        private void SendKinectBodyData(object bodies)
+        private void SendKinectBodyData(object bodyFrame)
         {
-            Debug.Assert(bodies.GetType() == typeof(Body[]));
+            Debug.Assert(bodyFrame.GetType() == typeof(BodyFrame));
 
             try
             {
@@ -42,8 +42,8 @@ namespace KinectSocket
                 connectionToServer.Connect(this.endPoint);
                 NetworkStream clientStream = connectionToServer.GetStream();
 
-                Console.WriteLine("Kinect Client: Sending Skeleton...");
-                byte[] bodyInBinary = this.ObjectToByteArray(bodies);
+                Console.WriteLine("Kinect Client: Sending BodyFrame...");
+                byte[] bodyInBinary = this.ObjectToByteArray(bodyFrame);
                 clientStream.Write(bodyInBinary, 0, bodyInBinary.Length);
                 clientStream.Flush();
 
