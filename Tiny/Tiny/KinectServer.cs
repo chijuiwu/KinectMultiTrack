@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Net;
 using System.Net.Sockets;
+using Microsoft.Kinect;
 
 namespace Tiny
 {
@@ -15,10 +16,14 @@ namespace Tiny
         private TcpListener tcpListener;
         private Thread listenThread;
 
+        private List<IPEndPoint> connectedClients;
+
         public KinectServer(int port)
         {
             this.port = port;
             this.tcpListener = new TcpListener(IPAddress.Any, port);
+
+            this.connectedClients = new List<IPEndPoint>();
         }
 
         public void Start()
@@ -33,44 +38,53 @@ namespace Tiny
             this.tcpListener.Start();
             while (true)
             {
-                TcpClient server = this.tcpListener.AcceptTcpClient();
+                TcpClient client = this.tcpListener.AcceptTcpClient();
                 Thread serverThread = new Thread(new ParameterizedThreadStart(this.HandleKinectStream));
-                serverThread.Start(server);
+                serverThread.Start(client);
             }
         }
 
         private void HandleKinectStream(object obj)
         {
-            TcpClient server = (TcpClient)obj;
-            NetworkStream serverStream = server.GetStream();
+            TcpClient client = (TcpClient)obj;
+            IPEndPoint endPoint = (IPEndPoint)client.Client.RemoteEndPoint;
+            this.connectedClients.Add(endPoint);
+
+            NetworkStream clientStream = client.GetStream();
 
             while (true)
             {
                 try
                 {
-                    if (!server.Connected) break;
+                    if (!client.Connected) break;
 
-                    while (!serverStream.DataAvailable) ;
+                    while (!clientStream.DataAvailable) ;
 
-                    byte[] bytes = new byte[server.Available];
-                    serverStream.Read(bytes, 0, bytes.Length);
+                    byte[] bytes = new byte[client.Available];
+                    clientStream.Read(bytes, 0, bytes.Length);
                     string message = Encoding.ASCII.GetString(bytes, 0, bytes.Length);
-                    IPEndPoint endPoint = (IPEndPoint)server.Client.RemoteEndPoint;
                     Console.WriteLine("Kinect Server: Received " + message + " from: " + endPoint);
 
                     string okay = "Okay";
                     byte[] response = Encoding.ASCII.GetBytes(okay);
-                    serverStream.Write(response, 0, response.Length);
-                    serverStream.Flush();
+                    clientStream.Write(response, 0, response.Length);
+                    clientStream.Flush();
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine("Kinect Server: Exception when communicating with the client...");
                     Console.WriteLine(e.Message);
-                    serverStream.Close();
-                    server.Close();
+                    clientStream.Close();
+                    client.Close();
                 }
             }
+
+            this.connectedClients.Remove(endPoint);
+        }
+
+        private void ProcessKinectBody(Body body, int clientId)
+        {
+
         }
     }
 }

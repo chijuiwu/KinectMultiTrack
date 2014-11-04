@@ -1,13 +1,29 @@
 ﻿<Window x:Class="Tiny.KinectServerWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="KinectServerWindow" Height="350" Width="525">
-    <Grid>
-        <Viewbox HorizontalAlignment="Left" Height="231" Margin="29,33,0,0" VerticalAlignment="Top" Width="203"/>
-        <Label Content="ColorStream" HorizontalAlignment="Left" Margin="95,7,0,0" VerticalAlignment="Top"/>
-        <Viewbox HorizontalAlignment="Left" Height="231" Margin="279,33,0,0" VerticalAlignment="Top" Width="215"/>
-        <Label Content="SkeletonStream" HorizontalAlignment="Left" Margin="347,10,0,0" VerticalAlignment="Top"/>
+        Title="KinectServerWindow" Height="508" Width="762">
+    <Window.Resources>
+        <SolidColorBrush x:Key="MediumGreyBrush" Color="#ff6e6e6e" />
+        <SolidColorBrush x:Key="KinectPurpleBrush" Color="#ff52318f" />
+        <SolidColorBrush x:Key="KinectBlueBrush" Color="#ff00BCF2" />
+    </Window.Resources>
+    <Grid Margin="10 10 10 10">
 
+        <Viewbox x:Name="Client1ViewBox" HorizontalAlignment="Left" Height="262" Margin="10,90,0,0" VerticalAlignment="Top" Width="231">
+            <Image Source="{Binding Client1BodyStreamImageSource}" Stretch="UniformToFill" />
+        </Viewbox>
+        <Label Content="Client1 Body Stream" HorizontalAlignment="Left" Margin="65,13,0,0" VerticalAlignment="Top" FontSize="16" FontFamily="Microsoft Sans Serif"/>
+        <Label Content="Client2 Body Stream" HorizontalAlignment="Center" Margin="295,13,279,0" VerticalAlignment="Top" FontSize="16" FontFamily="Microsoft Sans Serif" Width="160"/>
+        <Label Content="Combined Body Stream" HorizontalAlignment="Center" Margin="534,13,20,0" VerticalAlignment="Top" FontSize="16" FontFamily="Microsoft Sans Serif" Width="180"/>
+        <Viewbox x:Name="Client2ViewBox" HorizontalAlignment="Left" Height="262" Margin="257,90,0,0" VerticalAlignment="Top" Width="231">
+            <Image Source="{Binding Client2BodyStreamImageSource}" Stretch="UniformToFill" />
+        </Viewbox>
+        <Viewbox x:Name="CombinedViewBox" HorizontalAlignment="Left" Height="262" Margin="503,90,0,0" VerticalAlignment="Top" Width="231">
+            <Image Source="{Binding CombinedBodyStreamImageSource}" Stretch="UniformToFill" />
+        </Viewbox>
 
+        <StatusBar Grid.Row="2" Name="KinectStatusBar" HorizontalAlignment="Center" VerticalAlignment="Bottom" Background="White" Foreground="{StaticResource MediumGreyBrush}">
+            <StatusBarItem Content="{Binding KinectStatusText}" />
+        </StatusBar>
     </Grid>
 </Window>

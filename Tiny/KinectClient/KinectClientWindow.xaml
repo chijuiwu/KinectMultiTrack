@@ -24,8 +24,8 @@
             <Image Source="{Binding BodyStreamImageSource}" Stretch="UniformToFill" />
         </Viewbox>
 
-        <StatusBar Grid.Row="2" Name="KinectStatusBar" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Background="White" Foreground="{StaticResource MediumGreyBrush}">
-            <StatusBarItem Content="{Binding KinectStatusText}" FontWeight="Bold" FontSize="16" FontFamily="Microsoft Sans Serif" />
+        <StatusBar Grid.Row="2" Name="KinectStatusBar" HorizontalAlignment="Center" VerticalAlignment="Bottom" Background="White" Foreground="{StaticResource MediumGreyBrush}">
+            <StatusBarItem Content="{Binding KinectStatusText}" />
         </StatusBar>
     </Grid>
 </Window>

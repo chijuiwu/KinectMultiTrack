@@ -67,17 +67,19 @@ namespace KinectClient
             }
         }
 
-        public void SendKinectBodyFrame(BodyFrame bodyFrame)
+        public void SendKinectBodyFrame(TimeSpan timeStamp, Body[] bodies)
         {
             if (!this.CanWriteToServer()) return;
 
-            Thread kinectStreamThread = new Thread(new ParameterizedThreadStart(this.SendKinectBodyFrameThread));
-            kinectStreamThread.Start((object)bodyFrame);
+            Thread kinectStreamThread = new Thread(usused => SendBodyFrameAsThread((object)timeStamp, (object)bodies));
+            kinectStreamThread.Start();
         }
 
-        private void SendKinectBodyFrameThread(object bodyFrame)
+        private void SendBodyFrameAsThread(object timeStamp, object bodies)
         {
-            Debug.Assert(bodyFrame.GetType() == typeof(BodyFrame));
+            Debug.Assert(timeStamp.GetType() == typeof(TimeSpan));
+            Debug.Assert(bodies.GetType)
+            //BodyFrame bodyFrameObject = (BodyFrame) object;
             if (!this.CanWriteToServer()) return;
 
             try
@@ -105,14 +107,15 @@ namespace KinectClient
         // Source: http://stackoverflow.com/questions/4865104/convert-any-object-to-a-bytes
         private byte[] ObjectToByteArray(Object obj)
         {
-            //if (obj == null) return null;
-            //BinaryFormatter bf = new BinaryFormatter();
-            //using(MemoryStream ms = new MemoryStream())
-            //{
-            //    bf.Serialize(ms, obj);
-            //    return ms.ToArray();
-            //}
-            return Encoding.ASCII.GetBytes("Kinect Body");
+            if (obj == null)
+                return null;
+            BinaryFormatter bf = new BinaryFormatter();
+            using (MemoryStream ms = new MemoryStream())
+            {
+                bf.Serialize(ms, obj);
+                return ms.ToArray();
+            }
+            //return Encoding.ASCII.GetBytes("Kinect Body");
         }
     }
 }

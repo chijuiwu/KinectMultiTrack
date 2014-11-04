@@ -50,10 +50,9 @@ namespace KinectClient
         {
             this.kinectSocket = new KinectSocket(localhost, kinectServerPort);
 
+            this.DataContext = this;
             this.KinectStatusText = Properties.Resources.KinectUninitialized;
-
             this.InitializeKinect();
-            this.InitializeDrawKinectStream();
 
             this.InitializeComponent();
         }
@@ -76,14 +75,16 @@ namespace KinectClient
             }
             set
             {
-                this.kinectStatusText = value;
-                if (this.PropertyChanged != null)
+                if (this.kinectStatusText != value)
                 {
-                    this.PropertyChanged(this, new PropertyChangedEventArgs("KinectStatusText"));
+                    this.kinectStatusText = value;
+                    if (this.PropertyChanged != null)
+                    {
+                        this.PropertyChanged(this, new PropertyChangedEventArgs("KinectStatusText"));
+                    }
                 }
             }
         }
-
 
         private void InitializeKinect()
         {
@@ -99,12 +100,16 @@ namespace KinectClient
 
             this.bodyFrameReader = this.kinectSensor.BodyFrameSource.OpenReader();
             this.bodies = new Body[this.kinectSensor.BodyFrameSource.BodyCount];
+
+            this.bodyDrawingGroup = new DrawingGroup();
+            this.bodyImageSource = new DrawingImage(this.bodyDrawingGroup);
+            this.bodyColor = new Pen(Brushes.Blue, 6);
         }
 
         private void kinectSensor_IsAvailableChanged(object sender, IsAvailableChangedEventArgs e)
         {
-            this.kinectStatusText = this.kinectSensor.IsAvailable ?
-                Properties.Resources.KinectRunning : Properties.Resources.KinectNotAvailable;
+            this.KinectStatusText = this.kinectSensor.IsAvailable ? Properties.Resources.KinectRunning
+                                                            : Properties.Resources.KinectNotAvailable;
         }
 
         private void KinectClientWindow_Loaded(object sender, RoutedEventArgs e)
@@ -130,14 +135,6 @@ namespace KinectClient
             }
         }
 
-        private void InitializeDrawKinectStream()
-        {
-            this.bodyDrawingGroup = new DrawingGroup();
-            this.bodyImageSource = new DrawingImage(this.bodyDrawingGroup);
-            this.bodyColor = new Pen(Brushes.Blue, 6);
-        }
-
-
         private void bodyFrameReader_FrameArrived(object sender, BodyFrameArrivedEventArgs e)
         {
             bool dataReceived = false;
@@ -149,7 +146,7 @@ namespace KinectClient
                     bodyFrame.GetAndRefreshBodyData(this.bodies);
                     dataReceived = true;
                     // Send Kinect body frame to the server for tracking
-                    this.kinectSocket.SendKinectBodyFrame(bodyFrame);
+                    this.kinectSocket.SendKinectBodyFrame(bodyFrame.RelativeTime, this.bodies);
                 }
             }
 
