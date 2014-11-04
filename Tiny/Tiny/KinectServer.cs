@@ -7,6 +7,8 @@ using System.Threading;
 using System.Net;
 using System.Net.Sockets;
 using Microsoft.Kinect;
+using BodyFrameSerializer = KinectSerializer.BodyFrameSerializer;
+using KinectSerializer;
 
 namespace Tiny
 {
@@ -39,8 +41,8 @@ namespace Tiny
             while (true)
             {
                 TcpClient client = this.tcpListener.AcceptTcpClient();
-                Thread serverThread = new Thread(new ParameterizedThreadStart(this.HandleKinectStream));
-                serverThread.Start(client);
+                Thread clientThread = new Thread(new ParameterizedThreadStart(this.HandleKinectStream));
+                clientThread.Start(client);
             }
         }
 
@@ -56,14 +58,25 @@ namespace Tiny
             {
                 try
                 {
-                    if (!client.Connected) break;
+                    if (!client.Connected)
+                        break;
 
                     while (!clientStream.DataAvailable) ;
 
                     byte[] bytes = new byte[client.Available];
                     clientStream.Read(bytes, 0, bytes.Length);
-                    string message = Encoding.ASCII.GetString(bytes, 0, bytes.Length);
-                    Console.WriteLine("Kinect Server: Received " + message + " from: " + endPoint);
+                    SerializableBodyFrame bodyFrame = BodyFrameSerializer.Deserialize(bytes);
+                    Console.WriteLine("time stamp: " + bodyFrame.TimeStamp);
+
+                    SerializableBody[] bodies = bodyFrame.Bodies;
+                    Console.WriteLine("bodies: " + bodies);
+                    //foreach (SerializableBody body in bodies)
+                    //{
+                    //    if (body.IsTracked)
+                    //    {
+                    //        Console.WriteLine("tracked body!!!! Id: " + body.TrackingId);
+                    //    }
+                    //}
 
                     string okay = "Okay";
                     byte[] response = Encoding.ASCII.GetBytes(okay);
@@ -74,6 +87,7 @@ namespace Tiny
                 {
                     Console.WriteLine("Kinect Server: Exception when communicating with the client...");
                     Console.WriteLine(e.Message);
+                    Console.WriteLine(e.StackTrace);
                     clientStream.Close();
                     client.Close();
                 }

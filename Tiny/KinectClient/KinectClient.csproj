@@ -98,6 +98,12 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\KinectSerializer\KinectSerializer.csproj">
+      <Project>{b5fef9e7-315a-456f-844f-1b483526b22f}</Project>
+      <Name>KinectSerializer</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

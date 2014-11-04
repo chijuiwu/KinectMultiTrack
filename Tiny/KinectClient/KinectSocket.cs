@@ -10,6 +10,7 @@ using System.Threading;
 using Microsoft.Kinect;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using BodyFrameSerializer = KinectSerializer.BodyFrameSerializer;
 
 namespace KinectClient
 {
@@ -20,7 +21,7 @@ namespace KinectClient
         private IPEndPoint endPoint;
 
         private TcpClient connectionToServer;
-        private NetworkStream clientStream;
+        private NetworkStream serverStream;
 
         public KinectSocket(string host, int port)
         {
@@ -32,22 +33,22 @@ namespace KinectClient
             {
                 this.connectionToServer = new TcpClient();
                 this.connectionToServer.Connect(this.endPoint);
-                this.clientStream = connectionToServer.GetStream();
+                this.serverStream = connectionToServer.GetStream();
             }
             catch (Exception e)
             {
                 Console.WriteLine("Kinect Client: Exception...");
                 Console.WriteLine(e.Message);
-                this.clientStream = null;
+                this.serverStream = null;
                 this.connectionToServer = null;
             }
         }
 
         public void CloseConnection()
         {
-            if (this.clientStream != null)
+            if (this.serverStream != null)
             {
-                this.clientStream.Close();
+                this.serverStream.Close();
             }
             if (this.connectionToServer != null)
             {
@@ -57,42 +58,47 @@ namespace KinectClient
 
         private bool CanWriteToServer()
         {
-            if (this.connectionToServer == null || this.clientStream == null)
+            if (this.connectionToServer == null || this.serverStream == null)
             {
                 return false;
             }
             else
             {
-                return connectionToServer.Connected && this.clientStream.CanWrite;
+                return connectionToServer.Connected && this.serverStream.CanWrite;
             }
         }
 
-        public void SendKinectBodyFrame(TimeSpan timeStamp, Body[] bodies)
+        public void SendKinectBodyFrame(TimeSpan timeSpan, Body[] bodies)
         {
             if (!this.CanWriteToServer()) return;
 
-            Thread kinectStreamThread = new Thread(usused => SendBodyFrameAsThread((object)timeStamp, (object)bodies));
+            Thread kinectStreamThread = new Thread(usused => SendBodyFrameAsThread((object)timeSpan, (object)bodies));
             kinectStreamThread.Start();
         }
 
-        private void SendBodyFrameAsThread(object timeStamp, object bodies)
+        private void SendBodyFrameAsThread(object timeSpan, object bodies)
         {
-            Debug.Assert(timeStamp.GetType() == typeof(TimeSpan));
-            Debug.Assert(bodies.GetType)
-            //BodyFrame bodyFrameObject = (BodyFrame) object;
+            Debug.Assert(timeSpan.GetType() == typeof(TimeSpan));
+            Debug.Assert(bodies.GetType() == typeof(Body[]));
+        
             if (!this.CanWriteToServer()) return;
+
+            BinaryFormatter bf = new BinaryFormatter();
+            TimeSpan timeSpanObject = (TimeSpan)timeSpan;
+            Body[] bodiesObject = (Body[])bodies;
 
             try
             {
-                Console.WriteLine("Kinect Client: Sending BodyFrame...");
-                byte[] bodyInBinary = this.ObjectToByteArray(bodyFrame);
-                this.clientStream.Write(bodyInBinary, 0, bodyInBinary.Length);
-                this.clientStream.Flush();
+                //Console.WriteLine("Kinect Client: Sending BodyFrame...");
+                byte[] bodyInBinary = BodyFrameSerializer.Serialize(timeSpanObject, bodiesObject);
+                Console.WriteLine("body bin length: " + bodyInBinary.Length);
+                this.serverStream.Write(bodyInBinary, 0, bodyInBinary.Length);
+                this.serverStream.Flush();
 
-                while (!clientStream.DataAvailable) ;
+                while (!serverStream.DataAvailable) ;
 
                 byte[] responseRaw = new byte[connectionToServer.Available];
-                this.clientStream.Read(responseRaw, 0, responseRaw.Length);
+                this.serverStream.Read(responseRaw, 0, responseRaw.Length);
                 string response = Encoding.ASCII.GetString(responseRaw, 0, responseRaw.Length);
                 Console.WriteLine("Kinect Client: Received " + response + " from: " + this.endPoint);
             }
