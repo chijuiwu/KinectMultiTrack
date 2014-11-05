@@ -89,9 +89,7 @@ namespace KinectClient
 
             try
             {
-                //Console.WriteLine("Kinect Client: Sending BodyFrame...");
                 byte[] bodyInBinary = BodyFrameSerializer.Serialize(timeSpanObject, bodiesObject);
-                Console.WriteLine("body bin length: " + bodyInBinary.Length);
                 this.serverStream.Write(bodyInBinary, 0, bodyInBinary.Length);
                 this.serverStream.Flush();
 

@@ -68,15 +68,13 @@ namespace Tiny
                     SerializableBodyFrame bodyFrame = BodyFrameSerializer.Deserialize(bytes);
                     Console.WriteLine("time stamp: " + bodyFrame.TimeStamp);
 
-                    SerializableBody[] bodies = bodyFrame.Bodies;
-                    Console.WriteLine("bodies: " + bodies);
-                    //foreach (SerializableBody body in bodies)
-                    //{
-                    //    if (body.IsTracked)
-                    //    {
-                    //        Console.WriteLine("tracked body!!!! Id: " + body.TrackingId);
-                    //    }
-                    //}
+                    SerializableBody[] serializedBodies = bodyFrame.Bodies;
+                    foreach (SerializableBody body in serializedBodies)
+                    {
+                        Console.WriteLine("body tracking id: " + body.TrackingId);
+                        Joint leftAnkle = body.AnkleLeft;
+                        //Console.WriteLine("left ankle: " + leftAnkle.Position.X + " " + leftAnkle.Position.Y + " " + leftAnkle.Position.Z);
+                    }
 
                     string okay = "Okay";
                     byte[] response = Encoding.ASCII.GetBytes(okay);
