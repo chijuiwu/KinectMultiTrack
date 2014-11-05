@@ -8,6 +8,7 @@ using System.Runtime.Serialization;
 using System.IO;
 using System.IO.Compression;
 using Microsoft.Kinect;
+using System.Net.Sockets;
 
 namespace KinectSerializer
 {
@@ -35,16 +36,12 @@ namespace KinectSerializer
             }
         }
 
-        public static SerializableBodyFrame Deserialize(byte[] data)
+        public static SerializableBodyFrame Deserialize(Stream stream)
         {
             BinaryFormatter bf = new BinaryFormatter();
             try
             {
-                using (MemoryStream ms = new MemoryStream(data))
-                {
-                    ms.Position = 0;
-                    return (SerializableBodyFrame)bf.Deserialize(ms);
-                }
+                return (SerializableBodyFrame)bf.Deserialize(stream);
             }
             catch (SerializationException e)
             {

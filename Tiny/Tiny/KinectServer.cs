@@ -9,6 +9,7 @@ using System.Net.Sockets;
 using Microsoft.Kinect;
 using BodyFrameSerializer = KinectSerializer.BodyFrameSerializer;
 using KinectSerializer;
+using System.IO;
 
 namespace Tiny
 {
@@ -61,11 +62,10 @@ namespace Tiny
                     if (!client.Connected)
                         break;
 
-                    while (!clientStream.DataAvailable) ;
+                    while (!clientStream.DataAvailable)
+                        ;
 
-                    byte[] bytes = new byte[client.Available];
-                    clientStream.Read(bytes, 0, bytes.Length);
-                    SerializableBodyFrame bodyFrame = BodyFrameSerializer.Deserialize(bytes);
+                    SerializableBodyFrame bodyFrame = BodyFrameSerializer.Deserialize(clientStream);
                     Console.WriteLine("time stamp: " + bodyFrame.TimeStamp);
 
                     SerializableBody[] serializedBodies = bodyFrame.Bodies;
@@ -73,7 +73,7 @@ namespace Tiny
                     {
                         Console.WriteLine("body tracking id: " + body.TrackingId);
                         Joint leftAnkle = body.AnkleLeft;
-                        //Console.WriteLine("left ankle: " + leftAnkle.Position.X + " " + leftAnkle.Position.Y + " " + leftAnkle.Position.Z);
+                        Console.WriteLine("left ankle: " + leftAnkle.Position.X + " " + leftAnkle.Position.Y + " " + leftAnkle.Position.Z);
                     }
 
                     string okay = "Okay";
