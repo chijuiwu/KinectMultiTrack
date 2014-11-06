@@ -56,7 +56,10 @@ namespace Tiny
             }
             else
             {
-                this.kinectViewer2.DisplayBodyFrame(bodyFrame);
+                this.Dispatcher.Invoke((Action)(() =>
+                {
+                    this.kinectViewer2.DisplayBodyFrame(bodyFrame);
+                }));
             }
         }
     }
