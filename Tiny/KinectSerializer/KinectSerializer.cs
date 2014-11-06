@@ -15,10 +15,10 @@ namespace KinectSerializer
     public class BodyFrameSerializer
     {
 
-        public static byte[] Serialize(TimeSpan timeSpan, Body[] bodies)
+        public static byte[] Serialize(TimeSpan timeSpan, Body[] bodies, int depthFrameWidth, int depthFrameHeight)
         {
             BinaryFormatter bf = new BinaryFormatter();
-            SerializableBodyFrame bodyFrame = new SerializableBodyFrame(timeSpan, bodies);
+            SerializableBodyFrame bodyFrame = new SerializableBodyFrame(timeSpan, bodies, depthFrameWidth, depthFrameHeight);
             try
             {
                 using (MemoryStream ms = new MemoryStream())

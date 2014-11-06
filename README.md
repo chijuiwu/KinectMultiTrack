@@ -8,14 +8,15 @@ The goals of this project are to develope and evaluate an algorithm which uses m
 ## Working on...
 
 * Literature review
-* Stream Kinect data via sockets
-* Display Kinect stream on the client and server
+* Kinect visualizer
 * Kinect calibration
 
 ## Completed...
 
 * DOER and Ethics (26th September, 2014)
 * Presentation (8th October, 2014)
+* Kinect BodyFrame Serializer
+* Kinect Client and Server Sockets
 
 ## Project Description
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,9 +8,8 @@ using System.Threading;
 using System.Net;
 using System.Net.Sockets;
 using Microsoft.Kinect;
-using BodyFrameSerializer = KinectSerializer.BodyFrameSerializer;
 using KinectSerializer;
-using System.IO;
+using BodyFrameSerializer = KinectSerializer.BodyFrameSerializer;
 
 namespace Tiny
 {
@@ -17,16 +17,19 @@ namespace Tiny
     {
         private int port;
         private TcpListener tcpListener;
+        private List<IPEndPoint> connectedClients;
         private Thread listenThread;
 
-        private List<IPEndPoint> connectedClients;
+        private KinectServerWindow kinectServerWindow;
 
         public KinectServer(int port)
         {
             this.port = port;
             this.tcpListener = new TcpListener(IPAddress.Any, port);
-
             this.connectedClients = new List<IPEndPoint>();
+
+            this.kinectServerWindow = new KinectServerWindow();
+            this.kinectServerWindow.Show();
         }
 
         public void Start()
@@ -52,6 +55,7 @@ namespace Tiny
             TcpClient client = (TcpClient)obj;
             IPEndPoint endPoint = (IPEndPoint)client.Client.RemoteEndPoint;
             this.connectedClients.Add(endPoint);
+            int clientId = this.connectedClients.IndexOf(endPoint);
 
             NetworkStream clientStream = client.GetStream();
 
@@ -66,18 +70,9 @@ namespace Tiny
                         ;
 
                     SerializableBodyFrame bodyFrame = BodyFrameSerializer.Deserialize(clientStream);
-                    Console.WriteLine("time stamp: " + bodyFrame.TimeStamp);
+                    this.kinectServerWindow.ProcessKinectBodyFrame(bodyFrame, clientId);
 
-                    SerializableBody[] serializedBodies = bodyFrame.Bodies;
-                    foreach (SerializableBody body in serializedBodies)
-                    {
-                        Console.WriteLine("body tracking id: " + body.TrackingId);
-                        Joint leftAnkle = body.AnkleLeft;
-                        Console.WriteLine("left ankle: " + leftAnkle.Position.X + " " + leftAnkle.Position.Y + " " + leftAnkle.Position.Z);
-                    }
-
-                    string okay = "Okay";
-                    byte[] response = Encoding.ASCII.GetBytes(okay);
+                    byte[] response = Encoding.ASCII.GetBytes(Properties.Resources.SERVER_RESPONSE_OKAY);
                     clientStream.Write(response, 0, response.Length);
                     clientStream.Flush();
                 }
@@ -91,12 +86,8 @@ namespace Tiny
                 }
             }
 
-            this.connectedClients.Remove(endPoint);
+            this.connectedClients.RemoveAt(clientId);
         }
-
-        private void ProcessKinectBody(Body body, int clientId)
-        {
-
-        }
+        
     }
 }

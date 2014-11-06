@@ -68,28 +68,32 @@ namespace KinectClient
             }
         }
 
-        public void SendKinectBodyFrame(TimeSpan timeSpan, Body[] bodies)
+        public void SendKinectBodyFrame(TimeSpan timeSpan, Body[] bodies, int depthFrameWidth, int depthFrameHeight)
         {
             if (!this.CanWriteToServer()) return;
 
-            Thread kinectStreamThread = new Thread(usused => SendBodyFrameAsThread((object)timeSpan, (object)bodies));
+            Thread kinectStreamThread = new Thread(usused => SendBodyFrameAsThread((object)timeSpan, (object)bodies, (object)depthFrameWidth, (object)depthFrameHeight));
             kinectStreamThread.Start();
         }
 
-        private void SendBodyFrameAsThread(object timeSpan, object bodies)
+        private void SendBodyFrameAsThread(object timeSpan, object bodies, object depthFrameWidth, object depthFrameHeight)
         {
             Debug.Assert(timeSpan.GetType() == typeof(TimeSpan));
             Debug.Assert(bodies.GetType() == typeof(Body[]));
+            Debug.Assert(depthFrameWidth.GetType() == typeof(int));
+            Debug.Assert(depthFrameHeight.GetType() == typeof(int));
         
             if (!this.CanWriteToServer()) return;
 
             BinaryFormatter bf = new BinaryFormatter();
             TimeSpan timeSpanObject = (TimeSpan)timeSpan;
             Body[] bodiesObject = (Body[])bodies;
+            int depthFrameWidthObject = (int)depthFrameWidth;
+            int depthFrameHeightObject = (int)depthFrameHeight;
 
             try
             {
-                byte[] bodyInBinary = BodyFrameSerializer.Serialize(timeSpanObject, bodiesObject);
+                byte[] bodyInBinary = BodyFrameSerializer.Serialize(timeSpanObject, bodiesObject, depthFrameWidthObject, depthFrameHeightObject);
                 Console.WriteLine("size: " + bodyInBinary.Length);
                 this.serverStream.Write(bodyInBinary, 0, bodyInBinary.Length);
                 this.serverStream.Flush();

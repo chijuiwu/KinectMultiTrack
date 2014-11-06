@@ -59,5 +59,14 @@ namespace Tiny.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Okay.
+        /// </summary>
+        internal static string SERVER_RESPONSE_OKAY {
+            get {
+                return ResourceManager.GetString("SERVER_RESPONSE_OKAY", resourceCulture);
+            }
+        }
     }
 }

@@ -12,22 +12,38 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using KinectSerializer;
 
 namespace Tiny
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class KinectServerWindow : Window
     {
-        private const int port = 12345;
-        private KinectServer server;
+        private KinectViewer kinectViewer1;
+        private KinectViewer kinectViewer2;
 
         public KinectServerWindow()
         {
-            InitializeComponent();
-            this.server = new KinectServer(KinectServerWindow.port);
-            this.server.Start();
+            this.kinectViewer1 = new KinectViewer();
+            this.kinectViewer1.Show();
+            this.kinectViewer2 = new KinectViewer();
+            this.kinectViewer2.Show();
+
+            this.InitializeComponent();
+        }
+
+        public void ProcessKinectBodyFrame(SerializableBodyFrame bodyFrame, int clientId)
+        {
+            Console.WriteLine("Time stamp: " + bodyFrame.TimeStamp);
+            Console.WriteLine("DepthFrame width: " + bodyFrame.DepthFrameWidth);
+            Console.WriteLine("DepthFrame height: " + bodyFrame.DepthFrameHeight);
+            SerializableBody[] bodies = bodyFrame.Bodies;
+            foreach (SerializableBody body in bodies)
+            {
+                if (body.IsTracked)
+                {
+                    Console.WriteLine("Tracked Body: " + body.TrackingId);
+                }
+            }
         }
     }
 }

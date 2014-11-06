@@ -13,5 +13,12 @@ namespace Tiny
     /// </summary>
     public partial class App : Application
     {
+        private const int port = 12345;
+        private KinectServer server;
+
+        public App() {
+            this.server = new KinectServer(App.port);
+            this.server.Start();
+        }
     }
 }

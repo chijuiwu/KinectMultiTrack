@@ -147,7 +147,7 @@ namespace KinectClient
                     dataReceived = true;
                     // Send Kinect body frame to the server for tracking
                     Console.WriteLine("Kinect Client: Sending BodyFrame...");
-                    this.kinectSocket.SendKinectBodyFrame(bodyFrame.RelativeTime, this.bodies);
+                    this.kinectSocket.SendKinectBodyFrame(bodyFrame.RelativeTime, this.bodies, this.displayWidth, this.displayHeight);
                 }
             }
 
