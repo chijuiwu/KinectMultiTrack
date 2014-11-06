@@ -13,36 +13,50 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using KinectSerializer;
+using Microsoft.Kinect;
 
 namespace Tiny
 {
     public partial class KinectServerWindow : Window
     {
-        private KinectViewer kinectViewer1;
-        private KinectViewer kinectViewer2;
+        private KinectBodyViewer kinectViewer1;
+        private KinectBodyViewer kinectViewer2;
 
         public KinectServerWindow()
         {
-            this.kinectViewer1 = new KinectViewer();
+            this.kinectViewer1 = new KinectBodyViewer();
             this.kinectViewer1.Show();
-            this.kinectViewer2 = new KinectViewer();
+            this.kinectViewer2 = new KinectBodyViewer();
             this.kinectViewer2.Show();
 
             this.InitializeComponent();
         }
 
-        public void ProcessKinectBodyFrame(SerializableBodyFrame bodyFrame, int clientId)
+        public void DisplayKinectBodyFrame(SerializableBodyFrame bodyFrame, int clientId)
         {
+            Console.WriteLine("Client id: " + clientId);
             Console.WriteLine("Time stamp: " + bodyFrame.TimeStamp);
-            Console.WriteLine("DepthFrame width: " + bodyFrame.DepthFrameWidth);
-            Console.WriteLine("DepthFrame height: " + bodyFrame.DepthFrameHeight);
             SerializableBody[] bodies = bodyFrame.Bodies;
             foreach (SerializableBody body in bodies)
             {
                 if (body.IsTracked)
                 {
-                    Console.WriteLine("Tracked Body: " + body.TrackingId);
+                    Console.WriteLine("Trackeding ID: " + body.TrackingId);
+                    Joint head = body.Joints[JointType.Head];
+                    Console.WriteLine("Head: " + head.Position.X + ", " + head.Position.Y + ", " + head.Position.Z);
                 }
+            }
+
+            if (clientId == 0)
+            {
+                this.Dispatcher.Invoke((Action)(() =>
+                {
+                    this.kinectViewer1.DisplayBodyFrame(bodyFrame);
+                }));
+            }
+            else
+            {
+                this.kinectViewer2.DisplayBodyFrame(bodyFrame);
             }
         }
     }

@@ -168,12 +168,20 @@ namespace KinectClient
                             foreach (JointType jointType in joints.Keys)
                             {
                                 CameraSpacePoint position = joints[jointType].Position;
+                                if (jointType.Equals(JointType.Head))
+                                {
+                                    Console.WriteLine("client x before conversion : " + position.X);
+                                }
                                 if (position.Z < 0)
                                 {
                                     position.Z = 0.1f;
                                 }
                                 DepthSpacePoint depthSpacePoint = this.coordinateMapper.MapCameraPointToDepthSpace(position);
                                 jointPoints[jointType] = new Point(depthSpacePoint.X, depthSpacePoint.Y);
+                                if (jointType.Equals(JointType.Head))
+                                {
+                                    Console.WriteLine("client x after conversion : " + jointPoints[jointType].X);
+                                }
                             }
                             this.DrawBody(joints, jointPoints, dc, this.bodyColor, this.inferredBonePen, this.trackedJointBrush, this.inferredJointBrush);
                         }

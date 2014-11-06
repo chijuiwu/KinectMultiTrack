@@ -70,7 +70,8 @@ namespace Tiny
                         ;
 
                     SerializableBodyFrame bodyFrame = BodyFrameSerializer.Deserialize(clientStream);
-                    this.kinectServerWindow.ProcessKinectBodyFrame(bodyFrame, clientId);
+                    // Show the Kinect Body stream from the client
+                    this.kinectServerWindow.DisplayKinectBodyFrame(bodyFrame, clientId);
 
                     byte[] response = Encoding.ASCII.GetBytes(Properties.Resources.SERVER_RESPONSE_OKAY);
                     clientStream.Write(response, 0, response.Length);

@@ -9,6 +9,7 @@ using System.IO;
 using System.IO.Compression;
 using Microsoft.Kinect;
 using System.Net.Sockets;
+using System.Collections.ObjectModel;
 
 namespace KinectSerializer
 {

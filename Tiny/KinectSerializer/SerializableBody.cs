@@ -8,6 +8,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization;
 using Microsoft.Kinect;
 using System.IO;
+using System.Collections.ObjectModel;
 
 namespace KinectSerializer
 {
@@ -42,6 +43,8 @@ namespace KinectSerializer
         public const string NameThumbRight = "ThumbRight";
         public const string NameWristLeft = "WristLeft";
         public const string NameWristRight = "WristRight";
+
+        public const string NameJointsDictionary = "JointsDict";
 
         #region Fields
 
@@ -184,6 +187,12 @@ namespace KinectSerializer
 
         #endregion
 
+        public Dictionary<JointType, Joint> Joints
+        {
+            get;
+            set;
+        }
+
         public SerializableBody(Body body)
         {
             this.IsTracked = body.IsTracked;
@@ -213,6 +222,33 @@ namespace KinectSerializer
             this.ThumbRight = body.Joints[JointType.ThumbRight];
             this.WristLeft = body.Joints[JointType.WristLeft];
             this.WristRight = body.Joints[JointType.WristRight];
+
+            this.Joints = new Dictionary<JointType, Joint>();
+            this.Joints.Add(JointType.AnkleLeft, body.Joints[JointType.AnkleLeft]);
+            this.Joints.Add(JointType.AnkleRight, body.Joints[JointType.AnkleRight]);
+            this.Joints.Add(JointType.ElbowLeft, body.Joints[JointType.ElbowLeft]);
+            this.Joints.Add(JointType.ElbowRight, body.Joints[JointType.ElbowRight]);
+            this.Joints.Add(JointType.FootLeft, body.Joints[JointType.FootLeft]);
+            this.Joints.Add(JointType.FootRight, body.Joints[JointType.FootRight]);
+            this.Joints.Add(JointType.HandLeft, body.Joints[JointType.HandLeft]);
+            this.Joints.Add(JointType.HandRight, body.Joints[JointType.HandRight]);
+            this.Joints.Add(JointType.HandTipLeft, body.Joints[JointType.HandTipLeft]);
+            this.Joints.Add(JointType.HandTipRight, body.Joints[JointType.HandTipRight]);
+            this.Joints.Add(JointType.Head, body.Joints[JointType.Head]);
+            this.Joints.Add(JointType.HipLeft, body.Joints[JointType.HipLeft]);
+            this.Joints.Add(JointType.HipRight, body.Joints[JointType.HipRight]);
+            this.Joints.Add(JointType.KneeLeft, body.Joints[JointType.KneeLeft]);
+            this.Joints.Add(JointType.KneeRight, body.Joints[JointType.KneeRight]);
+            this.Joints.Add(JointType.Neck, body.Joints[JointType.Neck]);
+            this.Joints.Add(JointType.ShoulderLeft, body.Joints[JointType.ShoulderLeft]);
+            this.Joints.Add(JointType.ShoulderRight, body.Joints[JointType.ShoulderRight]);
+            this.Joints.Add(JointType.SpineBase, body.Joints[JointType.SpineBase]);
+            this.Joints.Add(JointType.SpineMid, body.Joints[JointType.SpineMid]);
+            this.Joints.Add(JointType.SpineShoulder, body.Joints[JointType.SpineShoulder]);
+            this.Joints.Add(JointType.ThumbLeft, body.Joints[JointType.ThumbLeft]);
+            this.Joints.Add(JointType.ThumbRight, body.Joints[JointType.ThumbRight]);
+            this.Joints.Add(JointType.WristLeft, body.Joints[JointType.WristLeft]);
+            this.Joints.Add(JointType.WristRight, body.Joints[JointType.WristRight]);
         }
 
         protected SerializableBody(SerializationInfo info, StreamingContext ctx)
@@ -244,6 +280,8 @@ namespace KinectSerializer
             this.ThumbRight = (Joint)info.GetValue(SerializableBody.NameThumbRight, typeof(Joint));
             this.WristLeft = (Joint)info.GetValue(SerializableBody.NameWristLeft, typeof(Joint));
             this.WristRight = (Joint)info.GetValue(SerializableBody.NameWristRight, typeof(Joint));
+            this.WristRight = (Joint)info.GetValue(SerializableBody.NameWristRight, typeof(Joint));
+            this.Joints = (Dictionary<JointType, Joint>)info.GetValue(SerializableBody.NameJointsDictionary, typeof(Dictionary<JointType, Joint>));
         }
 
         [SecurityPermission(SecurityAction.Demand, SerializationFormatter = true)]
@@ -276,6 +314,7 @@ namespace KinectSerializer
             info.AddValue(SerializableBody.NameThumbRight, this.ThumbRight, typeof(Joint));
             info.AddValue(SerializableBody.NameWristLeft, this.WristLeft, typeof(Joint));
             info.AddValue(SerializableBody.NameWristRight, this.WristRight, typeof(Joint));
+            info.AddValue(SerializableBody.NameJointsDictionary, this.Joints, typeof(Dictionary<JointType, Joint>));
         }
     }
 }

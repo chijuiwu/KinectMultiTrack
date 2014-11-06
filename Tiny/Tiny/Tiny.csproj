@@ -63,19 +63,20 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="KinectBody.cs" />
     <Compile Include="KinectServer.cs" />
     <Compile Include="KinectServerWindow.xaml.cs">
       <DependentUpon>KinectServerWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="KinectViewer.xaml">
+    <Page Include="KinectBodyViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="KinectViewer.xaml.cs">
-      <DependentUpon>KinectViewer.xaml</DependentUpon>
+    <Compile Include="KinectBodyViewer.xaml.cs">
+      <DependentUpon>KinectBodyViewer.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
