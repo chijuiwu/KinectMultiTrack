@@ -11,6 +11,7 @@ using Microsoft.Kinect;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using BodyFrameSerializer = KinectSerializer.BodyFrameSerializer;
+using KinectSerializer;
 
 namespace KinectClient
 {
@@ -68,36 +69,33 @@ namespace KinectClient
             }
         }
 
-        public void SendKinectBodyFrame(TimeSpan timeSpan, Body[] bodies, int depthFrameWidth, int depthFrameHeight)
+        public void SendKinectBodyFrame(SerializableBodyFrame serializableBodyFrame)
         {
-            if (!this.CanWriteToServer()) return;
+            if (!this.CanWriteToServer())
+                return;
 
-            Thread kinectStreamThread = new Thread(usused => SendBodyFrameAsThread((object)timeSpan, (object)bodies, (object)depthFrameWidth, (object)depthFrameHeight));
+            Thread kinectStreamThread = new Thread(usused => SendBodyFrameAsThread((object)serializableBodyFrame));
             kinectStreamThread.Start();
         }
 
-        private void SendBodyFrameAsThread(object timeSpan, object bodies, object depthFrameWidth, object depthFrameHeight)
+        private void SendBodyFrameAsThread(object serializableBodyFrameObj)
         {
-            Debug.Assert(timeSpan.GetType() == typeof(TimeSpan));
-            Debug.Assert(bodies.GetType() == typeof(Body[]));
-            Debug.Assert(depthFrameWidth.GetType() == typeof(int));
-            Debug.Assert(depthFrameHeight.GetType() == typeof(int));
-        
-            if (!this.CanWriteToServer()) return;
+            Debug.Assert(serializableBodyFrameObj.GetType() == typeof(SerializableBodyFrame));
+
+            if (!this.CanWriteToServer())
+                return;
 
             BinaryFormatter bf = new BinaryFormatter();
-            TimeSpan timeSpanObject = (TimeSpan)timeSpan;
-            Body[] bodiesObject = (Body[])bodies;
-            int depthFrameWidthObject = (int)depthFrameWidth;
-            int depthFrameHeightObject = (int)depthFrameHeight;
+            SerializableBodyFrame serializableBodyFrame = (SerializableBodyFrame)serializableBodyFrameObj;
 
             try
             {
-                byte[] bodyInBinary = BodyFrameSerializer.Serialize(timeSpanObject, bodiesObject, depthFrameWidthObject, depthFrameHeightObject);
+                byte[] bodyInBinary = BodyFrameSerializer.Serialize(serializableBodyFrame);
                 this.serverStream.Write(bodyInBinary, 0, bodyInBinary.Length);
                 this.serverStream.Flush();
 
-                while (!serverStream.DataAvailable) ;
+                while (!serverStream.DataAvailable)
+                    ;
 
                 byte[] responseRaw = new byte[connectionToServer.Available];
                 this.serverStream.Read(responseRaw, 0, responseRaw.Length);

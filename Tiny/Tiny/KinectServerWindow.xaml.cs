@@ -36,15 +36,13 @@ namespace Tiny
         {
             Console.WriteLine("Client id: " + clientId);
             Console.WriteLine("Time stamp: " + bodyFrame.TimeStamp);
-            SerializableBody[] bodies = bodyFrame.Bodies;
+            List<SerializableBody> bodies = bodyFrame.Bodies;
             foreach (SerializableBody body in bodies)
             {
-                if (body.IsTracked)
-                {
-                    Console.WriteLine("Trackeding ID: " + body.TrackingId);
-                    Joint head = body.Joints[JointType.Head];
-                    Console.WriteLine("Head: " + head.Position.X + ", " + head.Position.Y + ", " + head.Position.Z);
-                }
+                Console.WriteLine("Trackeding ID: " + body.TrackingId);
+                SerializableJoint head = body.Joints[JointType.Head];
+                CameraSpacePoint headPosition = head.CameraSpacePoint;
+                Console.WriteLine("Head: " + headPosition.X + ", " + headPosition.Y + ", " + headPosition.Z);
             }
 
             if (clientId == 0)

@@ -15,31 +15,32 @@ namespace KinectSerializer
     public class SerializableBodyFrame : ISerializable
     {
         public const string NameTimeStamp = "TimeStamp";
-        public const string NameBodyArray = "Bodies";
+        public const string NameBodyList = "Bodies";
         public const string NameDepthFrameWidth = "DepthFrameWidth";
         public const string NameDepthFrameHeight = "DepthFrameHeight";
 
         private long timeStamp;
-        private SerializableBody[] bodies;
+        private List<SerializableBody> bodies;
         private int depthFrameWidth;
         private int depthFrameHeight;
 
-        public SerializableBodyFrame(TimeSpan timeSpan, Body[] bodies, int depthFrameWidth, int depthFrameHeight)
+        public SerializableBodyFrame(TimeSpan relativeTime, FrameDescription depthFrameDescription)
         {
-            this.timeStamp = timeSpan.Ticks;
-            this.bodies = new SerializableBody[bodies.Length];
-            for (int i = 0; i < bodies.Length; i++)
-            {
-                this.bodies[i] = new SerializableBody(bodies[i]);
-            }
-            this.depthFrameWidth = depthFrameWidth;
-            this.depthFrameHeight = depthFrameHeight;
+            this.timeStamp = relativeTime.Ticks;
+            this.bodies = new List<SerializableBody>();
+            this.depthFrameWidth = depthFrameDescription.Width;
+            this.depthFrameHeight = depthFrameDescription.Height;
+        }
+
+        public void addSerializableBody(SerializableBody body)
+        {
+            this.bodies.Add(body);
         }
 
         protected SerializableBodyFrame(SerializationInfo info, StreamingContext ctx)
         {
             this.timeStamp = (long)info.GetValue(SerializableBodyFrame.NameTimeStamp, typeof(long));
-            this.bodies = (SerializableBody[])info.GetValue(SerializableBodyFrame.NameBodyArray, typeof(SerializableBody[]));
+            this.bodies = (List<SerializableBody>)info.GetValue(SerializableBodyFrame.NameBodyList, typeof(List<SerializableBody>));
             this.depthFrameWidth = (int)info.GetValue(SerializableBodyFrame.NameDepthFrameWidth, typeof(int));
             this.depthFrameHeight = (int)info.GetValue(SerializableBodyFrame.NameDepthFrameHeight, typeof(int));
         }
@@ -48,7 +49,7 @@ namespace KinectSerializer
         public void GetObjectData(SerializationInfo info, StreamingContext ctx)
         {
             info.AddValue(SerializableBodyFrame.NameTimeStamp, this.timeStamp, typeof(long));
-            info.AddValue(SerializableBodyFrame.NameBodyArray, this.bodies, typeof(SerializableBody[]));
+            info.AddValue(SerializableBodyFrame.NameBodyList, this.bodies, typeof(List<SerializableBody>));
             info.AddValue(SerializableBodyFrame.NameDepthFrameWidth, this.depthFrameWidth, typeof(int));
             info.AddValue(SerializableBodyFrame.NameDepthFrameHeight, this.depthFrameHeight, typeof(int));
         }
@@ -61,7 +62,7 @@ namespace KinectSerializer
             }
         }
 
-        public SerializableBody[] Bodies
+        public List<SerializableBody> Bodies
         {
             get
             {

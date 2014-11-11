@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KinectClient", "KinectClien
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tiny", "Tiny\Tiny.csproj", "{B5E5572A-3AF3-4A84-A337-C12DDD899007}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KinectVisualizer", "KinectVisualizer\KinectVisualizer.csproj", "{A7AA4D92-16BA-40D2-A425-F30C0E25FB48}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KinectSerializer", "KinectSerializer\KinectSerializer.csproj", "{B5FEF9E7-315A-456F-844F-1B483526B22F}"
 EndProject
 Global
@@ -25,10 +23,6 @@ Global
 		{B5E5572A-3AF3-4A84-A337-C12DDD899007}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B5E5572A-3AF3-4A84-A337-C12DDD899007}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B5E5572A-3AF3-4A84-A337-C12DDD899007}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A7AA4D92-16BA-40D2-A425-F30C0E25FB48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A7AA4D92-16BA-40D2-A425-F30C0E25FB48}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A7AA4D92-16BA-40D2-A425-F30C0E25FB48}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A7AA4D92-16BA-40D2-A425-F30C0E25FB48}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B5FEF9E7-315A-456F-844F-1B483526B22F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B5FEF9E7-315A-456F-844F-1B483526B22F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B5FEF9E7-315A-456F-844F-1B483526B22F}.Release|Any CPU.ActiveCfg = Release|Any CPU
