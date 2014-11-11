@@ -179,10 +179,11 @@ namespace KinectClient
                                 TrackingState trackingState = joint.TrackingState;
                                 JointOrientation orientation = jointOrientations[jointType];
                                 CameraSpacePoint position = joint.Position;
+                                DepthSpacePoint depthSpacePoint = this.coordinateMapper.MapCameraPointToDepthSpace(position);
+                                if (position.Z < 0)
                                 {
                                     position.Z = 0.1f;
                                 }
-                                DepthSpacePoint depthSpacePoint = this.coordinateMapper.MapCameraPointToDepthSpace(position);
                                 jointPoints[jointType] = new Point(depthSpacePoint.X, depthSpacePoint.Y);
                                 // serializing KinectJoint
                                 SerializableJoint serializableJoint = new SerializableJoint(trackingState, jointType, position, depthSpacePoint, orientation);
