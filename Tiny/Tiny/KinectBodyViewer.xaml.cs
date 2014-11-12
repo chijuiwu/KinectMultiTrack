@@ -124,5 +124,13 @@ namespace Tiny
 
             drawingContext.DrawLine(drawPen, jointPoints[jointType0], jointPoints[jointType1]);
         }
+
+        internal void UpdateBodyStreamDisplay(KinectServer server, SerializableBodyFrame bodyFrame)
+        {
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                this.DisplayBodyFrame(bodyFrame);
+            }));
+        }
     }
 }

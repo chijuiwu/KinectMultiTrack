@@ -16,6 +16,13 @@ namespace Tiny
     class KinectCamera
     {
         private IPEndPoint clientIP;
+        public IPEndPoint ClientIP
+        {
+            get
+            {
+                return this.clientIP;
+            }
+        }
         private KinectBodyViewer kinectBodyViwer;
         private SerializableBodyFrame currentBodyFrame;
         public SerializableBodyFrame CurrentBodyFrame

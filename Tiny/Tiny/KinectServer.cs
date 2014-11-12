@@ -18,20 +18,28 @@ namespace Tiny
     {
         private TcpListener tcpListener;
         private Thread listenForConnectionThread;
-        private ConcurrentBag<KinectCamera> connectedCameras;
+        private WorldCamera worldCamera;
         public event BodyStreamHandler BodyStreamUpdate;
-        public delegate void BodyStreamHandler(KinectServer server, IEnumerable<KinectCamera> cameras);
-        private CombinedBodyViewer combinedBodyViwer;
+        public delegate void BodyStreamHandler(KinectServer server, IEnumerable<SerializableBodyFrame> bodyFrames);
+        public event TrackingHandler TrackingAlgorithmUpdate;
+        public delegate void TrackingHandler(KinectServer server, SerializableBodyFrame bodyFrame);
+        private CombinedBodyViewer combinedBodyViewer;
+        private KinectBodyViewer trackingBodyViewer;
 
         public KinectServer(int port)
         {
             this.tcpListener = new TcpListener(IPAddress.Any, port);
             this.listenForConnectionThread = new Thread(new ThreadStart(this.ListenForKinectStream));
-            this.connectedCameras = new ConcurrentBag<KinectCamera>();
+            this.worldCamera = new WorldCamera();
 
-            this.combinedBodyViwer = new CombinedBodyViewer();
-            this.combinedBodyViwer.Show();
-            this.BodyStreamUpdate += this.combinedBodyViwer.UpdateBodyStreamDisplay;
+            this.combinedBodyViewer = new CombinedBodyViewer();
+            this.combinedBodyViewer.Show();
+            this.BodyStreamUpdate += this.combinedBodyViewer.UpdateBodyStreamDisplay;
+
+            this.trackingBodyViewer = new KinectBodyViewer();
+            this.trackingBodyViewer.Show();
+            this.trackingBodyViewer.Label.Content = "Tracking Algorithm";
+            this.TrackingAlgorithmUpdate += this.trackingBodyViewer.UpdateBodyStreamDisplay;
         }
 
         public void Start()
@@ -58,7 +66,7 @@ namespace Tiny
             NetworkStream clientStream = client.GetStream();
 
             KinectCamera clientCamera = new KinectCamera(clientIP);
-            this.connectedCameras.Add(clientCamera);
+            this.worldCamera.AddOrUpdateClientCamera(clientCamera);
 
             while (true)
             {
@@ -70,7 +78,9 @@ namespace Tiny
 
                     SerializableBodyFrame bodyFrame = BodyFrameSerializer.Deserialize(clientStream);
                     clientCamera.updateBodyFrame(bodyFrame);
-                    this.BodyStreamUpdate(this, this.connectedCameras.ToList<KinectCamera>());
+                    this.worldCamera.SynchronizeFrames();
+                    this.BodyStreamUpdate(this, this.worldCamera.ClientBodyFrames);
+                    this.TrackingAlgorithmUpdate(this, this.worldCamera.BodyFrame);
 
                     byte[] response = Encoding.ASCII.GetBytes(Properties.Resources.SERVER_RESPONSE_OKAY);
                     clientStream.Write(response, 0, response.Length);
@@ -86,7 +96,7 @@ namespace Tiny
                 }
             }
 
-            this.connectedCameras.TryTake(out clientCamera);
+            this.worldCamera.RemoveClientCamera(clientCamera);
         }
 
     }

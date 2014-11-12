@@ -15,7 +15,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Label Grid.Row="0" Content="Combined Body Stream" HorizontalAlignment="Center" VerticalAlignment="Top" RenderTransformOrigin="-0.079,0.5" Margin="0" FontWeight="Bold" FontSize="16" FontFamily="Microsoft Sans Serif"/>
+        <Label x:Name="Label" Grid.Row="0" Content="Combined Body Stream" HorizontalAlignment="Center" VerticalAlignment="Top" RenderTransformOrigin="-0.079,0.5" Margin="0" FontWeight="Bold" FontSize="16" FontFamily="Microsoft Sans Serif"/>
 
         <Viewbox Grid.Row="1" HorizontalAlignment="Center">
             <Image Source="{Binding BodyStreamImageSource}" Stretch="UniformToFill" />

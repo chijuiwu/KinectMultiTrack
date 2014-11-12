@@ -47,21 +47,12 @@ namespace Tiny
             }
         }
 
-        internal void UpdateBodyStreamDisplay(KinectServer server, IEnumerable<KinectCamera> cameras)
+        internal void UpdateBodyStreamDisplay(KinectServer server, IEnumerable<SerializableBodyFrame> bodyFrames)
         {
-            IEnumerable<SerializableBodyFrame> bodyFrames = this.GetBodyFramesEnumerator(cameras);
             this.Dispatcher.Invoke((Action)(() =>
             {
                 this.DisplayBodyFrames(bodyFrames);
             }));
-        }
-
-        private IEnumerable<SerializableBodyFrame> GetBodyFramesEnumerator(IEnumerable<KinectCamera> cameras)
-        {
-            foreach (KinectCamera camera in cameras)
-            {
-                yield return camera.CurrentBodyFrame;
-            }
         }
 
         private void DisplayBodyFrames(IEnumerable<SerializableBodyFrame> bodyFrames)
