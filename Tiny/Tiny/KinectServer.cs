@@ -73,16 +73,16 @@ namespace Tiny
                 {
                     if (!client.Connected) break;
 
-                    //while (!clientStream.DataAvailable) ;
+                    while (!clientStream.DataAvailable) ;
 
                     SerializableBodyFrame bodyFrame = BodyFrameSerializer.Deserialize(clientStream);
-                    clientCamera.updateBodyFrame(bodyFrame);
-                    Thread visualUpdateThread = new Thread(new ThreadStart(this.StartVisualUpdateThread));
-                    visualUpdateThread.Start();
+                    //clientCamera.updateBodyFrame(bodyFrame);
+                    //Thread visualUpdateThread = new Thread(new ThreadStart(this.StartVisualUpdateThread));
+                    //visualUpdateThread.Start();
 
-                    //byte[] response = Encoding.ASCII.GetBytes(Properties.Resources.SERVER_RESPONSE_OKAY);
-                    //clientStream.Write(response, 0, response.Length);
-                    //clientStream.Flush();
+                    byte[] response = Encoding.ASCII.GetBytes(Properties.Resources.SERVER_RESPONSE_OKAY);
+                    clientStream.Write(response, 0, response.Length);
+                    clientStream.Flush();
                 }
                 catch (Exception e)
                 {

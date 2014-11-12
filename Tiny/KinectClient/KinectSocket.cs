@@ -17,8 +17,6 @@ namespace KinectClient
 {
     class KinectSocket
     {
-        private string host;
-        private int port;
         private IPEndPoint endPoint;
 
         private TcpClient connectionToServer;
@@ -26,20 +24,19 @@ namespace KinectClient
 
         public KinectSocket(string host, int port)
         {
-            this.host = host;
-            this.port = port;
-            this.endPoint = new IPEndPoint(IPAddress.Parse(this.host), this.port);
+            this.endPoint = new IPEndPoint(IPAddress.Parse(host), port);
 
             try
             {
                 this.connectionToServer = new TcpClient();
                 this.connectionToServer.Connect(this.endPoint);
-                this.serverStream = connectionToServer.GetStream();
+                this.serverStream = this.connectionToServer.GetStream();
             }
             catch (Exception e)
             {
-                Debug.WriteLine("Kinect Client: Exception...");
+                Debug.WriteLine("Kinect Client: Exception when connecting");
                 Debug.WriteLine(e.Message);
+                Debug.WriteLine(e.StackTrace);
                 this.serverStream = null;
                 this.connectionToServer = null;
             }
@@ -91,15 +88,18 @@ namespace KinectClient
                 this.serverStream.Write(bodyInBinary, 0, bodyInBinary.Length);
                 this.serverStream.Flush();
 
-                //byte[] responseRaw = new byte[1024];
-                //this.serverStream.Read(responseRaw, 0, responseRaw.Length);
-                //string response = Encoding.ASCII.GetString(responseRaw, 0, responseRaw.Length);
-                //Debug.WriteLine("Kinect Client: Received " + response + " from: " + this.endPoint);
+                while (!serverStream.DataAvailable) ;
+
+                byte[] responseRaw = new byte[1024];
+                this.serverStream.Read(responseRaw, 0, responseRaw.Length);
+                string response = Encoding.ASCII.GetString(responseRaw, 0, responseRaw.Length);
+                Debug.WriteLine("Kinect Client: Received " + response + " from: " + this.endPoint);
             }
             catch (Exception e)
             {
-                Debug.WriteLine("Kinect Client: Exception when communicating with the server...");
+                Debug.WriteLine("Kinect Client: Exception when transmitting data");
                 Debug.WriteLine(e.Message);
+                Debug.WriteLine(e.StackTrace);
             }
         }
 
