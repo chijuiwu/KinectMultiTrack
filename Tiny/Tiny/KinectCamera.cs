@@ -35,13 +35,13 @@ namespace Tiny
         // not sure
         private ConcurrentQueue<SerializableBodyFrame> bodyFramesQueue;
 
-        public KinectCamera(IPEndPoint clientIP)
+        public KinectCamera(IPEndPoint clientIP, SerializableBodyFrame currentBodyFrame)
         {
             this.clientIP = clientIP;
-            Thread bodyViewerThread = new Thread(new ThreadStart(StartKinectBodyViewerThread));
+            Thread bodyViewerThread = new Thread(new ThreadStart(this.StartKinectBodyViewerThread));
             bodyViewerThread.SetApartmentState(ApartmentState.STA);
             bodyViewerThread.Start();
-            this.currentBodyFrame = null;
+            this.currentBodyFrame = currentBodyFrame;
             this.bodyFramesQueue = new ConcurrentQueue<SerializableBodyFrame>();
         }
 
@@ -52,7 +52,7 @@ namespace Tiny
             Dispatcher.Run();
         }
 
-        public void updateBodyFrame(SerializableBodyFrame bodyFrame)
+        public void UpdateBodyFrame(SerializableBodyFrame bodyFrame)
         {
             this.currentBodyFrame = bodyFrame;
             //this.bodyFramesQueue.Enqueue(bodyFrame);

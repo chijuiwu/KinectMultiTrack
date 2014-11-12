@@ -72,16 +72,24 @@ namespace Tiny
             this.users = new ConcurrentDictionary<IPEndPoint, User>();
         }
 
-        public void AddOrUpdateClientCamera(KinectCamera clientCamera)
+        public void AddOrUpdateClientCamera(IPEndPoint clientIP, SerializableBodyFrame bodyFrame)
         {
-            User user = new User(clientCamera);
-            this.users.AddOrUpdate(clientCamera.ClientIP, user, (key, oldValue) => user);
+            bool containsClientIP = this.users.ContainsKey(clientIP);
+            if (containsClientIP)
+            {
+                this.users[clientIP].ClientCamera.UpdateBodyFrame(bodyFrame);
+            }
+            else
+            {
+                User user = new User(new KinectCamera(clientIP, bodyFrame));
+                this.users[clientIP] = user;
+            }
         }
 
-        public void RemoveClientCamera(KinectCamera clientCamera)
+        public void RemoveClientCamera(IPEndPoint clientIP)
         {
             User result;
-            this.users.TryRemove(clientCamera.ClientIP, out result);
+            this.users.TryRemove(clientIP, out result);
         }
 
         public void SynchronizeFrames()

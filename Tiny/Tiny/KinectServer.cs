@@ -11,6 +11,7 @@ using System.Net.Sockets;
 using Microsoft.Kinect;
 using KinectSerializer;
 using System.Diagnostics;
+using System.Windows.Threading;
 
 namespace Tiny
 {
@@ -19,7 +20,7 @@ namespace Tiny
         private TcpListener tcpListener;
         private Thread listenForConnectionThread;
         private WorldCamera worldCamera;
-        public event BodyStreamHandler ClientBodyStreamUpdate;
+        public event BodyStreamHandler CombinedBodyStreamUpdate;
         public event BodyStreamHandler TrackingAlgorithmUpdate;
         public delegate void BodyStreamHandler(KinectServer server, IEnumerable<SerializableBodyFrame> bodyFrames);
         private CombinedBodyViewer combinedBodyViewer;
@@ -31,14 +32,22 @@ namespace Tiny
             this.listenForConnectionThread = new Thread(new ThreadStart(this.ListenForKinectStream));
             this.worldCamera = new WorldCamera();
 
+            Thread combinedBodyViewerThread = new Thread(new ThreadStart(this.StartCombinedBodyViewerThread));
+            combinedBodyViewerThread.SetApartmentState(ApartmentState.STA);
+            combinedBodyViewerThread.Start();
+
+            //this.trackingBodyViewer = new CombinedBodyViewer();
+            //this.trackingBodyViewer.Show();
+            //this.trackingBodyViewer.Label.Content = "Tracking Algorithm";
+            //this.TrackingAlgorithmUpdate += this.trackingBodyViewer.UpdateBodyStreamDisplay;
+        }
+
+        private void StartCombinedBodyViewerThread()
+        {
             this.combinedBodyViewer = new CombinedBodyViewer();
             this.combinedBodyViewer.Show();
-            this.ClientBodyStreamUpdate += this.combinedBodyViewer.UpdateBodyStreamDisplay;
-
-            this.trackingBodyViewer = new CombinedBodyViewer();
-            this.trackingBodyViewer.Show();
-            this.trackingBodyViewer.Label.Content = "Tracking Algorithm";
-            this.TrackingAlgorithmUpdate += this.trackingBodyViewer.UpdateBodyStreamDisplay;
+            this.CombinedBodyStreamUpdate += this.combinedBodyViewer.UpdateBodyStreamDisplay;
+            Dispatcher.Run();
         }
 
         public void Start()
@@ -64,9 +73,6 @@ namespace Tiny
             IPEndPoint clientIP = (IPEndPoint)client.Client.RemoteEndPoint;
             NetworkStream clientStream = client.GetStream();
 
-            KinectCamera clientCamera = new KinectCamera(clientIP);
-            this.worldCamera.AddOrUpdateClientCamera(clientCamera);
-
             while (true)
             {
                 try
@@ -76,9 +82,9 @@ namespace Tiny
                     while (!clientStream.DataAvailable) ;
 
                     SerializableBodyFrame bodyFrame = BodyFrameSerializer.Deserialize(clientStream);
-                    //clientCamera.updateBodyFrame(bodyFrame);
-                    //Thread visualUpdateThread = new Thread(new ThreadStart(this.StartVisualUpdateThread));
-                    //visualUpdateThread.Start();
+                    this.worldCamera.AddOrUpdateClientCamera(clientIP, bodyFrame);
+                    Thread visualUpdateThread = new Thread(new ThreadStart(this.StartVisualUpdateThread));
+                    visualUpdateThread.Start();
 
                     byte[] response = Encoding.ASCII.GetBytes(Properties.Resources.SERVER_RESPONSE_OKAY);
                     clientStream.Write(response, 0, response.Length);
@@ -94,14 +100,20 @@ namespace Tiny
                 }
             }
 
-            this.worldCamera.RemoveClientCamera(clientCamera);
+            this.worldCamera.RemoveClientCamera(clientIP);
         }
 
         private void StartVisualUpdateThread()
         {
             this.worldCamera.SynchronizeFrames();
-            this.ClientBodyStreamUpdate(this, this.worldCamera.ClientBodyFrames);
-            this.TrackingAlgorithmUpdate(this, this.worldCamera.ProcessedBodyFrames);
+            IEnumerable<SerializableBodyFrame> clientBodyFrames = this.worldCamera.ClientBodyFrames;
+            Debug.WriteLine("client body frames count: " + clientBodyFrames.Count());
+            foreach (SerializableBodyFrame bodyFrame in clientBodyFrames)
+            {
+                Debug.WriteLine("bodies: " + bodyFrame.Bodies);
+            }
+            this.CombinedBodyStreamUpdate(this, this.worldCamera.ClientBodyFrames);
+            //this.TrackingAlgorithmUpdate(this, this.worldCamera.ProcessedBodyFrames);
         }
     }
 }

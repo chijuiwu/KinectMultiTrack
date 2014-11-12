@@ -18,7 +18,6 @@ namespace KinectClient
     class KinectSocket
     {
         private IPEndPoint endPoint;
-
         private TcpClient connectionToServer;
         private NetworkStream serverStream;
 
@@ -34,7 +33,7 @@ namespace KinectClient
             }
             catch (Exception e)
             {
-                Debug.WriteLine("Kinect Client: Exception when connecting");
+                Debug.WriteLine("Kinect Client: Exception when connecting to the server");
                 Debug.WriteLine(e.Message);
                 Debug.WriteLine(e.StackTrace);
                 this.serverStream = null;
@@ -101,21 +100,6 @@ namespace KinectClient
                 Debug.WriteLine(e.Message);
                 Debug.WriteLine(e.StackTrace);
             }
-        }
-
-        // Convert any object to byte[]
-        // Source: http://stackoverflow.com/questions/4865104/convert-any-object-to-a-bytes
-        private byte[] ObjectToByteArray(Object obj)
-        {
-            if (obj == null)
-                return null;
-            BinaryFormatter bf = new BinaryFormatter();
-            using (MemoryStream ms = new MemoryStream())
-            {
-                bf.Serialize(ms, obj);
-                return ms.ToArray();
-            }
-            //return Encoding.ASCII.GetBytes("Kinect Body");
         }
     }
 }
