@@ -19,8 +19,9 @@ namespace Tiny
         private TcpListener tcpListener;
         private Thread listenForConnectionThread;
         private ConcurrentBag<KinectCamera> connectedCameras;
-
-        private KinectServerWindow kinectServerWindow;
+        public event BodyStreamHandler BodyStreamUpdate;
+        public delegate void BodyStreamHandler(KinectServer server, IEnumerable<KinectCamera> cameras);
+        private CombinedBodyViewer combinedBodyViwer;
 
         public KinectServer(int port)
         {
@@ -28,8 +29,9 @@ namespace Tiny
             this.listenForConnectionThread = new Thread(new ThreadStart(this.ListenForKinectStream));
             this.connectedCameras = new ConcurrentBag<KinectCamera>();
 
-            this.kinectServerWindow = new KinectServerWindow();
-            this.kinectServerWindow.Show();
+            this.combinedBodyViwer = new CombinedBodyViewer();
+            this.combinedBodyViwer.Show();
+            this.BodyStreamUpdate += this.combinedBodyViwer.UpdateBodyStreamDisplay;
         }
 
         public void Start()
@@ -68,6 +70,7 @@ namespace Tiny
 
                     SerializableBodyFrame bodyFrame = BodyFrameSerializer.Deserialize(clientStream);
                     clientCamera.updateBodyFrame(bodyFrame);
+                    this.BodyStreamUpdate(this, this.connectedCameras.ToList<KinectCamera>());
 
                     byte[] response = Encoding.ASCII.GetBytes(Properties.Resources.SERVER_RESPONSE_OKAY);
                     clientStream.Write(response, 0, response.Length);

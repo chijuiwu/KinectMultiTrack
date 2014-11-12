@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using KinectSerializer;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using Microsoft.Kinect;
+using System.Windows.Threading;
 
 namespace Tiny
 {
@@ -15,15 +17,32 @@ namespace Tiny
     {
         private IPEndPoint clientIP;
         private KinectBodyViewer kinectBodyViwer;
+        private SerializableBodyFrame currentBodyFrame;
+        public SerializableBodyFrame CurrentBodyFrame
+        {
+            get
+            {
+                return this.currentBodyFrame;
+            }
+        }
         // not sure
         private ConcurrentQueue<SerializableBodyFrame> bodyFramesQueue;
 
         public KinectCamera(IPEndPoint clientIP)
         {
             this.clientIP = clientIP;
+            Thread bodyViewerThread = new Thread(new ThreadStart(StartKinectBodyViewerThread));
+            bodyViewerThread.SetApartmentState(ApartmentState.STA);
+            bodyViewerThread.Start();
+            this.currentBodyFrame = null;
+            this.bodyFramesQueue = new ConcurrentQueue<SerializableBodyFrame>();
+        }
+
+        private void StartKinectBodyViewerThread()
+        {
             this.kinectBodyViwer = new KinectBodyViewer();
             this.kinectBodyViwer.Show();
-            this.bodyFramesQueue = new ConcurrentQueue<SerializableBodyFrame>();
+            Dispatcher.Run();
         }
 
         public void updateBodyFrame(SerializableBodyFrame bodyFrame)
@@ -45,6 +64,7 @@ namespace Tiny
             {
                 this.kinectBodyViwer.DisplayBodyFrame(bodyFrame);
             }));
+            this.currentBodyFrame = bodyFrame;
         }
     }
 }

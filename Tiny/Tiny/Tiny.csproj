@@ -55,7 +55,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="KinectServerWindow.xaml">
+    <Page Include="CombinedBodyViewer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -66,8 +66,8 @@
     <Compile Include="KinectBody.cs" />
     <Compile Include="KinectCamera.cs" />
     <Compile Include="KinectServer.cs" />
-    <Compile Include="KinectServerWindow.xaml.cs">
-      <DependentUpon>KinectServerWindow.xaml</DependentUpon>
+    <Compile Include="CombinedBodyViewer.xaml.cs">
+      <DependentUpon>CombinedBodyViewer.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
     <Page Include="KinectBodyViewer.xaml">
