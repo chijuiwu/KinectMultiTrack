@@ -64,6 +64,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="KinectBody.cs" />
+    <Compile Include="KinectCamera.cs" />
     <Compile Include="KinectServer.cs" />
     <Compile Include="KinectServerWindow.xaml.cs">
       <DependentUpon>KinectServerWindow.xaml</DependentUpon>

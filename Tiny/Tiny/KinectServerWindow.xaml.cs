@@ -19,46 +19,10 @@ namespace Tiny
 {
     public partial class KinectServerWindow : Window
     {
-        private KinectBodyViewer kinectViewer1;
-        private KinectBodyViewer kinectViewer2;
 
         public KinectServerWindow()
         {
-            this.kinectViewer1 = new KinectBodyViewer();
-            this.kinectViewer1.Show();
-            this.kinectViewer2 = new KinectBodyViewer();
-            this.kinectViewer2.Show();
-
             this.InitializeComponent();
-        }
-
-        public void DisplayKinectBodyFrame(SerializableBodyFrame bodyFrame, int clientId)
-        {
-            Console.WriteLine("Client id: " + clientId);
-            Console.WriteLine("Time stamp: " + bodyFrame.TimeStamp);
-            List<SerializableBody> bodies = bodyFrame.Bodies;
-            foreach (SerializableBody body in bodies)
-            {
-                Console.WriteLine("Trackeding ID: " + body.TrackingId);
-                SerializableJoint head = body.Joints[JointType.Head];
-                CameraSpacePoint headPosition = head.CameraSpacePoint;
-                Console.WriteLine("Head: " + headPosition.X + ", " + headPosition.Y + ", " + headPosition.Z);
-            }
-
-            if (clientId == 0)
-            {
-                this.Dispatcher.Invoke((Action)(() =>
-                {
-                    this.kinectViewer1.DisplayBodyFrame(bodyFrame);
-                }));
-            }
-            else
-            {
-                this.Dispatcher.Invoke((Action)(() =>
-                {
-                    this.kinectViewer2.DisplayBodyFrame(bodyFrame);
-                }));
-            }
         }
     }
 }
