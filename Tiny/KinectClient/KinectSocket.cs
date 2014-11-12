@@ -38,8 +38,8 @@ namespace KinectClient
             }
             catch (Exception e)
             {
-                Console.WriteLine("Kinect Client: Exception...");
-                Console.WriteLine(e.Message);
+                Debug.WriteLine("Kinect Client: Exception...");
+                Debug.WriteLine(e.Message);
                 this.serverStream = null;
                 this.connectionToServer = null;
             }
@@ -71,8 +71,7 @@ namespace KinectClient
 
         public void SendKinectBodyFrame(SerializableBodyFrame serializableBodyFrame)
         {
-            if (!this.CanWriteToServer())
-                return;
+            if (!this.CanWriteToServer()) return;
 
             Thread kinectStreamThread = new Thread(usused => SendBodyFrameAsThread((object)serializableBodyFrame));
             kinectStreamThread.Start();
@@ -82,10 +81,8 @@ namespace KinectClient
         {
             Debug.Assert(serializableBodyFrameObj.GetType() == typeof(SerializableBodyFrame));
 
-            if (!this.CanWriteToServer())
-                return;
+            if (!this.CanWriteToServer()) return;
 
-            BinaryFormatter bf = new BinaryFormatter();
             SerializableBodyFrame serializableBodyFrame = (SerializableBodyFrame)serializableBodyFrameObj;
 
             try
@@ -94,17 +91,15 @@ namespace KinectClient
                 this.serverStream.Write(bodyInBinary, 0, bodyInBinary.Length);
                 this.serverStream.Flush();
 
-                while (!serverStream.DataAvailable) ;
-
-                byte[] responseRaw = new byte[connectionToServer.Available];
+                byte[] responseRaw = new byte[1024];
                 this.serverStream.Read(responseRaw, 0, responseRaw.Length);
                 string response = Encoding.ASCII.GetString(responseRaw, 0, responseRaw.Length);
-                Console.WriteLine("Kinect Client: Received " + response + " from: " + this.endPoint);
+                Debug.WriteLine("Kinect Client: Received " + response + " from: " + this.endPoint);
             }
             catch (Exception e)
             {
-                Console.WriteLine("Kinect Client: Exception when communicating with the server...");
-                Console.WriteLine(e.Message);
+                Debug.WriteLine("Kinect Client: Exception when communicating with the server...");
+                Debug.WriteLine(e.Message);
             }
         }
 
