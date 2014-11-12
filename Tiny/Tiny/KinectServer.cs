@@ -21,10 +21,9 @@ namespace Tiny
         private WorldCamera worldCamera;
         public event BodyStreamHandler BodyStreamUpdate;
         public delegate void BodyStreamHandler(KinectServer server, IEnumerable<SerializableBodyFrame> bodyFrames);
-        public event TrackingHandler TrackingAlgorithmUpdate;
-        public delegate void TrackingHandler(KinectServer server, SerializableBodyFrame bodyFrame);
+        public event BodyStreamHandler TrackingAlgorithmUpdate;
         private CombinedBodyViewer combinedBodyViewer;
-        private KinectBodyViewer trackingBodyViewer;
+        private CombinedBodyViewer trackingBodyViewer;
 
         public KinectServer(int port)
         {
@@ -36,7 +35,7 @@ namespace Tiny
             this.combinedBodyViewer.Show();
             this.BodyStreamUpdate += this.combinedBodyViewer.UpdateBodyStreamDisplay;
 
-            this.trackingBodyViewer = new KinectBodyViewer();
+            this.trackingBodyViewer = new CombinedBodyViewer();
             this.trackingBodyViewer.Show();
             this.trackingBodyViewer.Label.Content = "Tracking Algorithm";
             this.TrackingAlgorithmUpdate += this.trackingBodyViewer.UpdateBodyStreamDisplay;
@@ -80,7 +79,7 @@ namespace Tiny
                     clientCamera.updateBodyFrame(bodyFrame);
                     this.worldCamera.SynchronizeFrames();
                     this.BodyStreamUpdate(this, this.worldCamera.ClientBodyFrames);
-                    this.TrackingAlgorithmUpdate(this, this.worldCamera.BodyFrame);
+                    this.TrackingAlgorithmUpdate(this, this.worldCamera.ClientBodyFrames);
 
                     byte[] response = Encoding.ASCII.GetBytes(Properties.Resources.SERVER_RESPONSE_OKAY);
                     clientStream.Write(response, 0, response.Length);
