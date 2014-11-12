@@ -76,10 +76,9 @@ namespace Tiny
                     while (!clientStream.DataAvailable) ;
 
                     SerializableBodyFrame bodyFrame = BodyFrameSerializer.Deserialize(clientStream);
-                    clientCamera.updateBodyFrame(bodyFrame);
-                    this.worldCamera.SynchronizeFrames();
-                    this.ClientBodyStreamUpdate(this, this.worldCamera.ClientBodyFrames);
-                    this.TrackingAlgorithmUpdate(this, this.worldCamera.ProcessedBodyFrames);
+                    //clientCamera.updateBodyFrame(bodyFrame);
+                    //Thread updateThread = new Thread(new ThreadStart(this.StartUpdateBodyFrameThread));
+                    //updateThread.Start();
 
                     byte[] response = Encoding.ASCII.GetBytes(Properties.Resources.SERVER_RESPONSE_OKAY);
                     clientStream.Write(response, 0, response.Length);
@@ -98,5 +97,11 @@ namespace Tiny
             this.worldCamera.RemoveClientCamera(clientCamera);
         }
 
+        private void StartUpdateBodyFrameThread()
+        {
+            //this.worldCamera.SynchronizeFrames();
+            this.ClientBodyStreamUpdate(this, this.worldCamera.ClientBodyFrames);
+            //this.TrackingAlgorithmUpdate(this, this.worldCamera.ProcessedBodyFrames);
+        }
     }
 }

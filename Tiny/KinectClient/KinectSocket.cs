@@ -94,8 +94,7 @@ namespace KinectClient
                 this.serverStream.Write(bodyInBinary, 0, bodyInBinary.Length);
                 this.serverStream.Flush();
 
-                while (!serverStream.DataAvailable)
-                    ;
+                while (!serverStream.DataAvailable) ;
 
                 byte[] responseRaw = new byte[connectionToServer.Available];
                 this.serverStream.Read(responseRaw, 0, responseRaw.Length);
