@@ -80,9 +80,9 @@ namespace Tiny
                     Thread visualUpdateThread = new Thread(new ThreadStart(this.StartVisualUpdateThread));
                     visualUpdateThread.Start();
 
-                    byte[] response = Encoding.ASCII.GetBytes(Properties.Resources.SERVER_RESPONSE_OKAY);
-                    clientStream.Write(response, 0, response.Length);
-                    clientStream.Flush();
+                    //byte[] response = Encoding.ASCII.GetBytes(Properties.Resources.SERVER_RESPONSE_OKAY);
+                    //clientStream.Write(response, 0, response.Length);
+                    //clientStream.Flush();
                 }
                 catch (Exception e)
                 {

@@ -91,10 +91,10 @@ namespace KinectClient
                 this.serverStream.Write(bodyInBinary, 0, bodyInBinary.Length);
                 this.serverStream.Flush();
 
-                byte[] responseRaw = new byte[1024];
-                this.serverStream.Read(responseRaw, 0, responseRaw.Length);
-                string response = Encoding.ASCII.GetString(responseRaw, 0, responseRaw.Length);
-                Debug.WriteLine("Kinect Client: Received " + response + " from: " + this.endPoint);
+                //byte[] responseRaw = new byte[1024];
+                //this.serverStream.Read(responseRaw, 0, responseRaw.Length);
+                //string response = Encoding.ASCII.GetString(responseRaw, 0, responseRaw.Length);
+                //Debug.WriteLine("Kinect Client: Received " + response + " from: " + this.endPoint);
             }
             catch (Exception e)
             {
