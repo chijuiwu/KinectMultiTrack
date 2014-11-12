@@ -54,6 +54,7 @@ namespace Tiny
 
         public void updateBodyFrame(SerializableBodyFrame bodyFrame)
         {
+            this.currentBodyFrame = bodyFrame;
             //this.bodyFramesQueue.Enqueue(bodyFrame);
             Debug.WriteLine("Client: " + this.clientIP);
             Debug.WriteLine("Time stamp: " + bodyFrame.TimeStamp);
@@ -71,7 +72,6 @@ namespace Tiny
             {
                 this.kinectBodyViwer.DisplayBodyFrame(bodyFrame);
             }));
-            this.currentBodyFrame = bodyFrame;
         }
     }
 }

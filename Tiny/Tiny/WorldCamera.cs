@@ -11,47 +11,85 @@ namespace Tiny
 {
     class WorldCamera
     {
-        private SerializableBodyFrame bodyFrame;
-        private ConcurrentDictionary<IPEndPoint, KinectCamera> connectedCameras;
-
-        public SerializableBodyFrame BodyFrame
+        public class User
         {
-            get
+            private KinectCamera clientCamera;
+            private SerializableBodyFrame worldBodyFrame;
+
+            public User(KinectCamera clientCamera)
             {
-                return this.connectedCameras.First(camera => true).Value.CurrentBodyFrame;
+                this.clientCamera = clientCamera;
+                this.worldBodyFrame = clientCamera.CurrentBodyFrame;
+            }
+
+            public KinectCamera ClientCamera
+            {
+                get
+                {
+                    return this.clientCamera;
+                }
+            }
+
+            public SerializableBodyFrame WorldBodyFrame
+            {
+                get
+                {
+                    return this.worldBodyFrame;
+                }
+                set
+                {
+                    this.worldBodyFrame = value;
+                }
             }
         }
+
+        private ConcurrentDictionary<IPEndPoint, User> users;
 
         public IEnumerable<SerializableBodyFrame> ClientBodyFrames
         {
             get
             {
-                foreach (KinectCamera camera in this.connectedCameras.Values)
+                foreach (User user in this.users.Values)
                 {
-                    yield return camera.CurrentBodyFrame;
+                    yield return user.ClientCamera.CurrentBodyFrame;
+                }
+            }
+        }
+
+        public IEnumerable<SerializableBodyFrame> ProcessedBodyFrames
+        {
+            get
+            {
+                foreach (User user in this.users.Values)
+                {
+                    yield return user.WorldBodyFrame;
                 }
             }
         }
 
         public WorldCamera()
         {
-            this.connectedCameras = new ConcurrentDictionary<IPEndPoint, KinectCamera>();
+            this.users = new ConcurrentDictionary<IPEndPoint, User>();
         }
 
         public void AddOrUpdateClientCamera(KinectCamera clientCamera)
         {
-            this.connectedCameras.AddOrUpdate(clientCamera.ClientIP, clientCamera, (key, oldValue) => clientCamera);
+            User user = new User(clientCamera);
+            this.users.AddOrUpdate(clientCamera.ClientIP, user, (key, oldValue) => user);
         }
 
         public void RemoveClientCamera(KinectCamera clientCamera)
         {
-            KinectCamera result;
-            this.connectedCameras.TryRemove(clientCamera.ClientIP, out result);
+            User result;
+            this.users.TryRemove(clientCamera.ClientIP, out result);
         }
 
         public void SynchronizeFrames()
         {
-            // TODO
+            foreach (User user in this.users.Values)
+            {
+                user.WorldBodyFrame = user.ClientCamera.CurrentBodyFrame;
+            }
         }
 
 
