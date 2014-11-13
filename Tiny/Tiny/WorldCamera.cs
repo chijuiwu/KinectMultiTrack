@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using KinectSerializer;
 using System.Collections.Concurrent;
 using System.Net;
+using System.Diagnostics;
 
 namespace Tiny
 {

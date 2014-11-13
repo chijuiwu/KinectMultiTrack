@@ -36,8 +36,7 @@ namespace KinectClient
                 Debug.WriteLine("Kinect Client: Exception when connecting to the server");
                 Debug.WriteLine(e.Message);
                 Debug.WriteLine(e.StackTrace);
-                this.serverStream = null;
-                this.connectionToServer = null;
+                this.CloseConnection();
             }
         }
 
@@ -46,6 +45,7 @@ namespace KinectClient
             if (this.serverStream != null)
             {
                 this.serverStream.Close();
+                this.serverStream.Dispose();
             }
             if (this.connectionToServer != null)
             {
@@ -89,7 +89,7 @@ namespace KinectClient
 
                 while (!serverStream.DataAvailable) ;
 
-                byte[] responseRaw = new byte[1024];
+                byte[] responseRaw = new byte[256];
                 this.serverStream.Read(responseRaw, 0, responseRaw.Length);
                 string response = Encoding.ASCII.GetString(responseRaw, 0, responseRaw.Length);
                 Debug.WriteLine("Kinect Client: Received " + response + " from: " + this.endPoint);

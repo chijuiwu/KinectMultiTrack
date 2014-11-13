@@ -73,6 +73,8 @@ namespace Tiny
             IPEndPoint clientIP = (IPEndPoint)client.Client.RemoteEndPoint;
             NetworkStream clientStream = client.GetStream();
 
+            Debug.WriteLine("Handling connection from: " + clientIP);
+
             while (true)
             {
                 try
@@ -87,6 +89,7 @@ namespace Tiny
                     visualUpdateThread.Start();
 
                     byte[] response = Encoding.ASCII.GetBytes(Properties.Resources.SERVER_RESPONSE_OKAY);
+                    Debug.WriteLine("response length: " + response.Length);
                     clientStream.Write(response, 0, response.Length);
                     clientStream.Flush();
                 }
@@ -100,6 +103,10 @@ namespace Tiny
                 }
             }
 
+            clientStream.Close();
+            clientStream.Dispose();
+            client.Close();
+
             this.worldCamera.RemoveClientCamera(clientIP);
         }
 
@@ -107,12 +114,7 @@ namespace Tiny
         {
             this.worldCamera.SynchronizeFrames();
             IEnumerable<SerializableBodyFrame> clientBodyFrames = this.worldCamera.ClientBodyFrames;
-            Debug.WriteLine("client body frames count: " + clientBodyFrames.Count());
-            foreach (SerializableBodyFrame bodyFrame in clientBodyFrames)
-            {
-                Debug.WriteLine("bodies: " + bodyFrame.Bodies);
-            }
-            this.CombinedBodyStreamUpdate(this, this.worldCamera.ClientBodyFrames);
+            //this.CombinedBodyStreamUpdate(this, this.worldCamera.ClientBodyFrames);
             //this.TrackingAlgorithmUpdate(this, this.worldCamera.ProcessedBodyFrames);
         }
     }

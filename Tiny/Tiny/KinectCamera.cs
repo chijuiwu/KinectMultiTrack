@@ -61,7 +61,7 @@ namespace Tiny
             List<SerializableBody> bodies = bodyFrame.Bodies;
             foreach (SerializableBody body in bodies)
             {
-                Debug.WriteLine("Trackeding ID: " + body.TrackingId);
+                Debug.WriteLine("Tracking ID: " + body.TrackingId);
                 SerializableJoint head = body.Joints[JointType.Head];
                 CameraSpacePoint headCameraPoint = head.CameraSpacePoint;
                 DepthSpacePoint headDepthPoint = head.DepthSpacePoint;
