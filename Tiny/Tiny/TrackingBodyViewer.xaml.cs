@@ -31,6 +31,7 @@ namespace Tiny
 
         public TrackingBodyViewer()
         {
+            this.DataContext = this;
             this.bodyDrawingGroup = new DrawingGroup();
             this.bodyImageSource = new DrawingImage(this.bodyDrawingGroup);
             this.bodyColors = new List<Pen>();
