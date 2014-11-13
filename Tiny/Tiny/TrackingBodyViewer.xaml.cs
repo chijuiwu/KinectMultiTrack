@@ -18,7 +18,7 @@ using System.Diagnostics;
 
 namespace Tiny
 {
-    public partial class CombinedBodyViewer : Window
+    public partial class TrackingBodyViewer : Window
     {
         private DrawingGroup bodyDrawingGroup;
         private DrawingImage bodyImageSource;
@@ -29,7 +29,7 @@ namespace Tiny
         private readonly Brush inferredJointBrush = Brushes.Yellow;
         private readonly Pen inferredBonePen = new Pen(Brushes.Gray, 1);
 
-        public CombinedBodyViewer()
+        public TrackingBodyViewer()
         {
             this.bodyDrawingGroup = new DrawingGroup();
             this.bodyImageSource = new DrawingImage(this.bodyDrawingGroup);
@@ -38,6 +38,7 @@ namespace Tiny
             this.bodyColors.Add(new Pen(Brushes.Orange, 6));
             this.InitializeComponent();
         }
+
         public ImageSource BodyStreamImageSource
         {
             get
@@ -139,3 +140,4 @@ namespace Tiny
         }
     }
 }
+
