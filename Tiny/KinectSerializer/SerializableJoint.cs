@@ -38,6 +38,19 @@ namespace KinectSerializer
             }
         }
 
+        private JointOrientation orientation;
+        public JointOrientation JointOrientation
+        {
+            get
+            {
+                return this.orientation;
+            }
+            set
+            {
+                this.orientation = value;
+            }
+        }
+
         private CameraSpacePoint cameraSpacePoint;
 
         public CameraSpacePoint CameraSpacePoint
@@ -45,6 +58,10 @@ namespace KinectSerializer
             get
             {
                 return this.cameraSpacePoint;
+            }
+            set
+            {
+                this.cameraSpacePoint = value;
             }
         }
 
@@ -56,24 +73,19 @@ namespace KinectSerializer
             {
                 return this.depthSpacePoint;
             }
-        }
-
-        private JointOrientation orientation;
-        public JointOrientation JointOrientation
-        {
-            get
+            set
             {
-                return this.orientation;
+                this.depthSpacePoint = value;
             }
         }
 
-        public SerializableJoint(TrackingState trackingState, JointType type, CameraSpacePoint cameraSpacePoint, DepthSpacePoint depthSpacePoint, JointOrientation orientation)
+        public SerializableJoint(TrackingState trackingState, JointType type, JointOrientation orientation, CameraSpacePoint cameraSpacePoint, DepthSpacePoint depthSpacePoint)
         {
             this.trackingState = trackingState;
             this.type = type;
+            this.orientation = orientation;
             this.cameraSpacePoint = cameraSpacePoint;
             this.depthSpacePoint = depthSpacePoint;
-            this.orientation = orientation;
         }
 
         protected SerializableJoint(SerializationInfo info, StreamingContext ctx)
@@ -93,6 +105,21 @@ namespace KinectSerializer
             info.AddValue(SerializableJoint.NameCamperaSpacePoint, this.cameraSpacePoint, typeof(CameraSpacePoint));
             info.AddValue(SerializableJoint.NameDepthSpacePoint, this.depthSpacePoint, typeof(DepthSpacePoint));
             info.AddValue(SerializableJoint.NameOrientation, this.orientation, typeof(JointOrientation));
+        }
+
+        internal static SerializableJoint Copy(SerializableJoint joint)
+        {
+            CameraSpacePoint jointCSPoint = joint.CameraSpacePoint;
+            CameraSpacePoint copyCSPoint = new CameraSpacePoint();
+            copyCSPoint.X = jointCSPoint.X;
+            copyCSPoint.Y = jointCSPoint.Y;
+            copyCSPoint.Z = jointCSPoint.Z;
+            DepthSpacePoint jointDSPoint = joint.DepthSpacePoint;
+            DepthSpacePoint copyDSPoint = new DepthSpacePoint();
+            copyDSPoint.X = jointDSPoint.X;
+            copyDSPoint.Y = jointDSPoint.Y;
+            SerializableJoint copy = new SerializableJoint(joint.TrackingState, joint.JointType, joint.JointOrientation, copyCSPoint, copyDSPoint);
+            return copy;
         }
     }
 }

@@ -75,5 +75,16 @@ namespace KinectSerializer
             info.AddValue(SerializableBody.NameTrackingId, this.TrackingId, typeof(ulong));
             info.AddValue(SerializableBody.NameJointsDictionary, this.jointsDict, typeof(Dictionary<JointType, SerializableJoint>));
         }
+
+        public static SerializableBody Copy(SerializableBody body)
+        {
+            SerializableBody copy = new SerializableBody(body.IsTracked, body.TrackingId);
+            Dictionary<JointType, SerializableJoint> jointsDict = body.Joints;
+            foreach (JointType jointType in jointsDict.Keys)
+            {
+                copy.updateJoint(jointType, SerializableJoint.Copy(jointsDict[jointType]));
+            }
+            return body;
+        }
     }
 }

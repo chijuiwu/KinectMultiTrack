@@ -37,6 +37,10 @@ namespace Tiny
             this.bodyColors = new List<Pen>();
             this.bodyColors.Add(new Pen(Brushes.Red, 6));
             this.bodyColors.Add(new Pen(Brushes.Orange, 6));
+            this.bodyColors.Add(new Pen(Brushes.Green, 6));
+            this.bodyColors.Add(new Pen(Brushes.Blue, 6));
+            this.bodyColors.Add(new Pen(Brushes.Indigo, 6));
+            this.bodyColors.Add(new Pen(Brushes.Violet, 6));
             this.InitializeComponent();
         }
 
@@ -85,6 +89,10 @@ namespace Tiny
                                 jointPoints[jointType] = new Point(depthSpacePoint.X, depthSpacePoint.Y);
                             }
                             this.DrawBody(joints, jointPoints, dc, drawPen, this.inferredBonePen, this.trackedJointBrush, this.inferredJointBrush);
+                            if (penIndex == this.bodyColors.Count())
+                            {
+                                penIndex = 0;
+                            }
                         }
                     }
                 }

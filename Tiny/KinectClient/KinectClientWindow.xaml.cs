@@ -186,7 +186,7 @@ namespace KinectClient
                                 }
                                 jointPoints[jointType] = new Point(depthSpacePoint.X, depthSpacePoint.Y);
                                 // serializing KinectJoint
-                                SerializableJoint serializableJoint = new SerializableJoint(trackingState, jointType, position, depthSpacePoint, orientation);
+                                SerializableJoint serializableJoint = new SerializableJoint(trackingState, jointType, orientation, position, depthSpacePoint);
                                 serializableBody.updateJoint(jointType, serializableJoint);
                             }
                             this.DrawBody(joints, jointPoints, dc, this.bodyColor, this.inferredBonePen, this.trackedJointBrush, this.inferredJointBrush);

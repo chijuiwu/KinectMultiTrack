@@ -20,16 +20,21 @@ namespace KinectSerializer
         public const string NameDepthFrameHeight = "DepthFrameHeight";
 
         private long timeStamp;
-        private List<SerializableBody> bodies;
         private int depthFrameWidth;
         private int depthFrameHeight;
+        private List<SerializableBody> bodies;
 
         public SerializableBodyFrame(TimeSpan relativeTime, FrameDescription depthFrameDescription)
+            : this(relativeTime.Ticks, depthFrameDescription.Width, depthFrameDescription.Height)
         {
-            this.timeStamp = relativeTime.Ticks;
+        }
+
+        public SerializableBodyFrame(long timeStamp, int depthFrameWidth, int depthFrameHeight)
+        {
+            this.timeStamp = timeStamp;
+            this.depthFrameWidth = depthFrameWidth;
+            this.depthFrameHeight = depthFrameHeight;
             this.bodies = new List<SerializableBody>();
-            this.depthFrameWidth = depthFrameDescription.Width;
-            this.depthFrameHeight = depthFrameDescription.Height;
         }
 
         public void addSerializableBody(SerializableBody body)
@@ -84,6 +89,16 @@ namespace KinectSerializer
             {
                 return this.depthFrameHeight;
             }
+        }
+
+        public static SerializableBodyFrame Copy(SerializableBodyFrame bodyFrame)
+        {
+            SerializableBodyFrame copy = new SerializableBodyFrame(bodyFrame.TimeStamp, bodyFrame.DepthFrameWidth, bodyFrame.DepthFrameHeight);
+            foreach (SerializableBody body in bodyFrame.Bodies)
+            {
+                copy.addSerializableBody(SerializableBody.Copy(body));
+            }
+            return copy;
         }
     }
 }

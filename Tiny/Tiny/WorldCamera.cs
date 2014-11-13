@@ -7,6 +7,7 @@ using KinectSerializer;
 using System.Collections.Concurrent;
 using System.Net;
 using System.Diagnostics;
+using Microsoft.Kinect;
 
 namespace Tiny
 {
@@ -101,7 +102,36 @@ namespace Tiny
         {
             foreach (User user in this.users.Values)
             {
-                user.WorldBodyFrame = user.ClientCamera.CurrentBodyFrame;
+                user.WorldBodyFrame = SerializableBodyFrame.Copy(user.ClientCamera.CurrentBodyFrame);
+            }
+            SerializableBodyFrame referenceBodyFrame = this.users.First().Value.WorldBodyFrame;
+            // Assumes only one body
+            SerializableBody referenceBody = referenceBodyFrame.Bodies.First();
+            Dictionary<JointType, SerializableJoint> referenceJoints = referenceBody.Joints;
+            SerializableJoint referenceHead = referenceJoints[JointType.Head];
+            CameraSpacePoint referenceHeadCS = referenceHead.CameraSpacePoint;
+            SerializableJoint referenceShoulderLeft = referenceJoints[JointType.ShoulderLeft];
+            CameraSpacePoint referenceShoulderLeftCS = referenceShoulderLeft.CameraSpacePoint;
+            SerializableJoint referenceShoulderRight = referenceJoints[JointType.ShoulderRight];
+            CameraSpacePoint referenceShoulderRightCS = referenceShoulderRight.CameraSpacePoint;
+            foreach (User user in this.users.Values)
+            {
+                // Translate the joint positions
+                if (!user.WorldBodyFrame.Equals(referenceBodyFrame))
+                {
+                    // Assumes only one body
+                    SerializableBody userBody = user.WorldBodyFrame.Bodies.First();
+                    Dictionary<JointType, SerializableJoint> userJoints = userBody.Joints;
+                    SerializableJoint userHead = userJoints[JointType.Head];
+                    CameraSpacePoint userHeadCS = userHead.CameraSpacePoint;
+                    SerializableJoint userShoulderLeft = userJoints[JointType.ShoulderLeft];
+                    CameraSpacePoint userShoulderLeftCS = userShoulderLeft.CameraSpacePoint;
+                    SerializableJoint userShoulderRight = userJoints[JointType.ShoulderRight];
+                    CameraSpacePoint userShoulderRightCS = userShoulderRight.CameraSpacePoint;
+                    float headPosDiffX = referenceHeadCS.X - userHeadCS.X;
+                    float headPosDiffY = referenceHeadCS.Y - userHeadCS.Y;
+                    float headPosDiffZ = referenceHeadCS.Z - userHeadCS.Z;
+                }
             }
         }
 
