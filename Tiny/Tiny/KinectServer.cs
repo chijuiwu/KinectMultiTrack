@@ -85,11 +85,10 @@ namespace Tiny
 
                     SerializableBodyFrame bodyFrame = BodyFrameSerializer.Deserialize(clientStream);
                     this.worldCamera.AddOrUpdateClientCamera(clientIP, bodyFrame);
-                    Thread visualUpdateThread = new Thread(new ThreadStart(this.StartVisualUpdateThread));
-                    visualUpdateThread.Start();
+                    Thread t = new Thread(new ThreadStart(this.StartVisualUpdateThread));
+                    t.Start();
 
                     byte[] response = Encoding.ASCII.GetBytes(Properties.Resources.SERVER_RESPONSE_OKAY);
-                    Debug.WriteLine("response length: " + response.Length);
                     clientStream.Write(response, 0, response.Length);
                     clientStream.Flush();
                 }
@@ -103,18 +102,27 @@ namespace Tiny
                 }
             }
 
+            this.worldCamera.RemoveClientCamera(clientIP);
             clientStream.Close();
             clientStream.Dispose();
             client.Close();
-
-            this.worldCamera.RemoveClientCamera(clientIP);
         }
 
         private void StartVisualUpdateThread()
         {
             this.worldCamera.SynchronizeFrames();
             IEnumerable<SerializableBodyFrame> clientBodyFrames = this.worldCamera.ClientBodyFrames;
-            //this.CombinedBodyStreamUpdate(this, this.worldCamera.ClientBodyFrames);
+            this.CombinedBodyStreamUpdate(this, clientBodyFrames);
+           
+            //try
+            //{
+            //    this.CombinedBodyStreamUpdate(this, clientBodyFrames);
+            //}
+            //catch (Exception e)
+            //{
+            //    Debug.WriteLine(e.Message);
+            //    Debug.WriteLine(e.StackTrace);
+            //}
             //this.TrackingAlgorithmUpdate(this, this.worldCamera.ProcessedBodyFrames);
         }
     }

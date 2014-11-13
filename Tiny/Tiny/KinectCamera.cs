@@ -73,5 +73,13 @@ namespace Tiny
                 this.kinectBodyViwer.DisplayBodyFrame(bodyFrame);
             }));
         }
+
+        public void Close()
+        {
+            this.kinectBodyViwer.Dispatcher.Invoke((Action)(() =>
+            {
+                this.kinectBodyViwer.Close();
+            }));
+        }
     }
 }

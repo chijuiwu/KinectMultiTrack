@@ -59,12 +59,9 @@ namespace Tiny
         private void DisplayBodyFrames(IEnumerable<SerializableBodyFrame> bodyFrames)
         {
             if (bodyFrames.Count() == 0) return;
-            Debug.WriteLine("count: " + bodyFrames.Count());
             using (DrawingContext dc = this.bodyDrawingGroup.Open())
             {
                 SerializableBodyFrame firstFrame = bodyFrames.First();
-                if (firstFrame == null) return;
-                Debug.WriteLine("first frame: " + firstFrame);
                 dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, firstFrame.DepthFrameWidth, firstFrame.DepthFrameHeight));
                 int penIndex = 0;
                 foreach (SerializableBodyFrame bodyFrame in bodyFrames)

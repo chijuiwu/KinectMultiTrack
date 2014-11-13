@@ -89,8 +89,12 @@ namespace Tiny
 
         public void RemoveClientCamera(IPEndPoint clientIP)
         {
-            User result;
-            this.users.TryRemove(clientIP, out result);
+            User user;
+            bool foundUser = this.users.TryRemove(clientIP, out user);
+            if (foundUser)
+            {
+                user.ClientCamera.Close();
+            }
         }
 
         public void SynchronizeFrames()
@@ -100,7 +104,6 @@ namespace Tiny
                 user.WorldBodyFrame = user.ClientCamera.CurrentBodyFrame;
             }
         }
-
 
     }
 }
