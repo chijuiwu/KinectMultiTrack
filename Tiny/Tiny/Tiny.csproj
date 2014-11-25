@@ -55,10 +55,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Exceptions\UntrackedJointException.cs" />
     <Compile Include="TrackingBodyViewer.xaml.cs">
       <DependentUpon>TrackingBodyViewer.xaml</DependentUpon>
     </Compile>
     <Compile Include="WorldCamera.cs" />
+    <Compile Include="WorldCoordinateSystem.cs" />
     <Page Include="CombinedBodyViewer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

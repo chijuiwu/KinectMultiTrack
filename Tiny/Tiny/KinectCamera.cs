@@ -61,12 +61,13 @@ namespace Tiny
             List<SerializableBody> bodies = bodyFrame.Bodies;
             foreach (SerializableBody body in bodies)
             {
-                Debug.WriteLine("Tracking ID: " + body.TrackingId);
-                SerializableJoint head = body.Joints[JointType.Head];
-                CameraSpacePoint headCameraPoint = head.CameraSpacePoint;
-                DepthSpacePoint headDepthPoint = head.DepthSpacePoint;
-                Debug.WriteLine("Head CameraPt: " + headCameraPoint.X + ", " + headCameraPoint.Y + ", " + headCameraPoint.Z);
-                Debug.WriteLine("Head DepthPt: " + headDepthPoint.X + ", " + headDepthPoint.Y);
+                //Debug.WriteLine("Tracking ID: " + body.TrackingId);
+                //SerializableJoint head = body.Joints[JointType.Head];
+                //CameraSpacePoint headCameraPoint = head.CameraSpacePoint;
+                //DepthSpacePoint headDepthPoint = head.DepthSpacePoint;
+                //Debug.WriteLine("Head CameraPt: " + headCameraPoint.X + ", " + headCameraPoint.Y + ", " + headCameraPoint.Z);
+                //Debug.WriteLine("Head DepthPt: " + headDepthPoint.X + ", " + headDepthPoint.Y);
+                Debug.WriteLine("Angle: " + WorldCoordinateSystem.GetInitialAngle(body));
             }
             this.kinectBodyViwer.Dispatcher.Invoke((Action)(() =>
             {
