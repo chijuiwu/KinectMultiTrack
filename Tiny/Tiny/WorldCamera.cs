@@ -13,59 +13,13 @@ namespace Tiny
 {
     class WorldCamera
     {
-        public class User
-        {
-            private KinectCamera clientCamera;
-            private SerializableBodyFrame worldBodyFrame;
-
-            public User(KinectCamera clientCamera)
-            {
-                this.clientCamera = clientCamera;
-                this.worldBodyFrame = clientCamera.CurrentBodyFrame;
-            }
-
-            public KinectCamera ClientCamera
-            {
-                get
-                {
-                    return this.clientCamera;
-                }
-            }
-
-            public SerializableBodyFrame WorldBodyFrame
-            {
-                get
-                {
-                    return this.worldBodyFrame;
-                }
-                set
-                {
-                    this.worldBodyFrame = value;
-                }
-            }
-        }
-
         private ConcurrentDictionary<IPEndPoint, User> users;
 
-        public IEnumerable<SerializableBodyFrame> ClientBodyFrames
+        public IEnumerable<KeyValuePair<IPEndPoint, User>> Users
         {
             get
             {
-                foreach (User user in this.users.Values)
-                {
-                    yield return user.ClientCamera.CurrentBodyFrame;
-                }
-            }
-        }
-
-        public IEnumerable<SerializableBodyFrame> ProcessedBodyFrames
-        {
-            get
-            {
-                foreach (User user in this.users.Values)
-                {
-                    yield return user.WorldBodyFrame;
-                }
+                return this.users.AsEnumerable<KeyValuePair<IPEndPoint, User>>();
             }
         }
 
@@ -74,27 +28,21 @@ namespace Tiny
             this.users = new ConcurrentDictionary<IPEndPoint, User>();
         }
 
-        public void AddOrUpdateClientCamera(IPEndPoint clientIP, SerializableBodyFrame bodyFrame)
+        public void AddOrUpdateClient(IPEndPoint clientIP, SerializableBodyFrame bodyFrame)
         {
-            bool containsClientIP = this.users.ContainsKey(clientIP);
-            if (containsClientIP)
+            if (!this.users.ContainsKey(clientIP))
             {
-                this.users[clientIP].ClientCamera.UpdateBodyFrame(bodyFrame);
+                this.users[clientIP] = new User();
             }
-            else
-            {
-                User user = new User(new KinectCamera(clientIP, bodyFrame));
-                this.users[clientIP] = user;
-            }
+            this.users[clientIP].IncomingBodyFrames.Enqueue(bodyFrame);
         }
 
-        public void RemoveClientCamera(IPEndPoint clientIP)
+        public void RemoveClient(IPEndPoint clientIP)
         {
             User user;
-            bool foundUser = this.users.TryRemove(clientIP, out user);
-            if (foundUser)
+            if (this.users.TryRemove(clientIP, out user))
             {
-                user.ClientCamera.Close();
+                user.CloseBodyViewer();
             }
         }
 
@@ -102,7 +50,7 @@ namespace Tiny
         {
             foreach (User user in this.users.Values)
             {
-                user.WorldBodyFrame = SerializableBodyFrame.Copy(user.ClientCamera.CurrentBodyFrame);
+                user.ProcessBodyFrame();
             }
             //if (this.users.Count() <= 1) return;
 

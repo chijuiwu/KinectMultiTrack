@@ -9,9 +9,20 @@ using Tiny.Exceptions;
 
 namespace Tiny
 {
-    class WorldCoordinateSystem
+    class WorldView
     {
-        
+
+        private Dictionary<ulong, WorldBody> bodyCoordinates;
+
+        public WorldView(SerializableBodyFrame bodyFrame)
+        {
+            this.bodyCoordinates = new Dictionary<ulong, WorldBody>();
+            foreach (SerializableBody body in bodyFrame.Bodies)
+            {
+                this.bodyCoordinates[body.TrackingId] = new WorldBody(body.Joints.AsEnumerable<KeyValuePair<JointType, SerializableJoint>>());
+            }
+        }
+
         // Get the initial angle between user and Kinect
         public static double GetInitialAngle(SerializableBody body)
         {

@@ -59,9 +59,11 @@
     <Compile Include="TrackingBodyViewer.xaml.cs">
       <DependentUpon>TrackingBodyViewer.xaml</DependentUpon>
     </Compile>
+    <Compile Include="User.cs" />
+    <Compile Include="WorldBody.cs" />
     <Compile Include="WorldCamera.cs" />
     <Compile Include="WorldCoordinate.cs" />
-    <Compile Include="WorldCoordinateSystem.cs" />
+    <Compile Include="WorldView.cs" />
     <Page Include="CombinedBodyViewer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -71,7 +73,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="KinectBody.cs" />
-    <Compile Include="KinectCamera.cs" />
     <Compile Include="KinectServer.cs" />
     <Compile Include="CombinedBodyViewer.xaml.cs">
       <DependentUpon>CombinedBodyViewer.xaml</DependentUpon>
