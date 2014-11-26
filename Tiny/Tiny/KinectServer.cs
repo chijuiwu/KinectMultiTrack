@@ -20,9 +20,10 @@ namespace Tiny
         private TcpListener tcpListener;
         private Thread listenForConnectionThread;
         private WorldCamera worldCamera;
-        public event BodyStreamHandler CombinedBodyStreamUpdate;
-        public event BodyStreamHandler TrackingAlgorithmUpdate;
-        public delegate void BodyStreamHandler(KinectServer server, IEnumerable<SerializableBodyFrame> bodyFrames);
+        public event KinectBodyStreamHandler CombinedBodyStreamUpdate;
+        public delegate void KinectBodyStreamHandler(KinectServer server, IEnumerable<SerializableBodyFrame> bodyFrames);
+        public event WorldBodyViewHandler TrackingAlgorithmUpdate;
+        public delegate void WorldBodyViewHandler(KinectServer server, IEnumerable<WorldView> bodyFrames);
         private CombinedBodyViewer combinedBodyViewer;
         private TrackingBodyViewer trackingBodyViewer;
 
@@ -53,7 +54,7 @@ namespace Tiny
         {
             this.trackingBodyViewer = new TrackingBodyViewer();
             this.trackingBodyViewer.Show();
-            this.TrackingAlgorithmUpdate += this.trackingBodyViewer.UpdateBodyStreamDisplay;
+            this.TrackingAlgorithmUpdate += this.trackingBodyViewer.UpdateTrackingDisplay;
             Dispatcher.Run();
         }
 
@@ -118,11 +119,10 @@ namespace Tiny
         private void StartVisualUpdateThread()
         {
             this.worldCamera.SynchronizeFrames();
-            Tuple<SerializableBodyFrame, WorldView> lastFrame = this.worldCamera
-            IEnumerable<SerializableBodyFrame> clientBodyFrames = this.worldCamera.ClientBodyFrames;
-            this.CombinedBodyStreamUpdate(this, clientBodyFrames);
-            IEnumerable<SerializableBodyFrame> processedBodyFrames = this.worldCamera.ProcessedBodyFrames;
-            this.TrackingAlgorithmUpdate(this, processedBodyFrames);
+            IEnumerable<SerializableBodyFrame> userLastKinectFrames = this.worldCamera.UserLastKinectFrames;
+            IEnumerable<WorldView> userLastWorldViews = this.worldCamera.UserLastWorldViews;
+            this.CombinedBodyStreamUpdate(this, userLastKinectFrames);
+            this.TrackingAlgorithmUpdate(this, userLastWorldViews);
         }
     }
 }

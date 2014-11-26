@@ -15,11 +15,36 @@ namespace Tiny
     {
         private ConcurrentDictionary<IPEndPoint, User> users;
 
-        public IEnumerable<KeyValuePair<IPEndPoint, User>> Users
+        public IEnumerable<Tuple<SerializableBodyFrame, WorldView>> UserLastCoordinates
         {
             get
             {
-                return this.users.AsEnumerable<KeyValuePair<IPEndPoint, User>>();
+                foreach(User user in users.Values)
+                {
+                    yield return user.LastFrame;
+                }
+            }
+        }
+
+        public IEnumerable<SerializableBodyFrame> UserLastKinectFrames
+        {
+            get
+            {
+                foreach(Tuple<SerializableBodyFrame, WorldView> lastFrame in this.UserLastCoordinates)
+                {
+                    yield return lastFrame.Item1;
+                }
+            }
+        }
+
+        public IEnumerable<WorldView> UserLastWorldViews
+        {
+            get
+            {
+                foreach (Tuple<SerializableBodyFrame, WorldView> lastFrame in this.UserLastCoordinates)
+                {
+                    yield return lastFrame.Item2;
+                }
             }
         }
 

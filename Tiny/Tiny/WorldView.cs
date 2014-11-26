@@ -11,15 +11,46 @@ namespace Tiny
 {
     class WorldView
     {
+        private int depthFrameWidth;
+        private int depthFrameHeight;
 
         private Dictionary<ulong, WorldBody> bodyCoordinates;
 
         public WorldView(SerializableBodyFrame bodyFrame)
         {
+            this.depthFrameWidth = bodyFrame.DepthFrameWidth;
+            this.depthFrameHeight = bodyFrame.DepthFrameHeight;
             this.bodyCoordinates = new Dictionary<ulong, WorldBody>();
             foreach (SerializableBody body in bodyFrame.Bodies)
             {
                 this.bodyCoordinates[body.TrackingId] = new WorldBody(body.Joints.AsEnumerable<KeyValuePair<JointType, SerializableJoint>>());
+            }
+        }
+
+        public int DepthFrameWidth
+        {
+            get
+            {
+                return this.depthFrameWidth;
+            }
+        }
+
+        public int DepthFrameHeight
+        {
+            get
+            {
+                return this.depthFrameHeight;
+            }
+        }
+
+        public IEnumerable<WorldBody> WorldBoides
+        {
+            get
+            {
+                foreach(WorldBody body in bodyCoordinates.Values)
+                {
+                    yield return body;
+                }
             }
         }
 

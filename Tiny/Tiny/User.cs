@@ -14,12 +14,10 @@ namespace Tiny
 {
     class User
     {
-        private IPEndPoint clientIP;
-
         // Unprocessed body frames, assume the frame order is perserved
         private ConcurrentQueue<SerializableBodyFrame> incomingBodyFrames;
 
-        private LinkedList<Tuple<SerializableBodyFrame, WorldView>> processedBodyFrames;
+        private ConcurrentStack<Tuple<SerializableBodyFrame, WorldView>> processedBodyFrames;
 
         private Thread bodyViewerThread;
         private KinectBodyViewer kinectBodyViwer;
@@ -27,8 +25,10 @@ namespace Tiny
         public User()
         {
             this.incomingBodyFrames = new ConcurrentQueue<SerializableBodyFrame>();
-            this.processedBodyFrames = new LinkedList<Tuple<SerializableBodyFrame, WorldView>>();
+            this.processedBodyFrames = new ConcurrentStack<Tuple<SerializableBodyFrame, WorldView>>();
             this.bodyViewerThread = new Thread(new ThreadStart(this.StartKinectBodyViewerThread));
+            this.bodyViewerThread.SetApartmentState(ApartmentState.STA);
+            this.bodyViewerThread.Start();
         }
 
         private void StartKinectBodyViewerThread()
@@ -36,11 +36,6 @@ namespace Tiny
             this.kinectBodyViwer = new KinectBodyViewer();
             this.kinectBodyViwer.Show();
             Dispatcher.Run();
-        }
-
-        public Tuple<SerializableBodyFrame, WorldView> GetLastFrame()
-        {
-            return this.processedBodyFrames.Last.Value;
         }
 
         public void ProcessBodyFrame()
@@ -52,11 +47,10 @@ namespace Tiny
             {
                 return;
             }
-            Debug.WriteLine("Client: " + this.clientIP);
             Debug.WriteLine("Time stamp: " + bodyFrame.TimeStamp);
 
             WorldView bodyFrameInWorldView = new WorldView(bodyFrame);
-            this.processedBodyFrames.AddLast(Tuple.Create(bodyFrame, bodyFrameInWorldView));
+            this.processedBodyFrames.Push(Tuple.Create(bodyFrame, bodyFrameInWorldView));
 
             this.kinectBodyViwer.Dispatcher.Invoke((Action)(() =>
             {
@@ -72,14 +66,6 @@ namespace Tiny
             }));
         }
 
-        public IPEndPoint ClientIP
-        {
-            get
-            {
-                return this.clientIP;
-            }
-        }
-
         public ConcurrentQueue<SerializableBodyFrame> IncomingBodyFrames
         {
             get
@@ -88,11 +74,19 @@ namespace Tiny
             }
         }
 
-        public LinkedList<Tuple<SerializableBodyFrame, WorldCoordinate>> ProcessedBodyFrames
+        public ConcurrentStack<Tuple<SerializableBodyFrame, WorldView>> ProcessedBodyFrames
         {
             get
             {
                 return this.processedBodyFrames;
+            }
+        }
+
+        public Tuple<SerializableBodyFrame, WorldView> LastFrame
+        {
+            get
+            {
+                return this.processedBodyFrames.First();
             }
         }
     }

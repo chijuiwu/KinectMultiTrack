@@ -11,27 +11,27 @@ namespace Tiny
     class WorldBody
     {
 
-        private Dictionary<JointType, WorldCoordinate> jointCoordinates;
+        private Dictionary<JointType, WorldCoordinate> joints;
 
-        public WorldBody(IEnumerable<KeyValuePair<JointType, SerializableJoint>> joints)
+        public WorldBody(IEnumerable<KeyValuePair<JointType, SerializableJoint>> kinectJoints)
         {
-            this.jointCoordinates = new Dictionary<JointType, WorldCoordinate>();
-            foreach(KeyValuePair<JointType, SerializableJoint> jointPair in joints)
+            this.joints = new Dictionary<JointType, WorldCoordinate>();
+            foreach(KeyValuePair<JointType, SerializableJoint> jointPair in kinectJoints)
             {
                 JointType jointType = jointPair.Key;
                 SerializableJoint joint = jointPair.Value;
                 CameraSpacePoint jointPosition = joint.CameraSpacePoint;
                 // TODO use the transformed points
                 WorldCoordinate worldCoordinate = new WorldCoordinate(jointPosition.X, jointPosition.Y, jointPosition.Z);
-                this.jointCoordinates[jointType] = worldCoordinate;
+                this.joints[jointType] = worldCoordinate;
             }
         }
 
-        public Dictionary<JointType, WorldCoordinate> JointWorldCoordinates
+        public Dictionary<JointType, WorldCoordinate> Joints
         {
             get
             {
-                return this.jointCoordinates;
+                return this.joints;
             }
         }
     }

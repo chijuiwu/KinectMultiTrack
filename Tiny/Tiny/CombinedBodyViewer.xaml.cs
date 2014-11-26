@@ -31,7 +31,7 @@ namespace Tiny
 
         public CombinedBodyViewer()
         {
-            this.InitializeComponent();
+            InitializeComponent();
             this.DataContext = this;
             this.bodyDrawingGroup = new DrawingGroup();
             this.bodyImageSource = new DrawingImage(this.bodyDrawingGroup);

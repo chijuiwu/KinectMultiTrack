@@ -52,99 +52,64 @@ namespace Tiny
             }
         }
 
-        internal void UpdateBodyStreamDisplay(KinectServer server, IEnumerable<SerializableBodyFrame> bodyFrames)
+        internal void UpdateTrackingDisplay(KinectServer server, IEnumerable<WorldView> worldViews)
         {
             this.Dispatcher.Invoke((Action)(() =>
             {
-                this.DisplayBodyFrames(bodyFrames);
+                this.DisplayBodyFrames(worldViews);
             }));
         }
 
-        private void DisplayBodyFrames(IEnumerable<SerializableBodyFrame> bodyFrames)
+        private void DisplayBodyFrames(IEnumerable<WorldView> worldViews)
         {
-            if (bodyFrames.Count() == 0) return;
+            if (worldViews.Count() == 0) return;
             using (DrawingContext dc = this.bodyDrawingGroup.Open())
             {
-                SerializableBodyFrame firstFrame = bodyFrames.First();
-                dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, firstFrame.DepthFrameWidth, firstFrame.DepthFrameHeight));
+                WorldView firstWorldView = worldViews.First();
+                dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, firstWorldView.DepthFrameWidth, firstWorldView.DepthFrameHeight));
                 int penIndex = 0;
-                foreach (SerializableBodyFrame bodyFrame in bodyFrames)
+                foreach (WorldView worldView in worldViews)
                 {
-                    foreach (SerializableBody body in bodyFrame.Bodies)
+                    foreach (WorldBody body in worldView.WorldBoides)
                     {
-                        if (body.IsTracked)
+                        Pen drawPen = this.bodyColors[penIndex++];
+                        Dictionary<JointType, WorldCoordinate> joints = body.Joints;
+                        Dictionary<JointType, Point> jointPoints = new Dictionary<JointType, Point>();
+                        foreach (JointType jointType in joints.Keys)
                         {
-                            Pen drawPen = this.bodyColors[penIndex++];
-                            Dictionary<JointType, SerializableJoint> joints = body.Joints;
-
-                            Dictionary<JointType, Point> jointPoints = new Dictionary<JointType, Point>();
-                            foreach (JointType jointType in joints.Keys)
-                            {
-                                CameraSpacePoint position = joints[jointType].CameraSpacePoint;
-                                if (position.Z < 0)
-                                {
-                                    position.Z = 0.1f;
-                                }
-                                DepthSpacePoint depthSpacePoint = joints[jointType].DepthSpacePoint;
-                                jointPoints[jointType] = new Point(depthSpacePoint.X, depthSpacePoint.Y);
-                            }
-                            this.DrawBody(joints, jointPoints, dc, drawPen, this.inferredBonePen, this.trackedJointBrush, this.inferredJointBrush);
-                            if (penIndex == this.bodyColors.Count())
-                            {
-                                penIndex = 0;
-                            }
+                            WorldCoordinate worldCoordinate = joints[jointType];
+                            jointPoints[jointType] = new Point(worldCoordinate.X, worldCoordinate.Y);
+                        }
+                        this.DrawBody(jointPoints, dc, drawPen, this.inferredBonePen, this.trackedJointBrush, this.inferredJointBrush);
+                        if (penIndex == this.bodyColors.Count())
+                        {
+                            penIndex = 0;
                         }
                     }
                 }
-                this.bodyDrawingGroup.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, firstFrame.DepthFrameWidth, firstFrame.DepthFrameHeight));
+                this.bodyDrawingGroup.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, firstWorldView.DepthFrameWidth, firstWorldView.DepthFrameHeight));
             }
         }
 
-        private void DrawBody(Dictionary<JointType, SerializableJoint> joints, IDictionary<JointType, Point> jointPoints, DrawingContext drawingContext, Pen bonePen, Pen inferredBonePen, Brush jointBrush, Brush inferredJointBrush)
+        private void DrawBody(IDictionary<JointType, Point> jointPoints, DrawingContext drawingContext, Pen bonePen, Pen inferredBonePen, Brush jointBrush, Brush inferredJointBrush)
         {
             // Draw the bones
             foreach (var bone in KinectBody.Bones)
             {
-                this.DrawBone(joints, jointPoints, bone.Item1, bone.Item2, drawingContext, bonePen, inferredBonePen);
+                this.DrawBone(jointPoints, bone.Item1, bone.Item2, drawingContext, bonePen, inferredBonePen);
             }
 
             // Draw the joints
-            foreach (JointType jointType in joints.Keys)
+            foreach (JointType jointType in jointPoints.Keys)
             {
-                Brush drawBrush = null;
-                TrackingState trackingState = joints[jointType].TrackingState;
-                if (trackingState == TrackingState.Tracked)
-                {
-                    drawBrush = jointBrush;
-                }
-                else if (trackingState == TrackingState.Inferred)
-                {
-                    drawBrush = inferredJointBrush;
-                }
-                if (drawBrush != null)
-                {
-                    drawingContext.DrawEllipse(drawBrush, null, jointPoints[jointType], JointThickness, JointThickness);
-                }
+                Brush drawBrush = jointBrush;
+                drawingContext.DrawEllipse(drawBrush, null, jointPoints[jointType], JointThickness, JointThickness);
             }
         }
 
-        private void DrawBone(Dictionary<JointType, SerializableJoint> joints, IDictionary<JointType, Point> jointPoints, JointType jointType0, JointType jointType1, DrawingContext drawingContext, Pen drawingPen, Pen inferredDrawingPen)
+        private void DrawBone(IDictionary<JointType, Point> jointPoints, JointType jointType0, JointType jointType1, DrawingContext drawingContext, Pen drawingPen, Pen inferredDrawingPen)
         {
-            SerializableJoint joint0 = joints[jointType0];
-            SerializableJoint joint1 = joints[jointType1];
-
-            if (joint0.TrackingState == TrackingState.NotTracked ||
-                joint1.TrackingState == TrackingState.NotTracked)
-            {
-                return;
-            }
-
-            Pen drawPen = inferredDrawingPen;
-            if ((joint0.TrackingState == TrackingState.Tracked) && (joint1.TrackingState == TrackingState.Tracked))
-            {
-                drawPen = drawingPen;
-            }
-
+            Pen drawPen = drawingPen;
             drawingContext.DrawLine(drawPen, jointPoints[jointType0], jointPoints[jointType1]);
         }
     }
