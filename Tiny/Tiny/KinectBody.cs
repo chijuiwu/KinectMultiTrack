@@ -9,6 +9,38 @@ namespace Tiny
 {
     class KinectBody
     {
+        // All joints
+        public static HashSet<JointType> Joints = new HashSet<JointType>()
+        {
+            JointType.AnkleLeft,
+            JointType.AnkleRight,
+            JointType.ElbowLeft,
+            JointType.ElbowRight,
+            JointType.FootLeft,
+            JointType.FootRight,
+            JointType.HandLeft,
+            JointType.HandRight,
+            JointType.HandTipLeft,
+            JointType.HandTipRight,
+            JointType.Head,
+            JointType.HipLeft,
+            JointType.HipRight,
+            JointType.KneeLeft,
+            JointType.KneeRight,
+            JointType.Neck,
+            JointType.ShoulderLeft,
+            JointType.ShoulderRight,
+            JointType.SpineBase,
+            JointType.SpineMid,
+            JointType.SpineShoulder,
+            JointType.ThumbLeft,
+            JointType.ThumbRight,
+            JointType.WristLeft,
+            JointType.WristRight
+        };
+
+
+        // All bones
         public static List<Tuple<JointType, JointType>> Bones = new List<Tuple<JointType, JointType>>() {
             // Toroso
             new Tuple<JointType, JointType>(JointType.Head, JointType.Neck),

@@ -20,11 +20,11 @@ namespace Tiny
 
             if (shoulderLeft.TrackingState.Equals(TrackingState.NotTracked))
             {
-                throw new UntrackedJointException("[Getting Initial Angle]: ShoulderLeft joint not tracked");
+                throw new UntrackedJointException("[Getting initial angle]: ShoulderLeft joint not tracked");
             }
             else if (shoulderRight.TrackingState.Equals(TrackingState.NotTracked))
             {
-                throw new UntrackedJointException("[Getting Initial Angle]: ShoulderRight joint not tracked");
+                throw new UntrackedJointException("[Getting initial angle]: ShoulderRight joint not tracked");
             }
 
             CameraSpacePoint shoulderLeftPos = shoulderLeft.CameraSpacePoint;
@@ -37,12 +37,70 @@ namespace Tiny
         }
 
         // Get the initial centre position of user's body
-        public CameraSpacePoint GetInitialCentrePosition(SerializableBody body)
+        // Each item in the array is a body at a particular frame in the initial data collection sequence
+        public static WorldCoordinate GetInitialCentrePosition(SerializableBody[] userInitialBodies)
         {
-            float sumOfXs = 0;
-            float sumOfYs = 0;
-            float sumOfZs = 0;
+            float totalAverageX = 0;
+            float totalAverageY = 0;
+            float totalAverageZ = 0;
+
+            foreach (SerializableBody body in userInitialBodies)
+            {
+                float sumOfXs = 0;
+                float sumOfYs = 0;
+                float sumOfZs = 0;
+
+                foreach(JointType jointType in KinectBody.Joints)
+                {
+                    if (!body.Joints.ContainsKey(jointType))
+                    {
+                        throw new UntrackedJointException("[Getting initial centre position]: " + jointType + " not unavialble");
+                    }
+                    SerializableJoint joint = body.Joints[jointType];
+                    if (joint.TrackingState.Equals(TrackingState.NotTracked))
+                    {
+                        throw new UntrackedJointException("[Getting initial centre position]: " + jointType + " not tracked");
+                    }
+                    sumOfXs += joint.CameraSpacePoint.X;
+                    sumOfYs += joint.CameraSpacePoint.Y;
+                    sumOfZs += joint.CameraSpacePoint.Z;
+                }
+
+                totalAverageX += sumOfXs / KinectBody.Joints.Count;
+                totalAverageY += sumOfYs / KinectBody.Joints.Count;
+                totalAverageZ += sumOfZs / KinectBody.Joints.Count;
+            }
+
+            float centreX = totalAverageX / userInitialBodies.Length;
+            float centreY = totalAverageY / userInitialBodies.Length;
+            float centreZ = totalAverageZ / userInitialBodies.Length;
+            return new WorldCoordinate(centreX, centreY, centreZ);
         }
 
+        // Joints transformed to the origin of the world coordinate system
+        public static Dictionary<JointType, WorldCoordinate> GetTransformedPoints(SerializableBody body, double initialAngle, WorldCoordinate centrePoint)
+        {
+            Dictionary<JointType, WorldCoordinate> transformedJointCoordinates = new Dictionary<JointType, WorldCoordinate>();
+
+            foreach(JointType jointType in body.Joints.Keys)
+            {
+                SerializableJoint joint = body.Joints[jointType];
+                CameraSpacePoint jointPosition = joint.CameraSpacePoint;
+
+                // Translation
+                float translatedX = jointPosition.X - centrePoint.X;
+                float translatedY = jointPosition.Y - centrePoint.Y;
+                float translatedZ = jointPosition.Z - centrePoint.Z;
+
+                // Rotation
+                float transformedX = (float) (translatedX * Math.Cos(initialAngle) + translatedZ * Math.Sin(initialAngle));
+                float transformedY = translatedY;
+                float transformedZ = (float) (translatedZ * Math.Cos(initialAngle) - translatedX * Math.Sin(initialAngle));
+
+                transformedJointCoordinates[jointType] = new WorldCoordinate(translatedX, translatedY, translatedZ);
+            }
+
+            return transformedJointCoordinates;
+        }
     }
 }

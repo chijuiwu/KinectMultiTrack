@@ -60,6 +60,7 @@
       <DependentUpon>TrackingBodyViewer.xaml</DependentUpon>
     </Compile>
     <Compile Include="WorldCamera.cs" />
+    <Compile Include="WorldCoordinate.cs" />
     <Compile Include="WorldCoordinateSystem.cs" />
     <Page Include="CombinedBodyViewer.xaml">
       <Generator>MSBuild:Compile</Generator>
