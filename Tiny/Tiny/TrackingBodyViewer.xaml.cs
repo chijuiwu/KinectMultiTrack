@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,8 +19,9 @@ using System.Diagnostics;
 
 namespace Tiny
 {
-    public partial class TrackingBodyViewer : Window
+    public partial class TrackingBodyViewer : Window, INotifyPropertyChanged
     {
+        private string trackingStatusText;
         private DrawingGroup bodyDrawingGroup;
         private DrawingImage bodyImageSource;
         private List<Pen> bodyColors;
@@ -31,8 +33,9 @@ namespace Tiny
 
         public TrackingBodyViewer()
         {
-            this.InitializeComponent();
+            InitializeComponent();
             this.DataContext = this;
+            this.TrackingStatusText = Properties.Resources.TRACKING_CALIBRATION;
             this.bodyDrawingGroup = new DrawingGroup();
             this.bodyImageSource = new DrawingImage(this.bodyDrawingGroup);
             this.bodyColors = new List<Pen>();
@@ -44,12 +47,39 @@ namespace Tiny
             this.bodyColors.Add(new Pen(Brushes.Violet, 6));
         }
 
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public ImageSource BodyStreamImageSource
         {
             get
             {
                 return this.bodyImageSource;
             }
+        }
+
+        public string TrackingStatusText
+        {
+            get
+            {
+                return this.trackingStatusText;
+            }
+            set
+            {
+                if (this.trackingStatusText != value)
+                {
+                    this.trackingStatusText = value;
+                    if (this.PropertyChanged != null)
+                    {
+                        this.PropertyChanged(this, new PropertyChangedEventArgs("TrackingStatusText"));
+                    }
+                }
+            }
+        }
+
+        public void setCalibrationComplete(bool completed)
+        {
+            this.TrackingStatusText = completed ? Properties.Resources.TRACKING_START
+                                                            : Properties.Resources.TRACKING_CALIBRATION;
         }
 
         internal void UpdateTrackingDisplay(KinectServer server, IEnumerable<WorldView> worldViews)

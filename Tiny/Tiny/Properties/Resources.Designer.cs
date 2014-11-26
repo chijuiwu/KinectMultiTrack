@@ -68,5 +68,23 @@ namespace Tiny.Properties {
                 return ResourceManager.GetString("SERVER_RESPONSE_OKAY", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Calibrating initial position.
+        /// </summary>
+        internal static string TRACKING_CALIBRATION {
+            get {
+                return ResourceManager.GetString("TRACKING_CALIBRATION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Start tracking.
+        /// </summary>
+        internal static string TRACKING_START {
+            get {
+                return ResourceManager.GetString("TRACKING_START", resourceCulture);
+            }
+        }
     }
 }

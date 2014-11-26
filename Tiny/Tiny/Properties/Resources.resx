@@ -120,4 +120,10 @@
   <data name="SERVER_RESPONSE_OKAY" xml:space="preserve">
     <value>Okay</value>
   </data>
+  <data name="TRACKING_CALIBRATION" xml:space="preserve">
+    <value>Calibrating initial position</value>
+  </data>
+  <data name="TRACKING_START" xml:space="preserve">
+    <value>Start tracking</value>
+  </data>
 </root>

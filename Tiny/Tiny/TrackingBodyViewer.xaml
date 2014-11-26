@@ -13,6 +13,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <Label x:Name="Label" Grid.Row="0" Content="Tracking Algorithm" HorizontalAlignment="Center" VerticalAlignment="Top" RenderTransformOrigin="-0.079,0.5" Margin="0" FontWeight="Bold" FontSize="16" FontFamily="Microsoft Sans Serif"/>
@@ -20,6 +21,10 @@
         <Viewbox Grid.Row="1" HorizontalAlignment="Center">
             <Image Source="{Binding BodyStreamImageSource}" Stretch="UniformToFill" />
         </Viewbox>
+
+        <StatusBar Grid.Row="2" Name="TrackingStatusBar" HorizontalAlignment="Center" VerticalAlignment="Bottom" Background="White" Foreground="{StaticResource MediumGreyBrush}">
+            <StatusBarItem Content="{Binding TrackingStatusText}" />
+        </StatusBar>
     </Grid>
 </Window>
 
