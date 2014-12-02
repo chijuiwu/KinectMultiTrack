@@ -14,6 +14,9 @@ namespace Tiny
 {
     class User
     {
+        private double initAngle;
+        private WorldCoordinate initCentrePosition;
+
         // Unprocessed body frames, assume the frame order is perserved
         private ConcurrentQueue<SerializableBodyFrame> incomingBodyFrames;
 
@@ -47,7 +50,7 @@ namespace Tiny
             {
                 return;
             }
-            Debug.WriteLine("Time stamp: " + bodyFrame.TimeStamp);
+            Debug.WriteLine("Processing bodyframe @ timestamp: " + bodyFrame.TimeStamp);
 
             WorldView bodyFrameInWorldView = new WorldView(bodyFrame);
             this.processedBodyFrames.Push(Tuple.Create(bodyFrame, bodyFrameInWorldView));
@@ -89,5 +92,14 @@ namespace Tiny
                 return this.processedBodyFrames.First();
             }
         }
+
+        public bool CalibrationReady
+        {
+            get
+            {
+                return this.processedBodyFrames.Count == UserTracker.CALIBRATION_FRAMES;
+            }
+        }
+
     }
 }

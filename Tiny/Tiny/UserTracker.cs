@@ -13,26 +13,21 @@ namespace Tiny
 {
     class UserTracker
     {
+        public static const int CALIBRATION_FRAMES = 120;
         private ConcurrentDictionary<IPEndPoint, User> users;
 
-        public IEnumerable<Tuple<SerializableBodyFrame, WorldView>> UserLastCoordinates
+        public UserTracker()
         {
-            get
-            {
-                foreach(User user in users.Values)
-                {
-                    yield return user.LastFrame;
-                }
-            }
+            this.users = new ConcurrentDictionary<IPEndPoint, User>();
         }
 
         public IEnumerable<SerializableBodyFrame> UserLastKinectFrames
         {
             get
             {
-                foreach(Tuple<SerializableBodyFrame, WorldView> lastFrame in this.UserLastCoordinates)
+                foreach (User user in users.Values)
                 {
-                    yield return lastFrame.Item1;
+                    yield return user.LastFrame.Item1;
                 }
             }
         }
@@ -41,19 +36,17 @@ namespace Tiny
         {
             get
             {
-                foreach (Tuple<SerializableBodyFrame, WorldView> lastFrame in this.UserLastCoordinates)
+                foreach (User user in users.Values)
                 {
-                    yield return lastFrame.Item2;
+                    if (user.CalibrationReady)
+                    {
+                        yield return user.LastFrame.Item2;
+                    }
                 }
             }
         }
 
-        public UserTracker()
-        {
-            this.users = new ConcurrentDictionary<IPEndPoint, User>();
-        }
-
-        public void AddOrUpdateClient(IPEndPoint clientIP, SerializableBodyFrame bodyFrame)
+        public void AddOrUpdateBodyFrame(IPEndPoint clientIP, SerializableBodyFrame bodyFrame)
         {
             if (!this.users.ContainsKey(clientIP))
             {

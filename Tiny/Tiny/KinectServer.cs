@@ -99,7 +99,7 @@ namespace Tiny
                     while (!clientStream.DataAvailable) ;
 
                     SerializableBodyFrame bodyFrame = BodyFrameSerializer.Deserialize(clientStream);
-                    this.userTracker.AddOrUpdateClient(clientIP, bodyFrame);
+                    this.userTracker.AddOrUpdateBodyFrame(clientIP, bodyFrame);
                     Thread visualUpdateThread = new Thread(new ThreadStart(this.StartVisualUpdateThread));
                     visualUpdateThread.Start();
 
