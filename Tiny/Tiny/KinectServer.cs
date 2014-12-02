@@ -19,19 +19,26 @@ namespace Tiny
     {
         private TcpListener tcpListener;
         private Thread listenForConnectionThread;
-        private WorldCamera worldCamera;
-        public event KinectBodyStreamHandler CombinedBodyStreamUpdate;
-        public delegate void KinectBodyStreamHandler(KinectServer server, IEnumerable<SerializableBodyFrame> bodyFrames);
-        public event WorldBodyViewHandler TrackingAlgorithmUpdate;
-        public delegate void WorldBodyViewHandler(KinectServer server, IEnumerable<WorldView> bodyFrames);
+
+        private UserTracker userTracker;
         private CombinedBodyViewer combinedBodyViewer;
         private TrackingBodyViewer trackingBodyViewer;
+
+        public event KinectBodyStreamHandler CombinedStreamUpdate;
+        public delegate void KinectBodyStreamHandler(IEnumerable<SerializableBodyFrame> bodyFrames);
+        
+        public event WorldBodyStreamHandler TrackingAlgorithmUpdate;
+        public delegate void WorldBodyStreamHandler(IEnumerable<WorldView> bodyFrames);
+        
+        public event KinectCalibrationHandler KinectCalibrationUpdate;
+        public delegate void KinectCalibrationHandler(bool completed);
+
 
         public KinectServer(int port)
         {
             this.tcpListener = new TcpListener(IPAddress.Any, port);
             this.listenForConnectionThread = new Thread(new ThreadStart(this.ListenForKinectStream));
-            this.worldCamera = new WorldCamera();
+            this.userTracker = new UserTracker();
 
             Thread combinedBodyViewerThread = new Thread(new ThreadStart(this.StartCombinedBodyViewerThread));
             combinedBodyViewerThread.SetApartmentState(ApartmentState.STA);
@@ -46,7 +53,7 @@ namespace Tiny
         {
             this.combinedBodyViewer = new CombinedBodyViewer();
             this.combinedBodyViewer.Show();
-            this.CombinedBodyStreamUpdate += this.combinedBodyViewer.UpdateBodyStreamDisplay;
+            this.CombinedStreamUpdate += this.combinedBodyViewer.UpdateBodyStreamDisplay;
             Dispatcher.Run();
         }
 
@@ -92,7 +99,7 @@ namespace Tiny
                     while (!clientStream.DataAvailable) ;
 
                     SerializableBodyFrame bodyFrame = BodyFrameSerializer.Deserialize(clientStream);
-                    this.worldCamera.AddOrUpdateClient(clientIP, bodyFrame);
+                    this.userTracker.AddOrUpdateClient(clientIP, bodyFrame);
                     Thread visualUpdateThread = new Thread(new ThreadStart(this.StartVisualUpdateThread));
                     visualUpdateThread.Start();
 
@@ -110,7 +117,7 @@ namespace Tiny
                 }
             }
 
-            this.worldCamera.RemoveClient(clientIP);
+            this.userTracker.RemoveClient(clientIP);
             clientStream.Close();
             clientStream.Dispose();
             client.Close();
@@ -118,11 +125,11 @@ namespace Tiny
 
         private void StartVisualUpdateThread()
         {
-            this.worldCamera.SynchronizeFrames();
-            IEnumerable<SerializableBodyFrame> userLastKinectFrames = this.worldCamera.UserLastKinectFrames;
-            IEnumerable<WorldView> userLastWorldViews = this.worldCamera.UserLastWorldViews;
-            this.CombinedBodyStreamUpdate(this, userLastKinectFrames);
-            this.TrackingAlgorithmUpdate(this, userLastWorldViews);
+            this.userTracker.SynchronizeFrames();
+            IEnumerable<SerializableBodyFrame> userLastKinectFrames = this.userTracker.UserLastKinectFrames;
+            IEnumerable<WorldView> userLastWorldViews = this.userTracker.UserLastWorldViews;
+            this.CombinedStreamUpdate(userLastKinectFrames);
+            this.TrackingAlgorithmUpdate(userLastWorldViews);
         }
     }
 }

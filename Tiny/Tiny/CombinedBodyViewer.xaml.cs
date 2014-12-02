@@ -51,7 +51,7 @@ namespace Tiny
             }
         }
 
-        internal void UpdateBodyStreamDisplay(KinectServer server, IEnumerable<SerializableBodyFrame> bodyFrames)
+        internal void UpdateBodyStreamDisplay(IEnumerable<SerializableBodyFrame> bodyFrames)
         {
             this.Dispatcher.Invoke((Action)(() =>
             {

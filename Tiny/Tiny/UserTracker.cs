@@ -11,7 +11,7 @@ using Microsoft.Kinect;
 
 namespace Tiny
 {
-    class WorldCamera
+    class UserTracker
     {
         private ConcurrentDictionary<IPEndPoint, User> users;
 
@@ -48,7 +48,7 @@ namespace Tiny
             }
         }
 
-        public WorldCamera()
+        public UserTracker()
         {
             this.users = new ConcurrentDictionary<IPEndPoint, User>();
         }
