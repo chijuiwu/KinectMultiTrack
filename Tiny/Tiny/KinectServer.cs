@@ -136,6 +136,7 @@ namespace Tiny
                 this.KinectCalibrationUpdate(false);
             }
             IEnumerable<SerializableBodyFrame> userLastKinectFrames = this.userTracker.UserLastKinectFrames;
+            Debug.WriteLine("size: " + userLastKinectFrames.Count());
             IEnumerable<WorldView> userLastWorldViews = this.userTracker.UserLastWorldViews;
             this.CombinedStreamUpdate(userLastKinectFrames);
             this.TrackingAlgorithmUpdate(userLastWorldViews);
