@@ -28,7 +28,11 @@ namespace Tiny
             {
                 foreach (User user in users.Values)
                 {
-                    yield return user.LastFrame.Item1;
+                    SerializableBodyFrame lastKinectFrame = user.LastKinectFrame;
+                    if (lastKinectFrame != null)
+                    {
+                        yield return lastKinectFrame;
+                    }
                 }
             }
         }
@@ -39,9 +43,10 @@ namespace Tiny
             {
                 foreach (User user in users.Values)
                 {
-                    if (user.CalibrationCompleted)
+                    WorldView lastWorldView = user.LastWorldView;
+                    if (lastWorldView != null)
                     {
-                        yield return user.LastFrame.Item2;
+                        yield return lastWorldView;
                     }
                 }
             }
