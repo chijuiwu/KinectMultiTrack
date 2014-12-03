@@ -62,6 +62,7 @@ namespace Tiny
             // TODO: scale to multiple users in one frame
             if (this.ReadyToCalibrate())
             {
+                Debug.WriteLine("ready to calibrate...");
                 SerializableBodyFrame firstCalibrationFrame;
                 this.calibrationBodyFrames.TryPeek(out firstCalibrationFrame);
                 this.initAngle = WorldView.GetInitialAngle(firstCalibrationFrame.Bodies[0]);
@@ -76,7 +77,11 @@ namespace Tiny
             }
             else if (!this.calibrationCompleted)
             {
-                this.calibrationBodyFrames.Enqueue(nextKinectFrame);
+                if (nextKinectFrame.Bodies.Count > 0)
+                {
+                    Debug.WriteLine("enqueueing...");
+                    this.calibrationBodyFrames.Enqueue(nextKinectFrame);
+                }
             }
             else 
             {
@@ -95,7 +100,7 @@ namespace Tiny
 
         private bool ReadyToCalibrate()
         {
-            return !this.calibrationCompleted && this.processedBodyFrames.Count == UserTracker.CALIBRATION_FRAMES;
+            return !this.calibrationCompleted && this.calibrationBodyFrames.Count == UserTracker.CALIBRATION_FRAMES;
         }
 
         public void CloseBodyViewer()
@@ -136,24 +141,28 @@ namespace Tiny
             {
                 if (this.processedBodyFrames.Count > 0)
                 {
+                    Debug.WriteLine("using processed body frames");
                     Tuple<SerializableBodyFrame, WorldView> lastKinectFrameTuple;
                     this.processedBodyFrames.TryPeek(out lastKinectFrameTuple);
                     return lastKinectFrameTuple.Item1;
                 }
                 else if (this.calibrationBodyFrames.Count > 0)
                 {
+                    Debug.WriteLine("using calibration body frames");
                     SerializableBodyFrame lastKinectFrame;
                     this.calibrationBodyFrames.TryPeek(out lastKinectFrame);
                     return lastKinectFrame;
                 }
                 else if (this.incomingBodyFrames.Count > 0)
                 {
+                    Debug.WriteLine("using incoming body frames");
                     SerializableBodyFrame lastKinectFrame;
                     this.incomingBodyFrames.TryPeek(out lastKinectFrame);
                     return lastKinectFrame;
                 }
                 else
                 {
+                    Debug.WriteLine("null");
                     return null;
                 }
             }

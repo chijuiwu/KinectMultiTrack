@@ -61,6 +61,7 @@ namespace Tiny
 
         private void DisplayBodyFrames(IEnumerable<SerializableBodyFrame> bodyFrames)
         {
+            Debug.WriteLine("body frame size (combined): " + bodyFrames.Count());
             if (bodyFrames.Count() == 0) return;
             using (DrawingContext dc = this.bodyDrawingGroup.Open())
             {
