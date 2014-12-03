@@ -23,7 +23,6 @@ namespace Tiny
         private ConcurrentQueue<SerializableBodyFrame> calibrationBodyFrames;
         private ConcurrentStack<Tuple<SerializableBodyFrame, WorldView>> processedBodyFrames;
 
-
         public event DisplayKinectBodyFrameHandler DisplayKinectBodyFrame;
         public delegate void DisplayKinectBodyFrameHandler(SerializableBodyFrame bodyFrame);
 
@@ -44,7 +43,7 @@ namespace Tiny
         {
             this.kinectBodyViwer = new KinectBodyViewer();
             this.kinectBodyViwer.Show();
-            this.DisplayKinectBodyFrame += this.kinectBodyViwer.UpdateClie
+            this.DisplayKinectBodyFrame += this.kinectBodyViwer.UpdateBodyFrame;
             Dispatcher.Run();
         }
 
@@ -84,11 +83,14 @@ namespace Tiny
                 this.processedBodyFrames.Push(Tuple.Create(nextKinectFrame, new WorldView(nextKinectFrame, WorldView.GetTransformedBody(nextKinectFrame.Bodies[0], this.initAngle, this.initCentrePosition))));
             }
 
-            // Display the next recent frame
-            this.kinectBodyViwer.Dispatcher.Invoke((Action)(() =>
+            if (this.DisplayKinectBodyFrame != null)
             {
-                this.kinectBodyViwer.DisplayBodyFrame(nextKinectFrame);
-            }));
+                this.DisplayKinectBodyFrame(nextKinectFrame);
+            }
+            else
+            {
+                Debug.WriteLine("null");
+            }
         }
 
         private bool ReadyToCalibrate()

@@ -72,7 +72,6 @@ namespace Tiny
             if (!this.users.ContainsKey(clientIP))
             {
                 this.users[clientIP] = new User();
-                Debug.WriteLine("HERE");
             }
             this.users[clientIP].IncomingBodyFrames.Enqueue(bodyFrame);
         }

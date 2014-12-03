@@ -44,6 +44,14 @@ namespace Tiny
             }
         }
 
+        internal void UpdateBodyFrame(SerializableBodyFrame bodyFrame)
+        {
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                this.DisplayBodyFrame(bodyFrame);
+            }));
+        }
+
         public void DisplayBodyFrame(SerializableBodyFrame bodyFrame)
         {
             using (DrawingContext dc = this.bodyDrawingGroup.Open())
