@@ -38,7 +38,7 @@ namespace Tiny
             {
                 foreach (User user in users.Values)
                 {
-                    if (user.CalibrationReady)
+                    if (user.CalibrationCompleted)
                     {
                         yield return user.LastFrame.Item2;
                     }

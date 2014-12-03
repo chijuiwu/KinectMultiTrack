@@ -16,10 +16,11 @@ namespace Tiny
     {
         private double initAngle;
         private WorldCoordinate initCentrePosition;
+        private bool calibrationCompleted;
 
         // Unprocessed body frames, assume the frame order is perserved
         private ConcurrentQueue<SerializableBodyFrame> incomingBodyFrames;
-
+        private ConcurrentQueue<SerializableBodyFrame> calibrationBodyFrames;
         private ConcurrentStack<Tuple<SerializableBodyFrame, WorldView>> processedBodyFrames;
 
         private Thread bodyViewerThread;
@@ -28,6 +29,7 @@ namespace Tiny
         public User()
         {
             this.incomingBodyFrames = new ConcurrentQueue<SerializableBodyFrame>();
+            this.calibrationBodyFrames = new ConcurrentQueue<SerializableBodyFrame>();
             this.processedBodyFrames = new ConcurrentStack<Tuple<SerializableBodyFrame, WorldView>>();
             this.bodyViewerThread = new Thread(new ThreadStart(this.StartKinectBodyViewerThread));
             this.bodyViewerThread.SetApartmentState(ApartmentState.STA);
@@ -41,24 +43,46 @@ namespace Tiny
             Dispatcher.Run();
         }
 
+        // TODO should have one enqueueing thread and one dequeueing thread
         public void ProcessBodyFrame()
         {
-            // TODO should have one enqueueing thread and one dequeueing thread
-
             SerializableBodyFrame bodyFrame;
             if (!this.incomingBodyFrames.TryDequeue(out bodyFrame))
             {
                 return;
             }
+
             Debug.WriteLine("Processing bodyframe @ timestamp: " + bodyFrame.TimeStamp);
+
+            if (this.ReadyToCalibrate())
+            {
+                // Kinect Calibration
+                SerializableBodyFrame firstBodyFrame;
+                this.calibrationBodyFrames.TryPeek(out firstBodyFrame);
+                this.initAngle = WorldView.GetInitialAngle(firstBodyFrame.);
+            }
+            else if (!this.calibrationCompleted)
+            {
+                this.calibrationBodyFrames.Enqueue(bodyFrame);
+            }
+            else 
+            {
+
+            }
 
             WorldView bodyFrameInWorldView = new WorldView(bodyFrame);
             this.processedBodyFrames.Push(Tuple.Create(bodyFrame, bodyFrameInWorldView));
 
+            // Display the next recent frame
             this.kinectBodyViwer.Dispatcher.Invoke((Action)(() =>
             {
                 this.kinectBodyViwer.DisplayBodyFrame(bodyFrame);
             }));
+        }
+
+        private bool ReadyToCalibrate()
+        {
+            return !this.calibrationCompleted && this.processedBodyFrames.Count == UserTracker.CALIBRATION_FRAMES;
         }
 
         public void CloseBodyViewer()
@@ -93,7 +117,7 @@ namespace Tiny
             }
         }
 
-        public bool CalibrationReady
+        public bool CalibrationCompleted
         {
             get
             {
