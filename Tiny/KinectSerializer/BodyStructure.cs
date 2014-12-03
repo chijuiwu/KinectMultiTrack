@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Kinect;
 
-namespace Tiny
+namespace KinectSerializer
 {
-    class KinectBody
+    public class BodyStructure
     {
         // All joints
         public static HashSet<JointType> Joints = new HashSet<JointType>()
@@ -38,7 +38,6 @@ namespace Tiny
             JointType.WristLeft,
             JointType.WristRight
         };
-
 
         // All bones
         public static List<Tuple<JointType, JointType>> Bones = new List<Tuple<JointType, JointType>>() {

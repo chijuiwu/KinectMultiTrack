@@ -16,15 +16,14 @@ namespace Tiny
 
         private Dictionary<ulong, WorldBody> bodyCoordinates;
 
-        public WorldView(SerializableBodyFrame bodyFrame)
+        // Assume one user in each frame
+        // TODO: scale to multiple users in one frame
+        public WorldView(SerializableBodyFrame bodyFrame, WorldBody worldBody)
         {
             this.depthFrameWidth = bodyFrame.DepthFrameWidth;
             this.depthFrameHeight = bodyFrame.DepthFrameHeight;
             this.bodyCoordinates = new Dictionary<ulong, WorldBody>();
-            foreach (SerializableBody body in bodyFrame.Bodies)
-            {
-                this.bodyCoordinates[body.TrackingId] = new WorldBody(body.Joints.AsEnumerable<KeyValuePair<JointType, SerializableJoint>>());
-            }
+            this.bodyCoordinates[0] = worldBody;
         }
 
         public int DepthFrameWidth
@@ -92,7 +91,7 @@ namespace Tiny
                 float sumOfYs = 0;
                 float sumOfZs = 0;
 
-                foreach(JointType jointType in KinectBody.Joints)
+                foreach(JointType jointType in BodyStructure.Joints)
                 {
                     if (!body.Joints.ContainsKey(jointType))
                     {
@@ -108,9 +107,9 @@ namespace Tiny
                     sumOfZs += joint.CameraSpacePoint.Z;
                 }
 
-                totalAverageX += sumOfXs / KinectBody.Joints.Count;
-                totalAverageY += sumOfYs / KinectBody.Joints.Count;
-                totalAverageZ += sumOfZs / KinectBody.Joints.Count;
+                totalAverageX += sumOfXs / BodyStructure.Joints.Count;
+                totalAverageY += sumOfYs / BodyStructure.Joints.Count;
+                totalAverageZ += sumOfZs / BodyStructure.Joints.Count;
             }
 
             float centreX = totalAverageX / userInitialBodies.Length;
@@ -120,9 +119,9 @@ namespace Tiny
         }
 
         // Joints transformed to the origin of the world coordinate system
-        public static Dictionary<JointType, WorldCoordinate> GetTransformedPoints(SerializableBody body, double initialAngle, WorldCoordinate centrePoint)
+        public static WorldBody GetTransformedBody(SerializableBody body, double initialAngle, WorldCoordinate centrePoint)
         {
-            Dictionary<JointType, WorldCoordinate> transformedJointCoordinates = new Dictionary<JointType, WorldCoordinate>();
+            WorldBody transformedWorldBody = new WorldBody();
 
             foreach(JointType jointType in body.Joints.Keys)
             {
@@ -139,10 +138,10 @@ namespace Tiny
                 float transformedY = translatedY;
                 float transformedZ = (float) (translatedZ * Math.Cos(initialAngle) - translatedX * Math.Sin(initialAngle));
 
-                transformedJointCoordinates[jointType] = new WorldCoordinate(translatedX, translatedY, translatedZ);
+                transformedWorldBody.Joints[jointType] = new WorldCoordinate(transformedX, transformedY, transformedZ);
             }
 
-            return transformedJointCoordinates;
+            return transformedWorldBody;
         }
     }
 }

@@ -241,7 +241,7 @@ namespace KinectClient
         private void DrawBody(IReadOnlyDictionary<JointType, Joint> joints, IDictionary<JointType, Point> jointPoints, DrawingContext drawingContext, Pen bonePen, Pen inferredBonePen, Brush jointBrush, Brush inferredJointBrush)
         {
             // Draw the bones
-            foreach (var bone in KinectBody.Bones)
+            foreach (var bone in BodyStructure.Bones)
             {
                 this.DrawBone(joints, jointPoints, bone.Item1, bone.Item2, drawingContext, bonePen, inferredBonePen);
             }

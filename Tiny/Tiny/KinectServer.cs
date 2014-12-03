@@ -62,6 +62,7 @@ namespace Tiny
             this.trackingBodyViewer = new TrackingBodyViewer();
             this.trackingBodyViewer.Show();
             this.TrackingAlgorithmUpdate += this.trackingBodyViewer.UpdateTrackingDisplay;
+            this.KinectCalibrationUpdate += this.trackingBodyViewer.UpdateCalibrationStatus;
             Dispatcher.Run();
         }
 
@@ -126,6 +127,14 @@ namespace Tiny
         private void StartVisualUpdateThread()
         {
             this.userTracker.SynchronizeFrames();
+            if (this.userTracker.CalibrationCompleted)
+            {
+                this.KinectCalibrationUpdate(true);
+            }
+            else
+            {
+                this.KinectCalibrationUpdate(false);
+            }
             IEnumerable<SerializableBodyFrame> userLastKinectFrames = this.userTracker.UserLastKinectFrames;
             IEnumerable<WorldView> userLastWorldViews = this.userTracker.UserLastWorldViews;
             this.CombinedStreamUpdate(userLastKinectFrames);

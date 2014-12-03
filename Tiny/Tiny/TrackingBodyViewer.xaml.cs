@@ -22,6 +22,7 @@ namespace Tiny
     public partial class TrackingBodyViewer : Window, INotifyPropertyChanged
     {
         private string trackingStatusText;
+
         private DrawingGroup bodyDrawingGroup;
         private DrawingImage bodyImageSource;
         private List<Pen> bodyColors;
@@ -124,7 +125,7 @@ namespace Tiny
         private void DrawBody(IDictionary<JointType, Point> jointPoints, DrawingContext drawingContext, Pen bonePen, Pen inferredBonePen, Brush jointBrush, Brush inferredJointBrush)
         {
             // Draw the bones
-            foreach (var bone in KinectBody.Bones)
+            foreach (var bone in BodyStructure.Bones)
             {
                 this.DrawBone(jointPoints, bone.Item1, bone.Item2, drawingContext, bonePen, inferredBonePen);
             }
@@ -141,6 +142,11 @@ namespace Tiny
         {
             Pen drawPen = drawingPen;
             drawingContext.DrawLine(drawPen, jointPoints[jointType0], jointPoints[jointType1]);
+        }
+
+        internal void UpdateCalibrationStatus(bool completed)
+        {
+            this.setCalibrationComplete(completed);
         }
     }
 }

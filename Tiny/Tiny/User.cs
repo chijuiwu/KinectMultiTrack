@@ -46,37 +46,43 @@ namespace Tiny
         // TODO should have one enqueueing thread and one dequeueing thread
         public void ProcessBodyFrame()
         {
-            SerializableBodyFrame bodyFrame;
-            if (!this.incomingBodyFrames.TryDequeue(out bodyFrame))
+            SerializableBodyFrame nextKinectFrame;
+            if (!this.incomingBodyFrames.TryDequeue(out nextKinectFrame))
             {
                 return;
             }
 
-            Debug.WriteLine("Processing bodyframe @ timestamp: " + bodyFrame.TimeStamp);
+            Debug.WriteLine("Processing bodyframe @ timestamp: " + nextKinectFrame.TimeStamp);
 
+            // Kinect calibration
+            // TODO: scale to multiple users in one frame
             if (this.ReadyToCalibrate())
             {
-                // Kinect Calibration
-                SerializableBodyFrame firstBodyFrame;
-                this.calibrationBodyFrames.TryPeek(out firstBodyFrame);
-                this.initAngle = WorldView.GetInitialAngle(firstBodyFrame.);
+                SerializableBodyFrame firstCalibrationFrame;
+                this.calibrationBodyFrames.TryPeek(out firstCalibrationFrame);
+                this.initAngle = WorldView.GetInitialAngle(firstCalibrationFrame.Bodies[0]);
+                SerializableBodyFrame[] calibrationFrames = this.calibrationBodyFrames.ToArray();
+                SerializableBody[] calibrationBodies = new SerializableBody[calibrationFrames.Length];
+                for (int i = 0; i < calibrationBodies.Length; i++)
+                {
+                    calibrationBodies[i] = calibrationFrames[i].Bodies[0];
+                }
+                this.initCentrePosition = WorldView.GetInitialCentrePosition(calibrationBodies);
+                this.calibrationCompleted = true;
             }
             else if (!this.calibrationCompleted)
             {
-                this.calibrationBodyFrames.Enqueue(bodyFrame);
+                this.calibrationBodyFrames.Enqueue(nextKinectFrame);
             }
             else 
             {
-
+                this.processedBodyFrames.Push(Tuple.Create(nextKinectFrame, new WorldView(nextKinectFrame, WorldView.GetTransformedBody(nextKinectFrame.Bodies[0], this.initAngle, this.initCentrePosition))));
             }
-
-            WorldView bodyFrameInWorldView = new WorldView(bodyFrame);
-            this.processedBodyFrames.Push(Tuple.Create(bodyFrame, bodyFrameInWorldView));
 
             // Display the next recent frame
             this.kinectBodyViwer.Dispatcher.Invoke((Action)(() =>
             {
-                this.kinectBodyViwer.DisplayBodyFrame(bodyFrame);
+                this.kinectBodyViwer.DisplayBodyFrame(nextKinectFrame);
             }));
         }
 
@@ -121,7 +127,7 @@ namespace Tiny
         {
             get
             {
-                return this.processedBodyFrames.Count == UserTracker.CALIBRATION_FRAMES;
+                return this.calibrationCompleted;
             }
         }
 

@@ -13,18 +13,9 @@ namespace Tiny
 
         private Dictionary<JointType, WorldCoordinate> joints;
 
-        public WorldBody(IEnumerable<KeyValuePair<JointType, SerializableJoint>> kinectJoints)
+        public WorldBody()
         {
             this.joints = new Dictionary<JointType, WorldCoordinate>();
-            foreach(KeyValuePair<JointType, SerializableJoint> jointPair in kinectJoints)
-            {
-                JointType jointType = jointPair.Key;
-                SerializableJoint joint = jointPair.Value;
-                CameraSpacePoint jointPosition = joint.CameraSpacePoint;
-                // TODO use the transformed points
-                WorldCoordinate worldCoordinate = new WorldCoordinate(jointPosition.X, jointPosition.Y, jointPosition.Z);
-                this.joints[jointType] = worldCoordinate;
-            }
         }
 
         public Dictionary<JointType, WorldCoordinate> Joints
