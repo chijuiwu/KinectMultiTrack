@@ -79,11 +79,6 @@ namespace Tiny
                             Dictionary<JointType, Point> jointPoints = new Dictionary<JointType, Point>();
                             foreach (JointType jointType in joints.Keys)
                             {
-                                CameraSpacePoint position = joints[jointType].CameraSpacePoint;
-                                if (position.Z < 0)
-                                {
-                                    position.Z = 0.1f;
-                                }
                                 DepthSpacePoint depthSpacePoint = joints[jointType].DepthSpacePoint;
                                 jointPoints[jointType] = new Point(depthSpacePoint.X, depthSpacePoint.Y);
                             }

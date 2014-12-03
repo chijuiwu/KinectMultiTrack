@@ -23,7 +23,10 @@ namespace Tiny
         private ConcurrentQueue<SerializableBodyFrame> calibrationBodyFrames;
         private ConcurrentStack<Tuple<SerializableBodyFrame, WorldView>> processedBodyFrames;
 
-        private Thread bodyViewerThread;
+
+        public event DisplayKinectBodyFrameHandler DisplayKinectBodyFrame;
+        public delegate void DisplayKinectBodyFrameHandler(SerializableBodyFrame bodyFrame);
+
         private KinectBodyViewer kinectBodyViwer;
 
         public User()
@@ -32,15 +35,16 @@ namespace Tiny
             this.calibrationBodyFrames = new ConcurrentQueue<SerializableBodyFrame>();
             this.processedBodyFrames = new ConcurrentStack<Tuple<SerializableBodyFrame, WorldView>>();
             
-            this.bodyViewerThread = new Thread(new ThreadStart(this.StartKinectBodyViewerThread));
-            this.bodyViewerThread.SetApartmentState(ApartmentState.STA);
-            this.bodyViewerThread.Start();
+            Thread bodyViewerThread = new Thread(new ThreadStart(this.StartKinectBodyViewerThread));
+            bodyViewerThread.SetApartmentState(ApartmentState.STA);
+            bodyViewerThread.Start();
         }
 
         private void StartKinectBodyViewerThread()
         {
             this.kinectBodyViwer = new KinectBodyViewer();
             this.kinectBodyViwer.Show();
+            this.DisplayKinectBodyFrame += this.kinectBodyViwer.UpdateClie
             Dispatcher.Run();
         }
 

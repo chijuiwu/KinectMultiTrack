@@ -16,9 +16,6 @@ using Microsoft.Kinect;
 
 namespace Tiny
 {
-    /// <summary>
-    /// Interaction logic for KinectViewer.xaml
-    /// </summary>
     public partial class KinectBodyViewer : Window
     {
         private DrawingGroup bodyDrawingGroup;
@@ -32,12 +29,11 @@ namespace Tiny
 
         public KinectBodyViewer()
         {
+            InitializeComponent();
             this.DataContext = this;
             this.bodyDrawingGroup = new DrawingGroup();
             this.bodyImageSource = new DrawingImage(this.bodyDrawingGroup);
             this.bodyColor = new Pen(Brushes.Blue, 6);
-
-            this.InitializeComponent();
         }
 
         public ImageSource BodyStreamImageSource
