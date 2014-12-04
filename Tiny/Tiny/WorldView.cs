@@ -194,7 +194,6 @@ namespace Tiny
                 inverseMatrix[0, 1] = determinant * swappedMatrix[0, 1];
                 inverseMatrix[1, 0] = determinant * swappedMatrix[1, 0];
                 inverseMatrix[1, 1] = determinant * swappedMatrix[1, 1];
-                
 
                 float translatedX = (float)(inverseMatrix[0, 0] * jointWorld.X + inverseMatrix[0, 1] * jointWorld.Z);
                 float translatedY = jointWorld.Y;

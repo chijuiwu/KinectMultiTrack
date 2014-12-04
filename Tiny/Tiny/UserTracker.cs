@@ -14,11 +14,17 @@ namespace Tiny
     class UserTracker
     {
         public const int CALIBRATION_FRAMES = 120;
+
+        private readonly int EXPECTED_CONNECTIONS;
+        private int currentConnections;
+
         // Assume one user per Kinect
         private ConcurrentDictionary<IPEndPoint, User> users;
 
-        public UserTracker()
+        public UserTracker(int expectedConnections)
         {
+            this.EXPECTED_CONNECTIONS = expectedConnections;
+            this.currentConnections = 0;
             this.users = new ConcurrentDictionary<IPEndPoint, User>();
         }
 
@@ -72,6 +78,7 @@ namespace Tiny
             if (!this.users.ContainsKey(clientIP))
             {
                 this.users[clientIP] = new User();
+                this.currentConnections++;
             }
             this.users[clientIP].IncomingBodyFrames.Enqueue(bodyFrame);
         }
@@ -82,11 +89,31 @@ namespace Tiny
             if (this.users.TryRemove(clientIP, out user))
             {
                 user.CloseBodyViewer();
+                this.currentConnections--;
             }
         }
 
         public void SynchronizeFrames()
         {
+            if (this.users.Count >= this.currentConnections)
+            {
+                bool readyToCalibrate = true;
+                foreach (User user in this.users.Values)
+                {
+                    if (!user.ReadyToCalibrate)
+                    {
+                        readyToCalibrate = false;
+                    }
+                }
+                if (readyToCalibrate)
+                {
+                    foreach (User user in this.users.Values)
+                    {
+                        user.CalibrateKinect();
+                    }
+                }
+            }
+
             foreach (User user in this.users.Values)
             {
                 user.ProcessBodyFrame();

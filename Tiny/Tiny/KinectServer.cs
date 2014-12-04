@@ -17,6 +17,8 @@ namespace Tiny
 {
     class KinectServer
     {
+        private readonly int EXPECTED_CONNECTIONS;
+
         private TcpListener tcpListener;
         private Thread listenForConnectionThread;
 
@@ -34,11 +36,13 @@ namespace Tiny
         public delegate void KinectCalibrationHandler(bool completed);
 
 
-        public KinectServer(int port)
+        public KinectServer(int port, int expectedConnections)
         {
+            this.EXPECTED_CONNECTIONS = expectedConnections;
+
             this.tcpListener = new TcpListener(IPAddress.Any, port);
             this.listenForConnectionThread = new Thread(new ThreadStart(this.ListenForKinectStream));
-            this.userTracker = new UserTracker();
+            this.userTracker = new UserTracker(expectedConnections);
 
             Thread combinedBodyViewerThread = new Thread(new ThreadStart(this.StartCombinedBodyViewerThread));
             combinedBodyViewerThread.SetApartmentState(ApartmentState.STA);

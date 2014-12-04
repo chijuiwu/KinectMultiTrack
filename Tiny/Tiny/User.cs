@@ -16,6 +16,8 @@ namespace Tiny
     {
         private double initAngle;
         private WorldCoordinate initCentrePosition;
+        private int depthFrameWidth;
+        private int depthFrameHeight;
         private bool calibrationCompleted;
 
         // Unprocessed body frames, assume the frame order is perserved
@@ -51,6 +53,34 @@ namespace Tiny
             Dispatcher.Run();
         }
 
+        public void CalibrateKinect()
+        {
+            // TODO: scale to multiple users in one frame
+            if (this.ReadyToCalibrate)
+            {
+                // Get the last CALIBRATION_FRAMES
+                while (this.calibrationBodyFrames.Count > UserTracker.CALIBRATION_FRAMES)
+                {
+                    SerializableBodyFrame ignored;
+                    this.calibrationBodyFrames.TryDequeue(out ignored);
+                }
+
+                SerializableBodyFrame firstCalibrationFrame;
+                this.calibrationBodyFrames.TryPeek(out firstCalibrationFrame);
+                this.initAngle = WorldView.GetInitialAngle(firstCalibrationFrame.Bodies[0]);
+                SerializableBodyFrame[] calibrationFrames = this.calibrationBodyFrames.ToArray();
+                SerializableBody[] calibrationBodies = new SerializableBody[calibrationFrames.Length];
+                for (int i = 0; i < calibrationBodies.Length; i++)
+                {
+                    calibrationBodies[i] = calibrationFrames[i].Bodies[0];
+                }
+                this.initCentrePosition = WorldView.GetInitialCentrePosition(calibrationBodies);
+                this.depthFrameWidth = firstCalibrationFrame.DepthFrameWidth;
+                this.depthFrameHeight = firstCalibrationFrame.DepthFrameHeight;
+                this.calibrationCompleted = true;
+            }
+        }
+
         // TODO should have one enqueueing thread and one dequeueing thread
         public void ProcessBodyFrame()
         {
@@ -62,32 +92,16 @@ namespace Tiny
 
             Debug.WriteLine("Processing bodyframe @ timestamp: " + nextKinectFrame.TimeStamp);
 
-            // Kinect calibration
-            // TODO: scale to multiple users in one frame
-            if (this.ReadyToCalibrate())
+            if (this.CalibrationCompleted)
             {
-                SerializableBodyFrame firstCalibrationFrame;
-                this.calibrationBodyFrames.TryPeek(out firstCalibrationFrame);
-                this.initAngle = WorldView.GetInitialAngle(firstCalibrationFrame.Bodies[0]);
-                SerializableBodyFrame[] calibrationFrames = this.calibrationBodyFrames.ToArray();
-                SerializableBody[] calibrationBodies = new SerializableBody[calibrationFrames.Length];
-                for (int i = 0; i < calibrationBodies.Length; i++)
-                {
-                    calibrationBodies[i] = calibrationFrames[i].Bodies[0];
-                }
-                this.initCentrePosition = WorldView.GetInitialCentrePosition(calibrationBodies);
-                this.calibrationCompleted = true;
+                this.processedBodyFrames.Push(Tuple.Create(nextKinectFrame, new WorldView(WorldView.GetBodyWorldCoordinates(nextKinectFrame.Bodies[0], this.initAngle, this.initCentrePosition), this.initAngle, this.initCentrePosition, this.depthFrameWidth, this.depthFrameHeight)));
             }
-            else if (!this.calibrationCompleted)
+            else
             {
                 if (nextKinectFrame.Bodies.Count > 0)
                 {
                     this.calibrationBodyFrames.Enqueue(nextKinectFrame);
                 }
-            }
-            else 
-            {
-                this.processedBodyFrames.Push(Tuple.Create(nextKinectFrame, new WorldView(WorldView.GetBodyWorldCoordinates(nextKinectFrame.Bodies[0], this.initAngle, this.initCentrePosition), this.initAngle, this.initCentrePosition, nextKinectFrame.DepthFrameWidth, nextKinectFrame.DepthFrameHeight)));
             }
 
             if (this.DisplayKinectBodyFrame != null)
@@ -95,15 +109,26 @@ namespace Tiny
                 this.DisplayKinectBodyFrame(nextKinectFrame);
             }
         }
-
-        private bool ReadyToCalibrate()
-        {
-            return !this.calibrationCompleted && this.calibrationBodyFrames.Count == UserTracker.CALIBRATION_FRAMES;
-        }
-
+        
         public void CloseBodyViewer()
         {
             this.CloseKinectBodyViewer();
+        }
+
+        public bool ReadyToCalibrate
+        {
+            get
+            {
+                return !this.calibrationCompleted && this.calibrationBodyFrames.Count == UserTracker.CALIBRATION_FRAMES;
+            }
+        }
+
+        public bool CalibrationCompleted
+        {
+            get
+            {
+                return this.calibrationCompleted;
+            }
         }
 
         public ConcurrentQueue<SerializableBodyFrame> IncomingBodyFrames
@@ -119,14 +144,6 @@ namespace Tiny
             get
             {
                 return this.processedBodyFrames;
-            }
-        }
-
-        public bool CalibrationCompleted
-        {
-            get
-            {
-                return this.calibrationCompleted;
             }
         }
 
@@ -176,6 +193,5 @@ namespace Tiny
                 }
             }
         }
-
     }
 }
