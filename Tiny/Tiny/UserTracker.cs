@@ -95,7 +95,7 @@ namespace Tiny
 
         public void SynchronizeFrames()
         {
-            if (this.users.Count >= this.currentConnections)
+            if (this.users.Count >= this.EXPECTED_CONNECTIONS)
             {
                 bool readyToCalibrate = true;
                 foreach (User user in this.users.Values)
@@ -103,6 +103,7 @@ namespace Tiny
                     if (!user.ReadyToCalibrate)
                     {
                         readyToCalibrate = false;
+                        break;
                     }
                 }
                 if (readyToCalibrate)
