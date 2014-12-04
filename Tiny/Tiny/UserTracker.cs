@@ -107,8 +107,10 @@ namespace Tiny
                     }
                     if (readyToCalibrate)
                     {
-                        foreach (User user in this.users.Values)
+                        foreach (IPEndPoint userIP in this.users.Keys)
                         {
+                            User user = this.users[userIP];
+                            Debug.WriteLine("user IP: " + userIP);
                             user.CalibrateKinect();
                         }
                     }

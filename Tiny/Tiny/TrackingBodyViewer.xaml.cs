@@ -117,16 +117,11 @@ namespace Tiny
                 {
                     foreach (WorldBody body in worldView.WorldBoides)
                     {
-                        foreach (JointType jointType in body.Joints.Keys)
-                        {
-                            WorldCoordinate jointWorld = body.Joints[jointType];
-                            Debug.WriteLine("joint: " + jointType + " world: " + jointWorld);
-                        }
-
                         Pen drawPen = this.bodyColors[penIndex++];
                         Dictionary<JointType, Point> jointPoints = new Dictionary<JointType, Point>();
 
-                        KinectBody bodyKinect = WorldView.GetBodyKinectCoordinates(body, worldView.InitialAngle, worldView.InitialCentrePosition);
+                        // convert coordinate wrt first world view
+                        KinectBody bodyKinect = WorldView.GetBodyKinectCoordinates(body, firstWorldView.InitialAngle, firstWorldView.InitialCentrePosition);
                         foreach (JointType jointType in bodyKinect.Joints.Keys)
                         {
                             CameraSpacePoint position = bodyKinect.Joints[jointType];

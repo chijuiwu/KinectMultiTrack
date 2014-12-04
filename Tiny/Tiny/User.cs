@@ -76,6 +76,7 @@ namespace Tiny
                     calibrationBodies[i] = calibrationFrames[i].Bodies[0];
                 }
                 this.initAngle = WorldView.GetInitialAngle(firstCalibrationFrame.Bodies[0]);
+                Debug.WriteLine("angle: " + this.initAngle);
                 this.initCentrePosition = WorldView.GetInitialCentrePosition(calibrationBodies);
                 this.depthFrameWidth = firstCalibrationFrame.DepthFrameWidth;
                 this.depthFrameHeight = firstCalibrationFrame.DepthFrameHeight;
