@@ -22,7 +22,7 @@ namespace Tiny
 
         // Unprocessed body frames, assume the frame order is perserved
         private ConcurrentQueue<SerializableBodyFrame> incomingBodyFrames;
-        private ConcurrentQueue<SerializableBodyFrame> calibrationBodyFrames;
+        private ConcurrentStack<SerializableBodyFrame> calibrationBodyFrames;
         private ConcurrentStack<Tuple<SerializableBodyFrame, WorldView>> processedBodyFrames;
 
         public event DisplayKinectBodyFrameHandler DisplayKinectBodyFrame;
@@ -36,7 +36,7 @@ namespace Tiny
         public User()
         {
             this.incomingBodyFrames = new ConcurrentQueue<SerializableBodyFrame>();
-            this.calibrationBodyFrames = new ConcurrentQueue<SerializableBodyFrame>();
+            this.calibrationBodyFrames = new ConcurrentStack<SerializableBodyFrame>();
             this.processedBodyFrames = new ConcurrentStack<Tuple<SerializableBodyFrame, WorldView>>();
             
             Thread bodyViewerThread = new Thread(new ThreadStart(this.StartKinectBodyViewerThread));
@@ -55,25 +55,25 @@ namespace Tiny
 
         public void CalibrateKinect()
         {
-            // TODO: scale to multiple users in one frame
+            // TODO: scale to multiple bodies in one frame
             if (this.ReadyToCalibrate)
             {
-                // Get the last CALIBRATION_FRAMES
-                while (this.calibrationBodyFrames.Count > UserTracker.CALIBRATION_FRAMES)
+                SerializableBodyFrame[] calibrationFrames = new SerializableBodyFrame[UserTracker.CALIBRATION_FRAMES];
+                int frameCount = 0;
+                while (frameCount < UserTracker.CALIBRATION_FRAMES)
                 {
-                    SerializableBodyFrame ignored;
-                    this.calibrationBodyFrames.TryDequeue(out ignored);
+                    SerializableBodyFrame calibrationFrame;
+                    this.calibrationBodyFrames.TryPop(out calibrationFrame);
+                    calibrationFrames[frameCount++] = calibrationFrame;
                 }
 
-                SerializableBodyFrame firstCalibrationFrame;
-                this.calibrationBodyFrames.TryPeek(out firstCalibrationFrame);
-                this.initAngle = WorldView.GetInitialAngle(firstCalibrationFrame.Bodies[0]);
-                SerializableBodyFrame[] calibrationFrames = this.calibrationBodyFrames.ToArray();
+                SerializableBodyFrame firstCalibrationFrame = calibrationFrames[0];
                 SerializableBody[] calibrationBodies = new SerializableBody[calibrationFrames.Length];
                 for (int i = 0; i < calibrationBodies.Length; i++)
                 {
                     calibrationBodies[i] = calibrationFrames[i].Bodies[0];
                 }
+                this.initAngle = WorldView.GetInitialAngle(firstCalibrationFrame.Bodies[0]);
                 this.initCentrePosition = WorldView.GetInitialCentrePosition(calibrationBodies);
                 this.depthFrameWidth = firstCalibrationFrame.DepthFrameWidth;
                 this.depthFrameHeight = firstCalibrationFrame.DepthFrameHeight;
@@ -100,7 +100,7 @@ namespace Tiny
             {
                 if (nextKinectFrame.Bodies.Count > 0)
                 {
-                    this.calibrationBodyFrames.Enqueue(nextKinectFrame);
+                    this.calibrationBodyFrames.Push(nextKinectFrame);
                 }
             }
 

@@ -61,7 +61,7 @@ namespace Tiny
 
         private void DisplayBodyFrames(IEnumerable<SerializableBodyFrame> bodyFrames)
         {
-            if (bodyFrames.Count() == 0) return;
+            if (!bodyFrames.Any()) return;
             using (DrawingContext dc = this.bodyDrawingGroup.Open())
             {
                 SerializableBodyFrame firstFrame = bodyFrames.First();
