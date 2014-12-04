@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using KinectSerializer;
 using Microsoft.Kinect;
+using System.Diagnostics;
 
 namespace Tiny
 {
@@ -44,15 +45,28 @@ namespace Tiny
             }
         }
 
+        internal void CloseBodyStream()
+        {
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                this.PerformCloseBodyStream();
+            }));
+        }
+
+        private void PerformCloseBodyStream()
+        {
+            this.Close();
+        }
+
         internal void UpdateBodyFrame(SerializableBodyFrame bodyFrame)
         {
             this.Dispatcher.Invoke((Action)(() =>
             {
-                this.DisplayBodyFrame(bodyFrame);
+                this.PerformUpdateBodyFrame(bodyFrame);
             }));
         }
 
-        public void DisplayBodyFrame(SerializableBodyFrame bodyFrame)
+        private void PerformUpdateBodyFrame(SerializableBodyFrame bodyFrame)
         {
             using (DrawingContext dc = this.bodyDrawingGroup.Open())
             {
@@ -67,6 +81,7 @@ namespace Tiny
                         foreach (JointType jointType in joints.Keys)
                         {
                             DepthSpacePoint depthSpacePoint = joints[jointType].DepthSpacePoint;
+                            //Debug.WriteLine("joint: " + jointType + " depth coordinate: " + depthSpacePoint.X + "," + depthSpacePoint.Y);
                             jointPoints[jointType] = new Point(depthSpacePoint.X, depthSpacePoint.Y);
                         }
                         this.DrawBody(joints, jointPoints, dc, this.bodyColor, this.inferredBonePen, this.trackedJointBrush, this.inferredJointBrush);

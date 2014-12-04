@@ -150,7 +150,7 @@ namespace KinectClient
                 {
                     bodyFrame.GetAndRefreshBodyData(this.bodies);
                     dataReceived = true;
-                    // serializing KinectBodyFrame
+                    // serialize KinectBodyFrame
                     serializableBodyFrame = new SerializableBodyFrame(bodyFrame.RelativeTime, this.depthFrameDescription);
                 }
             }
@@ -164,7 +164,7 @@ namespace KinectClient
                     {
                         if (body.IsTracked)
                         {
-                            // serializing KinectBody
+                            // serialize KinectBody
                             SerializableBody serializableBody = new SerializableBody(true, body.TrackingId);
 
                             this.DrawClippedEdges(body, dc);
@@ -179,15 +179,14 @@ namespace KinectClient
                                 TrackingState trackingState = joint.TrackingState;
                                 JointOrientation orientation = jointOrientations[jointType];
                                 CameraSpacePoint position = joint.Position;
-                                DepthSpacePoint depthSpacePoint = this.coordinateMapper.MapCameraPointToDepthSpace(position);
                                 if (position.Z < 0)
                                 {
                                     position.Z = 0.1f;
                                 }
+                                DepthSpacePoint depthSpacePoint = this.coordinateMapper.MapCameraPointToDepthSpace(position);
                                 jointPoints[jointType] = new Point(depthSpacePoint.X, depthSpacePoint.Y);
-                                // serializing KinectJoint
-                                SerializableJoint serializableJoint = new SerializableJoint(trackingState, jointType, orientation, position, depthSpacePoint);
-                                serializableBody.updateJoint(jointType, serializableJoint);
+                                // serialize KinectJoint
+                                serializableBody.Joints[jointType] = new SerializableJoint(trackingState, jointType, orientation, position, depthSpacePoint);
                             }
                             this.DrawBody(joints, jointPoints, dc, this.bodyColor, this.inferredBonePen, this.trackedJointBrush, this.inferredJointBrush);
                             // construct serializable KinectBodyFrame
@@ -197,7 +196,7 @@ namespace KinectClient
                     this.bodyDrawingGroup.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, this.displayWidth, this.displayHeight));
                 }
                 // send
-                this.kinectSocket.SendKinectBodyFrame(serializableBodyFrame);
+                this.kinectSocket.SendSerializedKinectBodyFrame(serializableBodyFrame);
             }
         }
 

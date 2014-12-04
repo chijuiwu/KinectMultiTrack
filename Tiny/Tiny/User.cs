@@ -26,6 +26,9 @@ namespace Tiny
         public event DisplayKinectBodyFrameHandler DisplayKinectBodyFrame;
         public delegate void DisplayKinectBodyFrameHandler(SerializableBodyFrame bodyFrame);
 
+        public event CloseKinectBodyStreamHandler CloseKinectBodyViewer;
+        public delegate void CloseKinectBodyStreamHandler();
+
         private KinectBodyViewer kinectBodyViwer;
 
         public User()
@@ -44,6 +47,7 @@ namespace Tiny
             this.kinectBodyViwer = new KinectBodyViewer();
             this.kinectBodyViwer.Show();
             this.DisplayKinectBodyFrame += this.kinectBodyViwer.UpdateBodyFrame;
+            this.CloseKinectBodyViewer += this.kinectBodyViwer.CloseBodyStream;
             Dispatcher.Run();
         }
 
@@ -62,7 +66,6 @@ namespace Tiny
             // TODO: scale to multiple users in one frame
             if (this.ReadyToCalibrate())
             {
-                Debug.WriteLine("ready to calibrate...");
                 SerializableBodyFrame firstCalibrationFrame;
                 this.calibrationBodyFrames.TryPeek(out firstCalibrationFrame);
                 this.initAngle = WorldView.GetInitialAngle(firstCalibrationFrame.Bodies[0]);
@@ -79,22 +82,17 @@ namespace Tiny
             {
                 if (nextKinectFrame.Bodies.Count > 0)
                 {
-                    Debug.WriteLine("enqueueing...");
                     this.calibrationBodyFrames.Enqueue(nextKinectFrame);
                 }
             }
             else 
             {
-                this.processedBodyFrames.Push(Tuple.Create(nextKinectFrame, new WorldView(nextKinectFrame, WorldView.GetTransformedBody(nextKinectFrame.Bodies[0], this.initAngle, this.initCentrePosition))));
+                this.processedBodyFrames.Push(Tuple.Create(nextKinectFrame, new WorldView(WorldView.GetBodyWorldCoordinates(nextKinectFrame.Bodies[0], this.initAngle, this.initCentrePosition), this.initAngle, this.initCentrePosition, nextKinectFrame.DepthFrameWidth, nextKinectFrame.DepthFrameHeight)));
             }
 
             if (this.DisplayKinectBodyFrame != null)
             {
                 this.DisplayKinectBodyFrame(nextKinectFrame);
-            }
-            else
-            {
-                Debug.WriteLine("null");
             }
         }
 
@@ -105,10 +103,7 @@ namespace Tiny
 
         public void CloseBodyViewer()
         {
-            this.kinectBodyViwer.Dispatcher.Invoke((Action)(() =>
-            {
-                this.kinectBodyViwer.Close();
-            }));
+            this.CloseKinectBodyViewer();
         }
 
         public ConcurrentQueue<SerializableBodyFrame> IncomingBodyFrames
@@ -141,28 +136,24 @@ namespace Tiny
             {
                 if (this.processedBodyFrames.Count > 0)
                 {
-                    Debug.WriteLine("using processed body frames");
                     Tuple<SerializableBodyFrame, WorldView> lastKinectFrameTuple;
                     this.processedBodyFrames.TryPeek(out lastKinectFrameTuple);
                     return lastKinectFrameTuple.Item1;
                 }
                 else if (this.calibrationBodyFrames.Count > 0)
                 {
-                    Debug.WriteLine("using calibration body frames");
                     SerializableBodyFrame lastKinectFrame;
                     this.calibrationBodyFrames.TryPeek(out lastKinectFrame);
                     return lastKinectFrame;
                 }
                 else if (this.incomingBodyFrames.Count > 0)
                 {
-                    Debug.WriteLine("using incoming body frames");
                     SerializableBodyFrame lastKinectFrame;
                     this.incomingBodyFrames.TryPeek(out lastKinectFrame);
                     return lastKinectFrame;
                 }
                 else
                 {
-                    Debug.WriteLine("null");
                     return null;
                 }
             }

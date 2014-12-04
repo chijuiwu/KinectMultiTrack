@@ -76,6 +76,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Exceptions\UntrackedJointException.cs" />
+    <Compile Include="KinectBody.cs" />
     <Compile Include="TrackingBodyViewer.xaml.cs">
       <DependentUpon>TrackingBodyViewer.xaml</DependentUpon>
     </Compile>

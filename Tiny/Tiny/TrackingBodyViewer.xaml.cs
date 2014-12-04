@@ -32,9 +32,19 @@ namespace Tiny
         private readonly Brush inferredJointBrush = Brushes.Yellow;
         private readonly Pen inferredBonePen = new Pen(Brushes.Gray, 1);
 
+        private KinectSensor kinectSensor;
+        private CoordinateMapper coordinateMapper;
+
         public TrackingBodyViewer()
         {
-            InitializeComponent();
+            try
+            {
+                InitializeComponent();
+            } catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                Debug.WriteLine(e.StackTrace);
+            }
             this.DataContext = this;
             this.TrackingStatusText = Properties.Resources.TRACKING_CALIBRATION;
             this.bodyDrawingGroup = new DrawingGroup();
@@ -46,6 +56,10 @@ namespace Tiny
             this.bodyColors.Add(new Pen(Brushes.Blue, 6));
             this.bodyColors.Add(new Pen(Brushes.Indigo, 6));
             this.bodyColors.Add(new Pen(Brushes.Violet, 6));
+
+            this.kinectSensor = KinectSensor.GetDefault();
+            this.kinectSensor.Open();
+            this.coordinateMapper = this.kinectSensor.CoordinateMapper;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -97,19 +111,25 @@ namespace Tiny
             using (DrawingContext dc = this.bodyDrawingGroup.Open())
             {
                 WorldView firstWorldView = worldViews.First();
-                dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, firstWorldView.DepthFrameWidth, firstWorldView.DepthFrameHeight));
+                dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, firstWorldView.KinectDepthFrameWidth, firstWorldView.KinectDepthFrameHeight));
                 int penIndex = 0;
                 foreach (WorldView worldView in worldViews)
                 {
                     foreach (WorldBody body in worldView.WorldBoides)
                     {
                         Pen drawPen = this.bodyColors[penIndex++];
-                        Dictionary<JointType, WorldCoordinate> joints = body.Joints;
                         Dictionary<JointType, Point> jointPoints = new Dictionary<JointType, Point>();
-                        foreach (JointType jointType in joints.Keys)
+
+                        KinectBody bodyKinect = WorldView.GetBodyKinectCoordinates(body, worldView.InitialAngle, worldView.InitialCentrePosition);
+                        foreach (JointType jointType in bodyKinect.Joints.Keys)
                         {
-                            WorldCoordinate worldCoordinate = joints[jointType];
-                            jointPoints[jointType] = new Point(worldCoordinate.X, worldCoordinate.Y);
+                            CameraSpacePoint position = bodyKinect.Joints[jointType];
+                            if (position.Z < 0)
+                            {
+                                position.Z = 0.1f;
+                            }
+                            DepthSpacePoint depthSpacePoint = this.coordinateMapper.MapCameraPointToDepthSpace(position);
+                            jointPoints[jointType] = new Point(depthSpacePoint.X, depthSpacePoint.Y);
                         }
                         this.DrawBody(jointPoints, dc, drawPen, this.inferredBonePen, this.trackedJointBrush, this.inferredJointBrush);
                         if (penIndex == this.bodyColors.Count())
@@ -118,7 +138,7 @@ namespace Tiny
                         }
                     }
                 }
-                this.bodyDrawingGroup.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, firstWorldView.DepthFrameWidth, firstWorldView.DepthFrameHeight));
+                this.bodyDrawingGroup.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, firstWorldView.KinectDepthFrameWidth, firstWorldView.KinectDepthFrameHeight));
             }
         }
 

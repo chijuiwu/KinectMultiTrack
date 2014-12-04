@@ -65,7 +65,7 @@ namespace Tiny
 
         public override string ToString()
         {
-            return String.Format("({1},{2},{3})", this.X, this.Y, this.Z);
+            return String.Format("({0},{1},{2})", this.X, this.Y, this.Z);
         }
     }
 }
