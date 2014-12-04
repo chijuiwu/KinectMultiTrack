@@ -16,7 +16,6 @@ namespace Tiny
         public const int CALIBRATION_FRAMES = 120;
 
         private readonly int EXPECTED_CONNECTIONS;
-        private int currentConnections;
 
         // Assume one user per Kinect
         private ConcurrentDictionary<IPEndPoint, User> users;
@@ -24,7 +23,6 @@ namespace Tiny
         public UserTracker(int expectedConnections)
         {
             this.EXPECTED_CONNECTIONS = expectedConnections;
-            this.currentConnections = 0;
             this.users = new ConcurrentDictionary<IPEndPoint, User>();
         }
 
@@ -78,7 +76,6 @@ namespace Tiny
             if (!this.users.ContainsKey(clientIP))
             {
                 this.users[clientIP] = new User();
-                this.currentConnections++;
             }
             this.users[clientIP].IncomingBodyFrames.Enqueue(bodyFrame);
         }
@@ -89,12 +86,13 @@ namespace Tiny
             if (this.users.TryRemove(clientIP, out user))
             {
                 user.CloseBodyViewer();
-                this.currentConnections--;
             }
         }
 
         public void SynchronizeFrames()
         {
+            Debug.WriteLine("users count: " + this.users.Count);
+            Debug.WriteLine("expected connections count: " + this.EXPECTED_CONNECTIONS);
             if (this.users.Count >= this.EXPECTED_CONNECTIONS)
             {
                 bool readyToCalibrate = true;

@@ -66,6 +66,8 @@ namespace Tiny
                     this.calibrationBodyFrames.TryPop(out calibrationFrame);
                     calibrationFrames[frameCount++] = calibrationFrame;
                 }
+                // Get rid of rest of calibration frames
+                this.calibrationBodyFrames.Clear();
 
                 SerializableBodyFrame firstCalibrationFrame = calibrationFrames[0];
                 SerializableBody[] calibrationBodies = new SerializableBody[calibrationFrames.Length];

@@ -14,7 +14,7 @@ namespace Tiny
     public partial class App : Application
     {
         public const int port = 12345;
-        public const int connections = 2;
+        public const int connections = 1;
 
         private KinectServer server;
 
