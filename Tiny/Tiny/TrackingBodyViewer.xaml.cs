@@ -117,6 +117,12 @@ namespace Tiny
                 {
                     foreach (WorldBody body in worldView.WorldBoides)
                     {
+                        foreach (JointType jointType in body.Joints.Keys)
+                        {
+                            WorldCoordinate jointWorld = body.Joints[jointType];
+                            Debug.WriteLine("joint: " + jointType + " world: " + jointWorld);
+                        }
+
                         Pen drawPen = this.bodyColors[penIndex++];
                         Dictionary<JointType, Point> jointPoints = new Dictionary<JointType, Point>();
 

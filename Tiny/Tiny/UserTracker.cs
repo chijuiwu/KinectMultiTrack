@@ -8,6 +8,7 @@ using System.Collections.Concurrent;
 using System.Net;
 using System.Diagnostics;
 using Microsoft.Kinect;
+using System.Runtime.CompilerServices;
 
 namespace Tiny
 {
@@ -16,9 +17,9 @@ namespace Tiny
         public const int CALIBRATION_FRAMES = 120;
 
         private readonly int EXPECTED_CONNECTIONS;
-
         // Assume one user per Kinect
         private ConcurrentDictionary<IPEndPoint, User> users;
+        private readonly object syncLock = new object();
 
         public UserTracker(int expectedConnections)
         {
@@ -91,31 +92,32 @@ namespace Tiny
 
         public void SynchronizeFrames()
         {
-            Debug.WriteLine("users count: " + this.users.Count);
-            Debug.WriteLine("expected connections count: " + this.EXPECTED_CONNECTIONS);
-            if (this.users.Count >= this.EXPECTED_CONNECTIONS)
+            lock (syncLock)
             {
-                bool readyToCalibrate = true;
-                foreach (User user in this.users.Values)
+                if (this.users.Count >= this.EXPECTED_CONNECTIONS)
                 {
-                    if (!user.ReadyToCalibrate)
-                    {
-                        readyToCalibrate = false;
-                        break;
-                    }
-                }
-                if (readyToCalibrate)
-                {
+                    bool readyToCalibrate = true;
                     foreach (User user in this.users.Values)
                     {
-                        user.CalibrateKinect();
+                        if (!user.ReadyToCalibrate)
+                        {
+                            readyToCalibrate = false;
+                            break;
+                        }
+                    }
+                    if (readyToCalibrate)
+                    {
+                        foreach (User user in this.users.Values)
+                        {
+                            user.CalibrateKinect();
+                        }
                     }
                 }
-            }
 
-            foreach (User user in this.users.Values)
-            {
-                user.ProcessBodyFrame();
+                foreach (User user in this.users.Values)
+                {
+                    user.ProcessBodyFrame();
+                }
             }
         }
     }

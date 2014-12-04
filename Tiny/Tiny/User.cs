@@ -67,7 +67,7 @@ namespace Tiny
                     calibrationFrames[frameCount++] = calibrationFrame;
                 }
                 // Get rid of rest of calibration frames
-                this.calibrationBodyFrames.Clear();
+                //this.calibrationBodyFrames.Clear();
 
                 SerializableBodyFrame firstCalibrationFrame = calibrationFrames[0];
                 SerializableBody[] calibrationBodies = new SerializableBody[calibrationFrames.Length];
@@ -121,7 +121,7 @@ namespace Tiny
         {
             get
             {
-                return !this.calibrationCompleted && this.calibrationBodyFrames.Count == UserTracker.CALIBRATION_FRAMES;
+                return !this.calibrationCompleted && this.calibrationBodyFrames.Count >= UserTracker.CALIBRATION_FRAMES;
             }
         }
 
