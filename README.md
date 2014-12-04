@@ -9,7 +9,12 @@ The project is about tracking people and resolving occlusion in realistic enviro
 
 * Literature review
 * Code refactor
-* Kinect calibration
+* Midterm report
+* Testing of differences in world coordinates
+* Extend for angle
+* Extend for more people
+* Testing for occlusions
+* User study
 
 ## Completed...
 
@@ -21,6 +26,7 @@ The project is about tracking people and resolving occlusion in realistic enviro
 	* Joint
 * Kinect Client and Server Sockets (5th November, 2014)
 * Kinect Visualizer (13th November, 2014)
+* Kinect Calibration (4th December, 2014)
 
 ## Project Description
 
