@@ -100,10 +100,6 @@ namespace Tiny
                     while (!clientStream.DataAvailable) ;
 
                     SerializableBodyFrame bodyFrame = BodyFrameSerializer.Deserialize(clientStream);
-                    if (bodyFrame == null)
-                    {
-                        Debug.WriteLine("body frame is null");
-                    }
                     this.userTracker.AddOrUpdateBodyFrame(clientIP, bodyFrame);
                     Thread visualUpdateThread = new Thread(new ThreadStart(this.StartVisualUpdateThread));
                     visualUpdateThread.Start();
