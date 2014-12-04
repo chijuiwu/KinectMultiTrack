@@ -56,11 +56,6 @@ namespace KinectSerializer
             this.jointsDict = new Dictionary<JointType, SerializableJoint>();
         }
 
-        public void updateJoint(JointType jointType, SerializableJoint joint)
-        {
-            this.jointsDict[jointType] = joint;
-        }
-
         protected SerializableBody(SerializationInfo info, StreamingContext ctx)
         {
             this.isTracked = (bool)info.GetValue(SerializableBody.NameIsTracked, typeof(bool));
@@ -82,7 +77,7 @@ namespace KinectSerializer
             Dictionary<JointType, SerializableJoint> jointsDict = body.Joints;
             foreach (JointType jointType in jointsDict.Keys)
             {
-                copy.updateJoint(jointType, SerializableJoint.Copy(jointsDict[jointType]));
+                copy.Joints[jointType] = SerializableJoint.Copy(jointsDict[jointType]);
             }
             return body;
         }

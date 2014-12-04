@@ -65,15 +65,14 @@ namespace KinectClient
             }
         }
 
-        public void SendKinectBodyFrame(SerializableBodyFrame serializableBodyFrame)
+        public void SendSerializedKinectBodyFrame(SerializableBodyFrame serializableBodyFrame)
         {
             if (!this.CanWriteToServer()) return;
-
-            Thread kinectStreamThread = new Thread(usused => SendBodyFrameAsThread((object)serializableBodyFrame));
-            kinectStreamThread.Start();
+            Thread kinectBodyStreamThread = new Thread(usused => StreamKinectBodyFrame((object)serializableBodyFrame));
+            kinectBodyStreamThread.Start();
         }
 
-        private void SendBodyFrameAsThread(object serializableBodyFrameObj)
+        private void StreamKinectBodyFrame(object serializableBodyFrameObj)
         {
             Debug.Assert(serializableBodyFrameObj.GetType() == typeof(SerializableBodyFrame));
 

@@ -44,15 +44,28 @@ namespace Tiny
             }
         }
 
+        internal void CloseBodyStream()
+        {
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                this.PerformCloseBodyStream();
+            }));
+        }
+
+        private void PerformCloseBodyStream()
+        {
+            this.Close();
+        }
+
         internal void UpdateBodyFrame(SerializableBodyFrame bodyFrame)
         {
             this.Dispatcher.Invoke((Action)(() =>
             {
-                this.DisplayBodyFrame(bodyFrame);
+                this.PerformUpdateBodyFrame(bodyFrame);
             }));
         }
 
-        public void DisplayBodyFrame(SerializableBodyFrame bodyFrame)
+        private void PerformUpdateBodyFrame(SerializableBodyFrame bodyFrame)
         {
             using (DrawingContext dc = this.bodyDrawingGroup.Open())
             {

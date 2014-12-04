@@ -26,6 +26,9 @@ namespace Tiny
         public event DisplayKinectBodyFrameHandler DisplayKinectBodyFrame;
         public delegate void DisplayKinectBodyFrameHandler(SerializableBodyFrame bodyFrame);
 
+        public event CloseKinectBodyStreamHandler CloseKinectBodyViewer;
+        public delegate void CloseKinectBodyStreamHandler();
+
         private KinectBodyViewer kinectBodyViwer;
 
         public User()
@@ -44,6 +47,7 @@ namespace Tiny
             this.kinectBodyViwer = new KinectBodyViewer();
             this.kinectBodyViwer.Show();
             this.DisplayKinectBodyFrame += this.kinectBodyViwer.UpdateBodyFrame;
+            this.CloseKinectBodyViewer += this.kinectBodyViwer.CloseBodyStream;
             Dispatcher.Run();
         }
 
@@ -92,10 +96,6 @@ namespace Tiny
             {
                 this.DisplayKinectBodyFrame(nextKinectFrame);
             }
-            else
-            {
-                Debug.WriteLine("null");
-            }
         }
 
         private bool ReadyToCalibrate()
@@ -105,10 +105,7 @@ namespace Tiny
 
         public void CloseBodyViewer()
         {
-            this.kinectBodyViwer.Dispatcher.Invoke((Action)(() =>
-            {
-                this.kinectBodyViwer.Close();
-            }));
+            this.CloseKinectBodyViewer();
         }
 
         public ConcurrentQueue<SerializableBodyFrame> IncomingBodyFrames
