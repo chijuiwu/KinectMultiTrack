@@ -17,7 +17,6 @@ namespace KinectSerializer
         public const string NameIsTracked = "IsTracked";
         public const string NameTrackingId = "TrackingId";
         public const string NameJointsDictionary = "JointsDict";
-        public const string NameJointsDepthPositionDictionary = "JointsCameraPositionDict";
 
         private bool isTracked;
 
