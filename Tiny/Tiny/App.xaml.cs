@@ -16,11 +16,11 @@ namespace Tiny
         public const int port = 12345;
         public const int connections = 2;
 
-        private KinectServer server;
+        private TrackingServer server;
 
         public App() {
-            this.server = new KinectServer(App.port, App.connections);
-            this.server.Start();
+            this.server = new TrackingServer(App.port, App.connections);
+            this.server.Run();
         }
     }
 }

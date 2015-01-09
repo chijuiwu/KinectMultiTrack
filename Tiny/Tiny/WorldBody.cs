@@ -8,7 +8,7 @@ using Microsoft.Kinect;
 
 namespace Tiny
 {
-    class WorldBody
+    public class WorldBody
     {
 
         private Dictionary<JointType, WorldCoordinate> joints;

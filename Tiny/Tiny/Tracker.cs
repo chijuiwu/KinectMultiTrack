@@ -12,7 +12,7 @@ using System.Runtime.CompilerServices;
 
 namespace Tiny
 {
-    class UserTracker
+    class Tracker
     {
         public const int CALIBRATION_FRAMES = 120;
 
@@ -21,7 +21,7 @@ namespace Tiny
         private ConcurrentDictionary<IPEndPoint, User> users;
         private readonly object syncLock = new object();
 
-        public UserTracker(int expectedConnections)
+        public Tracker(int expectedConnections)
         {
             this.EXPECTED_CONNECTIONS = expectedConnections;
             this.users = new ConcurrentDictionary<IPEndPoint, User>();
@@ -81,7 +81,7 @@ namespace Tiny
             this.users[clientIP].IncomingBodyFrames.Enqueue(bodyFrame);
         }
 
-        public void RemoveClient(IPEndPoint clientIP)
+        public void RemoveKinectClient(IPEndPoint clientIP)
         {
             User user;
             if (this.users.TryRemove(clientIP, out user))

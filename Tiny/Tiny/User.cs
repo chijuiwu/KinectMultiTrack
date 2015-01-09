@@ -31,7 +31,7 @@ namespace Tiny
         public event CloseKinectBodyStreamHandler CloseKinectBodyViewer;
         public delegate void CloseKinectBodyStreamHandler();
 
-        private KinectBodyViewer kinectBodyViwer;
+        private SingleKinectUI kinectBodyViwer;
 
         public User()
         {
@@ -46,7 +46,7 @@ namespace Tiny
 
         private void StartKinectBodyViewerThread()
         {
-            this.kinectBodyViwer = new KinectBodyViewer();
+            this.kinectBodyViwer = new SingleKinectUI();
             this.kinectBodyViwer.Show();
             this.DisplayKinectBodyFrame += this.kinectBodyViwer.UpdateBodyFrame;
             this.CloseKinectBodyViewer += this.kinectBodyViwer.CloseBodyStream;
@@ -58,9 +58,9 @@ namespace Tiny
             // TODO: scale to multiple bodies in one frame
             if (this.ReadyToCalibrate)
             {
-                SerializableBodyFrame[] calibrationFrames = new SerializableBodyFrame[UserTracker.CALIBRATION_FRAMES];
+                SerializableBodyFrame[] calibrationFrames = new SerializableBodyFrame[Tracker.CALIBRATION_FRAMES];
                 int frameCount = 0;
-                while (frameCount < UserTracker.CALIBRATION_FRAMES)
+                while (frameCount < Tracker.CALIBRATION_FRAMES)
                 {
                     SerializableBodyFrame calibrationFrame;
                     this.calibrationBodyFrames.TryPop(out calibrationFrame);
@@ -122,7 +122,7 @@ namespace Tiny
         {
             get
             {
-                return !this.calibrationCompleted && this.calibrationBodyFrames.Count >= UserTracker.CALIBRATION_FRAMES;
+                return !this.calibrationCompleted && this.calibrationBodyFrames.Count >= Tracker.CALIBRATION_FRAMES;
             }
         }
 

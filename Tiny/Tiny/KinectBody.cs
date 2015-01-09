@@ -7,7 +7,7 @@ using Microsoft.Kinect;
 
 namespace Tiny
 {
-    class KinectBody
+    public class KinectBody
     {
         private Dictionary<JointType, CameraSpacePoint> joints;
 

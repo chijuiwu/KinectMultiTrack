@@ -77,15 +77,15 @@
     </ApplicationDefinition>
     <Compile Include="Exceptions\UntrackedJointException.cs" />
     <Compile Include="KinectBody.cs" />
-    <Compile Include="TrackingBodyViewer.xaml.cs">
-      <DependentUpon>TrackingBodyViewer.xaml</DependentUpon>
+    <Compile Include="TrackingUI.xaml.cs">
+      <DependentUpon>TrackingUI.xaml</DependentUpon>
     </Compile>
     <Compile Include="User.cs" />
     <Compile Include="WorldBody.cs" />
-    <Compile Include="UserTracker.cs" />
+    <Compile Include="KinectTracker.cs" />
     <Compile Include="WorldCoordinate.cs" />
     <Compile Include="WorldView.cs" />
-    <Page Include="CombinedBodyViewer.xaml">
+    <Page Include="MultipleKinectUI.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -93,23 +93,23 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="KinectServer.cs" />
-    <Compile Include="CombinedBodyViewer.xaml.cs">
-      <DependentUpon>CombinedBodyViewer.xaml</DependentUpon>
+    <Compile Include="TrackingServer.cs" />
+    <Compile Include="MultipleKinectUI.xaml.cs">
+      <DependentUpon>MultipleKinectUI.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="KinectBodyViewer.xaml">
+    <Page Include="SingleKinectUI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="TrackingBodyViewer.xaml">
+    <Page Include="TrackingUI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="KinectBodyViewer.xaml.cs">
-      <DependentUpon>KinectBodyViewer.xaml</DependentUpon>
+    <Compile Include="SingleKinectUI.xaml.cs">
+      <DependentUpon>SingleKinectUI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

@@ -9,7 +9,7 @@ using Tiny.Exceptions;
 
 namespace Tiny
 {
-    class WorldView
+    public class WorldView
     {
         private double initAngle;
         WorldCoordinate initCentrePosition;

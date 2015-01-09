@@ -19,7 +19,7 @@ using System.Diagnostics;
 
 namespace Tiny
 {
-    public partial class TrackingBodyViewer : Window, INotifyPropertyChanged
+    public partial class TrackingUI : Window, INotifyPropertyChanged
     {
         private string trackingStatusText;
 
@@ -35,7 +35,7 @@ namespace Tiny
         private KinectSensor kinectSensor;
         private CoordinateMapper coordinateMapper;
 
-        public TrackingBodyViewer()
+        public TrackingUI()
         {
             try
             {

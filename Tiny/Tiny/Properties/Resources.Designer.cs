@@ -61,11 +61,38 @@ namespace Tiny.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Handle connection from .
+        /// </summary>
+        internal static string CONNECTION_START {
+            get {
+                return ResourceManager.GetString("CONNECTION_START", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Server exception.
+        /// </summary>
+        internal static string SERVER_EXCEPTION {
+            get {
+                return ResourceManager.GetString("SERVER_EXCEPTION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Okay.
         /// </summary>
         internal static string SERVER_RESPONSE_OKAY {
             get {
                 return ResourceManager.GetString("SERVER_RESPONSE_OKAY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Start server @ .
+        /// </summary>
+        internal static string SERVER_START {
+            get {
+                return ResourceManager.GetString("SERVER_START", resourceCulture);
             }
         }
         

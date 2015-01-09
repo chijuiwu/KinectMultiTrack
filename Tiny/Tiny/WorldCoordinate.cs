@@ -7,7 +7,7 @@ using Microsoft.Kinect;
 
 namespace Tiny
 {
-    class WorldCoordinate
+    public class WorldCoordinate
     {
         private float x;
         private float y;

@@ -10,7 +10,6 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 using KinectSerializer;
 using Microsoft.Kinect;
@@ -18,31 +17,26 @@ using System.Diagnostics;
 
 namespace Tiny
 {
-    public partial class CombinedBodyViewer : Window
+    public partial class SingleKinectUI : Window
     {
         private DrawingGroup bodyDrawingGroup;
         private DrawingImage bodyImageSource;
-        private List<Pen> bodyColors;
+        private Pen bodyColor;
         private const double JointThickness = 3;
         private const double ClipBoundsThickness = 10;
         private readonly Brush trackedJointBrush = new SolidColorBrush(Color.FromArgb(255, 68, 192, 68));
         private readonly Brush inferredJointBrush = Brushes.Yellow;
         private readonly Pen inferredBonePen = new Pen(Brushes.Gray, 1);
 
-        public CombinedBodyViewer()
+        public SingleKinectUI()
         {
             InitializeComponent();
             this.DataContext = this;
             this.bodyDrawingGroup = new DrawingGroup();
             this.bodyImageSource = new DrawingImage(this.bodyDrawingGroup);
-            this.bodyColors = new List<Pen>();
-            this.bodyColors.Add(new Pen(Brushes.Red, 6));
-            this.bodyColors.Add(new Pen(Brushes.Orange, 6));
-            this.bodyColors.Add(new Pen(Brushes.Green, 6));
-            this.bodyColors.Add(new Pen(Brushes.Blue, 6));
-            this.bodyColors.Add(new Pen(Brushes.Indigo, 6));
-            this.bodyColors.Add(new Pen(Brushes.Violet, 6));
+            this.bodyColor = new Pen(Brushes.Blue, 6);
         }
+
         public ImageSource BodyStreamImageSource
         {
             get
@@ -51,46 +45,49 @@ namespace Tiny
             }
         }
 
-        internal void UpdateBodyStreamDisplay(IEnumerable<SerializableBodyFrame> bodyFrames)
+        internal void CloseBodyStream()
         {
             this.Dispatcher.Invoke((Action)(() =>
             {
-                this.DisplayBodyFrames(bodyFrames);
+                this.PerformCloseBodyStream();
             }));
         }
 
-        private void DisplayBodyFrames(IEnumerable<SerializableBodyFrame> bodyFrames)
+        private void PerformCloseBodyStream()
         {
-            if (!bodyFrames.Any()) return;
+            this.Close();
+        }
+
+        internal void UpdateBodyFrame(SerializableBodyFrame bodyFrame)
+        {
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                this.PerformUpdateBodyFrame(bodyFrame);
+            }));
+        }
+
+        private void PerformUpdateBodyFrame(SerializableBodyFrame bodyFrame)
+        {
             using (DrawingContext dc = this.bodyDrawingGroup.Open())
             {
-                SerializableBodyFrame firstFrame = bodyFrames.First();
-                dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, firstFrame.DepthFrameWidth, firstFrame.DepthFrameHeight));
-                int penIndex = 0;
-                foreach (SerializableBodyFrame bodyFrame in bodyFrames)
+                dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, bodyFrame.DepthFrameWidth, bodyFrame.DepthFrameHeight));
+                foreach (SerializableBody body in bodyFrame.Bodies)
                 {
-                    foreach (SerializableBody body in bodyFrame.Bodies)
+                    if (body.IsTracked)
                     {
-                        if (body.IsTracked)
-                        {
-                            Pen drawPen = this.bodyColors[penIndex++];
-                            Dictionary<JointType, SerializableJoint> joints = body.Joints;
+                        Dictionary<JointType, SerializableJoint> joints = body.Joints;
 
-                            Dictionary<JointType, Point> jointPoints = new Dictionary<JointType, Point>();
-                            foreach (JointType jointType in joints.Keys)
-                            {
-                                DepthSpacePoint depthSpacePoint = joints[jointType].DepthSpacePoint;
-                                jointPoints[jointType] = new Point(depthSpacePoint.X, depthSpacePoint.Y);
-                            }
-                            this.DrawBody(joints, jointPoints, dc, drawPen, this.inferredBonePen, this.trackedJointBrush, this.inferredJointBrush);
-                            if (penIndex == this.bodyColors.Count())
-                            {
-                                penIndex = 0;
-                            }
+                        Dictionary<JointType, Point> jointPoints = new Dictionary<JointType, Point>();
+                        foreach (JointType jointType in joints.Keys)
+                        {
+                            DepthSpacePoint depthSpacePoint = joints[jointType].DepthSpacePoint;
+                            //Debug.WriteLine("joint: " + jointType + " depth coordinate: " + depthSpacePoint.X + "," + depthSpacePoint.Y);
+                            jointPoints[jointType] = new Point(depthSpacePoint.X, depthSpacePoint.Y);
                         }
+                        this.DrawBody(joints, jointPoints, dc, this.bodyColor, this.inferredBonePen, this.trackedJointBrush, this.inferredJointBrush);
                     }
                 }
-                this.bodyDrawingGroup.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, firstFrame.DepthFrameWidth, firstFrame.DepthFrameHeight));
+                this.bodyDrawingGroup.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, bodyFrame.DepthFrameWidth, bodyFrame.DepthFrameHeight));
             }
         }
 

@@ -117,8 +117,17 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="CONNECTION_START" xml:space="preserve">
+    <value>Handle connection from </value>
+  </data>
+  <data name="SERVER_EXCEPTION" xml:space="preserve">
+    <value>Server exception</value>
+  </data>
   <data name="SERVER_RESPONSE_OKAY" xml:space="preserve">
     <value>Okay</value>
+  </data>
+  <data name="SERVER_START" xml:space="preserve">
+    <value>Start server @ </value>
   </data>
   <data name="TRACKING_CALIBRATION" xml:space="preserve">
     <value>Calibrating initial position</value>
