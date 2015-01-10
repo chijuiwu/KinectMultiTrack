@@ -97,7 +97,7 @@ namespace Tiny
                                                             : Properties.Resources.TRACKING_CALIBRATION;
         }
 
-        internal void UpdateTrackingDisplay(IEnumerable<WorldView> worldViews)
+        internal void UpdateTrackingDisplay(IEnumerable<Tuple<IPEndPoint, WorldView>> worldViews)
         {
             this.Dispatcher.Invoke((Action)(() =>
             {

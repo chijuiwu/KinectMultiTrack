@@ -45,17 +45,12 @@ namespace Tiny
             }
         }
 
-        internal void CloseBodyStream()
+        public void Dispose()
         {
             this.Dispatcher.Invoke((Action)(() =>
             {
-                this.PerformCloseBodyStream();
+                this.Close();
             }));
-        }
-
-        private void PerformCloseBodyStream()
-        {
-            this.Close();
         }
 
         internal void UpdateBodyFrame(SerializableBodyFrame bodyFrame)

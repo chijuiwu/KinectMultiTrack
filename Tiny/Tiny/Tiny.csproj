@@ -77,12 +77,13 @@
     </ApplicationDefinition>
     <Compile Include="Exceptions\UntrackedJointException.cs" />
     <Compile Include="KinectBody.cs" />
+    <Compile Include="KinectProfile.cs" />
     <Compile Include="TrackingUI.xaml.cs">
       <DependentUpon>TrackingUI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="User.cs" />
+    <Compile Include="Person.cs" />
     <Compile Include="WorldBody.cs" />
-    <Compile Include="KinectTracker.cs" />
+    <Compile Include="Tracker.cs" />
     <Compile Include="WorldCoordinate.cs" />
     <Compile Include="WorldView.cs" />
     <Page Include="MultipleKinectUI.xaml">

@@ -16,88 +16,62 @@ namespace Tiny
     {
         public const int CALIBRATION_FRAMES = 120;
 
-        private readonly int EXPECTED_CONNECTIONS;
-        // Assume one user per Kinect
-        private ConcurrentDictionary<IPEndPoint, User> users;
-        private readonly object syncLock = new object();
+        private readonly int KINECT_COUNT;
+        private ConcurrentDictionary<IPEndPoint, KinectProfile> kinectProfilesDict;
 
-        public Tracker(int expectedConnections)
+        private readonly object syncFrameLock = new object();
+
+        public Tracker(int kinectCount)
         {
-            this.EXPECTED_CONNECTIONS = expectedConnections;
-            this.users = new ConcurrentDictionary<IPEndPoint, User>();
+            this.KINECT_COUNT = kinectCount;
+            this.kinectProfilesDict = new ConcurrentDictionary<IPEndPoint, KinectProfile>();
         }
 
-        public IEnumerable<SerializableBodyFrame> UserLastKinectFrames
+        public IEnumerable<Tuple<IPEndPoint, SerializableBodyFrame>> GetLatestRawFrames()
         {
-            get
+            foreach (IPEndPoint clientIP in this.kinectProfilesDict.Keys)
             {
-                foreach (User user in users.Values)
-                {
-                    SerializableBodyFrame lastKinectFrame = user.LastKinectFrame;
-                    if (lastKinectFrame != null)
-                    {
-                        yield return lastKinectFrame;
-                    }
-                }
+                SerializableBodyFrame latestFrame = this.kinectProfilesDict[clientIP].LatestFrame;
+                yield return Tuple.Create(clientIP, latestFrame);
             }
         }
 
-        public IEnumerable<WorldView> UserLastWorldViews
+        public IEnumerable<Tuple<IPEndPoint, WorldView>> GetLatestFramesInWorldView(IPEndPoint referenceKinectFOV)
         {
-            get
-            {
-                foreach (User user in users.Values)
-                {
-                    WorldView lastWorldView = user.LastWorldView;
-                    if (lastWorldView != null)
-                    {
-                        yield return lastWorldView;
-                    }
-                }
-            }
-        }
 
-        public bool CalibrationCompleted
-        {
-            get
+            foreach (IPEndPoint clientIP in this.kinectProfilesDict.Keys)
             {
-                foreach (User user in users.Values)
-                {
-                    if (!user.CalibrationCompleted)
-                    {
-                        return false;
-                    }
-                }
-                return true;
+                WorldView latestWorldView = this.kinectProfilesDict[clientIP].LatestWorldView;
+                yield return Tuple.Create(clientIP, latestWorldView);
             }
         }
 
         public void AddOrUpdateBodyFrame(IPEndPoint clientIP, SerializableBodyFrame bodyFrame)
         {
-            if (!this.users.ContainsKey(clientIP))
+            if (!this.kinectProfilesDict.ContainsKey(clientIP))
             {
-                this.users[clientIP] = new User();
+                this.kinectProfilesDict[clientIP] = new KinectProfile();
             }
-            this.users[clientIP].IncomingBodyFrames.Enqueue(bodyFrame);
+            this.kinectProfilesDict[clientIP].AddFrame(bodyFrame);
         }
 
-        public void RemoveKinectClient(IPEndPoint clientIP)
+        public void RemoveClient(IPEndPoint clientIP)
         {
-            User user;
-            if (this.users.TryRemove(clientIP, out user))
+            KinectProfile kinectProfile;
+            if (this.kinectProfilesDict.TryRemove(clientIP, out kinectProfile))
             {
-                user.CloseBodyViewer();
+                kinectProfile.DisposeUI();
             }
         }
 
         public void SynchronizeFrames()
         {
-            lock (syncLock)
+            lock (syncFrameLock)
             {
                 if (this.users.Count >= this.EXPECTED_CONNECTIONS)
                 {
                     bool readyToCalibrate = true;
-                    foreach (User user in this.users.Values)
+                    foreach (Person user in this.users.Values)
                     {
                         if (!user.ReadyToCalibrate)
                         {
@@ -109,14 +83,14 @@ namespace Tiny
                     {
                         foreach (IPEndPoint userIP in this.users.Keys)
                         {
-                            User user = this.users[userIP];
+                            Person user = this.users[userIP];
                             Debug.WriteLine("user IP: " + userIP);
                             user.CalibrateKinect();
                         }
                     }
                 }
 
-                foreach (User user in this.users.Values)
+                foreach (Person user in this.users.Values)
                 {
                     user.ProcessBodyFrame();
                 }

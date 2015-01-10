@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using KinectSerializer;
 using Microsoft.Kinect;
+using System.Net;
 using System.Diagnostics;
 
 namespace Tiny
@@ -51,7 +52,7 @@ namespace Tiny
             }
         }
 
-        internal void UpdateFrames(IEnumerable<SerializableBodyFrame> bodyFrames)
+        public void UpdateFrames(IEnumerable<Tuple<IPEndPoint, WorldView>> bodyFrames)
         {
             this.Dispatcher.Invoke((Action)(() =>
             {
@@ -59,7 +60,7 @@ namespace Tiny
             }));
         }
 
-        private void DisplayBodyFrames(IEnumerable<SerializableBodyFrame> bodyFrames)
+        private void DisplayBodyFrames(IEnumerable<Tuple<IPEndPoint, WorldView>> bodyFrames)
         {
             if (!bodyFrames.Any()) return;
             using (DrawingContext dc = this.bodyDrawingGroup.Open())

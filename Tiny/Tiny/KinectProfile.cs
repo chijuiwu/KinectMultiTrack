@@ -1,56 +1,60 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Threading;
-using System.Net;
-using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Windows.Threading;
 using KinectSerializer;
 
 namespace Tiny
 {
-    class User
+    public class KinectProfile
     {
-        private double initAngle;
-        private WorldCoordinate initCentrePosition;
         private int depthFrameWidth;
         private int depthFrameHeight;
-        private bool calibrationCompleted;
 
         // Unprocessed body frames, assume the frame order is perserved
         private ConcurrentQueue<SerializableBodyFrame> incomingBodyFrames;
         private ConcurrentStack<SerializableBodyFrame> calibrationBodyFrames;
         private ConcurrentStack<Tuple<SerializableBodyFrame, WorldView>> processedBodyFrames;
+        public event KinectBodyFrameHandler UpdateKinectBodyFrame;
+        public delegate void KinectBodyFrameHandler(SerializableBodyFrame bodyFrame);
 
-        public event DisplayKinectBodyFrameHandler DisplayKinectBodyFrame;
-        public delegate void DisplayKinectBodyFrameHandler(SerializableBodyFrame bodyFrame);
+        private SingleKinectUI kinectUI;
+        public event KinectUIHandler DisposeKinectUI;
+        public delegate void KinectUIHandler();
 
-        public event CloseKinectBodyStreamHandler CloseKinectBodyViewer;
-        public delegate void CloseKinectBodyStreamHandler();
-
-        private SingleKinectUI kinectBodyViwer;
-
-        public User()
+        public KinectProfile()
         {
             this.incomingBodyFrames = new ConcurrentQueue<SerializableBodyFrame>();
             this.calibrationBodyFrames = new ConcurrentStack<SerializableBodyFrame>();
             this.processedBodyFrames = new ConcurrentStack<Tuple<SerializableBodyFrame, WorldView>>();
             
-            Thread bodyViewerThread = new Thread(new ThreadStart(this.StartKinectBodyViewerThread));
-            bodyViewerThread.SetApartmentState(ApartmentState.STA);
-            bodyViewerThread.Start();
+            Thread kinectUIThread = new Thread(new ThreadStart(this.StartKinectUIThread));
+            kinectUIThread.SetApartmentState(ApartmentState.STA);
+            kinectUIThread.Start();
         }
 
-        private void StartKinectBodyViewerThread()
+        private void StartKinectUIThread()
         {
-            this.kinectBodyViwer = new SingleKinectUI();
-            this.kinectBodyViwer.Show();
-            this.DisplayKinectBodyFrame += this.kinectBodyViwer.UpdateBodyFrame;
-            this.CloseKinectBodyViewer += this.kinectBodyViwer.CloseBodyStream;
+            this.kinectUI = new SingleKinectUI();
+            this.kinectUI.Show();
+            this.UpdateKinectBodyFrame += this.kinectUI.UpdateBodyFrame;
+            this.DisposeKinectUI += this.kinectUI.Dispose;
             Dispatcher.Run();
+        }
+
+        public void AddFrame(SerializableBodyFrame bodyFrame)
+        {
+            this.incomingBodyFrames.Enqueue(bodyFrame);
+        }
+
+        public void DisposeUI()
+        {
+            this.DisposeKinectUI();
         }
 
         public void CalibrateKinect()
@@ -107,15 +111,10 @@ namespace Tiny
                 }
             }
 
-            if (this.DisplayKinectBodyFrame != null)
+            if (this.UpdateKinectBodyFrame != null)
             {
-                this.DisplayKinectBodyFrame(nextKinectFrame);
+                this.UpdateKinectBodyFrame(nextKinectFrame);
             }
-        }
-        
-        public void CloseBodyViewer()
-        {
-            this.CloseKinectBodyViewer();
         }
 
         public bool ReadyToCalibrate
@@ -126,31 +125,7 @@ namespace Tiny
             }
         }
 
-        public bool CalibrationCompleted
-        {
-            get
-            {
-                return this.calibrationCompleted;
-            }
-        }
-
-        public ConcurrentQueue<SerializableBodyFrame> IncomingBodyFrames
-        {
-            get
-            {
-                return this.incomingBodyFrames;
-            }
-        }
-
-        public ConcurrentStack<Tuple<SerializableBodyFrame, WorldView>> ProcessedBodyFrames
-        {
-            get
-            {
-                return this.processedBodyFrames;
-            }
-        }
-
-        public SerializableBodyFrame LastKinectFrame
+        public SerializableBodyFrame LatestFrame
         {
             get
             {
@@ -179,7 +154,7 @@ namespace Tiny
             }
         }
 
-        public WorldView LastWorldView
+        public WorldView LatestWorldView
         {
             get
             {

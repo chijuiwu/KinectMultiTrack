@@ -14,12 +14,12 @@ namespace Tiny
     public partial class App : Application
     {
         public const int port = 12345;
-        public const int connections = 2;
+        public const int kinects = 2;
 
         private TrackingServer server;
 
         public App() {
-            this.server = new TrackingServer(App.port, App.connections);
+            this.server = new TrackingServer(App.port, App.kinects);
             this.server.Run();
         }
     }

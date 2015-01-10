@@ -22,21 +22,17 @@ namespace Tiny
         private TrackingUI trackingUI;
 
         public event KinectFrameHandler MultipleKinectUpdate;
-        public delegate void KinectFrameHandler(IEnumerable<SerializableBodyFrame> bodyFrames);
+        public delegate void KinectFrameHandler(IEnumerable<Tuple<IPEndPoint, WorldView>> bodyFrames);
         
         public event WorldViewHandler TrackingUpdate;
-        public delegate void WorldViewHandler(IEnumerable<WorldView> worldViews);
-        
-        public event KinectCalibrationHandler CalibrationUpdate;
-        public delegate void KinectCalibrationHandler(bool completed);
+        public delegate void WorldViewHandler(IEnumerable<Tuple<IPEndPoint, WorldView>> worldViews);
 
-
-        public TrackingServer(int port, int expectedConnections)
+        public TrackingServer(int port, int kinectCount)
         {
             this.kinectListener = new TcpListener(IPAddress.Any, port);
             this.acceptKinectConnectionThread = new Thread(new ThreadStart(this.AcceptKinectConnectionThread));
             
-            this.tracker = new Tracker(expectedConnections);
+            this.tracker = new Tracker(kinectCount);
 
             Thread multipleKinectUIThread = new Thread(new ThreadStart(this.StartMultipleKinectUIThread));
             multipleKinectUIThread.SetApartmentState(ApartmentState.STA);
@@ -67,7 +63,6 @@ namespace Tiny
             this.trackingUI = new TrackingUI();
             this.trackingUI.Show();
             this.TrackingUpdate += this.trackingUI.UpdateTrackingDisplay;
-            this.CalibrationUpdate += this.trackingUI.UpdateCalibrationStatus;
             Dispatcher.Run();
         }
 
@@ -119,7 +114,7 @@ namespace Tiny
                 }
             }
 
-            this.tracker.RemoveKinectClient(clientIP);
+            this.tracker.RemoveClient(clientIP);
             clientStream.Close();
             clientStream.Dispose();
             client.Close();
@@ -128,18 +123,8 @@ namespace Tiny
         private void StartUIUpdateThread()
         {
             this.tracker.SynchronizeFrames();
-            if (this.tracker.CalibrationCompleted)
-            {
-                this.CalibrationUpdate(true);
-            }
-            else
-            {
-                this.CalibrationUpdate(false);
-            }
-            IEnumerable<SerializableBodyFrame> userLastKinectFrames = this.tracker.UserLastKinectFrames;
-            IEnumerable<WorldView> userLastWorldViews = this.tracker.UserLastWorldViews;
-            this.MultipleKinectUpdate(userLastKinectFrames);
-            this.TrackingUpdate(userLastWorldViews);
+            this.MultipleKinectUpdate(this.tracker.GetLatestRawFrames());
+            this.TrackingUpdate(this.tracker.GetLatestFramesInWorldView(null));
         }
     }
 }
