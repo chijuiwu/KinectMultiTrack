@@ -36,7 +36,7 @@ namespace Tiny
 
             this.unprocessedBodyFrames = new Stack<SBodyFrame>();
             this.processedBodyFrames = new Stack<Tuple<SBodyFrame, WorldBodyFrame>>();
-            
+
             Thread kinectUIThread = new Thread(new ThreadStart(this.StartKinectUIThread));
             kinectUIThread.SetApartmentState(ApartmentState.STA);
             kinectUIThread.Start();
@@ -58,7 +58,7 @@ namespace Tiny
         public void ProcessFrames(SBodyFrame bodyFrame)
         {
             Debug.WriteLine(Resources.PROCESS_BODYFRAME + bodyFrame.TimeStamp);
-            if(!this.calibrated)
+            if (!this.calibrated)
             {
                 this.unprocessedBodyFrames.Push(bodyFrame);
             }
@@ -70,11 +70,11 @@ namespace Tiny
                     if (this.trackedUsers.ContainsKey(body.TrackingId))
                     {
                         Person person = this.trackedUsers[body.TrackingId];
-                        worldviewBodies.Add(WorldBodyFrame.GetWorldviewBody(body, person.InitialAngle, person.InitialPosition));
+                        worldviewBodies.Add(WorldBody.Create(body, person.InitialAngle, person.InitialPosition));
                     }
                     // ignore bodies that do not match with any tracking id
                 }
-                this.processedBodyFrames.Push(Tuple.Create(bodyFrame, new WorldBodyFrame(worldviewBodies)));
+                this.processedBodyFrames.Push(Tuple.Create(bodyFrame, new WorldBodyFrame(bodyFrame.DepthFrameWidth, bodyFrame.DepthFrameHeight, worldviewBodies)));
             }
             this.UpdateKinectUI(bodyFrame);
         }
@@ -102,15 +102,15 @@ namespace Tiny
 
                 person.TrackingId = calibrationFrames[0].Bodies[personIdx].TrackingId;
 
-                person.InitialAngle = WorldBodyFrame.GetInitialAngle(calibrationFrames[0].Bodies[personIdx]);
+                person.InitialAngle = WorldBody.GetInitialAngle(calibrationFrames[0].Bodies[personIdx]);
 
                 // initial position = average of all previous positions
                 SBody[] previousPositions = new SBody[calibrationFrames.Length];
-                for(int frameIdx = 0; frameIdx < previousPositions.Length; frameIdx++)
+                for (int frameIdx = 0; frameIdx < previousPositions.Length; frameIdx++)
                 {
                     previousPositions[frameIdx] = calibrationFrames[frameIdx].Bodies[personIdx];
                 }
-                person.InitialPosition = WorldBodyFrame.GetInitialPosition(previousPositions);
+                person.InitialPosition = WorldBody.GetInitialPosition(previousPositions);
 
                 this.trackedUsers.Add(person.TrackingId, person);
             }

@@ -112,17 +112,17 @@ namespace Tiny
             using (DrawingContext dc = this.bodyDrawingGroup.Open())
             {
                 WorldBodyFrame firstWorldView = worldViews.First();
-                dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, firstWorldView.KinectDepthFrameWidth, firstWorldView.KinectDepthFrameHeight));
+                dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, firstWorldView.DepthFrameWidth, firstWorldView.DepthFrameHeight));
                 int penIndex = 0;
                 foreach (WorldBodyFrame worldView in worldViews)
                 {
-                    foreach (WorldBody body in worldView.WorldBoides)
+                    foreach (WorldBody body in worldView.Boides)
                     {
                         Pen drawPen = this.bodyColors[penIndex++];
                         Dictionary<JointType, Point> jointPoints = new Dictionary<JointType, Point>();
 
                         // convert coordinate wrt first world view
-                        KinectBody bodyKinect = WorldBodyFrame.GetKinectBody(body, firstWorldView.InitialAngle, firstWorldView.InitialCentrePosition);
+                        KinectBody bodyKinect = WorldBody.GetKinectBody(body, firstWorldView.InitialAngle, firstWorldView.InitialCentrePosition);
                         foreach (JointType jointType in bodyKinect.Joints.Keys)
                         {
                             CameraSpacePoint position = bodyKinect.Joints[jointType];
@@ -140,7 +140,7 @@ namespace Tiny
                         }
                     }
                 }
-                this.bodyDrawingGroup.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, firstWorldView.KinectDepthFrameWidth, firstWorldView.KinectDepthFrameHeight));
+                this.bodyDrawingGroup.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, firstWorldView.DepthFrameWidth, firstWorldView.DepthFrameHeight));
             }
         }
 

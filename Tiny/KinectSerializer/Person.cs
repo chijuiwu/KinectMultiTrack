@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Net;
 using System.Diagnostics;
-using KinectSerializer;
 
 namespace Tiny
 {
@@ -13,7 +12,6 @@ namespace Tiny
         private double initAngle;
         private WorldCoordinate initPosition;
         private ulong trackingId;
-        private Stack<SBodySer>
 
         public Person()
         {
