@@ -77,7 +77,7 @@
     </ApplicationDefinition>
     <Compile Include="Exceptions\UntrackedJointException.cs" />
     <Compile Include="KinectBody.cs" />
-    <Compile Include="KinectProfile.cs" />
+    <Compile Include="KinectAgent.cs" />
     <Compile Include="TrackingUI.xaml.cs">
       <DependentUpon>TrackingUI.xaml</DependentUpon>
     </Compile>

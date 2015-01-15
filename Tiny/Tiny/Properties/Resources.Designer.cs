@@ -70,6 +70,15 @@ namespace Tiny.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Processing bodyframe @ .
+        /// </summary>
+        internal static string PROCESS_BODYFRAME {
+            get {
+                return ResourceManager.GetString("PROCESS_BODYFRAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Server exception.
         /// </summary>
         internal static string SERVER_EXCEPTION {

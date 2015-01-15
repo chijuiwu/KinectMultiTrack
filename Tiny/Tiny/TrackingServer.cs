@@ -22,7 +22,7 @@ namespace Tiny
         private TrackingUI trackingUI;
 
         public event KinectFrameHandler MultipleKinectUpdate;
-        public delegate void KinectFrameHandler(IEnumerable<Tuple<IPEndPoint, WorldView>> bodyFrames);
+        public delegate void KinectFrameHandler(IEnumerable<Tuple<IPEndPoint, SerializableBodyFrame>> bodyFrames);
         
         public event WorldViewHandler TrackingUpdate;
         public delegate void WorldViewHandler(IEnumerable<Tuple<IPEndPoint, WorldView>> worldViews);
@@ -122,7 +122,8 @@ namespace Tiny
 
         private void StartUIUpdateThread()
         {
-            this.tracker.SynchronizeFrames();
+            Tracker.SyncFrameResult result = this.tracker.SynchronizeFrames(null);
+            
             this.MultipleKinectUpdate(this.tracker.GetLatestRawFrames());
             this.TrackingUpdate(this.tracker.GetLatestFramesInWorldView(null));
         }

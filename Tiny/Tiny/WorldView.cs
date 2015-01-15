@@ -17,6 +17,11 @@ namespace Tiny
         private int kinectDepthFrameHeight;
         private Dictionary<ulong, WorldBody> bodyCoordinates;
 
+        public WorldView(List<WorldBody> bodies)
+        {
+
+        }
+
         // Assume one user in each frame
         // TODO: scale to multiple users in one frame
         public WorldView(WorldBody worldBody, double initAngle, WorldCoordinate initCentrePosition, int kinectDepthWidth, int kinectDepthHeight)
@@ -98,7 +103,7 @@ namespace Tiny
 
         // Get the initial centre position of user's body
         // Each item in the array is a body at a particular frame in the initial data collection sequence
-        public static WorldCoordinate GetInitialCentrePosition(SerializableBody[] userInitialBodies)
+        public static WorldCoordinate GetInitialPosition(SerializableBody[] userInitialBodies)
         {
             float totalAverageX = 0;
             float totalAverageY = 0;

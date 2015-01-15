@@ -120,6 +120,9 @@
   <data name="CONNECTION_START" xml:space="preserve">
     <value>Handle connection from </value>
   </data>
+  <data name="PROCESS_BODYFRAME" xml:space="preserve">
+    <value>Processing bodyframe @ </value>
+  </data>
   <data name="SERVER_EXCEPTION" xml:space="preserve">
     <value>Server exception</value>
   </data>

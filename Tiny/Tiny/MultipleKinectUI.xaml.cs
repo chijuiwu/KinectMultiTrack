@@ -52,7 +52,7 @@ namespace Tiny
             }
         }
 
-        public void UpdateFrames(IEnumerable<Tuple<IPEndPoint, WorldView>> bodyFrames)
+        public void UpdateFrames(IEnumerable<Tuple<IPEndPoint, SerializableBodyFrame>> bodyFrames)
         {
             this.Dispatcher.Invoke((Action)(() =>
             {

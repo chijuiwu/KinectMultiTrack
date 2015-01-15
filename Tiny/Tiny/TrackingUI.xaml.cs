@@ -16,6 +16,7 @@ using System.Windows.Shapes;
 using KinectSerializer;
 using Microsoft.Kinect;
 using System.Diagnostics;
+using System.Net;
 
 namespace Tiny
 {
@@ -105,7 +106,7 @@ namespace Tiny
             }));
         }
 
-        private void DisplayBodyFrames(IEnumerable<WorldView> worldViews)
+        private void DisplayBodyFrames(IEnumerable<Tuple<IPEndPoint, WorldView>> worldViews)
         {
             if (worldViews.Count() == 0) return;
             using (DrawingContext dc = this.bodyDrawingGroup.Open())
