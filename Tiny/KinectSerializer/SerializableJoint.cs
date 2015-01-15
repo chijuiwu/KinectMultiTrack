@@ -10,7 +10,7 @@ using Microsoft.Kinect;
 namespace KinectSerializer
 {
     [Serializable]
-    public class SerializableJoint : ISerializable
+    public class SJoint : ISerializable
     {
         public const string NameTrackingState = "TrackingState";
         public const string NameJointType = "Type";
@@ -79,7 +79,7 @@ namespace KinectSerializer
             }
         }
 
-        public SerializableJoint(TrackingState trackingState, JointType type, JointOrientation orientation, CameraSpacePoint cameraSpacePoint, DepthSpacePoint depthSpacePoint)
+        public SJoint(TrackingState trackingState, JointType type, JointOrientation orientation, CameraSpacePoint cameraSpacePoint, DepthSpacePoint depthSpacePoint)
         {
             this.trackingState = trackingState;
             this.type = type;
@@ -88,26 +88,26 @@ namespace KinectSerializer
             this.depthSpacePoint = depthSpacePoint;
         }
 
-        protected SerializableJoint(SerializationInfo info, StreamingContext ctx)
+        protected SJoint(SerializationInfo info, StreamingContext ctx)
         {
-            this.trackingState = (TrackingState)info.GetValue(SerializableJoint.NameTrackingState, typeof(TrackingState));
-            this.type = (JointType)info.GetValue(SerializableJoint.NameJointType, typeof(JointType));
-            this.cameraSpacePoint = (CameraSpacePoint)info.GetValue(SerializableJoint.NameCamperaSpacePoint, typeof(CameraSpacePoint));
-            this.depthSpacePoint = (DepthSpacePoint)info.GetValue(SerializableJoint.NameDepthSpacePoint, typeof(DepthSpacePoint));
-            this.orientation = (JointOrientation)info.GetValue(SerializableJoint.NameOrientation, typeof(JointOrientation));
+            this.trackingState = (TrackingState)info.GetValue(SJoint.NameTrackingState, typeof(TrackingState));
+            this.type = (JointType)info.GetValue(SJoint.NameJointType, typeof(JointType));
+            this.cameraSpacePoint = (CameraSpacePoint)info.GetValue(SJoint.NameCamperaSpacePoint, typeof(CameraSpacePoint));
+            this.depthSpacePoint = (DepthSpacePoint)info.GetValue(SJoint.NameDepthSpacePoint, typeof(DepthSpacePoint));
+            this.orientation = (JointOrientation)info.GetValue(SJoint.NameOrientation, typeof(JointOrientation));
         }
 
         [SecurityPermission(SecurityAction.Demand, SerializationFormatter = true)]
         public void GetObjectData(SerializationInfo info, StreamingContext ctx)
         {
-            info.AddValue(SerializableJoint.NameTrackingState, this.trackingState, typeof(TrackingState));
-            info.AddValue(SerializableJoint.NameJointType, this.type, typeof(JointType));
-            info.AddValue(SerializableJoint.NameCamperaSpacePoint, this.cameraSpacePoint, typeof(CameraSpacePoint));
-            info.AddValue(SerializableJoint.NameDepthSpacePoint, this.depthSpacePoint, typeof(DepthSpacePoint));
-            info.AddValue(SerializableJoint.NameOrientation, this.orientation, typeof(JointOrientation));
+            info.AddValue(SJoint.NameTrackingState, this.trackingState, typeof(TrackingState));
+            info.AddValue(SJoint.NameJointType, this.type, typeof(JointType));
+            info.AddValue(SJoint.NameCamperaSpacePoint, this.cameraSpacePoint, typeof(CameraSpacePoint));
+            info.AddValue(SJoint.NameDepthSpacePoint, this.depthSpacePoint, typeof(DepthSpacePoint));
+            info.AddValue(SJoint.NameOrientation, this.orientation, typeof(JointOrientation));
         }
 
-        internal static SerializableJoint Copy(SerializableJoint joint)
+        internal static SJoint Copy(SJoint joint)
         {
             CameraSpacePoint jointCSPoint = joint.CameraSpacePoint;
             CameraSpacePoint copyCSPoint = new CameraSpacePoint();
@@ -118,7 +118,7 @@ namespace KinectSerializer
             DepthSpacePoint copyDSPoint = new DepthSpacePoint();
             copyDSPoint.X = jointDSPoint.X;
             copyDSPoint.Y = jointDSPoint.Y;
-            SerializableJoint copy = new SerializableJoint(joint.TrackingState, joint.JointType, joint.JointOrientation, copyCSPoint, copyDSPoint);
+            SJoint copy = new SJoint(joint.TrackingState, joint.JointType, joint.JointOrientation, copyCSPoint, copyDSPoint);
             return copy;
         }
     }

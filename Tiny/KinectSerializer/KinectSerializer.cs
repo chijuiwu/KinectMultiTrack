@@ -16,7 +16,7 @@ namespace KinectSerializer
     public class BodyFrameSerializer
     {
 
-        public static byte[] Serialize(SerializableBodyFrame bodyFrame)
+        public static byte[] Serialize(SBodyFrame bodyFrame)
         {
             BinaryFormatter bf = new BinaryFormatter();
             try
@@ -36,12 +36,12 @@ namespace KinectSerializer
             }
         }
 
-        public static SerializableBodyFrame Deserialize(Stream stream)
+        public static SBodyFrame Deserialize(Stream stream)
         {
             BinaryFormatter bf = new BinaryFormatter();
             try
             {
-                return (SerializableBodyFrame)bf.Deserialize(stream);
+                return (SBodyFrame)bf.Deserialize(stream);
             }
             catch (SerializationException e)
             {

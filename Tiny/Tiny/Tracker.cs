@@ -18,40 +18,79 @@ namespace Tiny
         private bool calibrated = false;
 
         private readonly int KINECT_COUNT;
-        private ConcurrentDictionary<IPEndPoint, KinectAgent> kinectAgentsDict;
+        private ConcurrentDictionary<IPEndPoint, KinectAgent> kinectsDict;
 
         private readonly object syncFrameLock = new object();
-        public class SyncFrameResult
-        {
-            private IEnumerable<Tuple<IPEndPoint, SerializableBodyFrame>> currentRawFrames;
-            private IEnumerable<Tuple<IPEndPoint, WorldView>> currentFramesInWorldView;
 
-            public SyncFrameResult(IEnumerable<Tuple<IPEndPoint, SerializableBodyFrame>> currentRawFrames, IEnumerable<Tuple<IPEndPoint, WorldView>> currentFramesInWorldView)
+        public class SyncResult
+        {
+            public class FrameMapping
             {
-                this.currentRawFrames = currentRawFrames;
-                this.currentFramesInWorldView = currentFramesInWorldView;
+                private SBodyFrame rawFrame;
+                private WorldBodyFrame worldviewFrame;
+
+                public FrameMapping(SBodyFrame rawFrame, WorldBodyFrame worldviewFrame)
+                {
+                    this.rawFrame = rawFrame;
+                    this.worldviewFrame = worldviewFrame;
+                }
+
+                public SBodyFrame RawFrame
+                {
+                    get
+                    {
+                        return this.rawFrame;
+                    }
+                }
+
+                public WorldBodyFrame WorldViewFrame
+                {
+                    get
+                    {
+                        return this.worldviewFrame;
+                    }
+                }
+            }
+            private IEnumerable<Tuple<IPEndPoint, FrameMapping>> frames;
+
+            public SyncResult(IEnumerable<Tuple<IPEndPoint, FrameMapping>> frames)
+            {
+                this.frames = frames;
+            }
+
+            public IEnumerable<Tuple<IPEndPoint, SBodyFrame>> RawFrames
+            {
+                get
+                {
+                    foreach (Tuple<IPEndPoint, FrameMapping> frameTuple in this.frames)
+                    {
+                        yield return Tuple.Create(frameTuple.Item1, frameTuple.Item2.RawFrame);
+                    }
+                }
+            }
+
+            public IEnumerable<Tuple<IPEndPoint, WorldBodyFrame>> WorldviewFrames
+            {
+                get
+                {
+                    foreach (Tuple<IPEndPoint, FrameMapping> frameTuple in this.frames)
+                    {
+                        yield return Tuple.Create(frameTuple.Item1, frameTuple.Item2.WorldViewFrame);
+                    }
+                }
             }
         }
 
         public Tracker(int kinectCount)
         {
             this.KINECT_COUNT = kinectCount;
-            this.kinectAgentsDict = new ConcurrentDictionary<IPEndPoint, KinectAgent>();
-        }
-
-        public void AddOrUpdateBodyFrame(IPEndPoint clientIP, SerializableBodyFrame bodyFrame)
-        {
-            if (!this.kinectAgentsDict.ContainsKey(clientIP))
-            {
-                this.kinectAgentsDict[clientIP] = new KinectAgent();
-            }
-            this.kinectAgentsDict[clientIP].AddFrame(bodyFrame);
+            this.kinectsDict = new ConcurrentDictionary<IPEndPoint, KinectAgent>();
         }
 
         public void RemoveClient(IPEndPoint clientIP)
         {
             KinectAgent kinectProfile;
-            if (this.kinectAgentsDict.TryRemove(clientIP, out kinectProfile))
+            if (this.kinectsDict.TryRemove(clientIP, out kinectProfile))
             {
                 kinectProfile.DisposeUI();
             }
@@ -59,47 +98,47 @@ namespace Tiny
 
         private bool RequireCalibration()
         {
-            bool readyForCalibration = true;
-            foreach (KinectAgent kinect in this.kinectAgentsDict.Values)
-            {
-                if (!kinect.ReadyForCalibration)
-                {
-                    readyForCalibration = false;
-                }
-            }
-            if (readyForCalibration)
-            {
-                return this.kinectAgentsDict.Count >= this.KINECT_COUNT && !this.calibrated;
-            }
-            else
+            if (this.kinectsDict.Count < this.KINECT_COUNT && this.calibrated)
             {
                 return false;
             }
+            else
+            {
+                foreach (KinectAgent kinect in this.kinectsDict.Values)
+                {
+                    if (!kinect.ReadyToCalibrate)
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
         }
 
-        public SyncFrameResult SynchronizeFrames(IPEndPoint referenceKinectFOV)
+        public SyncResult Synchronize(IPEndPoint clientIP, SBodyFrame bodyframe)
         {
+            if (!this.kinectsDict.ContainsKey(clientIP))
+            {
+                this.kinectsDict[clientIP] = new KinectAgent();
+            }
             lock (syncFrameLock)
             {
                 if (this.RequireCalibration())
                 {
-                    foreach (KinectAgent kinect in this.kinectAgentsDict.Values)
+                    foreach (KinectAgent kinect in this.kinectsDict.Values)
                     {
                         kinect.Calibrate();
                     }
                 }
-                List<Tuple<IPEndPoint, SerializableBodyFrame>> rawFramesList = new List<Tuple<IPEndPoint,SerializableBodyFrame>>();
-                List<Tuple<IPEndPoint, WorldView>> worldviewFramesList = new List<Tuple<IPEndPoint, WorldView>>();
-                foreach (IPEndPoint clientIP in this.kinectAgentsDict.Keys)
+                this.kinectsDict[clientIP].ProcessFrames(bodyframe);
+                List<Tuple<IPEndPoint, SyncResult.FrameMapping>> frames = new List<Tuple<IPEndPoint, SyncResult.FrameMapping>>();
+                foreach (IPEndPoint client in this.kinectsDict.Keys)
                 {
-                    this.kinectAgentsDict[clientIP].ProcessFrames();
-                    SerializableBodyFrame rawFrame = this.kinectAgentsDict[clientIP].LatestRawFrame;
-                    rawFramesList.Add(Tuple.Create(clientIP, rawFrame));
-                    WorldView worldviewFrame = this.kinectAgentsDict[clientIP].LatestWorldviewFrame;
-                    worldviewFramesList.Add(Tuple.Create(clientIP, worldviewFrame));
+                    SBodyFrame rawFrame = this.kinectsDict[clientIP].CurrentRawFrame;
+                    WorldBodyFrame worldviewFrame = this.kinectsDict[clientIP].CurrentWorldviewFrame;
+                    frames.Add(Tuple.Create(client, new SyncResult.FrameMapping(rawFrame, worldviewFrame)));
                 }
-                SyncFrameResult result = new SyncFrameResult(rawFramesList, worldviewFramesList);
-                return result;
+                return new SyncResult(frames);
             }
         }
     }

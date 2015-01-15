@@ -98,7 +98,7 @@ namespace Tiny
                                                             : Properties.Resources.TRACKING_CALIBRATION;
         }
 
-        internal void UpdateTrackingDisplay(IEnumerable<Tuple<IPEndPoint, WorldView>> worldViews)
+        internal void UpdateTrackingDisplay(IEnumerable<Tuple<IPEndPoint, WorldBodyFrame>> worldViews)
         {
             this.Dispatcher.Invoke((Action)(() =>
             {
@@ -106,15 +106,15 @@ namespace Tiny
             }));
         }
 
-        private void DisplayBodyFrames(IEnumerable<Tuple<IPEndPoint, WorldView>> worldViews)
+        private void DisplayBodyFrames(IEnumerable<Tuple<IPEndPoint, WorldBodyFrame>> worldViews)
         {
             if (worldViews.Count() == 0) return;
             using (DrawingContext dc = this.bodyDrawingGroup.Open())
             {
-                WorldView firstWorldView = worldViews.First();
+                WorldBodyFrame firstWorldView = worldViews.First();
                 dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, firstWorldView.KinectDepthFrameWidth, firstWorldView.KinectDepthFrameHeight));
                 int penIndex = 0;
-                foreach (WorldView worldView in worldViews)
+                foreach (WorldBodyFrame worldView in worldViews)
                 {
                     foreach (WorldBody body in worldView.WorldBoides)
                     {
@@ -122,7 +122,7 @@ namespace Tiny
                         Dictionary<JointType, Point> jointPoints = new Dictionary<JointType, Point>();
 
                         // convert coordinate wrt first world view
-                        KinectBody bodyKinect = WorldView.GetBodyKinectCoordinates(body, firstWorldView.InitialAngle, firstWorldView.InitialCentrePosition);
+                        KinectBody bodyKinect = WorldBodyFrame.GetKinectBody(body, firstWorldView.InitialAngle, firstWorldView.InitialCentrePosition);
                         foreach (JointType jointType in bodyKinect.Joints.Keys)
                         {
                             CameraSpacePoint position = bodyKinect.Joints[jointType];

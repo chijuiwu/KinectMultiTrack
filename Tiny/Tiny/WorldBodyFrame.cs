@@ -9,7 +9,7 @@ using Tiny.Exceptions;
 
 namespace Tiny
 {
-    public class WorldView
+    public class WorldBodyFrame
     {
         private double initAngle;
         WorldCoordinate initCentrePosition;
@@ -17,14 +17,14 @@ namespace Tiny
         private int kinectDepthFrameHeight;
         private Dictionary<ulong, WorldBody> bodyCoordinates;
 
-        public WorldView(List<WorldBody> bodies)
+        public WorldBodyFrame(List<WorldBody> bodies)
         {
 
         }
 
         // Assume one user in each frame
         // TODO: scale to multiple users in one frame
-        public WorldView(WorldBody worldBody, double initAngle, WorldCoordinate initCentrePosition, int kinectDepthWidth, int kinectDepthHeight)
+        public WorldBodyFrame(WorldBody worldBody, double initAngle, WorldCoordinate initCentrePosition, int kinectDepthWidth, int kinectDepthHeight)
         {
             this.initAngle = initAngle;
             this.initCentrePosition = initCentrePosition;
@@ -78,10 +78,10 @@ namespace Tiny
         }
 
         // Get the initial angle between user and Kinect
-        public static double GetInitialAngle(SerializableBody body)
+        public static double GetInitialAngle(SBody body)
         {
-            SerializableJoint shoulderLeft = body.Joints[JointType.ShoulderLeft];
-            SerializableJoint shoulderRight = body.Joints[JointType.ShoulderRight];
+            SJoint shoulderLeft = body.Joints[JointType.ShoulderLeft];
+            SJoint shoulderRight = body.Joints[JointType.ShoulderRight];
 
             if (shoulderLeft.TrackingState.Equals(TrackingState.NotTracked))
             {
@@ -103,13 +103,13 @@ namespace Tiny
 
         // Get the initial centre position of user's body
         // Each item in the array is a body at a particular frame in the initial data collection sequence
-        public static WorldCoordinate GetInitialPosition(SerializableBody[] userInitialBodies)
+        public static WorldCoordinate GetInitialPosition(SBody[] userInitialBodies)
         {
             float totalAverageX = 0;
             float totalAverageY = 0;
             float totalAverageZ = 0;
 
-            foreach (SerializableBody body in userInitialBodies)
+            foreach (SBody body in userInitialBodies)
             {
                 float sumOfXs = 0;
                 float sumOfYs = 0;
@@ -121,7 +121,7 @@ namespace Tiny
                     {
                         throw new UntrackedJointException("[Getting initial centre position]: " + jointType + " not unavialble");
                     }
-                    SerializableJoint joint = body.Joints[jointType];
+                    SJoint joint = body.Joints[jointType];
                     if (joint.TrackingState.Equals(TrackingState.NotTracked))
                     {
                         throw new UntrackedJointException("[Getting initial centre position]: " + jointType + " not tracked");
@@ -143,13 +143,13 @@ namespace Tiny
         }
 
         // Joints transformed to the origin of the world coordinate system
-        public static WorldBody GetBodyWorldCoordinates(SerializableBody body, double initialAngle, WorldCoordinate centrePoint)
+        public static WorldBody GetWorldviewBody(SBody body, double initialAngle, WorldCoordinate centrePoint)
         {
             WorldBody bodyWorld = new WorldBody();
 
             foreach(JointType jointType in body.Joints.Keys)
             {
-                SerializableJoint joint = body.Joints[jointType];
+                SJoint joint = body.Joints[jointType];
                 CameraSpacePoint jointPosition = joint.CameraSpacePoint;
 
                 // Translation
@@ -169,7 +169,7 @@ namespace Tiny
         }
 
         // Joints transformed back to the Kinect camera space point
-        public static KinectBody GetBodyKinectCoordinates(WorldBody body, double initialAngle, WorldCoordinate centrePoint)
+        public static KinectBody GetKinectBody(WorldBody body, double initialAngle, WorldCoordinate centrePoint)
         {
             KinectBody bodyKinect = new KinectBody();
 

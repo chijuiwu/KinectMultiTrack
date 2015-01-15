@@ -18,27 +18,24 @@ namespace Tiny
         private int depthFrameHeight;
 
         private bool calibrated;
-        private List<Person> trackedUsers;
+        private Dictionary<ulong, Person> trackedUsers;
 
-        // Unprocessed body frames, assume the frame order is perserved
-        private Queue<SerializableBodyFrame> incomingBodyFrames;
-        private Stack<SerializableBodyFrame> calibrationBodyFrames;
-        private Stack<Tuple<SerializableBodyFrame, WorldView>> processedBodyFrames;
-        public event KinectBodyFrameHandler UpdateKinectBodyFrame;
-        public delegate void KinectBodyFrameHandler(SerializableBodyFrame bodyFrame);
+        private Stack<SBodyFrame> unprocessedBodyFrames;
+        private Stack<Tuple<SBodyFrame, WorldBodyFrame>> processedBodyFrames;
 
         private SingleKinectUI kinectUI;
+        public event KinectBodyFrameHandler UpdateKinectUI;
+        public delegate void KinectBodyFrameHandler(SBodyFrame bodyFrame);
         public event KinectUIHandler DisposeKinectUI;
         public delegate void KinectUIHandler();
 
         public KinectAgent()
         {
             this.calibrated = false;
-            this.trackedUsers = new List<Person>();
+            this.trackedUsers = new Dictionary<ulong, Person>();
 
-            this.incomingBodyFrames = new Queue<SerializableBodyFrame>();
-            this.calibrationBodyFrames = new Stack<SerializableBodyFrame>();
-            this.processedBodyFrames = new Stack<Tuple<SerializableBodyFrame, WorldView>>();
+            this.unprocessedBodyFrames = new Stack<SBodyFrame>();
+            this.processedBodyFrames = new Stack<Tuple<SBodyFrame, WorldBodyFrame>>();
             
             Thread kinectUIThread = new Thread(new ThreadStart(this.StartKinectUIThread));
             kinectUIThread.SetApartmentState(ApartmentState.STA);
@@ -49,7 +46,7 @@ namespace Tiny
         {
             this.kinectUI = new SingleKinectUI();
             this.kinectUI.Show();
-            this.UpdateKinectBodyFrame += this.kinectUI.UpdateBodyFrame;
+            this.UpdateKinectUI += this.kinectUI.UpdateBodyFrame;
             this.DisposeKinectUI += this.kinectUI.Dispose;
             Dispatcher.Run();
         }
@@ -58,92 +55,81 @@ namespace Tiny
             this.DisposeKinectUI();
         }
 
-        public void AddFrame(SerializableBodyFrame bodyFrame)
+        public void ProcessFrames(SBodyFrame bodyFrame)
         {
-            this.incomingBodyFrames.Enqueue(bodyFrame);
-        }
-
-        public void ProcessFrames()
-        {
-            try
+            Debug.WriteLine(Resources.PROCESS_BODYFRAME + bodyFrame.TimeStamp);
+            if(!this.calibrated)
             {
-                SerializableBodyFrame nextBodyFrame = this.incomingBodyFrames.Dequeue();
-                Debug.WriteLine(Resources.PROCESS_BODYFRAME + nextBodyFrame.TimeStamp);
-
-                if (this.calibrated)
-                {
-                    this.processedBodyFrames.Push(Tuple.Create(nextBodyFrame, new WorldView(WorldView.GetBodyWorldCoordinates(nextBodyFrame.Bodies[0], this.initAngle, this.initCentrePosition), this.initAngle, this.initCentrePosition, this.depthFrameWidth, this.depthFrameHeight)));
-                }
-                else if (nextBodyFrame.Bodies.Count > 0)
-                {
-                    this.calibrationBodyFrames.Push(nextBodyFrame);
-                }
-
-                this.UpdateKinectBodyFrame(nextBodyFrame);
-            } catch (InvalidOperationException ignored)
-            {
-                return;
+                this.unprocessedBodyFrames.Push(bodyFrame);
             }
+            else
+            {
+                List<WorldBody> worldviewBodies = new List<WorldBody>();
+                foreach (SBody body in bodyFrame.Bodies)
+                {
+                    if (this.trackedUsers.ContainsKey(body.TrackingId))
+                    {
+                        Person person = this.trackedUsers[body.TrackingId];
+                        worldviewBodies.Add(WorldBodyFrame.GetWorldviewBody(body, person.InitialAngle, person.InitialPosition));
+                    }
+                    // ignore bodies that do not match with any tracking id
+                }
+                this.processedBodyFrames.Push(Tuple.Create(bodyFrame, new WorldBodyFrame(worldviewBodies)));
+            }
+            this.UpdateKinectUI(bodyFrame);
         }
 
-        public bool ReadyForCalibration
+        public bool ReadyToCalibrate
         {
             get
             {
-                return this.calibrationBodyFrames.Count >= Tracker.CALIBRATION_FRAMES;
+                return this.unprocessedBodyFrames.Count >= Tracker.CALIBRATION_FRAMES;
             }
         }
 
         public void Calibrate()
         {
-            SerializableBodyFrame[] calibrationFrames = new SerializableBodyFrame[Tracker.CALIBRATION_FRAMES];
+            SBodyFrame[] calibrationFrames = new SBodyFrame[Tracker.CALIBRATION_FRAMES];
             int calibrationFramesCount = 0;
             while (calibrationFramesCount < Tracker.CALIBRATION_FRAMES)
             {
-                calibrationFrames[calibrationFramesCount++] = this.calibrationBodyFrames.Pop();
+                calibrationFrames[calibrationFramesCount++] = this.unprocessedBodyFrames.Pop();
             }
 
             for (int personIdx = 0; personIdx < calibrationFrames[0].Bodies.Count; personIdx++)
             {
                 Person person = new Person();
-                this.trackedUsers.Add(person);
-                
-                person.InitialAngle = WorldView.GetInitialAngle(calibrationFrames[0].Bodies[personIdx]);
+
+                person.TrackingId = calibrationFrames[0].Bodies[personIdx].TrackingId;
+
+                person.InitialAngle = WorldBodyFrame.GetInitialAngle(calibrationFrames[0].Bodies[personIdx]);
 
                 // initial position = average of all previous positions
-                SerializableBody[] previousPositions = new SerializableBody[calibrationFrames.Length];
+                SBody[] previousPositions = new SBody[calibrationFrames.Length];
                 for(int frameIdx = 0; frameIdx < previousPositions.Length; frameIdx++)
                 {
                     previousPositions[frameIdx] = calibrationFrames[frameIdx].Bodies[personIdx];
                 }
-                person.InitialPosition = WorldView.GetInitialPosition(previousPositions);
+                person.InitialPosition = WorldBodyFrame.GetInitialPosition(previousPositions);
+
+                this.trackedUsers.Add(person.TrackingId, person);
             }
             this.depthFrameWidth = calibrationFrames[0].DepthFrameWidth;
             this.depthFrameHeight = calibrationFrames[0].DepthFrameHeight;
             this.calibrated = true;
         }
 
-        public SerializableBodyFrame LatestRawFrame
+        public SBodyFrame CurrentRawFrame
         {
             get
             {
                 if (this.processedBodyFrames.Count > 0)
                 {
-                    Tuple<SerializableBodyFrame, WorldView> lastKinectFrameTuple;
-                    this.processedBodyFrames.TryPeek(out lastKinectFrameTuple);
-                    return lastKinectFrameTuple.Item1;
+                    return this.processedBodyFrames.Peek().Item1;
                 }
-                else if (this.calibrationBodyFrames.Count > 0)
+                else if (this.unprocessedBodyFrames.Count > 0)
                 {
-                    SerializableBodyFrame lastKinectFrame;
-                    this.calibrationBodyFrames.TryPeek(out lastKinectFrame);
-                    return lastKinectFrame;
-                }
-                else if (this.incomingBodyFrames.Count > 0)
-                {
-                    SerializableBodyFrame lastKinectFrame;
-                    this.incomingBodyFrames.TryPeek(out lastKinectFrame);
-                    return lastKinectFrame;
+                    return this.unprocessedBodyFrames.Peek();
                 }
                 else
                 {
@@ -152,16 +138,13 @@ namespace Tiny
             }
         }
 
-        public WorldView LatestWorldviewFrame
+        public WorldBodyFrame CurrentWorldviewFrame
         {
             get
             {
                 if (this.processedBodyFrames.Count > 0)
                 {
-
-                    Tuple<SerializableBodyFrame, WorldView> lastKinectFrameTuple;
-                    this.processedBodyFrames.TryPeek(out lastKinectFrameTuple);
-                    return lastKinectFrameTuple.Item2;
+                    return this.processedBodyFrames.Peek().Item2;
                 }
                 else
                 {

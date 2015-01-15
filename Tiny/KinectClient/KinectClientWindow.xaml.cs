@@ -142,7 +142,7 @@ namespace KinectClient
             bool dataReceived = false;
 
             // serializing KinectBodyFrame
-            SerializableBodyFrame serializableBodyFrame = null;
+            SBodyFrame serializableBodyFrame = null;
 
             using (BodyFrame bodyFrame = e.FrameReference.AcquireFrame())
             {
@@ -151,7 +151,7 @@ namespace KinectClient
                     bodyFrame.GetAndRefreshBodyData(this.bodies);
                     dataReceived = true;
                     // serialize KinectBodyFrame
-                    serializableBodyFrame = new SerializableBodyFrame(bodyFrame.RelativeTime, this.depthFrameDescription);
+                    serializableBodyFrame = new SBodyFrame(bodyFrame.RelativeTime, this.depthFrameDescription);
                 }
             }
 
@@ -165,7 +165,7 @@ namespace KinectClient
                         if (body.IsTracked)
                         {
                             // serialize KinectBody
-                            SerializableBody serializableBody = new SerializableBody(true, body.TrackingId);
+                            SBody serializableBody = new SBody(true, body.TrackingId);
 
                             this.DrawClippedEdges(body, dc);
 
@@ -186,7 +186,7 @@ namespace KinectClient
                                 DepthSpacePoint depthSpacePoint = this.coordinateMapper.MapCameraPointToDepthSpace(position);
                                 jointPoints[jointType] = new Point(depthSpacePoint.X, depthSpacePoint.Y);
                                 // serialize KinectJoint
-                                serializableBody.Joints[jointType] = new SerializableJoint(trackingState, jointType, orientation, position, depthSpacePoint);
+                                serializableBody.Joints[jointType] = new SJoint(trackingState, jointType, orientation, position, depthSpacePoint);
                             }
                             this.DrawBody(joints, jointPoints, dc, this.bodyColor, this.inferredBonePen, this.trackedJointBrush, this.inferredJointBrush);
                             // construct serializable KinectBodyFrame

@@ -11,6 +11,7 @@ namespace Tiny
     {
         private double initAngle;
         private WorldCoordinate initPosition;
+        private ulong trackingId;
 
         public Person()
         {
@@ -40,51 +41,16 @@ namespace Tiny
             }
         }
 
-        //public SerializableBodyFrame LastKinectFrame
-        //{
-        //    get
-        //    {
-        //        if (this.processedBodyFrames.Count > 0)
-        //        {
-        //            Tuple<SerializableBodyFrame, WorldView> lastKinectFrameTuple;
-        //            this.processedBodyFrames.TryPeek(out lastKinectFrameTuple);
-        //            return lastKinectFrameTuple.Item1;
-        //        }
-        //        else if (this.calibrationBodyFrames.Count > 0)
-        //        {
-        //            SerializableBodyFrame lastKinectFrame;
-        //            this.calibrationBodyFrames.TryPeek(out lastKinectFrame);
-        //            return lastKinectFrame;
-        //        }
-        //        else if (this.incomingBodyFrames.Count > 0)
-        //        {
-        //            SerializableBodyFrame lastKinectFrame;
-        //            this.incomingBodyFrames.TryPeek(out lastKinectFrame);
-        //            return lastKinectFrame;
-        //        }
-        //        else
-        //        {
-        //            return null;
-        //        }
-        //    }
-        //}
-
-        //public WorldView LastWorldView
-        //{
-        //    get
-        //    {
-        //        if (this.processedBodyFrames.Count > 0)
-        //        {
-
-        //            Tuple<SerializableBodyFrame, WorldView> lastKinectFrameTuple;
-        //            this.processedBodyFrames.TryPeek(out lastKinectFrameTuple);
-        //            return lastKinectFrameTuple.Item2;
-        //        }
-        //        else
-        //        {
-        //            return null;
-        //        }
-        //    }
-        //}
+        public ulong TrackingId
+        {
+            get
+            {
+                return this.trackingId;
+            }
+            set
+            {
+                this.trackingId = value;
+            }
+        }
     }
 }

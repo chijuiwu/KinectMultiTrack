@@ -14,6 +14,9 @@ namespace Tiny
 {
     public class TrackingServer
     {
+        // HACK
+        private IPEndPoint referenceKinectIP;
+
         private TcpListener kinectListener;
         private Thread acceptKinectConnectionThread;
 
@@ -22,10 +25,10 @@ namespace Tiny
         private TrackingUI trackingUI;
 
         public event KinectFrameHandler MultipleKinectUpdate;
-        public delegate void KinectFrameHandler(IEnumerable<Tuple<IPEndPoint, SerializableBodyFrame>> bodyFrames);
+        public delegate void KinectFrameHandler(IEnumerable<Tuple<IPEndPoint, SBodyFrame>> bodyFrames);
         
         public event WorldViewHandler TrackingUpdate;
-        public delegate void WorldViewHandler(IEnumerable<Tuple<IPEndPoint, WorldView>> worldViews);
+        public delegate void WorldViewHandler(IEnumerable<Tuple<IPEndPoint, WorldBodyFrame>> worldViews);
 
         public TrackingServer(int port, int kinectCount)
         {
@@ -84,6 +87,8 @@ namespace Tiny
             NetworkStream clientStream = client.GetStream();
 
             Debug.WriteLine(Tiny.Properties.Resources.CONNECTION_START + clientIP);
+            // HACK
+            this.referenceKinectIP = clientIP;
 
             while (true)
             {
@@ -93,11 +98,9 @@ namespace Tiny
 
                     while (!clientStream.DataAvailable) ;
 
-                    SerializableBodyFrame bodyFrame = BodyFrameSerializer.Deserialize(clientStream);
-                    
-                    this.tracker.AddOrUpdateBodyFrame(clientIP, bodyFrame);
-                    Thread uiUpdateThread = new Thread(new ThreadStart(this.StartUIUpdateThread));
-                    uiUpdateThread.Start();
+                    SBodyFrame bodyFrame = BodyFrameSerializer.Deserialize(clientStream);
+                    Thread trackingUpdateThread = new Thread(() => this.StartTrackingUpdateThread(clientIP, bodyFrame));
+                    trackingUpdateThread.Start();
 
                     // Response content is trivial
                     byte[] response = Encoding.ASCII.GetBytes(Properties.Resources.SERVER_RESPONSE_OKAY);
@@ -120,12 +123,11 @@ namespace Tiny
             client.Close();
         }
 
-        private void StartUIUpdateThread()
+        private void StartTrackingUpdateThread(IPEndPoint clientIP, SBodyFrame bodyFrame)
         {
-            Tracker.SyncFrameResult result = this.tracker.SynchronizeFrames(null);
-            
-            this.MultipleKinectUpdate(this.tracker.GetLatestRawFrames());
-            this.TrackingUpdate(this.tracker.GetLatestFramesInWorldView(null));
+            Tracker.SyncResult result = this.tracker.Synchronize(clientIP, bodyFrame);
+            this.MultipleKinectUpdate(result.RawFrames);
+            this.TrackingUpdate(result.WorldviewFrames);
         }
     }
 }

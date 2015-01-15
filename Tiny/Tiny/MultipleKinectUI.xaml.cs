@@ -52,7 +52,7 @@ namespace Tiny
             }
         }
 
-        public void UpdateFrames(IEnumerable<Tuple<IPEndPoint, SerializableBodyFrame>> bodyFrames)
+        public void UpdateFrames(IEnumerable<Tuple<IPEndPoint, SBodyFrame>> bodyFrames)
         {
             this.Dispatcher.Invoke((Action)(() =>
             {
@@ -60,22 +60,22 @@ namespace Tiny
             }));
         }
 
-        private void DisplayBodyFrames(IEnumerable<Tuple<IPEndPoint, WorldView>> bodyFrames)
+        private void DisplayBodyFrames(IEnumerable<Tuple<IPEndPoint, SBodyFrame>> bodyFrames)
         {
             if (!bodyFrames.Any()) return;
             using (DrawingContext dc = this.bodyDrawingGroup.Open())
             {
-                SerializableBodyFrame firstFrame = bodyFrames.First();
+                SBodyFrame firstFrame = bodyFrames.First();
                 dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, firstFrame.DepthFrameWidth, firstFrame.DepthFrameHeight));
                 int penIndex = 0;
-                foreach (SerializableBodyFrame bodyFrame in bodyFrames)
+                foreach (SBodyFrame bodyFrame in bodyFrames)
                 {
-                    foreach (SerializableBody body in bodyFrame.Bodies)
+                    foreach (SBody body in bodyFrame.Bodies)
                     {
                         if (body.IsTracked)
                         {
                             Pen drawPen = this.bodyColors[penIndex++];
-                            Dictionary<JointType, SerializableJoint> joints = body.Joints;
+                            Dictionary<JointType, SJoint> joints = body.Joints;
 
                             Dictionary<JointType, Point> jointPoints = new Dictionary<JointType, Point>();
                             foreach (JointType jointType in joints.Keys)
@@ -95,7 +95,7 @@ namespace Tiny
             }
         }
 
-        private void DrawBody(Dictionary<JointType, SerializableJoint> joints, IDictionary<JointType, Point> jointPoints, DrawingContext drawingContext, Pen bonePen, Pen inferredBonePen, Brush jointBrush, Brush inferredJointBrush)
+        private void DrawBody(Dictionary<JointType, SJoint> joints, IDictionary<JointType, Point> jointPoints, DrawingContext drawingContext, Pen bonePen, Pen inferredBonePen, Brush jointBrush, Brush inferredJointBrush)
         {
             // Draw the bones
             foreach (var bone in BodyStructure.Bones)
@@ -123,10 +123,10 @@ namespace Tiny
             }
         }
 
-        private void DrawBone(Dictionary<JointType, SerializableJoint> joints, IDictionary<JointType, Point> jointPoints, JointType jointType0, JointType jointType1, DrawingContext drawingContext, Pen drawingPen, Pen inferredDrawingPen)
+        private void DrawBone(Dictionary<JointType, SJoint> joints, IDictionary<JointType, Point> jointPoints, JointType jointType0, JointType jointType1, DrawingContext drawingContext, Pen drawingPen, Pen inferredDrawingPen)
         {
-            SerializableJoint joint0 = joints[jointType0];
-            SerializableJoint joint1 = joints[jointType1];
+            SJoint joint0 = joints[jointType0];
+            SJoint joint1 = joints[jointType1];
 
             if (joint0.TrackingState == TrackingState.NotTracked ||
                 joint1.TrackingState == TrackingState.NotTracked)

@@ -85,7 +85,7 @@
     <Compile Include="WorldBody.cs" />
     <Compile Include="Tracker.cs" />
     <Compile Include="WorldCoordinate.cs" />
-    <Compile Include="WorldView.cs" />
+    <Compile Include="WorldBodyFrame.cs" />
     <Page Include="MultipleKinectUI.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
