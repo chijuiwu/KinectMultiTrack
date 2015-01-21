@@ -23,9 +23,10 @@ namespace Tiny
     {
         private DrawingGroup bodyDrawingGroup;
         private DrawingImage bodyImageSource;
-        private List<Pen> bodyColors;
-        private const double JointThickness = 3;
-        private const double ClipBoundsThickness = 10;
+        private List<Pen> kinectColors;
+        private readonly double jointThickness = 3;
+        private readonly double clipBoundsThickness = 10;
+        private readonly Brush backgroundBrush = Brushes.Black;
         private readonly Brush trackedJointBrush = new SolidColorBrush(Color.FromArgb(255, 68, 192, 68));
         private readonly Brush inferredJointBrush = Brushes.Yellow;
         private readonly Pen inferredBonePen = new Pen(Brushes.Gray, 1);
@@ -36,13 +37,14 @@ namespace Tiny
             this.DataContext = this;
             this.bodyDrawingGroup = new DrawingGroup();
             this.bodyImageSource = new DrawingImage(this.bodyDrawingGroup);
-            this.bodyColors = new List<Pen>();
-            this.bodyColors.Add(new Pen(Brushes.Red, 6));
-            this.bodyColors.Add(new Pen(Brushes.Orange, 6));
-            this.bodyColors.Add(new Pen(Brushes.Green, 6));
-            this.bodyColors.Add(new Pen(Brushes.Blue, 6));
-            this.bodyColors.Add(new Pen(Brushes.Indigo, 6));
-            this.bodyColors.Add(new Pen(Brushes.Violet, 6));
+            // Frames from a kinect have the same color (Hack: max 6 Kinects)
+            this.kinectColors = new List<Pen>();
+            this.kinectColors.Add(new Pen(Brushes.Red, 6));
+            this.kinectColors.Add(new Pen(Brushes.Orange, 6));
+            this.kinectColors.Add(new Pen(Brushes.Green, 6));
+            this.kinectColors.Add(new Pen(Brushes.Blue, 6));
+            this.kinectColors.Add(new Pen(Brushes.Indigo, 6));
+            this.kinectColors.Add(new Pen(Brushes.Violet, 6));
         }
         public ImageSource BodyStreamImageSource
         {
@@ -52,7 +54,7 @@ namespace Tiny
             }
         }
 
-        public void UpdateFrames(IEnumerable<Tuple<IPEndPoint, SBodyFrame>> bodyFrames)
+        public void UpdateDisplay(IEnumerable<Tuple<IPEndPoint, SBodyFrame>> bodyFrames)
         {
             this.Dispatcher.Invoke((Action)(() =>
             {
@@ -65,82 +67,90 @@ namespace Tiny
             if (!bodyFrames.Any()) return;
             using (DrawingContext dc = this.bodyDrawingGroup.Open())
             {
-                SBodyFrame firstFrame = bodyFrames.First();
-                dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, firstFrame.DepthFrameWidth, firstFrame.DepthFrameHeight));
-                int penIndex = 0;
-                foreach (SBodyFrame bodyFrame in bodyFrames)
+                SBodyFrame frameZeroth = bodyFrames.First().Item2;
+                int frameWidth = frameZeroth.DepthFrameWidth;
+                int frameHeight = frameZeroth.DepthFrameHeight;
+                // background
+                dc.DrawRectangle(this.backgroundBrush, null, new Rect(0.0, 0.0, frameWidth, frameHeight));
+
+                int kinectIdx = 0;
+                foreach (Tuple<IPEndPoint, SBodyFrame> kinectBodyFrame in bodyFrames)
                 {
+                    Pen kinectPen = this.kinectColors[kinectIdx++];
+                    SBodyFrame bodyFrame = kinectBodyFrame.Item2;
                     foreach (SBody body in bodyFrame.Bodies)
                     {
                         if (body.IsTracked)
                         {
-                            Pen drawPen = this.bodyColors[penIndex++];
                             Dictionary<JointType, SJoint> joints = body.Joints;
-
-                            Dictionary<JointType, Point> jointPoints = new Dictionary<JointType, Point>();
+                            Dictionary<JointType, Tuple<SJoint, Point>> jointPts = new Dictionary<JointType, Tuple<SJoint, Point>>();
                             foreach (JointType jointType in joints.Keys)
                             {
-                                DepthSpacePoint depthSpacePoint = joints[jointType].DepthSpacePoint;
-                                jointPoints[jointType] = new Point(depthSpacePoint.X, depthSpacePoint.Y);
+                                SJoint joint = joints[jointType];
+                                Point jointPt = new Point(joint.DepthSpacePoint.X, joint.DepthSpacePoint.Y);
+                                jointPts[jointType] = Tuple.Create(joint, jointPt);
                             }
-                            this.DrawBody(joints, jointPoints, dc, drawPen, this.inferredBonePen, this.trackedJointBrush, this.inferredJointBrush);
-                            if (penIndex == this.bodyColors.Count())
-                            {
-                                penIndex = 0;
-                            }
+                            this.DrawBody(jointPts, dc, kinectPen);
                         }
                     }
                 }
-                this.bodyDrawingGroup.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, firstFrame.DepthFrameWidth, firstFrame.DepthFrameHeight));
+                this.bodyDrawingGroup.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, frameWidth, frameHeight));
             }
         }
 
-        private void DrawBody(Dictionary<JointType, SJoint> joints, IDictionary<JointType, Point> jointPoints, DrawingContext drawingContext, Pen bonePen, Pen inferredBonePen, Brush jointBrush, Brush inferredJointBrush)
+        private void DrawBody(Dictionary<JointType, Tuple<SJoint, Point>> jointPts, DrawingContext dc, Pen trackedBonePen)
         {
-            // Draw the bones
+            // Draw joints
+            foreach (JointType jointType in jointPts.Keys)
+            {
+                TrackingState jointTS = jointPts[jointType].Item1.TrackingState;
+                Point jointPt = jointPts[jointType].Item2;
+                if (jointTS == TrackingState.NotTracked)
+                {
+                    continue;
+                }
+                else if (jointTS == TrackingState.Tracked)
+                {
+                    this.DrawJoint(jointPt, dc, this.trackedJointBrush);
+                }
+                else
+                {
+                    this.DrawJoint(jointPt, dc, this.inferredJointBrush);
+                }
+            }
+
+            // Draw bones
             foreach (var bone in BodyStructure.Bones)
             {
-                this.DrawBone(joints, jointPoints, bone.Item1, bone.Item2, drawingContext, bonePen, inferredBonePen);
-            }
-
-            // Draw the joints
-            foreach (JointType jointType in joints.Keys)
-            {
-                Brush drawBrush = null;
-                TrackingState trackingState = joints[jointType].TrackingState;
-                if (trackingState == TrackingState.Tracked)
+                JointType jointType0 = bone.Item1;
+                JointType jointType1 = bone.Item2;
+                TrackingState joint0TS = jointPts[jointType0].Item1.TrackingState;
+                TrackingState joint1TS = jointPts[jointType1].Item1.TrackingState;
+                Point jointPt0 = jointPts[jointType0].Item2;
+                Point jointPt1 = jointPts[jointType1].Item2;
+                if (joint0TS == TrackingState.NotTracked || joint1TS == TrackingState.NotTracked)
                 {
-                    drawBrush = jointBrush;
+                    continue;
                 }
-                else if (trackingState == TrackingState.Inferred)
+                else if (joint0TS == TrackingState.Tracked && joint1TS == TrackingState.Tracked)
                 {
-                    drawBrush = inferredJointBrush;
+                    this.DrawBone(jointPt0, jointPt1, dc, trackedBonePen);
                 }
-                if (drawBrush != null)
+                else
                 {
-                    drawingContext.DrawEllipse(drawBrush, null, jointPoints[jointType], JointThickness, JointThickness);
+                    this.DrawBone(jointPt0, jointPt1, dc, this.inferredBonePen);
                 }
             }
         }
 
-        private void DrawBone(Dictionary<JointType, SJoint> joints, IDictionary<JointType, Point> jointPoints, JointType jointType0, JointType jointType1, DrawingContext drawingContext, Pen drawingPen, Pen inferredDrawingPen)
+        private void DrawJoint(Point joint, DrawingContext dc, Brush brush)
         {
-            SJoint joint0 = joints[jointType0];
-            SJoint joint1 = joints[jointType1];
+            dc.DrawEllipse(brush, null, joint, this.jointThickness, this.jointThickness);
+        }
 
-            if (joint0.TrackingState == TrackingState.NotTracked ||
-                joint1.TrackingState == TrackingState.NotTracked)
-            {
-                return;
-            }
-
-            Pen drawPen = inferredDrawingPen;
-            if ((joint0.TrackingState == TrackingState.Tracked) && (joint1.TrackingState == TrackingState.Tracked))
-            {
-                drawPen = drawingPen;
-            }
-
-            drawingContext.DrawLine(drawPen, jointPoints[jointType0], jointPoints[jointType1]);
+        private void DrawBone(Point jointPoint0, Point jointPoint1, DrawingContext dc, Pen pen)
+        {
+            dc.DrawLine(pen, jointPoint0, jointPoint1);
         }
     }
 }

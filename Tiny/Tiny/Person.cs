@@ -11,13 +11,8 @@ namespace Tiny
     class Person
     {
         private double initAngle;
-        private WorldCoordinate initPosition;
-        private ulong trackingId;
-        private Stack<SBodySer>
-
-        public Person()
-        {
-        }
+        private WCoordinate initPosition;
+        private Stack<Tuple<SBody, WBody>> previousPositions;
 
         public double InitialAngle
         {
@@ -31,7 +26,7 @@ namespace Tiny
             }
         }
 
-        public WorldCoordinate InitialPosition
+        public WCoordinate InitialPosition
         {
             get
             {
@@ -43,16 +38,14 @@ namespace Tiny
             }
         }
 
-        public ulong TrackingId
+        public Person()
         {
-            get
-            {
-                return this.trackingId;
-            }
-            set
-            {
-                this.trackingId = value;
-            }
+            this.previousPositions = new Stack<Tuple<SBody, WBody>>();
+        }
+
+        public void UpdatePosition(SBody body, WBody worldviewBody)
+        {
+            this.previousPositions.Push(Tuple.Create(body, worldviewBody));
         }
     }
 }

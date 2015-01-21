@@ -7,7 +7,7 @@ using Microsoft.Kinect;
 
 namespace Tiny
 {
-    public class WorldCoordinate
+    public class WCoordinate
     {
         private float x;
         private float y;
@@ -49,14 +49,14 @@ namespace Tiny
             }
         }
 
-        public WorldCoordinate(float x, float y, float z)
+        public WCoordinate(float x, float y, float z)
         {
             this.x = x;
             this.y = y;
             this.z = z;
         }
 
-        public WorldCoordinate(CameraSpacePoint point)
+        public WCoordinate(CameraSpacePoint point)
         {
             this.x = point.X;
             this.y = point.Y;

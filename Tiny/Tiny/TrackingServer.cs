@@ -28,7 +28,7 @@ namespace Tiny
         public delegate void KinectFrameHandler(IEnumerable<Tuple<IPEndPoint, SBodyFrame>> bodyFrames);
         
         public event WorldViewHandler TrackingUpdate;
-        public delegate void WorldViewHandler(IEnumerable<Tuple<IPEndPoint, WorldBodyFrame>> worldViews);
+        public delegate void WorldViewHandler(IEnumerable<Tuple<IPEndPoint, WBodyFrame>> worldViews);
 
         public TrackingServer(int port, int kinectCount)
         {
@@ -57,7 +57,7 @@ namespace Tiny
         {
             this.multipleKinectUI = new MultipleKinectUI();
             this.multipleKinectUI.Show();
-            this.MultipleKinectUpdate += this.multipleKinectUI.UpdateFrames;
+            this.MultipleKinectUpdate += this.multipleKinectUI.UpdateDisplay;
             Dispatcher.Run();
         }
 
@@ -65,7 +65,7 @@ namespace Tiny
         {
             this.trackingUI = new TrackingUI();
             this.trackingUI.Show();
-            this.TrackingUpdate += this.trackingUI.UpdateTrackingDisplay;
+            this.TrackingUpdate += this.trackingUI.UpdateDisplay;
             Dispatcher.Run();
         }
 

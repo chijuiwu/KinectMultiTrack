@@ -24,15 +24,18 @@ namespace Tiny
 
         public class SyncResult
         {
-            public class FrameMapping
+            public class KinectFrame
             {
+                private IPEndPoint clientIP;
                 private SBodyFrame rawFrame;
-                private WorldBodyFrame worldviewFrame;
+                private WBodyFrame worldviewFrame;
 
-                public FrameMapping(SBodyFrame rawFrame, WorldBodyFrame worldviewFrame)
+                public IPEndPoint ClientIP
                 {
-                    this.rawFrame = rawFrame;
-                    this.worldviewFrame = worldviewFrame;
+                    get
+                    {
+                        return this.clientIP;
+                    }
                 }
 
                 public SBodyFrame RawFrame
@@ -43,41 +46,50 @@ namespace Tiny
                     }
                 }
 
-                public WorldBodyFrame WorldViewFrame
+                public WBodyFrame WorldViewFrame
                 {
                     get
                     {
                         return this.worldviewFrame;
                     }
                 }
-            }
-            private IEnumerable<Tuple<IPEndPoint, FrameMapping>> frames;
 
-            public SyncResult(IEnumerable<Tuple<IPEndPoint, FrameMapping>> frames)
-            {
-                this.frames = frames;
+                public KinectFrame(IPEndPoint clientIP, SBodyFrame rawFrame, WBodyFrame worldviewFrame)
+                {
+                    this.clientIP = clientIP;
+                    this.rawFrame = rawFrame;
+                    this.worldviewFrame = worldviewFrame;
+                }
             }
+
+            private IEnumerable<KinectFrame> frames;
+
 
             public IEnumerable<Tuple<IPEndPoint, SBodyFrame>> RawFrames
             {
                 get
                 {
-                    foreach (Tuple<IPEndPoint, FrameMapping> frameTuple in this.frames)
+                    foreach (KinectFrame frame in this.frames)
                     {
-                        yield return Tuple.Create(frameTuple.Item1, frameTuple.Item2.RawFrame);
+                        yield return Tuple.Create(frame.ClientIP, frame.RawFrame);
                     }
                 }
             }
 
-            public IEnumerable<Tuple<IPEndPoint, WorldBodyFrame>> WorldviewFrames
+            public IEnumerable<Tuple<IPEndPoint, WBodyFrame>> WorldviewFrames
             {
                 get
                 {
-                    foreach (Tuple<IPEndPoint, FrameMapping> frameTuple in this.frames)
+                    foreach (KinectFrame frame in this.frames)
                     {
-                        yield return Tuple.Create(frameTuple.Item1, frameTuple.Item2.WorldViewFrame);
+                        yield return Tuple.Create(frame.ClientIP, frame.WorldViewFrame);
                     }
                 }
+            }
+
+            public SyncResult(IEnumerable<KinectFrame> frames)
+            {
+                this.frames = frames;
             }
         }
 
@@ -89,10 +101,10 @@ namespace Tiny
 
         public void RemoveClient(IPEndPoint clientIP)
         {
-            KinectAgent kinectProfile;
-            if (this.kinectsDict.TryRemove(clientIP, out kinectProfile))
+            KinectAgent kinect;
+            if (this.kinectsDict.TryRemove(clientIP, out kinect))
             {
-                kinectProfile.DisposeUI();
+                kinect.DisposeUI();
             }
         }
 
@@ -131,12 +143,12 @@ namespace Tiny
                     }
                 }
                 this.kinectsDict[clientIP].ProcessFrames(bodyframe);
-                List<Tuple<IPEndPoint, SyncResult.FrameMapping>> frames = new List<Tuple<IPEndPoint, SyncResult.FrameMapping>>();
+                List<SyncResult.KinectFrame> frames = new List<SyncResult.KinectFrame>();
                 foreach (IPEndPoint client in this.kinectsDict.Keys)
                 {
-                    SBodyFrame rawFrame = this.kinectsDict[clientIP].CurrentRawFrame;
-                    WorldBodyFrame worldviewFrame = this.kinectsDict[clientIP].CurrentWorldviewFrame;
-                    frames.Add(Tuple.Create(client, new SyncResult.FrameMapping(rawFrame, worldviewFrame)));
+                    SBodyFrame rawFrame = this.kinectsDict[client].CurrentRawFrame;
+                    WBodyFrame worldviewFrame = this.kinectsDict[client].CurrentWorldviewFrame;
+                    frames.Add(new SyncResult.KinectFrame(client, rawFrame, worldviewFrame));
                 }
                 return new SyncResult(frames);
             }

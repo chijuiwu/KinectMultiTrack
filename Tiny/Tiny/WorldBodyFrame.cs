@@ -8,13 +8,13 @@ using KinectSerializer;
 
 namespace Tiny
 {
-    public class WorldBodyFrame
+    public class WBodyFrame
     {
         private int depthFrameWidth;
         private int depthFrameHeight;
-        private List<WorldBody> bodies;
+        private List<WBody> bodies;
 
-        public WorldBodyFrame(int depthFrameWidth, int depthFrameHeight, List<WorldBody> bodies)
+        public WBodyFrame(int depthFrameWidth, int depthFrameHeight, List<WBody> bodies)
         {
             this.depthFrameWidth = depthFrameWidth;
             this.depthFrameHeight = depthFrameHeight;
@@ -37,7 +37,7 @@ namespace Tiny
             }
         }
 
-        public IEnumerable<WorldBody> Boides
+        public IEnumerable<WBody> Boides
         {
             get
             {

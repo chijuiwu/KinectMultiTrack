@@ -9,17 +9,17 @@ using Tiny.Exceptions;
 
 namespace Tiny
 {
-    public class WorldBody
+    public class WBody
     {
 
-        private Dictionary<JointType, WorldCoordinate> joints;
+        private Dictionary<JointType, WCoordinate> joints;
 
-        public WorldBody()
+        public WBody()
         {
-            this.joints = new Dictionary<JointType, WorldCoordinate>();
+            this.joints = new Dictionary<JointType, WCoordinate>();
         }
 
-        public Dictionary<JointType, WorldCoordinate> Joints
+        public Dictionary<JointType, WCoordinate> Joints
         {
             get
             {
@@ -53,7 +53,7 @@ namespace Tiny
 
         // Get the initial centre position of user's body
         // Each item in the array is a body at a particular frame in the initial data collection sequence
-        public static WorldCoordinate GetInitialPosition(SBody[] userInitialBodies)
+        public static WCoordinate GetInitialPosition(SBody[] userInitialBodies)
         {
             float totalAverageX = 0;
             float totalAverageY = 0;
@@ -89,13 +89,13 @@ namespace Tiny
             float centreX = totalAverageX / userInitialBodies.Length;
             float centreY = totalAverageY / userInitialBodies.Length;
             float centreZ = totalAverageZ / userInitialBodies.Length;
-            return new WorldCoordinate(centreX, centreY, centreZ);
+            return new WCoordinate(centreX, centreY, centreZ);
         }
 
         // Joints transformed to the origin of the world coordinate system
-        public static WorldBody Create(SBody body, double initialAngle, WorldCoordinate centrePoint)
+        public static WBody Create(SBody body, double initialAngle, WCoordinate centrePoint)
         {
-            WorldBody bodyWorld = new WorldBody();
+            WBody bodyWorld = new WBody();
 
             foreach (JointType jointType in body.Joints.Keys)
             {
@@ -112,20 +112,20 @@ namespace Tiny
                 float transformedY = translatedY;
                 float transformedZ = (float)(translatedZ * Math.Cos(initialAngle) - translatedX * Math.Sin(initialAngle));
 
-                bodyWorld.Joints[jointType] = new WorldCoordinate(transformedX, transformedY, transformedZ);
+                bodyWorld.Joints[jointType] = new WCoordinate(transformedX, transformedY, transformedZ);
             }
 
             return bodyWorld;
         }
 
         // Joints transformed back to the Kinect camera space point
-        public static KinectBody GetKinectBody(WorldBody body, double initialAngle, WorldCoordinate centrePoint)
+        public static KinectBody GetKinectBody(WBody body, double initialAngle, WCoordinate centrePoint)
         {
             KinectBody bodyKinect = new KinectBody();
 
             foreach (JointType jointType in body.Joints.Keys)
             {
-                WorldCoordinate jointWorld = body.Joints[jointType];
+                WCoordinate jointWorld = body.Joints[jointType];
 
                 double sinAngle = Math.Sin(initialAngle);
                 double cosAngle = Math.Cos(initialAngle);
