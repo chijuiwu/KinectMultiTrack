@@ -25,10 +25,10 @@ namespace Tiny
         private TrackingUI trackingUI;
 
         public event KinectFrameHandler MultipleKinectUpdate;
-        public delegate void KinectFrameHandler(IEnumerable<Tuple<IPEndPoint, SBodyFrame>> bodyFrames);
+        public delegate void KinectFrameHandler(Tracker.Result result);
         
         public event WorldViewHandler TrackingUpdate;
-        public delegate void WorldViewHandler(IEnumerable<Tuple<IPEndPoint, WBodyFrame>> worldViews);
+        public delegate void WorldViewHandler(Tracker.Result result);
 
         public TrackingServer(int port, int kinectCount)
         {
@@ -125,9 +125,9 @@ namespace Tiny
 
         private void StartTrackingUpdateThread(IPEndPoint clientIP, SBodyFrame bodyFrame)
         {
-            Tracker.TrackingResult result = this.tracker.Synchronize(clientIP, bodyFrame);
-            this.MultipleKinectUpdate(result.RawFrames);
-            this.TrackingUpdate(result.WorldviewFrames);
+            Tracker.Result result = this.tracker.Synchronize(clientIP, bodyFrame);
+            this.MultipleKinectUpdate(result);
+            this.TrackingUpdate(result);
         }
     }
 }

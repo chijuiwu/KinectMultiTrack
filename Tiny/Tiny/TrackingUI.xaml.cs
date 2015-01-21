@@ -92,16 +92,18 @@ namespace Tiny
                                                             : Properties.Resources.TRACKING_CALIBRATION;
         }
 
-        internal void UpdateDisplay(IEnumerable<Tuple<IPEndPoint, WBodyFrame>> worldViews)
+        internal void UpdateDisplay(Tracker.Result result)
         {
             this.Dispatcher.Invoke((Action)(() =>
             {
-                this.DisplayBodyFrames(worldViews);
+                this.DisplayBodyFrames(result);
             }));
         }
 
-        private void DisplayBodyFrames(IEnumerable<Tuple<IPEndPoint, WBodyFrame>> bodyFrames)
+        private void DisplayBodyFrames(Tracker.Result result)
         {
+            result.
+
             if (!bodyFrames.Any()) return;
 
             if (bodyFrames.Count() == 0) return;

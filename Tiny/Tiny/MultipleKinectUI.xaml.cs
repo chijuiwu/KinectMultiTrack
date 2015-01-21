@@ -54,35 +54,44 @@ namespace Tiny
             }
         }
 
-        public void UpdateDisplay(IEnumerable<Tuple<IPEndPoint, SBodyFrame>> bodyFrames)
+        public void UpdateDisplay(Tracker.Result result)
         {
             this.Dispatcher.Invoke((Action)(() =>
             {
-                this.DisplayBodyFrames(bodyFrames);
+                this.DisplayBodyFrames(result);
             }));
         }
 
-        private void DisplayBodyFrames(IEnumerable<Tuple<IPEndPoint, SBodyFrame>> bodyFrames)
+        private void DisplayBodyFrames(Tracker.Result result)
         {
-            if (!bodyFrames.Any()) return;
+            IEnumerable<Tracker.Result.KinectFOV> fovs = result.FOVs;
+            if (!fovs.Any())
+            {
+                return;
+            }
             using (DrawingContext dc = this.bodyDrawingGroup.Open())
             {
-                SBodyFrame frameZeroth = bodyFrames.First().Item2;
-                int frameWidth = frameZeroth.DepthFrameWidth;
-                int frameHeight = frameZeroth.DepthFrameHeight;
+                KinectAgent.Dimension firstFOVDim = fovs.First().Dimension;
+                int frameWidth = firstFOVDim.DepthFrameWidth;
+                int frameHeight = firstFOVDim.DepthFrameHeight;
                 // background
                 dc.DrawRectangle(this.backgroundBrush, null, new Rect(0.0, 0.0, frameWidth, frameHeight));
 
                 int kinectIdx = 0;
-                foreach (Tuple<IPEndPoint, SBodyFrame> kinectBodyFrame in bodyFrames)
+                foreach (Tracker.Result.KinectFOV fov in fovs)
                 {
-                    Pen kinectPen = this.kinectColors[kinectIdx++];
-                    SBodyFrame bodyFrame = kinectBodyFrame.Item2;
-                    foreach (SBody body in bodyFrame.Bodies)
+                    if (!fov.People.Any())
                     {
-                        if (body.IsTracked)
+                        continue;
+                    }
+                    Pen kinectPen = this.kinectColors[kinectIdx++];
+                    foreach (Person person in fov.People)
+                    {
+                        Person.Position position = person.CurrentPosition;
+                        SBody kinectBody = position.Kinect;
+                        if (kinectBody.IsTracked)
                         {
-                            Dictionary<JointType, SJoint> joints = body.Joints;
+                            Dictionary<JointType, SJoint> joints = kinectBody.Joints;
                             Dictionary<JointType, Tuple<SJoint, Point>> jointPts = new Dictionary<JointType, Tuple<SJoint, Point>>();
                             foreach (JointType jointType in joints.Keys)
                             {
@@ -94,6 +103,7 @@ namespace Tiny
                         }
                     }
                 }
+                // clip region
                 this.bodyDrawingGroup.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, frameWidth, frameHeight));
             }
         }

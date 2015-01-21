@@ -80,6 +80,14 @@ namespace Tiny
             }
         }
 
+        public Person.Position CurrentPosition
+        {
+            get
+            {
+                return this.positions.Peek();
+            }
+        }
+
         public Person(ulong id)
         {
             this.id = id;

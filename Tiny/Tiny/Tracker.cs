@@ -22,7 +22,7 @@ namespace Tiny
 
         private readonly object syncFrameLock = new object();
 
-        public class TrackingResult
+        public class Result
         {
             public class KinectFOV
             {
@@ -72,7 +72,7 @@ namespace Tiny
                 }
             }
 
-            public TrackingResult(IEnumerable<KinectFOV> fovs)
+            public Result(IEnumerable<KinectFOV> fovs)
             {
                 this.fovs = fovs;
             }
@@ -112,7 +112,7 @@ namespace Tiny
             }
         }
 
-        public TrackingResult Synchronize(IPEndPoint clientIP, SBodyFrame bodyframe)
+        public Result Synchronize(IPEndPoint clientIP, SBodyFrame bodyframe)
         {
             if (!this.kinectsDict.ContainsKey(clientIP))
             {
@@ -129,14 +129,14 @@ namespace Tiny
                 }
                 // Get a copy of the current positions of users
                 this.kinectsDict[clientIP].ProcessFrames(bodyframe);
-                List<TrackingResult.KinectFOV> frames = new List<TrackingResult.KinectFOV>();
+                List<Result.KinectFOV> frames = new List<Result.KinectFOV>();
                 foreach (IPEndPoint kinectId in this.kinectsDict.Keys)
                 {
                     KinectAgent.Dimension dimension = this.kinectsDict[kinectId].FrameDimension;
                     IEnumerable<Person> people = this.kinectsDict[kinectId].People;
-                    frames.Add(new TrackingResult.KinectFOV(kinectId, dimension, people));
+                    frames.Add(new Result.KinectFOV(kinectId, dimension, people));
                 }
-                return new TrackingResult(frames);
+                return new Result(frames);
             }
         }
     }
