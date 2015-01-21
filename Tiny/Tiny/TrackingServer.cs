@@ -125,7 +125,7 @@ namespace Tiny
 
         private void StartTrackingUpdateThread(IPEndPoint clientIP, SBodyFrame bodyFrame)
         {
-            Tracker.SyncResult result = this.tracker.Synchronize(clientIP, bodyFrame);
+            Tracker.TrackingResult result = this.tracker.Synchronize(clientIP, bodyFrame);
             this.MultipleKinectUpdate(result.RawFrames);
             this.TrackingUpdate(result.WorldviewFrames);
         }

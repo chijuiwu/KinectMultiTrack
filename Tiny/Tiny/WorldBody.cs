@@ -11,7 +11,6 @@ namespace Tiny
 {
     public class WBody
     {
-
         private Dictionary<JointType, WCoordinate> joints;
 
         public WBody()
@@ -163,6 +162,16 @@ namespace Tiny
             }
 
             return bodyKinect;
+        }
+
+        public static WBody Copy(WBody body)
+        {
+            WBody copy = new WBody();
+            foreach (JointType jointType in body.Joints.Keys)
+            {
+                copy.Joints[jointType] = WCoordinate.Copy(body.Joints[jointType]);
+            }
+            return copy;
         }
     }
 }

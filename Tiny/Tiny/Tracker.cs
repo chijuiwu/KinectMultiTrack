@@ -22,13 +22,13 @@ namespace Tiny
 
         private readonly object syncFrameLock = new object();
 
-        public class SyncResult
+        public class TrackingResult
         {
-            public class KinectFrame
+            public class KinectFOV
             {
                 private IPEndPoint clientIP;
-                private SBodyFrame rawFrame;
-                private WBodyFrame worldviewFrame;
+                private KinectAgent.Dimension dimension;
+                private IEnumerable<Person> people;
 
                 public IPEndPoint ClientIP
                 {
@@ -38,58 +38,43 @@ namespace Tiny
                     }
                 }
 
-                public SBodyFrame RawFrame
+                public KinectAgent.Dimension Dimension
                 {
                     get
                     {
-                        return this.rawFrame;
+                        return this.dimension;
                     }
                 }
 
-                public WBodyFrame WorldViewFrame
+                public IEnumerable<Person> People
                 {
                     get
                     {
-                        return this.worldviewFrame;
+                        return this.people;
                     }
                 }
 
-                public KinectFrame(IPEndPoint clientIP, SBodyFrame rawFrame, WBodyFrame worldviewFrame)
+                public KinectFOV(IPEndPoint clientIP, KinectAgent.Dimension dimension, IEnumerable<Person> people)
                 {
                     this.clientIP = clientIP;
-                    this.rawFrame = rawFrame;
-                    this.worldviewFrame = worldviewFrame;
+                    this.dimension = dimension;
+                    this.people = people;
                 }
             }
 
-            private IEnumerable<KinectFrame> frames;
+            private IEnumerable<KinectFOV> fovs;
 
-
-            public IEnumerable<Tuple<IPEndPoint, SBodyFrame>> RawFrames
+            public IEnumerable<KinectFOV> FOVs
             {
                 get
                 {
-                    foreach (KinectFrame frame in this.frames)
-                    {
-                        yield return Tuple.Create(frame.ClientIP, frame.RawFrame);
-                    }
+                    return this.fovs;
                 }
             }
 
-            public IEnumerable<Tuple<IPEndPoint, WBodyFrame>> WorldviewFrames
+            public TrackingResult(IEnumerable<KinectFOV> fovs)
             {
-                get
-                {
-                    foreach (KinectFrame frame in this.frames)
-                    {
-                        yield return Tuple.Create(frame.ClientIP, frame.WorldViewFrame);
-                    }
-                }
-            }
-
-            public SyncResult(IEnumerable<KinectFrame> frames)
-            {
-                this.frames = frames;
+                this.fovs = fovs;
             }
         }
 
@@ -118,7 +103,7 @@ namespace Tiny
             {
                 foreach (KinectAgent kinect in this.kinectsDict.Values)
                 {
-                    if (!kinect.ReadyToCalibrate)
+                    if (kinect.UnprocessedFramesCount < Tracker.CALIBRATION_FRAMES)
                     {
                         return false;
                     }
@@ -127,7 +112,7 @@ namespace Tiny
             }
         }
 
-        public SyncResult Synchronize(IPEndPoint clientIP, SBodyFrame bodyframe)
+        public TrackingResult Synchronize(IPEndPoint clientIP, SBodyFrame bodyframe)
         {
             if (!this.kinectsDict.ContainsKey(clientIP))
             {
@@ -142,15 +127,16 @@ namespace Tiny
                         kinect.Calibrate();
                     }
                 }
+                // Get a copy of the current positions of users
                 this.kinectsDict[clientIP].ProcessFrames(bodyframe);
-                List<SyncResult.KinectFrame> frames = new List<SyncResult.KinectFrame>();
-                foreach (IPEndPoint client in this.kinectsDict.Keys)
+                List<TrackingResult.KinectFOV> frames = new List<TrackingResult.KinectFOV>();
+                foreach (IPEndPoint kinectId in this.kinectsDict.Keys)
                 {
-                    SBodyFrame rawFrame = this.kinectsDict[client].CurrentRawFrame;
-                    WBodyFrame worldviewFrame = this.kinectsDict[client].CurrentWorldviewFrame;
-                    frames.Add(new SyncResult.KinectFrame(client, rawFrame, worldviewFrame));
+                    KinectAgent.Dimension dimension = this.kinectsDict[kinectId].FrameDimension;
+                    IEnumerable<Person> people = this.kinectsDict[kinectId].People;
+                    frames.Add(new TrackingResult.KinectFOV(kinectId, dimension, people));
                 }
-                return new SyncResult(frames);
+                return new TrackingResult(frames);
             }
         }
     }

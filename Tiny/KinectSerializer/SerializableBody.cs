@@ -19,6 +19,8 @@ namespace KinectSerializer
         public const string NameJointsDictionary = "JointsDict";
 
         private bool isTracked;
+        private ulong trackingId;
+        private Dictionary<JointType, SJoint> jointsDict;
 
         public bool IsTracked
         {
@@ -28,8 +30,6 @@ namespace KinectSerializer
             }
         }
 
-        private ulong trackingId;
-
         public ulong TrackingId
         {
             get
@@ -37,8 +37,6 @@ namespace KinectSerializer
                 return this.trackingId;
             }
         }
-
-        private Dictionary<JointType, SJoint> jointsDict;
 
         public Dictionary<JointType, SJoint> Joints
         {

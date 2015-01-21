@@ -27,8 +27,8 @@ namespace Tiny
         private DrawingGroup bodyDrawingGroup;
         private DrawingImage bodyImageSource;
         private List<Pen> bodyColors;
-        private const double JointThickness = 3;
-        private const double ClipBoundsThickness = 10;
+        private readonly double jointThickness = 3;
+        private readonly double clipBoundsThickness = 10;
         private readonly Brush trackedJointBrush = new SolidColorBrush(Color.FromArgb(255, 68, 192, 68));
         private readonly Brush inferredJointBrush = Brushes.Yellow;
         private readonly Pen inferredBonePen = new Pen(Brushes.Gray, 1);
@@ -38,18 +38,12 @@ namespace Tiny
 
         public TrackingUI()
         {
-            try
-            {
-                InitializeComponent();
-            } catch (Exception e)
-            {
-                Debug.WriteLine(e.Message);
-                Debug.WriteLine(e.StackTrace);
-            }
+            InitializeComponent();
             this.DataContext = this;
             this.TrackingStatusText = Properties.Resources.TRACKING_CALIBRATION;
             this.bodyDrawingGroup = new DrawingGroup();
             this.bodyImageSource = new DrawingImage(this.bodyDrawingGroup);
+            // A person will have the same color
             this.bodyColors = new List<Pen>();
             this.bodyColors.Add(new Pen(Brushes.Red, 6));
             this.bodyColors.Add(new Pen(Brushes.Orange, 6));
@@ -106,15 +100,17 @@ namespace Tiny
             }));
         }
 
-        private void DisplayBodyFrames(IEnumerable<Tuple<IPEndPoint, WBodyFrame>> worldViews)
+        private void DisplayBodyFrames(IEnumerable<Tuple<IPEndPoint, WBodyFrame>> bodyFrames)
         {
-            if (worldViews.Count() == 0) return;
+            if (!bodyFrames.Any()) return;
+
+            if (bodyFrames.Count() == 0) return;
             using (DrawingContext dc = this.bodyDrawingGroup.Open())
             {
-                WBodyFrame firstWorldView = worldViews.First();
+                WBodyFrame firstWorldView = bodyFrames.First();
                 dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, firstWorldView.DepthFrameWidth, firstWorldView.DepthFrameHeight));
                 int penIndex = 0;
-                foreach (WBodyFrame worldView in worldViews)
+                foreach (WBodyFrame worldView in bodyFrames)
                 {
                     foreach (WBody body in worldView.Boides)
                     {
@@ -156,7 +152,7 @@ namespace Tiny
             foreach (JointType jointType in jointPoints.Keys)
             {
                 Brush drawBrush = jointBrush;
-                drawingContext.DrawEllipse(drawBrush, null, jointPoints[jointType], JointThickness, JointThickness);
+                drawingContext.DrawEllipse(drawBrush, null, jointPoints[jointType], jointThickness, jointThickness);
             }
         }
 

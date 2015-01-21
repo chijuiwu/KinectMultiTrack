@@ -56,11 +56,9 @@ namespace Tiny
             this.z = z;
         }
 
-        public WCoordinate(CameraSpacePoint point)
+        public static WCoordinate Copy(WCoordinate c)
         {
-            this.x = point.X;
-            this.y = point.Y;
-            this.z = point.Z;
+            return new WCoordinate(c.X, c.Y, c.Z);
         }
 
         public override string ToString()

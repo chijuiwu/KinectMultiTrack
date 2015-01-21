@@ -14,11 +14,39 @@ namespace Tiny
 {
     public class KinectAgent
     {
+        public class Dimension
+        {
+            private int depthFrameWidth;
+            private int depthFrameHeight;
+
+            public int DepthFrameWidth
+            {
+                get
+                {
+                    return this.depthFrameWidth;
+                }
+            }
+
+            public int DepthFrameHeight
+            {
+                get
+                {
+                    return this.depthFrameHeight;
+                }
+            }
+
+            public Dimension(int depthFrameWidth, int depthFrameHeight)
+            {
+                this.depthFrameWidth = depthFrameWidth;
+                this.depthFrameHeight = depthFrameHeight;
+            }
+        }
+
         private bool calibrated;
-        private Dictionary<ulong, Person> trackedUsers;
+        private KinectAgent.Dimension dimension;
+        private Dictionary<ulong, Person> people;
 
         private Stack<SBodyFrame> unprocessedBodyFrames;
-        private Stack<Tuple<SBodyFrame, WBodyFrame>> processedBodyFrames;
 
         private SingleKinectUI kinectUI;
         public event KinectBodyFrameHandler UpdateKinectUI;
@@ -26,47 +54,40 @@ namespace Tiny
         public event KinectUIHandler DisposeKinectUI;
         public delegate void KinectUIHandler();
 
-        public SBodyFrame CurrentRawFrame
+        public KinectAgent.Dimension FrameDimension
         {
             get
             {
-                if (this.processedBodyFrames.Count > 0)
+                return this.dimension;
+            }
+        }
+
+        public IEnumerable<Person> People
+        {
+            get
+            {
+                foreach (Person person in this.people.Values)
                 {
-                    return this.processedBodyFrames.Peek().Item1;
-                }
-                else if (this.unprocessedBodyFrames.Count > 0)
-                {
-                    return this.unprocessedBodyFrames.Peek();
-                }
-                else
-                {
-                    return null;
+                    yield return Person.Copy(person);
                 }
             }
         }
 
-        public WBodyFrame CurrentWorldviewFrame
+        public int UnprocessedFramesCount
         {
             get
             {
-                if (this.processedBodyFrames.Count > 0)
-                {
-                    return this.processedBodyFrames.Peek().Item2;
-                }
-                else
-                {
-                    return null;
-                }
+                return this.unprocessedBodyFrames.Count;
             }
         }
 
         public KinectAgent()
         {
             this.calibrated = false;
-            this.trackedUsers = new Dictionary<ulong, Person>();
+            this.dimension = null;
+            this.people = new Dictionary<ulong, Person>();
 
             this.unprocessedBodyFrames = new Stack<SBodyFrame>();
-            this.processedBodyFrames = new Stack<Tuple<SBodyFrame, WBodyFrame>>();
 
             Thread kinectUIThread = new Thread(new ThreadStart(this.StartKinectUIThread));
             kinectUIThread.SetApartmentState(ApartmentState.STA);
@@ -86,41 +107,6 @@ namespace Tiny
             this.DisposeKinectUI();
         }
 
-        public void ProcessFrames(SBodyFrame bodyFrame)
-        {
-            Debug.WriteLine(Resources.PROCESS_BODYFRAME + bodyFrame.TimeStamp);
-            if (!this.calibrated)
-            {
-                this.unprocessedBodyFrames.Push(bodyFrame);
-            }
-            else
-            {
-                List<WBody> worldBodiesList = new List<WBody>();
-                foreach (SBody body in bodyFrame.Bodies)
-                {
-                    if (this.trackedUsers.ContainsKey(body.TrackingId))
-                    {
-                        Person person = this.trackedUsers[body.TrackingId];
-                        WBody worldBody = WBody.Create(body, person.InitialAngle, person.InitialPosition);
-                        person.UpdatePosition(body, worldBody);
-                        worldBodiesList.Add(worldBody);
-                    }
-                    // ignore bodies that do not match with any tracking id
-                }
-                WBodyFrame worldBodyFrame = new WBodyFrame(bodyFrame.DepthFrameWidth, bodyFrame.DepthFrameHeight, worldBodiesList);
-                this.processedBodyFrames.Push(Tuple.Create(bodyFrame, worldBodyFrame));
-            }
-            this.UpdateKinectUI(bodyFrame);
-        }
-
-        public bool ReadyToCalibrate
-        {
-            get
-            {
-                return this.unprocessedBodyFrames.Count >= Tracker.CALIBRATION_FRAMES;
-            }
-        }
-
         public void Calibrate()
         {
             SBodyFrame[] calibrationFrames = new SBodyFrame[Tracker.CALIBRATION_FRAMES];
@@ -136,7 +122,7 @@ namespace Tiny
             {
                 ulong trackingId = frameZeroth.Bodies[personIdx].TrackingId;
 
-                Person person = new Person();
+                Person person = new Person(trackingId);
 
                 person.InitialAngle = WBody.GetInitialAngle(frameZeroth.Bodies[personIdx]);
 
@@ -149,9 +135,33 @@ namespace Tiny
                 }
                 person.InitialPosition = WBody.GetInitialPosition(previousPositions);
 
-                this.trackedUsers.Add(trackingId, person);
+                this.people.Add(trackingId, person);
             }
             this.calibrated = true;
+            this.dimension = new KinectAgent.Dimension(frameZeroth.DepthFrameWidth, frameZeroth.DepthFrameHeight);
+        }
+
+        public void ProcessFrames(SBodyFrame bodyFrame)
+        {
+            Debug.WriteLine(Resources.PROCESS_BODYFRAME + bodyFrame.TimeStamp);
+            if (!this.calibrated)
+            {
+                this.unprocessedBodyFrames.Push(bodyFrame);
+            }
+            else
+            {
+                foreach (SBody body in bodyFrame.Bodies)
+                {
+                    if (this.people.ContainsKey(body.TrackingId))
+                    {
+                        Person person = this.people[body.TrackingId];
+                        WBody worldBody = WBody.Create(body, person.InitialAngle, person.InitialPosition);
+                        person.UpdatePosition(body, worldBody);
+                    }
+                    // ignore bodies that do not match with any tracking id
+                }
+            }
+            this.UpdateKinectUI(bodyFrame);
         }
     }
 }
