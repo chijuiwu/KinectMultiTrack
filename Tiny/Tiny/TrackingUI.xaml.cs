@@ -29,6 +29,7 @@ namespace Tiny
         private List<Pen> bodyColors;
         private readonly double jointThickness = 3;
         private readonly double clipBoundsThickness = 10;
+        private readonly Brush backgroundBrush = Brushes.Black;
         private readonly Brush trackedJointBrush = new SolidColorBrush(Color.FromArgb(255, 68, 192, 68));
         private readonly Brush inferredJointBrush = Brushes.Yellow;
         private readonly Pen inferredBonePen = new Pen(Brushes.Gray, 1);
@@ -102,11 +103,35 @@ namespace Tiny
 
         private void DisplayBodyFrames(Tracker.Result result)
         {
-            result.
+            IEnumerable<Tracker.Result.KinectFOV> fovs = result.FOVs;
+            if (!fovs.Any())
+            {
+                return;
+            }
+            using (DrawingContext dc = this.bodyDrawingGroup.Open())
+            {
+                // HACK - draw people wrt first fov
+                IPEndPoint firstFOVIP = fovs.First().ClientIP;
+                KinectAgent.Dimension firstFOVDim = fovs.First().Dimension;
+                int frameWidth = firstFOVDim.DepthFrameWidth;
+                int frameHeight = firstFOVDim.DepthFrameHeight;
+                // background
+                dc.DrawRectangle(this.backgroundBrush, null, new Rect(0.0, 0.0, frameWidth, frameHeight));
 
-            if (!bodyFrames.Any()) return;
+                int personIdx = 0;
+                foreach (Tracker.Result.KinectFOV fov in fovs)
+                {
+                    if (!fov.People.Any())
+                    {
+                        continue;
+                    }
+                    foreach (Person person in fov.People)
+                    {
 
-            if (bodyFrames.Count() == 0) return;
+                    }
+
+                }
+            }
             using (DrawingContext dc = this.bodyDrawingGroup.Open())
             {
                 WBodyFrame firstWorldView = bodyFrames.First();

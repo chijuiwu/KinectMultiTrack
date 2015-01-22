@@ -63,6 +63,7 @@ namespace Tiny
             }
 
             private IEnumerable<KinectFOV> fovs;
+            private IEnumerable<IEnumerable<Person>> matches;
 
             public IEnumerable<KinectFOV> FOVs
             {
@@ -72,9 +73,18 @@ namespace Tiny
                 }
             }
 
-            public Result(IEnumerable<KinectFOV> fovs)
+            public IEnumerable<IEnumerable<Person>> Matches
+            {
+                get
+                {
+                    return this.matches;
+                }
+            }
+
+            public Result(IEnumerable<KinectFOV> fovs, IEnumerable<IEnumerable<Person>> matches)
             {
                 this.fovs = fovs;
+                this.matches = matches;
             }
         }
 
@@ -129,15 +139,37 @@ namespace Tiny
                 }
                 // Get a copy of the current positions of users
                 this.kinectsDict[clientIP].ProcessFrames(bodyframe);
-                List<Result.KinectFOV> frames = new List<Result.KinectFOV>();
+                List<Result.KinectFOV> fovs = new List<Result.KinectFOV>();
                 foreach (IPEndPoint kinectId in this.kinectsDict.Keys)
                 {
                     KinectAgent.Dimension dimension = this.kinectsDict[kinectId].FrameDimension;
                     IEnumerable<Person> people = this.kinectsDict[kinectId].People;
-                    frames.Add(new Result.KinectFOV(kinectId, dimension, people));
+                    fovs.Add(new Result.KinectFOV(kinectId, dimension, people));
                 }
-                return new Result(frames);
+                IEnumerable<IEnumerable<Person>> matches = this.MatchPeople(fovs);
+                return new Tracker.Result(fovs, matches);
             }
+        }
+
+        private IEnumerable<IEnumerable<Person>> MatchPeople(IEnumerable<Result.KinectFOV> fovs)
+        {
+            Debug.WriteLine("Matching skeleton from different FOVs...");
+            List<List<Person>> matches = new List<List<Person>>();
+            foreach (Result.KinectFOV fov in fovs)
+            {
+                Debug.WriteLine("FOV: " + fov.ClientIP + " People: " + Helper.Count(fov.People);
+                foreach (Person person in fov.People)
+                {
+                    
+                }
+            }
+            return matches;
+        }
+
+        private Person FindClosestPersonByDistance(IEnumerable<Result.KinectFOV> fovs, Result.KinectFOV targetFOV, Person targetPerson)
+        {
+            Person suspect;
+            foreach (Result.KinectFOV )
         }
     }
 }
