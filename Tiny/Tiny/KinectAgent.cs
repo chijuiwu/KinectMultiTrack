@@ -16,34 +16,18 @@ namespace Tiny
     {
         public class Dimension
         {
-            private int depthFrameWidth;
-            private int depthFrameHeight;
-
-            public int DepthFrameWidth
-            {
-                get
-                {
-                    return this.depthFrameWidth;
-                }
-            }
-
-            public int DepthFrameHeight
-            {
-                get
-                {
-                    return this.depthFrameHeight;
-                }
-            }
+            public int DepthFrameWidth { get; private set; }
+            public int DepthFrameHeight { get; private set; }
 
             public Dimension(int depthFrameWidth, int depthFrameHeight)
             {
-                this.depthFrameWidth = depthFrameWidth;
-                this.depthFrameHeight = depthFrameHeight;
+                this.DepthFrameWidth = depthFrameWidth;
+                this.DepthFrameHeight = depthFrameHeight;
             }
         }
 
+        public KinectAgent.Dimension FrameDimension { get; private set; }
         private bool calibrated;
-        private KinectAgent.Dimension dimension;
         private Dictionary<ulong, Person> people;
 
         private Stack<SBodyFrame> unprocessedBodyFrames;
@@ -53,14 +37,6 @@ namespace Tiny
         public delegate void KinectBodyFrameHandler(SBodyFrame bodyFrame);
         public event KinectUIHandler DisposeKinectUI;
         public delegate void KinectUIHandler();
-
-        public KinectAgent.Dimension FrameDimension
-        {
-            get
-            {
-                return this.dimension;
-            }
-        }
 
         public IEnumerable<Person> People
         {
@@ -84,7 +60,7 @@ namespace Tiny
         public KinectAgent()
         {
             this.calibrated = false;
-            this.dimension = null;
+            this.FrameDimension = null;
             this.people = new Dictionary<ulong, Person>();
 
             this.unprocessedBodyFrames = new Stack<SBodyFrame>();
@@ -138,7 +114,7 @@ namespace Tiny
                 this.people.Add(trackingId, person);
             }
             this.calibrated = true;
-            this.dimension = new KinectAgent.Dimension(frameZeroth.DepthFrameWidth, frameZeroth.DepthFrameHeight);
+            this.FrameDimension = new KinectAgent.Dimension(frameZeroth.DepthFrameWidth, frameZeroth.DepthFrameHeight);
         }
 
         public void ProcessFrames(SBodyFrame bodyFrame)

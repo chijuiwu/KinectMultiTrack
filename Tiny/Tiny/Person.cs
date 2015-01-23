@@ -4,42 +4,27 @@ using System.Linq;
 using System.Text;
 using System.Net;
 using System.Diagnostics;
+using System.Globalization;
 using KinectSerializer;
 
 namespace Tiny
 {
-    public class Person : IComparable<Person>
+    public class Person
     {
         public class Position
         {
-            private SBody kinect;
-            private WBody worldview;
-
-            public SBody Kinect
-            {
-                get
-                {
-                    return this.kinect;
-                }
-            }
-
-            public WBody WorldView
-            {
-                get
-                {
-                    return this.worldview;
-                }
-            }
+            public SBody Kinect { get; private set; }
+            public WBody Worldview { get; private set; }
 
             public Position(SBody kinect, WBody worldview)
             {
-                this.kinect = kinect;
-                this.worldview = worldview;
+                this.Kinect = kinect;
+                this.Worldview = worldview;
             }
 
             public static Position Copy(Position c)
             {
-                return new Position(SBody.Copy(c.Kinect), WBody.Copy(c.WorldView));
+                return new Position(SBody.Copy(c.Kinect), WBody.Copy(c.Worldview));
             }
         }
 
@@ -84,9 +69,47 @@ namespace Tiny
             return copy;
         }
 
-        public int CompareTo(Person other)
+        public override string ToString()
         {
-            if (this.Id )
+            StringBuilder sb = new StringBuilder();
+            sb.Append("[");
+            sb.Append("Id: ").Append(this.Id).Append(", ");
+            sb.Append("Position: ").Append(this.CurrentPosition);
+            sb.Append("]");
+            return sb.ToString();
+        }
+
+        public override bool Equals(Object obj)
+        {
+            if (obj == null)
+            {
+                return false;
+            }
+            
+            Person p = obj as Person;
+            if ((Object)p == null)
+            {
+                return false;
+            }
+
+            return (this.Id == p.Id) && (this.InitialAngle == p.InitialAngle) && (this.InitialPosition == p.InitialPosition);
+        }
+
+        public bool Equals(Person p)
+        {
+            return (this.Id == p.Id) && (this.InitialAngle == p.InitialAngle) && (this.InitialPosition == p.InitialPosition);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 23 + this.Id.GetHashCode();
+                hash = hash * 23 + this.InitialAngle.GetHashCode();
+                hash = hash * 23 + this.InitialPosition.GetHashCode();
+                return hash;
+            }
         }
     }
 }

@@ -11,19 +11,11 @@ namespace Tiny
 {
     public class WBody
     {
-        private Dictionary<JointType, WCoordinate> joints;
+        public Dictionary<JointType, WCoordinate> Joints { get; private set; }
 
         public WBody()
         {
-            this.joints = new Dictionary<JointType, WCoordinate>();
-        }
-
-        public Dictionary<JointType, WCoordinate> Joints
-        {
-            get
-            {
-                return this.joints;
-            }
+            this.Joints = new Dictionary<JointType, WCoordinate>();
         }
 
         // Get the initial angle between user and Kinect
@@ -172,6 +164,17 @@ namespace Tiny
                 copy.Joints[jointType] = WCoordinate.Copy(body.Joints[jointType]);
             }
             return copy;
+        }
+
+        public static double GetCoordinateDifferences(WBody body0, WBody body1)
+        {
+            double diff = 0;
+            IEnumerable<JointType> commonJoints = body0.Joints.Keys.Union(body1.Joints.Keys);
+            foreach (JointType joint in commonJoints)
+            {
+                diff += WCoordinate.GetEuclideanDifference(body0.Joints[joint], body1.Joints[joint]);
+            }
+            return diff;
         }
     }
 }

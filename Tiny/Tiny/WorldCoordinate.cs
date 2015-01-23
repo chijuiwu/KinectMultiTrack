@@ -9,51 +9,15 @@ namespace Tiny
 {
     public class WCoordinate
     {
-        private float x;
-        private float y;
-        private float z;
-
-        public float X
-        {
-            get
-            {
-                return this.x;
-            }
-            set
-            {
-                this.x = value;
-            }
-        }
-
-        public float Y
-        {
-            get
-            {
-                return this.y;
-            }
-            set
-            {
-                this.y = value;
-            }
-        }
-
-        public float Z
-        {
-            get
-            {
-                return this.z;
-            }
-            set
-            {
-                this.z = value;
-            }
-        }
+        public float X { get; set; }
+        public float Y { get; set; }
+        public float Z { get; set; }
 
         public WCoordinate(float x, float y, float z)
         {
-            this.x = x;
-            this.y = y;
-            this.z = z;
+            this.X = x;
+            this.Y = y;
+            this.Z = z;
         }
 
         public static WCoordinate Copy(WCoordinate c)
@@ -64,6 +28,45 @@ namespace Tiny
         public override string ToString()
         {
             return String.Format("({0},{1},{2})", this.X, this.Y, this.Z);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null)
+            {
+                return false;
+            }
+
+            WCoordinate c = obj as WCoordinate;
+            if ((Object)c == null)
+            {
+                return false;
+            }
+
+            return (this.X == c.X) && (this.Y == c.Y) && (this.Z == c.Z);
+        }
+
+        public bool Equals(WCoordinate c)
+        {
+            return (this.X == c.X) && (this.Y == c.Y) && (this.Z == c.Z);
+        }
+
+        // http://stackoverflow.com/questions/263400/what-is-the-best-algorithm-for-an-overridden-system-object-gethashcode/263416#263416
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 23 + this.X.GetHashCode();
+                hash = hash * 23 + this.Y.GetHashCode();
+                hash = hash * 23 + this.Z.GetHashCode();
+                return hash;
+            }
+        }
+
+        public static float GetEuclideanDifference(WCoordinate c0, WCoordinate c1)
+        {
+            return (float)Math.Sqrt(c0.X * c1.X + c0.Y * c1.Y + c0.Z * c1.Z);
         }
     }
 }
