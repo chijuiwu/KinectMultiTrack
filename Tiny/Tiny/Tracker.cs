@@ -68,7 +68,7 @@ namespace Tiny
 
                 public Person(IEnumerable<SkeletonMatch> skeletons)
                 {
-                    this.SkeletonMatchCount = Helper.Count(skeletons);
+                    this.SkeletonMatchCount = skeletons.Count();
                     this.SkeletonMatches = skeletons;
                 }
 
@@ -163,11 +163,11 @@ namespace Tiny
         private IEnumerable<Result.Person> MatchSkeletonsAndPeople(IEnumerable<Result.KinectFOV> fovs)
         {
             Debug.WriteLine("Matching skeleton...");
-            Debug.WriteLine("FOV: " + Helper.Count(fovs));
+            Debug.WriteLine("FOV: " + fovs.Count());
             List<Result.Person> personList = new List<Result.Person>();
             foreach (Result.KinectFOV fov in fovs)
             {
-                Debug.WriteLine("Kinect: " + fov.ClientIP + " People: " + Helper.Count(fov.Skeletons));
+                Debug.WriteLine("Kinect: " + fov.ClientIP + " People: " + fov.Skeletons.Count());
                 foreach (TrackingSkeleton skeleton in fov.Skeletons)
                 {
                     // TODO: Validate result

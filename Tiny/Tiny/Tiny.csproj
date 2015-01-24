@@ -76,7 +76,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Exceptions\UntrackedJointException.cs" />
-    <Compile Include="Helper.cs" />
     <Compile Include="KinectSkeleton.cs" />
     <Compile Include="KinectCamera.cs" />
     <Compile Include="UI\SkeletonVisualizer.cs" />

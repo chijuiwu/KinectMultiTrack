@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="TrackingBodyViewer"
-        Height="600" Width="700">
+        Height="672.921" Width="785.075">
     <Window.Resources>
         <SolidColorBrush x:Key="MediumGreyBrush" Color="#ff6e6e6e" />
         <SolidColorBrush x:Key="KinectPurpleBrush" Color="#ff52318f" />
@@ -25,6 +25,20 @@
         <StatusBar Grid.Row="2" Name="TrackingStatusBar" HorizontalAlignment="Center" VerticalAlignment="Bottom" Background="White" Foreground="{StaticResource MediumGreyBrush}">
             <StatusBarItem Content="{Binding TrackingStatusText}" />
         </StatusBar>
+        <Button x:Name="ReferenceKinectBtn" Content="Reference Kinect" 
+                ContextMenuService.IsEnabled="False"
+                HorizontalAlignment="Left" Margin="570,0,0,4" Width="128" Click="Button_Click" Height="20" VerticalAlignment="Bottom" FontFamily="Microsoft Sans Serif" FontSize="14">
+            <Button.ContextMenu>
+                <ContextMenu x:Name="ReferenceKinectMenu">
+                    <MenuItem Header="PLACE-HOLDER-1"/>
+                    <MenuItem Header="PLACE-HOLDER-2"/>
+                    <MenuItem Header="PLACE-HOLDER-3"/>
+                    <MenuItem Header="PLACE-HOLDER-4"/>
+                    <MenuItem Header="PLACE-HOLDER-5"/>
+                    <MenuItem Header="PLACE-HOLDER-6"/>
+                </ContextMenu>
+            </Button.ContextMenu>
+        </Button>
     </Grid>
 </Window>
 

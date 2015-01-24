@@ -24,6 +24,7 @@ namespace Tiny.UI
 {
     public partial class TrackingUI : Window, INotifyPropertyChanged
     {
+        private string referenceKinectIP;
         private string trackingStatusText;
 
         private DrawingGroup bodyDrawingGroup;
@@ -37,6 +38,7 @@ namespace Tiny.UI
         {
             InitializeComponent();
             this.DataContext = this;
+            this.referenceKinectIP = null;
             this.TrackingStatusText = Properties.Resources.TRACKING_CALIBRATION;
             this.bodyDrawingGroup = new DrawingGroup();
             this.bodyImageSource = new DrawingImage(this.bodyDrawingGroup);
@@ -89,12 +91,55 @@ namespace Tiny.UI
                                                             : Properties.Resources.TRACKING_CALIBRATION;
         }
 
-        internal void UpdateDisplay(Tracker.Result result)
+        public void UpdateDisplay(Tracker.Result result)
         {
             this.Dispatcher.Invoke((Action)(() =>
             {
+                this.UpdateReferenceKinectMenu(result.FOVs);
                 this.DisplayBodyFrames(result);
             }));
+        }
+
+        private void UpdateReferenceKinectMenu(IEnumerable<Tracker.Result.KinectFOV> fovs)
+        {
+            this.ReferenceKinectMenu.Items.Clear();
+            bool containsReferenceFOV = false;
+            foreach (Tracker.Result.KinectFOV fov in fovs)
+            {
+                MenuItem kinectIPItem = new MenuItem();
+                kinectIPItem.Header = fov.ClientIP.ToString();
+                kinectIPItem.Click += KinectIPItem_Click;
+                this.ReferenceKinectMenu.Items.Add(kinectIPItem);
+                
+                if (kinectIPItem.Header.ToString().Equals(this.referenceKinectIP))
+                {
+                    containsReferenceFOV = true;
+                }
+            }
+            if (!containsReferenceFOV)
+            {
+                this.ReferenceKinectBtn.Content = "Reference Kinect";
+            }
+        }
+
+        private void KinectIPItem_Click(object sender, RoutedEventArgs e)
+        {
+            string referenceKinectIP = (sender as MenuItem).Header.ToString();
+            this.referenceKinectIP = referenceKinectIP;
+            this.ReferenceKinectBtn.Content = referenceKinectIP;
+        }
+
+        private Tracker.Result.KinectFOV GetReferenceKinectFOV(IEnumerable<Tracker.Result.KinectFOV> fovs)
+        {
+            Tracker.Result.KinectFOV referenceFOV = fovs.First();
+            foreach (Tracker.Result.KinectFOV fov in fovs)
+            {
+                if (fov.ClientIP.ToString().Equals(this.referenceKinectIP))
+                {
+                    referenceFOV = fov;
+                }
+            }
+            return referenceFOV;
         }
 
         private void DisplayBodyFrames(Tracker.Result result)
@@ -104,12 +149,11 @@ namespace Tiny.UI
             {
                 return;
             }
-            
-            // HACK - draw people wrt first FOV
-            Tracker.Result.KinectFOV firstFOV = fovs.First();
-            KinectCamera.Dimension firstFOVDim = firstFOV.Dimension;
-            int frameWidth = firstFOVDim.DepthFrameWidth;
-            int frameHeight = firstFOVDim.DepthFrameHeight;
+
+            Tracker.Result.KinectFOV referenceFOV = this.GetReferenceKinectFOV(fovs);
+            KinectCamera.Dimension referenceDim = referenceFOV.Dimension;
+            int frameWidth = referenceDim.DepthFrameWidth;
+            int frameHeight = referenceDim.DepthFrameHeight;
             using (DrawingContext dc = this.bodyDrawingGroup.Open())
             {
                 SkeletonVis.DrawBackground(frameWidth, frameHeight, dc);
@@ -118,11 +162,10 @@ namespace Tiny.UI
                 int personIdx = 0;
                 foreach (Tracker.Result.Person person in people)
                 {
-                    // HACK - find skeleton in first FOV
                     TrackingSkeleton referenceSkeleton = null;
                     foreach (Tracker.Result.SkeletonMatch match in person.SkeletonMatches)
                     {
-                        if (match.FOV.Equals(firstFOV))
+                        if (match.FOV.Equals(referenceFOV))
                         {
                             referenceSkeleton = match.Skeleton;
                             break;
@@ -157,9 +200,13 @@ namespace Tiny.UI
             }
         }
 
-        internal void UpdateCalibrationStatus(bool completed)
+        private void Button_Click(object sender, RoutedEventArgs e)
         {
-            this.setCalibrationComplete(completed);
+            Button senderBtn = sender as Button;
+            senderBtn.ContextMenu.IsEnabled = true;
+            senderBtn.ContextMenu.PlacementTarget = senderBtn;
+            senderBtn.ContextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
+            senderBtn.ContextMenu.IsOpen = true;
         }
     }
 }
