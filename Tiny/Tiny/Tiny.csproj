@@ -78,6 +78,7 @@
     <Compile Include="Exceptions\UntrackedJointException.cs" />
     <Compile Include="KinectSkeleton.cs" />
     <Compile Include="KinectCamera.cs" />
+    <Compile Include="TrackerUtils.cs" />
     <Compile Include="UI\SkeletonVisualizer.cs" />
     <Compile Include="UI\TrackingUI.xaml.cs">
       <DependentUpon>TrackingUI.xaml</DependentUpon>
