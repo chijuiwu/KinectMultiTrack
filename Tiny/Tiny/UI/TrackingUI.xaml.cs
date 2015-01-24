@@ -17,8 +17,10 @@ using KinectSerializer;
 using Microsoft.Kinect;
 using System.Diagnostics;
 using System.Net;
+using SkeletonVis = Tiny.UI.SkeletonVisualizer;
+using Tiny.WorldView;
 
-namespace Tiny
+namespace Tiny.UI
 {
     public partial class TrackingUI : Window, INotifyPropertyChanged
     {
@@ -27,12 +29,6 @@ namespace Tiny
         private DrawingGroup bodyDrawingGroup;
         private DrawingImage bodyImageSource;
         private List<Pen> bodyColors;
-        private readonly double jointThickness = 3;
-        private readonly double clipBoundsThickness = 10;
-        private readonly Brush backgroundBrush = Brushes.Black;
-        private readonly Brush trackedJointBrush = new SolidColorBrush(Color.FromArgb(255, 68, 192, 68));
-        private readonly Brush inferredJointBrush = Brushes.Yellow;
-        private readonly Pen inferredBonePen = new Pen(Brushes.Gray, 1);
 
         private KinectSensor kinectSensor;
         private CoordinateMapper coordinateMapper;
@@ -108,85 +104,57 @@ namespace Tiny
             {
                 return;
             }
+            
+            // HACK - draw people wrt first FOV
+            Tracker.Result.KinectFOV firstFOV = fovs.First();
+            KinectCamera.Dimension firstFOVDim = firstFOV.Dimension;
+            int frameWidth = firstFOVDim.DepthFrameWidth;
+            int frameHeight = firstFOVDim.DepthFrameHeight;
             using (DrawingContext dc = this.bodyDrawingGroup.Open())
             {
-                // HACK - draw people wrt first fov
-                IPEndPoint firstFOVIP = fovs.First().ClientIP;
-                KinectAgent.Dimension firstFOVDim = fovs.First().Dimension;
-                int frameWidth = firstFOVDim.DepthFrameWidth;
-                int frameHeight = firstFOVDim.DepthFrameHeight;
-                // background
-                dc.DrawRectangle(this.backgroundBrush, null, new Rect(0.0, 0.0, frameWidth, frameHeight));
+                SkeletonVis.DrawBackground(frameWidth, frameHeight, dc);
 
+                IEnumerable<Tracker.Result.Person> people = result.People;
                 int personIdx = 0;
-                foreach (Tracker.Result.KinectFOV fov in fovs)
+                foreach (Tracker.Result.Person person in people)
                 {
-                    if (!fov.People.Any())
+                    // HACK - find skeleton in first FOV
+                    TrackingSkeleton referenceSkeleton = null;
+                    foreach (Tracker.Result.SkeletonMatch match in person.SkeletonMatches)
                     {
-                        continue;
-                    }
-                    foreach (Person person in fov.People)
-                    {
-
-                    }
-
-                }
-            }
-            using (DrawingContext dc = this.bodyDrawingGroup.Open())
-            {
-                WBodyFrame firstWorldView = bodyFrames.First();
-                dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, firstWorldView.DepthFrameWidth, firstWorldView.DepthFrameHeight));
-                int penIndex = 0;
-                foreach (WBodyFrame worldView in bodyFrames)
-                {
-                    foreach (WBody body in worldView.Boides)
-                    {
-                        Pen drawPen = this.bodyColors[penIndex++];
-                        Dictionary<JointType, Point> jointPoints = new Dictionary<JointType, Point>();
-
-                        // convert coordinate wrt first world view
-                        KinectBody bodyKinect = WBody.GetKinectBody(body, firstWorldView.InitialAngle, firstWorldView.InitialCentrePosition);
-                        foreach (JointType jointType in bodyKinect.Joints.Keys)
+                        if (match.FOV.Equals(firstFOV))
                         {
-                            CameraSpacePoint position = bodyKinect.Joints[jointType];
+                            referenceSkeleton = match.Skeleton;
+                            break;
+                        }
+                    }
+                    double referenceAngle = referenceSkeleton.InitialAngle;
+                    WCoordinate referencePosition = referenceSkeleton.InitialPosition;
+
+                    Pen personPen = this.bodyColors[personIdx++];
+                    foreach (Tracker.Result.SkeletonMatch match in person.SkeletonMatches)
+                    {
+                        WBody worldviewBody = match.Skeleton.CurrentPosition.Worldview;
+                        KinectSkeleton kinectSkeleton = WBody.TransformBodyToKinectSkeleton(worldviewBody, referenceAngle, referencePosition);
+                        Dictionary<JointType, Tuple<TrackingState, Point>> jointPts = new Dictionary<JointType, Tuple<TrackingState, Point>>();
+                        foreach (JointType jointType in kinectSkeleton.Joints.Keys)
+                        {
+                            TrackingState jointTS = worldviewBody.Joints[jointType].TrackingState;
+                            CameraSpacePoint position = kinectSkeleton.Joints[jointType];
                             if (position.Z < 0)
                             {
                                 position.Z = 0.1f;
                             }
                             DepthSpacePoint depthSpacePoint = this.coordinateMapper.MapCameraPointToDepthSpace(position);
-                            jointPoints[jointType] = new Point(depthSpacePoint.X, depthSpacePoint.Y);
+                            jointPts[jointType] = Tuple.Create(jointTS, new Point(depthSpacePoint.X, depthSpacePoint.Y));
                         }
-                        this.DrawBody(jointPoints, dc, drawPen, this.inferredBonePen, this.trackedJointBrush, this.inferredJointBrush);
-                        if (penIndex == this.bodyColors.Count())
-                        {
-                            penIndex = 0;
-                        }
+                        
+                        SkeletonVis.DrawBody(jointPts, dc, personPen);
                     }
                 }
-                this.bodyDrawingGroup.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, firstWorldView.DepthFrameWidth, firstWorldView.DepthFrameHeight));
+                
+                SkeletonVis.DrawClipRegion(frameWidth, frameHeight, this.bodyDrawingGroup);
             }
-        }
-
-        private void DrawBody(IDictionary<JointType, Point> jointPoints, DrawingContext drawingContext, Pen bonePen, Pen inferredBonePen, Brush jointBrush, Brush inferredJointBrush)
-        {
-            // Draw the bones
-            foreach (var bone in BodyStructure.Bones)
-            {
-                this.DrawBone(jointPoints, bone.Item1, bone.Item2, drawingContext, bonePen, inferredBonePen);
-            }
-
-            // Draw the joints
-            foreach (JointType jointType in jointPoints.Keys)
-            {
-                Brush drawBrush = jointBrush;
-                drawingContext.DrawEllipse(drawBrush, null, jointPoints[jointType], jointThickness, jointThickness);
-            }
-        }
-
-        private void DrawBone(IDictionary<JointType, Point> jointPoints, JointType jointType0, JointType jointType1, DrawingContext drawingContext, Pen drawingPen, Pen inferredDrawingPen)
-        {
-            Pen drawPen = drawingPen;
-            drawingContext.DrawLine(drawPen, jointPoints[jointType0], jointPoints[jointType1]);
         }
 
         internal void UpdateCalibrationStatus(bool completed)

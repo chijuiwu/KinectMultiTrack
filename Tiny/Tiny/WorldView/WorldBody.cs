@@ -7,15 +7,15 @@ using KinectSerializer;
 using Microsoft.Kinect;
 using Tiny.Exceptions;
 
-namespace Tiny
+namespace Tiny.WorldView
 {
     public class WBody
     {
-        public Dictionary<JointType, WCoordinate> Joints { get; private set; }
+        public Dictionary<JointType, WJoint> Joints { get; private set; }
 
         public WBody()
         {
-            this.Joints = new Dictionary<JointType, WCoordinate>();
+            this.Joints = new Dictionary<JointType, WJoint>();
         }
 
         // Get the initial angle between user and Kinect
@@ -86,7 +86,7 @@ namespace Tiny
         // Joints transformed to the origin of the world coordinate system
         public static WBody Create(SBody body, double initialAngle, WCoordinate centrePoint)
         {
-            WBody bodyWorld = new WBody();
+            WBody worldviewBody = new WBody();
 
             foreach (JointType jointType in body.Joints.Keys)
             {
@@ -103,20 +103,22 @@ namespace Tiny
                 float transformedY = translatedY;
                 float transformedZ = (float)(translatedZ * Math.Cos(initialAngle) - translatedX * Math.Sin(initialAngle));
 
-                bodyWorld.Joints[jointType] = new WCoordinate(transformedX, transformedY, transformedZ);
+                WCoordinate coordinate = new WCoordinate(transformedX, transformedY, transformedZ);
+                worldviewBody.Joints[jointType] = new WJoint(coordinate, joint.TrackingState);
             }
 
-            return bodyWorld;
+            return worldviewBody;
         }
 
         // Joints transformed back to the Kinect camera space point
-        public static KinectBody GetKinectBody(WBody body, double initialAngle, WCoordinate centrePoint)
+        public static KinectSkeleton TransformBodyToKinectSkeleton(WBody body, double initialAngle, WCoordinate centrePoint)
         {
-            KinectBody bodyKinect = new KinectBody();
+            KinectSkeleton kinectSkeleton = new KinectSkeleton();
 
             foreach (JointType jointType in body.Joints.Keys)
             {
-                WCoordinate jointWorld = body.Joints[jointType];
+                WJoint worldviewJoint = body.Joints[jointType];
+                WCoordinate worldviewJointPos = worldviewJoint.Coordinate;
 
                 double sinAngle = Math.Sin(initialAngle);
                 double cosAngle = Math.Cos(initialAngle);
@@ -141,19 +143,19 @@ namespace Tiny
                 inverseMatrix[1, 0] = determinant * swappedMatrix[1, 0];
                 inverseMatrix[1, 1] = determinant * swappedMatrix[1, 1];
 
-                float translatedX = (float)(inverseMatrix[0, 0] * jointWorld.X + inverseMatrix[0, 1] * jointWorld.Z);
-                float translatedY = jointWorld.Y;
-                float translatedZ = (float)(inverseMatrix[1, 0] * jointWorld.X + inverseMatrix[1, 1] * jointWorld.Z);
+                float translatedX = (float)(inverseMatrix[0, 0] * worldviewJointPos.X + inverseMatrix[0, 1] * worldviewJointPos.Z);
+                float translatedY = worldviewJointPos.Y;
+                float translatedZ = (float)(inverseMatrix[1, 0] * worldviewJointPos.X + inverseMatrix[1, 1] * worldviewJointPos.Z);
 
                 CameraSpacePoint jointKinect = new CameraSpacePoint();
                 jointKinect.X = translatedX + centrePoint.X;
                 jointKinect.Y = translatedY + centrePoint.Y;
                 jointKinect.Z = translatedZ + centrePoint.Z;
 
-                bodyKinect.Joints[jointType] = jointKinect;
+                kinectSkeleton.Joints[jointType] = jointKinect;
             }
 
-            return bodyKinect;
+            return kinectSkeleton;
         }
 
         public static WBody Copy(WBody body)
@@ -161,7 +163,8 @@ namespace Tiny
             WBody copy = new WBody();
             foreach (JointType jointType in body.Joints.Keys)
             {
-                copy.Joints[jointType] = WCoordinate.Copy(body.Joints[jointType]);
+                WJoint joint = body.Joints[jointType];
+                copy.Joints[jointType] = new WJoint(WCoordinate.Copy(joint.Coordinate), joint.TrackingState);
             }
             return copy;
         }
@@ -170,9 +173,11 @@ namespace Tiny
         {
             double diff = 0;
             IEnumerable<JointType> commonJoints = body0.Joints.Keys.Union(body1.Joints.Keys);
-            foreach (JointType joint in commonJoints)
+            foreach (JointType jointType in commonJoints)
             {
-                diff += WCoordinate.GetEuclideanDifference(body0.Joints[joint], body1.Joints[joint]);
+                WJoint joint0 = body0.Joints[jointType];
+                WJoint joint1 = body1.Joints[jointType];
+                diff += WCoordinate.GetEuclideanDifference(joint0.Coordinate, joint1.Coordinate);
             }
             return diff;
         }

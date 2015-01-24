@@ -9,10 +9,12 @@ using System.Diagnostics;
 using System.Windows.Threading;
 using KinectSerializer;
 using Tiny.Properties;
+using Tiny.UI;
+using Tiny.WorldView;
 
 namespace Tiny
 {
-    public class KinectAgent
+    public class KinectCamera
     {
         public class Dimension
         {
@@ -26,9 +28,9 @@ namespace Tiny
             }
         }
 
-        public KinectAgent.Dimension FrameDimension { get; private set; }
+        public KinectCamera.Dimension FrameDimension { get; private set; }
         private bool calibrated;
-        private Dictionary<ulong, Person> people;
+        private Dictionary<ulong, TrackingSkeleton> skeletons;
 
         private Stack<SBodyFrame> unprocessedBodyFrames;
 
@@ -38,13 +40,13 @@ namespace Tiny
         public event KinectUIHandler DisposeKinectUI;
         public delegate void KinectUIHandler();
 
-        public IEnumerable<Person> People
+        public IEnumerable<TrackingSkeleton> Skeletons
         {
             get
             {
-                foreach (Person person in this.people.Values)
+                foreach (TrackingSkeleton skeleton in this.skeletons.Values)
                 {
-                    yield return Person.Copy(person);
+                    yield return TrackingSkeleton.Copy(skeleton);
                 }
             }
         }
@@ -57,11 +59,11 @@ namespace Tiny
             }
         }
 
-        public KinectAgent()
+        public KinectCamera()
         {
             this.calibrated = false;
             this.FrameDimension = null;
-            this.people = new Dictionary<ulong, Person>();
+            this.skeletons = new Dictionary<ulong, TrackingSkeleton>();
 
             this.unprocessedBodyFrames = new Stack<SBodyFrame>();
 
@@ -98,9 +100,9 @@ namespace Tiny
             {
                 ulong trackingId = frameZeroth.Bodies[personIdx].TrackingId;
 
-                Person person = new Person(trackingId);
+                TrackingSkeleton skeleton = new TrackingSkeleton(trackingId);
 
-                person.InitialAngle = WBody.GetInitialAngle(frameZeroth.Bodies[personIdx]);
+                skeleton.InitialAngle = WBody.GetInitialAngle(frameZeroth.Bodies[personIdx]);
 
                 // initial position = average of all previous positions
                 // TODO: May break if bodies count differ from the first frame
@@ -109,12 +111,12 @@ namespace Tiny
                 {
                     previousPositions[frameIdx] = calibrationFrames[frameIdx].Bodies[personIdx];
                 }
-                person.InitialPosition = WBody.GetInitialPosition(previousPositions);
+                skeleton.InitialPosition = WBody.GetInitialPosition(previousPositions);
 
-                this.people.Add(trackingId, person);
+                this.skeletons.Add(trackingId, skeleton);
             }
             this.calibrated = true;
-            this.FrameDimension = new KinectAgent.Dimension(frameZeroth.DepthFrameWidth, frameZeroth.DepthFrameHeight);
+            this.FrameDimension = new KinectCamera.Dimension(frameZeroth.DepthFrameWidth, frameZeroth.DepthFrameHeight);
         }
 
         public void ProcessFrames(SBodyFrame bodyFrame)
@@ -128,11 +130,11 @@ namespace Tiny
             {
                 foreach (SBody body in bodyFrame.Bodies)
                 {
-                    if (this.people.ContainsKey(body.TrackingId))
+                    if (this.skeletons.ContainsKey(body.TrackingId))
                     {
-                        Person person = this.people[body.TrackingId];
-                        WBody worldBody = WBody.Create(body, person.InitialAngle, person.InitialPosition);
-                        person.UpdatePosition(body, worldBody);
+                        TrackingSkeleton skeleton = this.skeletons[body.TrackingId];
+                        WBody worldBody = WBody.Create(body, skeleton.InitialAngle, skeleton.InitialPosition);
+                        skeleton.UpdatePosition(body, worldBody);
                     }
                     // ignore bodies that do not match with any tracking id
                 }

@@ -9,6 +9,7 @@ using Microsoft.Kinect;
 using KinectSerializer;
 using System.Diagnostics;
 using System.Windows.Threading;
+using Tiny.UI;
 
 namespace Tiny
 {

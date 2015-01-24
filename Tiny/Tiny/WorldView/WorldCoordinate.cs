@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Kinect;
 
-namespace Tiny
+namespace Tiny.WorldView
 {
     public class WCoordinate
     {

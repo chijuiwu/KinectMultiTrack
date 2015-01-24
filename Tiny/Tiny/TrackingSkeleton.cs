@@ -6,10 +6,11 @@ using System.Net;
 using System.Diagnostics;
 using System.Globalization;
 using KinectSerializer;
+using Tiny.WorldView;
 
 namespace Tiny
 {
-    public class Person
+    public class TrackingSkeleton
     {
         public class Position
         {
@@ -31,9 +32,9 @@ namespace Tiny
         public ulong Id { get; private set; }
         public double InitialAngle { get; set; }
         public WCoordinate InitialPosition { get; set; }
-        public Stack<Person.Position> Positions { get; private set; }
+        public Stack<TrackingSkeleton.Position> Positions { get; private set; }
 
-        public Person.Position CurrentPosition
+        public TrackingSkeleton.Position CurrentPosition
         {
             get
             {
@@ -41,13 +42,13 @@ namespace Tiny
             }
         }
 
-        public Person(ulong id)
+        public TrackingSkeleton(ulong id)
         {
             this.Id = id;
-            this.Positions = new Stack<Person.Position>();
+            this.Positions = new Stack<TrackingSkeleton.Position>();
         }
 
-        public Person(ulong id, double initAngle, WCoordinate initPos, Stack<Person.Position> positions)
+        public TrackingSkeleton(ulong id, double initAngle, WCoordinate initPos, Stack<TrackingSkeleton.Position> positions)
         {
             this.Id = id;
             this.InitialAngle = initAngle;
@@ -57,15 +58,15 @@ namespace Tiny
 
         public void UpdatePosition(SBody body, WBody worldviewBody)
         {
-            this.Positions.Push(new Person.Position(body, worldviewBody));
+            this.Positions.Push(new TrackingSkeleton.Position(body, worldviewBody));
         }
 
         // Copy only the current positions
-        public static Person Copy(Person person)
+        public static TrackingSkeleton Copy(TrackingSkeleton person)
         {
-            Stack<Person.Position> currentPos = new Stack<Person.Position>();
-            currentPos.Push(Person.Position.Copy(person.Positions.Peek()));
-            Person copy = new Person(person.Id, person.InitialAngle, person.InitialPosition, currentPos);
+            Stack<TrackingSkeleton.Position> currentPos = new Stack<TrackingSkeleton.Position>();
+            currentPos.Push(TrackingSkeleton.Position.Copy(person.Positions.Peek()));
+            TrackingSkeleton copy = new TrackingSkeleton(person.Id, person.InitialAngle, person.InitialPosition, currentPos);
             return copy;
         }
 
@@ -86,7 +87,7 @@ namespace Tiny
                 return false;
             }
             
-            Person p = obj as Person;
+            TrackingSkeleton p = obj as TrackingSkeleton;
             if ((Object)p == null)
             {
                 return false;
@@ -95,7 +96,7 @@ namespace Tiny
             return (this.Id == p.Id) && (this.InitialAngle == p.InitialAngle) && (this.InitialPosition == p.InitialPosition);
         }
 
-        public bool Equals(Person p)
+        public bool Equals(TrackingSkeleton p)
         {
             return (this.Id == p.Id) && (this.InitialAngle == p.InitialAngle) && (this.InitialPosition == p.InitialPosition);
         }

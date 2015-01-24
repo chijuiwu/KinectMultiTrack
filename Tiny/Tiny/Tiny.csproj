@@ -77,17 +77,18 @@
     </ApplicationDefinition>
     <Compile Include="Exceptions\UntrackedJointException.cs" />
     <Compile Include="Helper.cs" />
-    <Compile Include="KinectBody.cs" />
-    <Compile Include="KinectAgent.cs" />
-    <Compile Include="TrackingUI.xaml.cs">
+    <Compile Include="KinectSkeleton.cs" />
+    <Compile Include="KinectCamera.cs" />
+    <Compile Include="UI\SkeletonVisualizer.cs" />
+    <Compile Include="UI\TrackingUI.xaml.cs">
       <DependentUpon>TrackingUI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Person.cs" />
-    <Compile Include="WorldBody.cs" />
+    <Compile Include="TrackingSkeleton.cs" />
+    <Compile Include="WorldView\WorldBody.cs" />
     <Compile Include="Tracker.cs" />
-    <Compile Include="WorldCoordinate.cs" />
-    <Compile Include="WorldBodyFrame.cs" />
-    <Page Include="MultipleKinectUI.xaml">
+    <Compile Include="WorldView\WorldCoordinate.cs" />
+    <Compile Include="WorldView\WorldJoint.cs" />
+    <Page Include="UI\MultipleKinectUI.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -96,21 +97,21 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="TrackingServer.cs" />
-    <Compile Include="MultipleKinectUI.xaml.cs">
+    <Compile Include="UI\MultipleKinectUI.xaml.cs">
       <DependentUpon>MultipleKinectUI.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="SingleKinectUI.xaml">
+    <Page Include="UI\SingleKinectUI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="TrackingUI.xaml">
+    <Page Include="UI\TrackingUI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="SingleKinectUI.xaml.cs">
+    <Compile Include="UI\SingleKinectUI.xaml.cs">
       <DependentUpon>SingleKinectUI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">

@@ -9,6 +9,7 @@ using System.Net;
 using System.Diagnostics;
 using Microsoft.Kinect;
 using System.Runtime.CompilerServices;
+using Tiny.WorldView;
 
 namespace Tiny
 {
@@ -18,7 +19,7 @@ namespace Tiny
         private bool calibrated = false;
 
         private readonly int KINECT_COUNT;
-        private ConcurrentDictionary<IPEndPoint, KinectAgent> kinectsDict;
+        private ConcurrentDictionary<IPEndPoint, KinectCamera> kinectsDict;
 
         private readonly object syncFrameLock = new object();
 
@@ -27,62 +28,84 @@ namespace Tiny
             public class KinectFOV
             {
                 public IPEndPoint ClientIP { get; private set; }
-                public KinectAgent.Dimension Dimension { get; private set; }
-                public IEnumerable<Person> People { get; private set; }
+                public KinectCamera.Dimension Dimension { get; private set; }
+                public IEnumerable<TrackingSkeleton> Skeletons { get; private set; }
 
-                public KinectFOV(IPEndPoint clientIP, KinectAgent.Dimension dimension, IEnumerable<Person> people)
+                public KinectFOV(IPEndPoint clientIP, KinectCamera.Dimension dimension, IEnumerable<TrackingSkeleton> people)
                 {
                     this.ClientIP = clientIP;
                     this.Dimension = dimension;
-                    this.People = people;
+                    this.Skeletons = people;
                 }
             }
 
-            public class Match
+            public class SkeletonMatch
             {
-                public int Count { get; private set; }
-                public IEnumerable<Person> People { get; private set; }
+                public KinectFOV FOV { get; private set; }
+                public TrackingSkeleton Skeleton { get; private set; }
 
-                public Match(IEnumerable<Person> people)
+                public SkeletonMatch(KinectFOV fov, TrackingSkeleton skeleton)
                 {
-                    this.Count = Helper.Count(people);
-                    this.People = people;
+                    this.FOV = fov;
+                    this.Skeleton = skeleton;
                 }
 
                 public override string ToString()
                 {
                     StringBuilder sb = new StringBuilder();
-                    sb.Append("[Match: ").Append(this.Count).Append("]: ");
+                    sb.Append("[");
+                    sb.Append("FOV: ").Append(this.FOV.ClientIP).Append(", ");
+                    sb.Append("Skeleton: ").Append(this.Skeleton);
+                    sb.Append("]");
+                    return sb.ToString();
+                }
+            }
+
+            public class Person
+            {
+                public int SkeletonMatchCount { get; private set; }
+                public IEnumerable<SkeletonMatch> SkeletonMatches { get; private set; }
+
+                public Person(IEnumerable<SkeletonMatch> skeletons)
+                {
+                    this.SkeletonMatchCount = Helper.Count(skeletons);
+                    this.SkeletonMatches = skeletons;
+                }
+
+                public override string ToString()
+                {
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append("[Skeletons: ").Append(this.SkeletonMatchCount).Append("]: ");
                     String prefix = "";
-                    foreach (Person p in this.People)
+                    foreach (SkeletonMatch match in this.SkeletonMatches)
                     {
                         sb.Append(prefix);
                         prefix = ",";
-                        sb.Append(p);
+                        sb.Append(match);
                     }
                     return sb.ToString();
                 }
             }
 
             public IEnumerable<Result.KinectFOV> FOVs { get; private set; }
-            public IEnumerable<Result.Match> Matches { get; private set; }
+            public IEnumerable<Result.Person> People { get; private set; }
 
-            public Result(IEnumerable<Result.KinectFOV> fovs, IEnumerable<Result.Match> matches)
+            public Result(IEnumerable<Result.KinectFOV> fovs, IEnumerable<Result.Person> people)
             {
                 this.FOVs = fovs;
-                this.Matches = matches;
+                this.People = people;
             }
         }
 
         public Tracker(int kinectCount)
         {
             this.KINECT_COUNT = kinectCount;
-            this.kinectsDict = new ConcurrentDictionary<IPEndPoint, KinectAgent>();
+            this.kinectsDict = new ConcurrentDictionary<IPEndPoint, KinectCamera>();
         }
 
         public void RemoveClient(IPEndPoint clientIP)
         {
-            KinectAgent kinect;
+            KinectCamera kinect;
             if (this.kinectsDict.TryRemove(clientIP, out kinect))
             {
                 kinect.DisposeUI();
@@ -97,7 +120,7 @@ namespace Tiny
             }
             else
             {
-                foreach (KinectAgent kinect in this.kinectsDict.Values)
+                foreach (KinectCamera kinect in this.kinectsDict.Values)
                 {
                     if (kinect.UnprocessedFramesCount < Tracker.CALIBRATION_FRAMES)
                     {
@@ -112,13 +135,13 @@ namespace Tiny
         {
             if (!this.kinectsDict.ContainsKey(clientIP))
             {
-                this.kinectsDict[clientIP] = new KinectAgent();
+                this.kinectsDict[clientIP] = new KinectCamera();
             }
             lock (syncFrameLock)
             {
                 if (this.RequireCalibration())
                 {
-                    foreach (KinectAgent kinect in this.kinectsDict.Values)
+                    foreach (KinectCamera kinect in this.kinectsDict.Values)
                     {
                         kinect.Calibrate();
                     }
@@ -128,67 +151,68 @@ namespace Tiny
                 List<Result.KinectFOV> fovs = new List<Result.KinectFOV>();
                 foreach (IPEndPoint kinectId in this.kinectsDict.Keys)
                 {
-                    KinectAgent.Dimension dimension = this.kinectsDict[kinectId].FrameDimension;
-                    IEnumerable<Person> people = this.kinectsDict[kinectId].People;
-                    fovs.Add(new Result.KinectFOV(kinectId, dimension, people));
+                    KinectCamera.Dimension dimension = this.kinectsDict[kinectId].FrameDimension;
+                    IEnumerable<TrackingSkeleton> skeletons = this.kinectsDict[kinectId].Skeletons;
+                    fovs.Add(new Result.KinectFOV(kinectId, dimension, skeletons));
                 }
-                IEnumerable<Result.Match> matches = this.MatchPeople(fovs);
-                return new Result(fovs, matches);
+                IEnumerable<Result.Person> people = this.MatchSkeletonsAndPeople(fovs);
+                return new Result(fovs, people);
             }
         }
 
-        private IEnumerable<Result.Match> MatchPeople(IEnumerable<Result.KinectFOV> fovs)
+        private IEnumerable<Result.Person> MatchSkeletonsAndPeople(IEnumerable<Result.KinectFOV> fovs)
         {
             Debug.WriteLine("Matching skeleton...");
             Debug.WriteLine("FOV: " + Helper.Count(fovs));
-            List<Result.Match> matches = new List<Result.Match>();
+            List<Result.Person> personList = new List<Result.Person>();
             foreach (Result.KinectFOV fov in fovs)
             {
-                Debug.WriteLine("Kinect: " + fov.ClientIP + " People: " + Helper.Count(fov.People));
-                foreach (Person person in fov.People)
+                Debug.WriteLine("Kinect: " + fov.ClientIP + " People: " + Helper.Count(fov.Skeletons));
+                foreach (TrackingSkeleton skeleton in fov.Skeletons)
                 {
                     // TODO: Validate result
-                    Result.Match personInOtherFOVs = this.MatchPeopleByPosition(fovs, fov, person);
-                    Debug.WriteLine(personInOtherFOVs);
-                    matches.Add(personInOtherFOVs);
+                    // TODO: Deal with occlusion (One person may not appear in all FOVs)
+                    Result.Person personInAllFOVs = this.FindPersonByPosition(fovs, fov, skeleton);
+                    Debug.WriteLine(personInAllFOVs);
+                    personList.Add(personInAllFOVs);
                 }
             }
-            return matches;
+            return personList;
         }
 
         // Match people in other Kinect FOV by their positions in World View
-        private Result.Match MatchPeopleByPosition(IEnumerable<Result.KinectFOV> fovs, Result.KinectFOV targetFOV, Person targetPerson)
+        private Result.Person FindPersonByPosition(IEnumerable<Result.KinectFOV> fovs, Result.KinectFOV targetFOV, TrackingSkeleton targetSkeleton)
         {
             // over all Kinect FOVs
-            List<Person> personInOtherFOVs = new List<Person>();
+            List<Result.SkeletonMatch> personInAllFOVs = new List<Result.SkeletonMatch>() { new Result.SkeletonMatch(targetFOV, targetSkeleton) };
             foreach (Result.KinectFOV fov in fovs)
             {
                 if (!fov.Equals(targetFOV))
                 {
                     // within one FOV
-                    Person samePerson = null;
+                    TrackingSkeleton skeletonSamePerson = null;
                     double minDist = Double.MaxValue;
-                    foreach (Person p in fov.People)
+                    foreach (TrackingSkeleton skeleton in fov.Skeletons)
                     {
-                        if (!p.Equals(targetPerson))
+                        if (!skeleton.Equals(targetSkeleton))
                         {
-                            WBody body0 = p.CurrentPosition.Worldview;
-                            WBody body1 = targetPerson.CurrentPosition.Worldview;
+                            WBody body0 = skeleton.CurrentPosition.Worldview;
+                            WBody body1 = targetSkeleton.CurrentPosition.Worldview;
                             double diff = WBody.GetCoordinateDifferences(body0, body1);
                             if (diff < minDist)
                             {
-                                samePerson = p;
+                                skeletonSamePerson = skeleton;
                                 minDist = diff;
                             }
                         }
                     }
-                    if (samePerson != null)
+                    if (skeletonSamePerson != null)
                     {
-                        personInOtherFOVs.Add(samePerson);
+                        personInAllFOVs.Add(new Result.SkeletonMatch(fov, skeletonSamePerson));
                     }
                 }
             }
-            return new Result.Match(personInOtherFOVs);
+            return new Result.Person(personInAllFOVs);
         }
     }
 }
