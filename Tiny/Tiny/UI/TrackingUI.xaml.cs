@@ -29,7 +29,7 @@ namespace Tiny.UI
 
         private DrawingGroup bodyDrawingGroup;
         private DrawingImage bodyImageSource;
-        private List<Pen> bodyColors;
+        private List<Pen> personColors;
 
         private KinectSensor kinectSensor;
         private CoordinateMapper coordinateMapper;
@@ -43,13 +43,13 @@ namespace Tiny.UI
             this.bodyDrawingGroup = new DrawingGroup();
             this.bodyImageSource = new DrawingImage(this.bodyDrawingGroup);
             // A person will have the same color
-            this.bodyColors = new List<Pen>();
-            this.bodyColors.Add(new Pen(Brushes.Red, 6));
-            this.bodyColors.Add(new Pen(Brushes.Orange, 6));
-            this.bodyColors.Add(new Pen(Brushes.Green, 6));
-            this.bodyColors.Add(new Pen(Brushes.Blue, 6));
-            this.bodyColors.Add(new Pen(Brushes.Indigo, 6));
-            this.bodyColors.Add(new Pen(Brushes.Violet, 6));
+            this.personColors = new List<Pen>();
+            this.personColors.Add(new Pen(Brushes.Red, 6));
+            this.personColors.Add(new Pen(Brushes.Orange, 6));
+            this.personColors.Add(new Pen(Brushes.Green, 6));
+            this.personColors.Add(new Pen(Brushes.Blue, 6));
+            this.personColors.Add(new Pen(Brushes.Indigo, 6));
+            this.personColors.Add(new Pen(Brushes.Violet, 6));
 
             this.kinectSensor = KinectSensor.GetDefault();
             this.kinectSensor.Open();
@@ -173,7 +173,7 @@ namespace Tiny.UI
                     double referenceAngle = referenceSkeleton.InitialAngle;
                     WCoordinate referencePosition = referenceSkeleton.InitialPosition;
 
-                    Pen personPen = this.bodyColors[personIdx++];
+                    Pen personPen = this.personColors[personIdx++];
                     foreach (Tracker.Result.SkeletonMatch match in person.SkeletonMatches)
                     {
                         WBody worldviewBody = match.Skeleton.CurrentPosition.Worldview;

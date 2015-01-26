@@ -57,17 +57,17 @@ namespace Tiny
                             }
                         }
                     }
-
-                    Debug.WriteLine("Coordinate Differences...");
-                    foreach (JointType jt in differences.Keys)
-                    {
-                        differences[jt] = differences[jt] / jointCount[jt];
-                        Debug.WriteLine("JointType: " + jt + " Difference: " + differences[jt]);
-                    }
-
-                    average = differences.Values.Average();
-                    Debug.WriteLine("Average: " + average);
                 }
+
+                Debug.WriteLine("Coordinate Differences...");
+                foreach (JointType jt in differences.Keys)
+                {
+                    differences[jt] = differences[jt] / jointCount[jt];
+                    Debug.WriteLine("JointType: " + jt + " Difference: " + differences[jt]);
+                }
+
+                average = differences.Values.Average();
+                Debug.WriteLine("Average: " + average);
             }
         }
     }

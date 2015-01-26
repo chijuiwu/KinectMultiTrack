@@ -24,7 +24,7 @@ namespace Tiny.UI
     {
         private DrawingGroup bodyDrawingGroup;
         private DrawingImage bodyImageSource;
-        private List<Pen> kinectColors;
+        private List<Pen> personColors;
 
         public MultipleKinectUI()
         {
@@ -34,13 +34,13 @@ namespace Tiny.UI
             this.bodyImageSource = new DrawingImage(this.bodyDrawingGroup);
             // HACK: Max 6 Kinects
             // Frames from a kinect have the same color
-            this.kinectColors = new List<Pen>();
-            this.kinectColors.Add(new Pen(Brushes.Red, 6));
-            this.kinectColors.Add(new Pen(Brushes.Orange, 6));
-            this.kinectColors.Add(new Pen(Brushes.Green, 6));
-            this.kinectColors.Add(new Pen(Brushes.Blue, 6));
-            this.kinectColors.Add(new Pen(Brushes.Indigo, 6));
-            this.kinectColors.Add(new Pen(Brushes.Violet, 6));
+            this.personColors = new List<Pen>();
+            this.personColors.Add(new Pen(Brushes.Red, 6));
+            this.personColors.Add(new Pen(Brushes.Orange, 6));
+            this.personColors.Add(new Pen(Brushes.Green, 6));
+            this.personColors.Add(new Pen(Brushes.Blue, 6));
+            this.personColors.Add(new Pen(Brushes.Indigo, 6));
+            this.personColors.Add(new Pen(Brushes.Violet, 6));
         }
         public ImageSource BodyStreamImageSource
         {
@@ -73,24 +73,13 @@ namespace Tiny.UI
             {
                 SkeletonVis.DrawBackground(frameWidth, frameHeight, dc);
 
-                Dictionary<Tracker.Result.KinectFOV, Pen> kinectFOVPens = new Dictionary<Tracker.Result.KinectFOV, Pen>();
-                int penCount = 0;
+                int personIdx = 0;
                 foreach (Tracker.Result.Person person in result.People)
                 {
+                    Pen personPen = this.personColors[personIdx++];
+
                     foreach (Tracker.Result.SkeletonMatch match in person.SkeletonMatches)
                     {
-                        Tracker.Result.KinectFOV fov = match.FOV;
-                        Pen kinectPen;
-                        if (!kinectFOVPens.ContainsKey(fov))
-                        {
-                            kinectPen = this.kinectColors[penCount++];
-                            kinectFOVPens[fov] = kinectPen;
-                        }
-                        else
-                        {
-                            kinectPen = kinectFOVPens[fov];
-                        }
-
                         TrackingSkeleton.Position skeletonPos = match.Skeleton.CurrentPosition;
                         SBody skeletonKinectBody = skeletonPos.Kinect;
                         if (skeletonKinectBody.IsTracked)
@@ -103,7 +92,7 @@ namespace Tiny.UI
                                 Point jointPt = new Point(joint.DepthSpacePoint.X, joint.DepthSpacePoint.Y);
                                 jointPts[jointType] = Tuple.Create(joint.TrackingState, jointPt);
                             }
-                            SkeletonVis.DrawBody(jointPts, dc, kinectPen);
+                            SkeletonVis.DrawBody(jointPts, dc, personPen);
                         }
                     }
                 }
