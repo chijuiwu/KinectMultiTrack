@@ -129,6 +129,7 @@ namespace Tiny
             Tracker.Result result = this.tracker.Synchronize(clientIP, bodyFrame);
             this.MultipleKinectUpdate(result);
             this.TrackingUpdate(result);
+            TrackerUtils.CalculateCoordinateDifferences(result);
         }
     }
 }

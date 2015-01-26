@@ -43,13 +43,11 @@ namespace Tiny
             {
                 public KinectFOV FOV { get; private set; }
                 public TrackingSkeleton Skeleton { get; private set; }
-                public Dictionary<JointType, double> AverageCoordinateDifferences { get; private set; }
 
                 public SkeletonMatch(KinectFOV fov, TrackingSkeleton skeleton)
                 {
                     this.FOV = fov;
                     this.Skeleton = skeleton;
-                    this.AverageCoordinateDifferences = new Dictionary<JointType, double>();
                 }
 
                 public override string ToString()
@@ -65,55 +63,17 @@ namespace Tiny
 
             public class Person
             {
-                public int SkeletonMatchCount { get; private set; }
                 public IEnumerable<SkeletonMatch> SkeletonMatches { get; private set; }
 
                 public Person(IEnumerable<SkeletonMatch> skeletons)
                 {
-                    this.SkeletonMatchCount = skeletons.Count();
                     this.SkeletonMatches = skeletons;
-                    this.CalculateCoordinateDifferences();
-                }
-
-                private void CalculateCoordinateDifferences()
-                {
-                    foreach (SkeletonMatch reference in this.SkeletonMatches)
-                    {
-                        WBody referenceBody = reference.Skeleton.CurrentPosition.Worldview;
-                        Dictionary<JointType, int> jointCountsDict = new Dictionary<JointType, int>();
-                        foreach (SkeletonMatch other in this.SkeletonMatches)
-                        {
-                            if (!reference.FOV.Equals(other.FOV))
-                            {
-                                WBody matchBody = other.Skeleton.CurrentPosition.Worldview;
-                                IEnumerable<JointType> commonJoints = referenceBody.Joints.Keys.Union(matchBody.Joints.Keys);
-                                // Sum coordinate differences
-                                foreach (JointType jointType in commonJoints)
-                                {
-                                    WCoordinate referenceJoint = referenceBody.Joints[jointType].Coordinate;
-                                    WCoordinate otherJoint = matchBody.Joints[jointType].Coordinate;
-                                    reference.AverageCoordinateDifferences[jointType] += WCoordinate.GetEuclideanDifference(referenceJoint, otherJoint);
-                                    int currentJointCount = 0;
-                                    jointCountsDict.TryGetValue(jointType, out currentJointCount);
-                                    jointCountsDict[jointType] = currentJointCount + 1;
-                                }
-                            }
-                        }
-                        // Average coordinate differences
-                        foreach (JointType jointType in reference.AverageCoordinateDifferences.Keys)
-                        {
-                            if (jointCountsDict.ContainsKey(jointType))
-                            {
-                                reference.AverageCoordinateDifferences[jointType] = reference.AverageCoordinateDifferences[jointType] / jointCountsDict[jointType];
-                            }
-                        }
-                    }
                 }
 
                 public override string ToString()
                 {
                     StringBuilder sb = new StringBuilder();
-                    sb.Append("[Skeletons: ").Append(this.SkeletonMatchCount).Append("]: ");
+                    sb.Append("[Skeletons: ").Append(this.SkeletonMatches.Count()).Append("]: ");
                     String prefix = "";
                     foreach (SkeletonMatch match in this.SkeletonMatches)
                     {
