@@ -169,7 +169,7 @@ namespace Tiny.WorldView
             return copy;
         }
 
-        public static double GetCoordinateDifferences(WBody body0, WBody body1)
+        public static double CalculateDifferences(WBody body0, WBody body1)
         {
             double diff = 0;
             IEnumerable<JointType> commonJoints = body0.Joints.Keys.Union(body1.Joints.Keys);
@@ -177,7 +177,7 @@ namespace Tiny.WorldView
             {
                 WJoint joint0 = body0.Joints[jointType];
                 WJoint joint1 = body1.Joints[jointType];
-                diff += WCoordinate.GetEuclideanDifference(joint0.Coordinate, joint1.Coordinate);
+                diff += WCoordinate.CalculateDifference(joint0.Coordinate, joint1.Coordinate);
             }
             return diff;
         }

@@ -5,57 +5,68 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Kinect;
+using Tiny.WorldView;
+using KinectSerializer;
+using System.Diagnostics;
 
 namespace Tiny
 {
     public class TrackerUtils
     {
+        public static float CalculateCameraSpacePointDifference(CameraSpacePoint pt0, CameraSpacePoint pt1)
+        {
+            return (float) Math.Sqrt(pt0.X * pt1.X + pt0.Y * pt1.Y + pt0.Z * pt1.Z);
+        }
+
         // Calculate the coordinate differences
         public static void CalculateCoordinateDifferences(Tracker.Result result)
         {
             foreach (Tracker.Result.Person person in result.People)
             {
-                double sum;
-                double average;
-
+                float average;
+                Dictionary<JointType, int> jointCount = new Dictionary<JointType,int>();
                 Dictionary<JointType, float> differences = new Dictionary<JointType, float>();
-                foreach (Tracker.Result.KinectFOV fov in result.FOVs)
+                foreach (JointType jt in BodyStructure.Joints)
                 {
-                    foreach (Tracker.Result.SkeletonMatch match in person.SkeletonMatches)
-                    {
-
-                    }
+                    jointCount[jt] = 0;
+                    differences[jt] = 0;
                 }
-            }
-            foreach (SkeletonMatch reference in this.SkeletonMatches)
-            {
-                WBody referenceBody = reference.Skeleton.CurrentPosition.Worldview;
-                Dictionary<JointType, int> jointCountsDict = new Dictionary<JointType, int>();
-                foreach (SkeletonMatch other in this.SkeletonMatches)
+
+                foreach (Tracker.Result.SkeletonMatch current in person.SkeletonMatches)
                 {
-                    if (!reference.FOV.Equals(other.FOV))
+                    Tracker.Result.KinectFOV currentFOV = current.FOV;
+                    TrackingSkeleton skeleton = current.Skeleton;
+                    WBody wvPos = skeleton.CurrentPosition.Worldview;
+                    double initAngle = skeleton.InitialAngle;
+                    WCoordinate initPos = skeleton.InitialPosition;
+                    KinectSkeleton body = WBody.TransformBodyToKinectSkeleton(wvPos, initAngle, initPos);
+            
+                    foreach (Tracker.Result.SkeletonMatch other in person.SkeletonMatches)
                     {
-                        WBody matchBody = other.Skeleton.CurrentPosition.Worldview;
-                        IEnumerable<JointType> commonJoints = referenceBody.Joints.Keys.Union(matchBody.Joints.Keys);
-                        // Sum coordinate differences
-                        foreach (JointType jointType in commonJoints)
+                        if (!current.Equals(other))
                         {
-                            WCoordinate referenceJoint = referenceBody.Joints[jointType].Coordinate;
-                            WCoordinate otherJoint = matchBody.Joints[jointType].Coordinate;
-                            reference.AverageCoordinateDifferences[jointType] += WCoordinate.GetEuclideanDifference(referenceJoint, otherJoint);
-                            int currentJointCount = 0;
-                            jointCountsDict.TryGetValue(jointType, out currentJointCount);
-                            jointCountsDict[jointType] = currentJointCount + 1;
+                            TrackingSkeleton otherSkeleton = other.Skeleton;
+                            WBody otherWVPosition = otherSkeleton.CurrentPosition.Worldview;
+                            KinectSkeleton otherBody = WBody.TransformBodyToKinectSkeleton(otherWVPosition, initAngle, initPos);
+
+                            IEnumerable<JointType> commonJoints = body.Joints.Keys.Intersect(otherBody.Joints.Keys);
+                            foreach (JointType jt in commonJoints)
+                            {
+                                jointCount[jt]++;
+                                differences[jt] += TrackerUtils.CalculateCameraSpacePointDifference(body.Joints[jt], otherBody.Joints[jt]);
+                            }
                         }
                     }
-                }
-                // Average coordinate differences
-                foreach (JointType jointType in reference.AverageCoordinateDifferences.Keys)
-                {
-                    if (jointCountsDict.ContainsKey(jointType))
+
+                    Debug.WriteLine("Coordinate Differences...");
+                    foreach (JointType jt in differences.Keys)
                     {
-                        reference.AverageCoordinateDifferences[jointType] = reference.AverageCoordinateDifferences[jointType] / jointCountsDict[jointType];
+                        differences[jt] = differences[jt] / jointCount[jt];
+                        Debug.WriteLine("JointType: " + jt + " Difference: " + differences[jt]);
                     }
+
+                    average = differences.Values.Average();
+                    Debug.WriteLine("Average: " + average);
                 }
             }
         }

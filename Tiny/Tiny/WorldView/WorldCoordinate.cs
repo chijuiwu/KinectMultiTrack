@@ -64,7 +64,7 @@ namespace Tiny.WorldView
             }
         }
 
-        public static float GetEuclideanDifference(WCoordinate c0, WCoordinate c1)
+        public static float CalculateDifference(WCoordinate c0, WCoordinate c1)
         {
             return (float)Math.Sqrt(c0.X * c1.X + c0.Y * c1.Y + c0.Z * c1.Z);
         }

@@ -144,13 +144,12 @@ namespace Tiny.UI
 
         private void DisplayBodyFrames(Tracker.Result result)
         {
-            IEnumerable<Tracker.Result.KinectFOV> fovs = result.FOVs;
-            if (!fovs.Any())
+            if (!result.People.Any())
             {
                 return;
             }
 
-            Tracker.Result.KinectFOV referenceFOV = this.GetReferenceKinectFOV(fovs);
+            Tracker.Result.KinectFOV referenceFOV = this.GetReferenceKinectFOV(result.FOVs);
             KinectCamera.Dimension referenceDim = referenceFOV.Dimension;
             int frameWidth = referenceDim.DepthFrameWidth;
             int frameHeight = referenceDim.DepthFrameHeight;

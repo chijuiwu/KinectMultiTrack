@@ -32,7 +32,8 @@ namespace Tiny.UI
             this.DataContext = this;
             this.bodyDrawingGroup = new DrawingGroup();
             this.bodyImageSource = new DrawingImage(this.bodyDrawingGroup);
-            // Frames from a kinect have the same color (Hack: max 6 Kinects)
+            // HACK: Max 6 Kinects
+            // Frames from a kinect have the same color
             this.kinectColors = new List<Pen>();
             this.kinectColors.Add(new Pen(Brushes.Red, 6));
             this.kinectColors.Add(new Pen(Brushes.Orange, 6));
@@ -59,13 +60,12 @@ namespace Tiny.UI
 
         private void DisplayBodyFrames(Tracker.Result result)
         {
-            IEnumerable<Tracker.Result.KinectFOV> fovs = result.FOVs;
-            if (!fovs.Any())
+            if (!result.People.Any())
             {
                 return;
             }
 
-            KinectCamera.Dimension firstFOVDim = fovs.First().Dimension;
+            KinectCamera.Dimension firstFOVDim = result.FOVs.First().Dimension;
             int frameWidth = firstFOVDim.DepthFrameWidth;
             int frameHeight = firstFOVDim.DepthFrameHeight;
 
@@ -73,21 +73,29 @@ namespace Tiny.UI
             {
                 SkeletonVis.DrawBackground(frameWidth, frameHeight, dc);
 
-                int kinectIdx = 0;
-                foreach (Tracker.Result.KinectFOV fov in fovs)
+                Dictionary<Tracker.Result.KinectFOV, Pen> kinectFOVPens = new Dictionary<Tracker.Result.KinectFOV, Pen>();
+                int penCount = 0;
+                foreach (Tracker.Result.Person person in result.People)
                 {
-                    if (!fov.Skeletons.Any())
+                    foreach (Tracker.Result.SkeletonMatch match in person.SkeletonMatches)
                     {
-                        continue;
-                    }
-                    Pen kinectPen = this.kinectColors[kinectIdx++];
-                    foreach (TrackingSkeleton person in fov.Skeletons)
-                    {
-                        TrackingSkeleton.Position position = person.CurrentPosition;
-                        SBody kinectBody = position.Kinect;
-                        if (kinectBody.IsTracked)
+                        Tracker.Result.KinectFOV fov = match.FOV;
+                        Pen kinectPen;
+                        if (!kinectFOVPens.ContainsKey(fov))
                         {
-                            Dictionary<JointType, SJoint> joints = kinectBody.Joints;
+                            kinectPen = this.kinectColors[penCount++];
+                            kinectFOVPens[fov] = kinectPen;
+                        }
+                        else
+                        {
+                            kinectPen = kinectFOVPens[fov];
+                        }
+
+                        TrackingSkeleton.Position skeletonPos = match.Skeleton.CurrentPosition;
+                        SBody skeletonKinectBody = skeletonPos.Kinect;
+                        if (skeletonKinectBody.IsTracked)
+                        {
+                            Dictionary<JointType, SJoint> joints = skeletonKinectBody.Joints;
                             Dictionary<JointType, Tuple<TrackingState, Point>> jointPts = new Dictionary<JointType, Tuple<TrackingState, Point>>();
                             foreach (JointType jointType in joints.Keys)
                             {

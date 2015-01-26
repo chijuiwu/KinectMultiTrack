@@ -29,13 +29,11 @@ namespace Tiny
             {
                 public IPEndPoint ClientIP { get; private set; }
                 public KinectCamera.Dimension Dimension { get; private set; }
-                public IEnumerable<TrackingSkeleton> Skeletons { get; private set; }
 
-                public KinectFOV(IPEndPoint clientIP, KinectCamera.Dimension dimension, IEnumerable<TrackingSkeleton> people)
+                public KinectFOV(IPEndPoint clientIP, KinectCamera.Dimension dimension)
                 {
                     this.ClientIP = clientIP;
                     this.Dimension = dimension;
-                    this.Skeletons = people;
                 }
             }
 
@@ -150,8 +148,7 @@ namespace Tiny
                 foreach (IPEndPoint kinectId in this.kinectsDict.Keys)
                 {
                     KinectCamera.Dimension dimension = this.kinectsDict[kinectId].FrameDimension;
-                    IEnumerable<TrackingSkeleton> skeletons = this.kinectsDict[kinectId].Skeletons;
-                    fovs.Add(new Result.KinectFOV(kinectId, dimension, skeletons));
+                    fovs.Add(new Result.KinectFOV(kinectId, dimension));
                 }
                 IEnumerable<Result.Person> people = this.MatchSkeletonsAndPeople(fovs);
                 return new Result(fovs, people);
@@ -165,8 +162,9 @@ namespace Tiny
             List<Result.Person> personList = new List<Result.Person>();
             foreach (Result.KinectFOV fov in fovs)
             {
-                Debug.WriteLine("Kinect: " + fov.ClientIP + " People: " + fov.Skeletons.Count());
-                foreach (TrackingSkeleton skeleton in fov.Skeletons)
+                KinectCamera kinect = this.kinectsDict[fov.ClientIP];
+                Debug.WriteLine("Kinect: " + fov.ClientIP + " People: " + kinect.Skeletons.Count());
+                foreach (TrackingSkeleton skeleton in kinect.Skeletons)
                 {
                     // TODO: Validate result
                     // TODO: Deal with occlusion (One person may not appear in all FOVs)
@@ -190,13 +188,15 @@ namespace Tiny
                     // within one FOV
                     TrackingSkeleton skeletonSamePerson = null;
                     double minDist = Double.MaxValue;
-                    foreach (TrackingSkeleton skeleton in fov.Skeletons)
+
+                    KinectCamera kinect = this.kinectsDict[fov.ClientIP];
+                    foreach (TrackingSkeleton skeleton in kinect.Skeletons)
                     {
                         if (!skeleton.Equals(targetSkeleton))
                         {
                             WBody body0 = skeleton.CurrentPosition.Worldview;
                             WBody body1 = targetSkeleton.CurrentPosition.Worldview;
-                            double diff = WBody.GetCoordinateDifferences(body0, body1);
+                            double diff = WBody.CalculateDifferences(body0, body1);
                             if (diff < minDist)
                             {
                                 skeletonSamePerson = skeleton;
