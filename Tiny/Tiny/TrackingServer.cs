@@ -25,6 +25,8 @@ namespace Tiny
         private MultipleKinectUI multipleKinectUI;
         private TrackingUI trackingUI;
 
+        private TrackerUtils.Logger logger;
+
         public event KinectFrameHandler MultipleKinectUpdate;
         public delegate void KinectFrameHandler(Tracker.Result result);
         
@@ -45,6 +47,8 @@ namespace Tiny
             Thread trackingUIThread = new Thread(new ThreadStart(this.StartTrackingUIThread));
             trackingUIThread.SetApartmentState(ApartmentState.STA);
             trackingUIThread.Start();
+
+            this.logger = new TrackerUtils.Logger();
         }
 
         // Run the tracking server
@@ -83,7 +87,7 @@ namespace Tiny
 
         private void HandleKinectConnectionThread(object obj)
         {
-            TcpClient client = (TcpClient)obj;
+            TcpClient client = obj as TcpClient;
             IPEndPoint clientIP = (IPEndPoint)client.Client.RemoteEndPoint;
             NetworkStream clientStream = client.GetStream();
 
@@ -129,7 +133,14 @@ namespace Tiny
             Tracker.Result result = this.tracker.Synchronize(clientIP, bodyFrame);
             this.MultipleKinectUpdate(result);
             this.TrackingUpdate(result);
-            TrackerUtils.CalculateCoordinateDifferences(result);
+            Thread loggingThread = new Thread(new ParameterizedThreadStart(this.StartLoggingThread));
+            loggingThread.Start(result);
+        }
+
+        private void StartLoggingThread(object obj)
+        {
+            Tracker.Result result = obj as Tracker.Result;
+            this.logger.Write(result);
         }
     }
 }

@@ -27,11 +27,13 @@ namespace Tiny
         {
             public class KinectFOV
             {
+                public uint Id { get; private set; }
                 public IPEndPoint ClientIP { get; private set; }
                 public KinectCamera.Dimension Dimension { get; private set; }
 
-                public KinectFOV(IPEndPoint clientIP, KinectCamera.Dimension dimension)
+                public KinectFOV(uint id, IPEndPoint clientIP, KinectCamera.Dimension dimension)
                 {
+                    this.Id = id;
                     this.ClientIP = clientIP;
                     this.Dimension = dimension;
                 }
@@ -39,11 +41,13 @@ namespace Tiny
 
             public class SkeletonMatch
             {
+                public uint Id { get; private set; }
                 public KinectFOV FOV { get; private set; }
                 public TrackingSkeleton Skeleton { get; private set; }
 
-                public SkeletonMatch(KinectFOV fov, TrackingSkeleton skeleton)
+                public SkeletonMatch(uint id, KinectFOV fov, TrackingSkeleton skeleton)
                 {
+                    this.Id = id;
                     this.FOV = fov;
                     this.Skeleton = skeleton;
                 }
@@ -61,10 +65,12 @@ namespace Tiny
 
             public class Person
             {
+                public uint Id { get; private set; }
                 public IEnumerable<SkeletonMatch> SkeletonMatches { get; private set; }
 
-                public Person(IEnumerable<SkeletonMatch> skeletons)
+                public Person(uint id, IEnumerable<SkeletonMatch> skeletons)
                 {
+                    this.Id = id;
                     this.SkeletonMatches = skeletons;
                 }
 
@@ -83,11 +89,13 @@ namespace Tiny
                 }
             }
 
+            public long Timestamp { get; private set; }
             public IEnumerable<Result.KinectFOV> FOVs { get; private set; }
             public IEnumerable<Result.Person> People { get; private set; }
 
             public Result(IEnumerable<Result.KinectFOV> fovs, IEnumerable<Result.Person> people)
             {
+                this.Timestamp = DateTime.UtcNow.Ticks;
                 this.FOVs = fovs;
                 this.People = people;
             }
@@ -148,7 +156,7 @@ namespace Tiny
                 foreach (IPEndPoint kinectId in this.kinectsDict.Keys)
                 {
                     KinectCamera.Dimension dimension = this.kinectsDict[kinectId].FrameDimension;
-                    fovs.Add(new Result.KinectFOV(kinectId, dimension));
+                    fovs.Add(new Result.KinectFOV((uint)fovs.Count, kinectId, dimension));
                 }
                 IEnumerable<Result.Person> people = this.MatchSkeletonsAndPeople(fovs);
                 return new Result(fovs, people);
@@ -159,7 +167,7 @@ namespace Tiny
         {
             Debug.WriteLine("Matching skeleton...");
             Debug.WriteLine("FOV: " + fovs.Count());
-            List<Result.Person> personList = new List<Result.Person>();
+            List<Result.Person> people = new List<Result.Person>();
             foreach (Result.KinectFOV fov in fovs)
             {
                 KinectCamera kinect = this.kinectsDict[fov.ClientIP];
@@ -168,19 +176,20 @@ namespace Tiny
                 {
                     // TODO: Validate result
                     // TODO: Deal with occlusion (One person may not appear in all FOVs)
-                    Result.Person personInAllFOVs = this.FindPersonByPosition(fovs, fov, skeleton);
+                    IEnumerable<Result.SkeletonMatch> matches = this.MatchPersonByPosition(fovs, fov, skeleton);
+                    Result.Person personInAllFOVs = new Result.Person((uint)people.Count, matches);
                     Debug.WriteLine(personInAllFOVs);
-                    personList.Add(personInAllFOVs);
+                    people.Add(personInAllFOVs);
                 }
             }
-            return personList;
+            return people;
         }
 
         // Match people in other Kinect FOV by their positions in World View
-        private Result.Person FindPersonByPosition(IEnumerable<Result.KinectFOV> fovs, Result.KinectFOV targetFOV, TrackingSkeleton targetSkeleton)
+        private IEnumerable<Tracker.Result.SkeletonMatch> MatchPersonByPosition(IEnumerable<Result.KinectFOV> fovs, Result.KinectFOV targetFOV, TrackingSkeleton targetSkeleton)
         {
             // over all Kinect FOVs
-            List<Result.SkeletonMatch> personInAllFOVs = new List<Result.SkeletonMatch>() { new Result.SkeletonMatch(targetFOV, targetSkeleton) };
+            List<Result.SkeletonMatch> personInAllFOVs = new List<Result.SkeletonMatch>() { new Result.SkeletonMatch(0, targetFOV, targetSkeleton) };
             foreach (Result.KinectFOV fov in fovs)
             {
                 if (!fov.Equals(targetFOV))
@@ -206,11 +215,11 @@ namespace Tiny
                     }
                     if (skeletonSamePerson != null)
                     {
-                        personInAllFOVs.Add(new Result.SkeletonMatch(fov, skeletonSamePerson));
+                        personInAllFOVs.Add(new Result.SkeletonMatch((uint)personInAllFOVs.Count, fov, skeletonSamePerson));
                     }
                 }
             }
-            return new Result.Person(personInAllFOVs);
+            return personInAllFOVs;
         }
     }
 }

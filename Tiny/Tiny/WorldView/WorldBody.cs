@@ -172,7 +172,7 @@ namespace Tiny.WorldView
         public static double CalculateDifferences(WBody body0, WBody body1)
         {
             double diff = 0;
-            IEnumerable<JointType> commonJoints = body0.Joints.Keys.Union(body1.Joints.Keys);
+            IEnumerable<JointType> commonJoints = body0.Joints.Keys.Intersect(body1.Joints.Keys);
             foreach (JointType jointType in commonJoints)
             {
                 WJoint joint0 = body0.Joints[jointType];

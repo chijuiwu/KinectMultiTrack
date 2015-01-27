@@ -10,7 +10,7 @@ namespace KinectSerializer
     public class BodyStructure
     {
         // All joints
-        public static HashSet<JointType> Joints = new HashSet<JointType>()
+        public static List<JointType> Joints = new List<JointType>()
         {
             JointType.AnkleLeft,
             JointType.AnkleRight,

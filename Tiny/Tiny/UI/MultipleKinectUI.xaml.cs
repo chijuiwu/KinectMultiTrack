@@ -86,11 +86,11 @@ namespace Tiny.UI
                         {
                             Dictionary<JointType, SJoint> joints = skeletonKinectBody.Joints;
                             Dictionary<JointType, Tuple<TrackingState, Point>> jointPts = new Dictionary<JointType, Tuple<TrackingState, Point>>();
-                            foreach (JointType jointType in joints.Keys)
+                            foreach (JointType jt in joints.Keys)
                             {
-                                SJoint joint = joints[jointType];
+                                SJoint joint = joints[jt];
                                 Point jointPt = new Point(joint.DepthSpacePoint.X, joint.DepthSpacePoint.Y);
-                                jointPts[jointType] = Tuple.Create(joint.TrackingState, jointPt);
+                                jointPts[jt] = Tuple.Create(joint.TrackingState, jointPt);
                             }
                             SkeletonVis.DrawBody(jointPts, dc, personPen);
                         }
