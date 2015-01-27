@@ -34,7 +34,7 @@ namespace Tiny
 
         private Stack<SBodyFrame> unprocessedBodyFrames;
 
-        private SingleKinectUI kinectUI;
+        private KinectStreamUI kinectUI;
         public event KinectBodyFrameHandler UpdateKinectUI;
         public delegate void KinectBodyFrameHandler(SBodyFrame bodyFrame);
         public event KinectUIHandler DisposeKinectUI;
@@ -59,7 +59,7 @@ namespace Tiny
             }
         }
 
-        public KinectCamera()
+        public KinectCamera(string ip)
         {
             this.calibrated = false;
             this.FrameDimension = null;
@@ -67,15 +67,16 @@ namespace Tiny
 
             this.unprocessedBodyFrames = new Stack<SBodyFrame>();
 
-            Thread kinectUIThread = new Thread(new ThreadStart(this.StartKinectUIThread));
+            Thread kinectUIThread = new Thread(new ParameterizedThreadStart(this.StartKinectUIThread));
             kinectUIThread.SetApartmentState(ApartmentState.STA);
-            kinectUIThread.Start();
+            kinectUIThread.Start(ip);
         }
 
-        private void StartKinectUIThread()
+        private void StartKinectUIThread(object obj)
         {
-            this.kinectUI = new SingleKinectUI();
+            this.kinectUI = new KinectStreamUI();
             this.kinectUI.Show();
+            this.kinectUI.ClientIPLabel.Content = (obj as string);
             this.UpdateKinectUI += this.kinectUI.UpdateBodyFrame;
             this.DisposeKinectUI += this.kinectUI.Dispose;
             Dispatcher.Run();
@@ -139,7 +140,10 @@ namespace Tiny
                     // ignore bodies that do not match with any tracking id
                 }
             }
-            this.UpdateKinectUI(bodyFrame);
+            if (this.UpdateKinectUI != null)
+            {
+                this.UpdateKinectUI(bodyFrame);
+            }
         }
     }
 }

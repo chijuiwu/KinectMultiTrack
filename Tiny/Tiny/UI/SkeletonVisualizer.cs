@@ -41,25 +41,6 @@ namespace Tiny.UI
 
         public static void DrawBody(Dictionary<JointType, Tuple<Point, TrackingState>> joints, DrawingContext dc, Pen bonePen)
         {
-            // Draw joints
-            foreach (Tuple<Point, TrackingState> joint in joints.Values)
-            {
-                Point coordinate = joint.Item1;
-                TrackingState trackingState = joint.Item2;
-                if (trackingState == TrackingState.NotTracked)
-                {
-                    continue;
-                }
-                else if (trackingState == TrackingState.Tracked)
-                {
-                    SkeletonVis.DrawJoint(coordinate, dc, SkeletonVis.trackedJointBrush, SkeletonVis.jointThickness);
-                }
-                else if (trackingState == TrackingState.Inferred)
-                {
-                    SkeletonVis.DrawJoint(coordinate, dc, SkeletonVis.inferredJointBrush, SkeletonVis.jointThickness);
-                }
-            }
-
             // Draw bones
             foreach (var bone in BodyStructure.Bones)
             {
@@ -80,6 +61,24 @@ namespace Tiny.UI
                 else
                 {
                     SkeletonVis.DrawBone(jointPt0, jointPt1, dc, SkeletonVis.inferredBonePen);
+                }
+            }
+            // Draw joints
+            foreach (Tuple<Point, TrackingState> joint in joints.Values)
+            {
+                Point coordinate = joint.Item1;
+                TrackingState trackingState = joint.Item2;
+                if (trackingState == TrackingState.NotTracked)
+                {
+                    continue;
+                }
+                else if (trackingState == TrackingState.Tracked)
+                {
+                    SkeletonVis.DrawJoint(coordinate, dc, SkeletonVis.trackedJointBrush, SkeletonVis.jointThickness);
+                }
+                else if (trackingState == TrackingState.Inferred)
+                {
+                    SkeletonVis.DrawJoint(coordinate, dc, SkeletonVis.inferredJointBrush, SkeletonVis.jointThickness);
                 }
             }
         }

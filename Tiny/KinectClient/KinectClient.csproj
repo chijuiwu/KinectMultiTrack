@@ -74,7 +74,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="KinectClientWindow.xaml">
+    <Page Include="KinectClientUI.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -83,8 +83,8 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="KinectSocket.cs" />
-    <Compile Include="KinectClientWindow.xaml.cs">
-      <DependentUpon>KinectClientWindow.xaml</DependentUpon>
+    <Compile Include="KinectClientUI.xaml.cs">
+      <DependentUpon>KinectClientUI.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

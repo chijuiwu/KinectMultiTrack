@@ -23,7 +23,7 @@ namespace KinectClient
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class KinectClientWindow : Window, INotifyPropertyChanged
+    public partial class KinectClientUI : Window, INotifyPropertyChanged
     {
         private const string kinectServerAddress = "138.251.213.248";
         private const string localhost = "127.0.0.1";
@@ -48,15 +48,15 @@ namespace KinectClient
         private readonly Brush inferredJointBrush = Brushes.Yellow;
         private readonly Pen inferredBonePen = new Pen(Brushes.Gray, 1);
 
-        public KinectClientWindow()
+        public KinectClientUI()
         {
-            this.kinectSocket = new KinectSocket(kinectServerAddress, kinectServerPort);
+            InitializeComponent();
+
+            this.kinectSocket = new KinectSocket(localhost, kinectServerPort);
 
             this.DataContext = this;
             this.KinectStatusText = Properties.Resources.KinectUninitialized;
             this.InitializeKinect();
-
-            this.InitializeComponent();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

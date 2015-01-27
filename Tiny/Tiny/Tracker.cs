@@ -130,11 +130,7 @@ namespace Tiny
 
         private bool RequireCalibration()
         {
-            if (this.kinectsDict.Count < this.KINECT_COUNT && this.calibrated)
-            {
-                return false;
-            }
-            else
+            if (this.kinectsDict.Count == this.KINECT_COUNT && !this.calibrated)
             {
                 foreach (KinectCamera kinect in this.kinectsDict.Values)
                 {
@@ -145,13 +141,17 @@ namespace Tiny
                 }
                 return true;
             }
+            else
+            {
+                return false;
+            }
         }
 
         public Result Synchronize(IPEndPoint clientIP, SBodyFrame bodyframe)
         {
             if (!this.kinectsDict.ContainsKey(clientIP))
             {
-                this.kinectsDict[clientIP] = new KinectCamera();
+                this.kinectsDict[clientIP] = new KinectCamera(clientIP.ToString());
             }
             lock (syncFrameLock)
             {

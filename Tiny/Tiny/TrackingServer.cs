@@ -90,11 +90,7 @@ namespace Tiny
             TcpClient client = obj as TcpClient;
             IPEndPoint clientIP = (IPEndPoint)client.Client.RemoteEndPoint;
             NetworkStream clientStream = client.GetStream();
-
             Debug.WriteLine(Tiny.Properties.Resources.CONNECTION_START + clientIP);
-            // HACK
-            this.referenceKinectIP = clientIP;
-
             while (true)
             {
                 try
@@ -121,7 +117,6 @@ namespace Tiny
                     client.Close();
                 }
             }
-
             this.tracker.RemoveClient(clientIP);
             clientStream.Close();
             clientStream.Dispose();

@@ -101,7 +101,7 @@
       <DependentUpon>MultipleKinectUI.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="UI\SingleKinectUI.xaml">
+    <Page Include="UI\KinectStreamtUI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -111,8 +111,8 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="UI\SingleKinectUI.xaml.cs">
-      <DependentUpon>SingleKinectUI.xaml</DependentUpon>
+    <Compile Include="UI\KinectStreamtUI.xaml.cs">
+      <DependentUpon>KinectStreamtUI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

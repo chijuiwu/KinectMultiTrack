@@ -18,12 +18,12 @@ using SkeletonVis = Tiny.UI.SkeletonVisualizer;
 
 namespace Tiny.UI
 {
-    public partial class SingleKinectUI : Window
+    public partial class KinectStreamUI : Window
     {
         private DrawingGroup bodyDrawingGroup;
         public DrawingImage BodyStreamImageSource { get; private set; }
 
-        public SingleKinectUI()
+        public KinectStreamUI()
         {
             InitializeComponent();
             this.DataContext = this;
