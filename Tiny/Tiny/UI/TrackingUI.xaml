@@ -23,20 +23,16 @@
                 HorizontalAlignment="Left" Margin="191,18,0,0" Width="140" Click="ReferenceKinectButton_Click" Height="30" VerticalAlignment="Top" FontFamily="Microsoft Sans Serif" FontSize="14">
             <Button.ContextMenu>
                 <ContextMenu x:Name="ReferenceKinectMenu">
-                    <MenuItem Header="PLACE-HOLDER-1"/>
-                    <MenuItem Header="PLACE-HOLDER-2"/>
-                    <MenuItem Header="PLACE-HOLDER-3"/>
-                    <MenuItem Header="PLACE-HOLDER-4"/>
-                    <MenuItem Header="PLACE-HOLDER-5"/>
-                    <MenuItem Header="PLACE-HOLDER-6"/>
                 </ContextMenu>
             </Button.ContextMenu>
         </Button>
         <Button  Grid.Row="0" x:Name="ViewModeBtn" Content="View Mode"
                  ContextMenuService.IsEnabled="False"
-                 HorizontalAlignment="Left" Margin="378,18,0,0" VerticalAlignment="Top" Width="140" Height="30" Click="ViewModeBtn_Click">
+                 HorizontalAlignment="Left" Margin="378,18,0,0" VerticalAlignment="Top" Width="140" Height="30" Click="ViewModeBtn_Click" FontFamily="Microsoft Sans Serif" FontSize="14">
             <Button.ContextMenu>
                 <ContextMenu x:Name="ViewModeMenu">
+                    <MenuItem Header="All" Click="ViewMode_All_Click"/>
+                    <MenuItem Header="Average" Click="ViewMode_Average_Click"/>
                 </ContextMenu>
             </Button.ContextMenu>
         </Button>

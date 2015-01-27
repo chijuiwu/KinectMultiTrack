@@ -27,11 +27,15 @@ namespace Tiny
 
         private TrackerUtils.Logger logger;
 
-        public event KinectFrameHandler MultipleKinectUpdate;
-        public delegate void KinectFrameHandler(Tracker.Result result);
-        
-        public event WorldViewHandler TrackingUpdate;
-        public delegate void WorldViewHandler(Tracker.Result result);
+        private event KinectCameraHandler NewKinectCameraConnected;
+        private event KinectCameraHandler KinectCameraRemoved;
+        private delegate void KinectCameraHandler(IPEndPoint kinectClientIP);
+
+        private event KinectFrameHandler MultipleKinectUpdate;
+        private delegate void KinectFrameHandler(Tracker.Result result);
+
+        private event WorldViewHandler TrackingUpdate;
+        private delegate void WorldViewHandler(Tracker.Result result);
 
         public TrackingServer(int port, int kinectCount)
         {
@@ -71,6 +75,8 @@ namespace Tiny
             this.trackingUI = new TrackingUI();
             this.trackingUI.Show();
             this.TrackingUpdate += this.trackingUI.UpdateDisplay;
+            this.NewKinectCameraConnected += this.trackingUI.AddKinectCamera;
+            this.KinectCameraRemoved += this.trackingUI.RemoveKinectCamera;
             Dispatcher.Run();
         }
 
@@ -90,7 +96,12 @@ namespace Tiny
             TcpClient client = obj as TcpClient;
             IPEndPoint clientIP = (IPEndPoint)client.Client.RemoteEndPoint;
             NetworkStream clientStream = client.GetStream();
+            
             Debug.WriteLine(Tiny.Properties.Resources.CONNECTION_START + clientIP);
+            Thread cameraUpdateThread = new Thread(() => this.StartCameraUpdateThread(clientIP));
+            cameraUpdateThread.SetApartmentState(ApartmentState.STA);
+            cameraUpdateThread.Start();
+
             while (true)
             {
                 try
@@ -118,6 +129,7 @@ namespace Tiny
                 }
             }
             this.tracker.RemoveClient(clientIP);
+            this.KinectCameraRemoved(clientIP);
             clientStream.Close();
             clientStream.Dispose();
             client.Close();
@@ -128,6 +140,7 @@ namespace Tiny
             Tracker.Result result = this.tracker.Synchronize(clientIP, bodyFrame);
             this.MultipleKinectUpdate(result);
             this.TrackingUpdate(result);
+
             Thread loggingThread = new Thread(new ParameterizedThreadStart(this.StartLoggingThread));
             loggingThread.Start(result);
         }
@@ -136,6 +149,11 @@ namespace Tiny
         {
             Tracker.Result result = obj as Tracker.Result;
             this.logger.Write(result);
+        }
+
+        private void StartCameraUpdateThread(IPEndPoint clientIP)
+        {
+            this.NewKinectCameraConnected(clientIP);
         }
     }
 }

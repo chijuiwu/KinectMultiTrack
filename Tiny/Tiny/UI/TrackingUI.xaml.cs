@@ -57,7 +57,8 @@ namespace Tiny.UI
             }
         }
 
-        private string referenceKinectIP;
+        private Dictionary<string, MenuItem> referenceKinectIPs;
+        private string currentReferenceKinectIP;
         private bool showAllFOV;
         private readonly string ViewMode_All = "All";
         private readonly string ViewMode_Average = "Average";
@@ -74,9 +75,10 @@ namespace Tiny.UI
         {
             InitializeComponent();
             this.DataContext = this;
-            this.showAllFOV = false;
-            this.SetupViewModeMenu();
-            this.referenceKinectIP = null;
+
+            this.referenceKinectIPs = new Dictionary<string, MenuItem>();
+            this.currentReferenceKinectIP = "";
+            this.showAllFOV = true;
             this.TrackingStatusText = Properties.Resources.TRACKING_CALIBRATION;
             
             this.bodyDrawingGroup = new DrawingGroup();
@@ -93,19 +95,6 @@ namespace Tiny.UI
             this.kinectSensor = KinectSensor.GetDefault();
             this.kinectSensor.Open();
             this.coordinateMapper = this.kinectSensor.CoordinateMapper;
-        }
-
-        private void SetupViewModeMenu()
-        {
-            MenuItem all = new MenuItem();
-            all.Header = this.ViewMode_All;
-            all.Click += this.ViewModeItem_Click;
-            this.ViewModeMenu.Items.Add(all);
-
-            MenuItem average = new MenuItem();
-            average.Header = this.ViewMode_Average;
-            average.Click += this.ViewModeItem_Click;
-            this.ViewModeMenu.Items.Add(average);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -147,31 +136,9 @@ namespace Tiny.UI
         {
             this.Dispatcher.Invoke((Action)(() =>
             {
-                this.UpdateReferenceKinectMenu(result.FOVs);
+                //this.UpdateReferenceKinectMenu(result.FOVs);
                 this.DisplayBodyFrames(result);
             }));
-        }
-
-        private void UpdateReferenceKinectMenu(IEnumerable<Tracker.Result.KinectFOV> fovs)
-        {
-            this.ReferenceKinectMenu.Items.Clear();
-            bool containsReferenceFOV = false;
-            foreach (Tracker.Result.KinectFOV fov in fovs)
-            {
-                MenuItem kinectIPItem = new MenuItem();
-                kinectIPItem.Header = fov.ClientIP.ToString();
-                kinectIPItem.Click += ReferenceKinectItem_Click;
-                this.ReferenceKinectMenu.Items.Add(kinectIPItem);
-                
-                if (kinectIPItem.Header.ToString().Equals(this.referenceKinectIP))
-                {
-                    containsReferenceFOV = true;
-                }
-            }
-            if (!containsReferenceFOV)
-            {
-                this.ReferenceKinectBtn.Content = "Reference Kinect";
-            }
         }
 
         private Tracker.Result.KinectFOV GetReferenceKinectFOV(IEnumerable<Tracker.Result.KinectFOV> fovs)
@@ -179,7 +146,7 @@ namespace Tiny.UI
             Tracker.Result.KinectFOV referenceFOV = fovs.First();
             foreach (Tracker.Result.KinectFOV fov in fovs)
             {
-                if (fov.ClientIP.ToString().Equals(this.referenceKinectIP))
+                if (fov.ClientIP.ToString().Equals(this.currentReferenceKinectIP))
                 {
                     referenceFOV = fov;
                 }
@@ -308,10 +275,33 @@ namespace Tiny.UI
             referenceKinectBtn.ContextMenu.IsOpen = true;
         }
 
+        internal void AddKinectCamera(IPEndPoint clientIP)
+        {
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                MenuItem kinectIPItem = new MenuItem();
+                kinectIPItem.Header = clientIP.ToString();
+                kinectIPItem.Click += ReferenceKinectItem_Click;
+                this.ReferenceKinectMenu.Items.Add(kinectIPItem);
+                this.referenceKinectIPs[clientIP.ToString()] = kinectIPItem;
+            }));
+        }
+
+        internal void RemoveKinectCamera(IPEndPoint clientIP)
+        {
+            this.ReferenceKinectMenu.Items.Remove(this.referenceKinectIPs[clientIP.ToString()]);
+            this.referenceKinectIPs.Remove(clientIP.ToString());
+            if (this.currentReferenceKinectIP.Equals(clientIP))
+            {
+                this.ReferenceKinectBtn.Content = "Reference Kinect";
+                this.currentReferenceKinectIP = "";
+            }
+        }
+
         private void ReferenceKinectItem_Click(object sender, RoutedEventArgs e)
         {
             string referenceKinectIP = (sender as MenuItem).Header.ToString();
-            this.referenceKinectIP = referenceKinectIP;
+            this.currentReferenceKinectIP = referenceKinectIP;
             this.ReferenceKinectBtn.Content = referenceKinectIP;
         }
 
@@ -324,20 +314,17 @@ namespace Tiny.UI
             viewModeBtn.ContextMenu.IsOpen = true;
         }
 
-        private void ViewModeItem_Click(object sender, RoutedEventArgs e)
+        private void ViewMode_All_Click(object sender, RoutedEventArgs e)
         {
-            string viewMode = (sender as MenuItem).Header.ToString();
-            if (viewMode.Equals(this.ViewMode_Average))
-            {
-                this.showAllFOV = false;
-            }
-            else
-            {
-                this.showAllFOV = true;
-            }
-            this.ViewModeBtn.Content = viewMode;
+            this.showAllFOV = true;
+            this.ViewModeBtn.Content = this.ViewMode_All;
         }
 
+        private void ViewMode_Average_Click(object sender, RoutedEventArgs e)
+        {
+            this.showAllFOV = false;
+            this.ViewModeBtn.Content = this.ViewMode_Average;
+        }
     }
 }
 
