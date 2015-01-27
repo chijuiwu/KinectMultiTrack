@@ -74,6 +74,18 @@ namespace Tiny
                     this.SkeletonMatches = skeletons;
                 }
 
+                public TrackingSkeleton FindSkeletonInFOV(KinectFOV fov)
+                {
+                    foreach (SkeletonMatch match in this.SkeletonMatches)
+                    {
+                        if (match.FOV.Equals(fov))
+                        {
+                            return match.Skeleton;
+                        }
+                    }
+                    return null;
+                }
+
                 public override string ToString()
                 {
                     StringBuilder sb = new StringBuilder();

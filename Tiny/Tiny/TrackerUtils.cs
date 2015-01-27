@@ -119,20 +119,12 @@ namespace Tiny
                 {
                     foreach (Tracker.Result.Person person in result.People)
                     {
+                        Dictionary<JointType, CameraSpacePoint> sumJoints = new Dictionary<JointType, CameraSpacePoint>();
                         Dictionary<JointType, int> jointsCount = new Dictionary<JointType, int>();
-                        Dictionary<JointType, CameraSpacePoint> sum = new Dictionary<JointType, CameraSpacePoint>();
-                        foreach (JointType jt in BodyStructure.Joints)
-                        {
-                            jointsCount[jt] = 0;
-                            sum[jt] = new CameraSpacePoint();
-                            Debug.WriteLine("new cs point: " + sum[jt]);
-                        }
 
                         Tracker.Result.SkeletonMatch reference = person.SkeletonMatches.First();
                         Tracker.Result.KinectFOV referenceFOV = reference.FOV;
                         TrackingSkeleton referenceSkeleton = reference.Skeleton;
-                        double referenceAngle = referenceSkeleton.InitialAngle;
-                        WCoordinate referencePosition = referenceSkeleton.InitialPosition;
 
                         foreach (Tracker.Result.SkeletonMatch match in person.SkeletonMatches)
                         {
@@ -141,7 +133,7 @@ namespace Tiny
 
                             TrackingSkeleton matchSkeleton = match.Skeleton;
                             WBody position = matchSkeleton.CurrentPosition.Worldview;
-                            KinectSkeleton body = WBody.TransformBodyToKinectSkeleton(position, referenceAngle, referencePosition);
+                            KinectBody body = WBody.TransformToKinectBody(position, referenceSkeleton.InitialAngle, referenceSkeleton.InitialPosition);
 
                             string prefix = ", ";
                             foreach (JointType jt in BodyStructure.Joints)
@@ -149,16 +141,22 @@ namespace Tiny
                                 rawData.Write(prefix);
                                 if (body.Joints.ContainsKey(jt))
                                 {
-                                    CameraSpacePoint joint = body.Joints[jt];
                                     // Joint_X, Joint_Y, Joint_Z
-                                    rawData.Write(joint.X + ", " + joint.Y + ", " + joint.Z);
-
-                                    CameraSpacePoint accumulateJoint = new CameraSpacePoint();
-                                    accumulateJoint.X = sum[jt].X + joint.X;
-                                    accumulateJoint.Y = sum[jt].Y + joint.Y;
-                                    accumulateJoint.Z = sum[jt].Z + joint.Z;
-                                    sum[jt] = accumulateJoint;
-                                    jointsCount[jt] += 1;
+                                    rawData.Write(body.Joints[jt].X + ", " + body.Joints[jt].Y + ", " + body.Joints[jt].Z);
+                                    if (sumJoints.ContainsKey(jt))
+                                    {
+                                        CameraSpacePoint accumulatePt = new CameraSpacePoint();
+                                        accumulatePt.X = sumJoints[jt].X + body.Joints[jt].X;
+                                        accumulatePt.Y = sumJoints[jt].Y + body.Joints[jt].Y;
+                                        accumulatePt.Z = sumJoints[jt].Z + body.Joints[jt].Z;
+                                        sumJoints[jt] = accumulatePt;
+                                        jointsCount[jt] += 1;
+                                    }
+                                    else
+                                    {
+                                        sumJoints[jt] = body.Joints[jt];
+                                        jointsCount[jt] = 1;
+                                    }
                                 }
                                 else
                                 {
@@ -169,13 +167,13 @@ namespace Tiny
                         } // Skeleton Match
 
                         // Averages
-                        Dictionary<JointType, CameraSpacePoint> averages = sum;
-                        foreach (JointType jt in averages.Keys)
+                        Dictionary<JointType, CameraSpacePoint> averages = new Dictionary<JointType, CameraSpacePoint>();
+                        foreach (JointType jt in sumJoints.Keys)
                         {
                             CameraSpacePoint averageJoint = new CameraSpacePoint();
-                            averageJoint.X = averages[jt].X / jointsCount[jt];
-                            averageJoint.Y = averages[jt].Y / jointsCount[jt];
-                            averageJoint.Z = averages[jt].Z / jointsCount[jt];
+                            averageJoint.X = sumJoints[jt].X / jointsCount[jt];
+                            averageJoint.Y = sumJoints[jt].Y / jointsCount[jt];
+                            averageJoint.Z = sumJoints[jt].Z / jointsCount[jt];
                             averages[jt] = averageJoint;
                         }
                         this.WriteAverages(averages, result.Timestamp, person.Id);
@@ -226,7 +224,7 @@ namespace Tiny
 
                         TrackingSkeleton matchSkeleton = match.Skeleton;
                         WBody position = matchSkeleton.CurrentPosition.Worldview;
-                        KinectSkeleton body = WBody.TransformBodyToKinectSkeleton(position, referenceAngle, referencePosition);
+                        KinectBody body = WBody.TransformToKinectBody(position, referenceAngle, referencePosition);
 
                         string prefix = ", ";
                         foreach (JointType jt in BodyStructure.Joints)

@@ -16,7 +16,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Label x:Name="Label" Grid.Row="0" Content="Tracking" HorizontalAlignment="Center" VerticalAlignment="Top" RenderTransformOrigin="-0.079,0.5" Margin="0" FontWeight="Bold" FontSize="16" FontFamily="Microsoft Sans Serif"/>
+        <Label x:Name="Label" Grid.Row="0" Content="Tracking" HorizontalAlignment="Center" VerticalAlignment="Bottom" RenderTransformOrigin="-0.079,0.5" Margin="12,0,671,580" FontWeight="Bold" FontSize="16" FontFamily="Microsoft Sans Serif" Grid.RowSpan="2" Height="30"/>
 
         <Viewbox Grid.Row="1" HorizontalAlignment="Center">
             <Image Source="{Binding BodyStreamImageSource}" Stretch="UniformToFill" />
@@ -25,9 +25,10 @@
         <StatusBar Grid.Row="2" Name="TrackingStatusBar" HorizontalAlignment="Center" VerticalAlignment="Bottom" Background="White" Foreground="{StaticResource MediumGreyBrush}">
             <StatusBarItem Content="{Binding TrackingStatusText}" />
         </StatusBar>
+
         <Button x:Name="ReferenceKinectBtn" Content="Reference Kinect" 
                 ContextMenuService.IsEnabled="False"
-                HorizontalAlignment="Left" Margin="570,0,0,4" Width="128" Click="Button_Click" Height="20" VerticalAlignment="Bottom" FontFamily="Microsoft Sans Serif" FontSize="14">
+                HorizontalAlignment="Left" Margin="171,0,0,578" Width="140" Click="ReferenceKinectButton_Click" Height="30" VerticalAlignment="Bottom" FontFamily="Microsoft Sans Serif" FontSize="14" Grid.RowSpan="2">
             <Button.ContextMenu>
                 <ContextMenu x:Name="ReferenceKinectMenu">
                     <MenuItem Header="PLACE-HOLDER-1"/>
@@ -36,6 +37,14 @@
                     <MenuItem Header="PLACE-HOLDER-4"/>
                     <MenuItem Header="PLACE-HOLDER-5"/>
                     <MenuItem Header="PLACE-HOLDER-6"/>
+                </ContextMenu>
+            </Button.ContextMenu>
+        </Button>
+        <Button  x:Name="ViewModeBtn" Content="View Mode"
+                 ContextMenuService.IsEnabled="False"
+                 HorizontalAlignment="Left" Margin="359,8,0,0" VerticalAlignment="Top" Width="140" Height="30" Click="ViewModeBtn_Click">
+            <Button.ContextMenu>
+                <ContextMenu x:Name="ViewModeMenu">
                 </ContextMenu>
             </Button.ContextMenu>
         </Button>

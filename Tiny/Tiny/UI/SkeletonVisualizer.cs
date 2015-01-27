@@ -34,41 +34,41 @@ namespace Tiny.UI
             dg.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, frameWidth, frameHeight));
         }
 
-        public static void DrawBody(Dictionary<JointType, Tuple<TrackingState, Point>> jointPts, DrawingContext dc)
+        public static void DrawBody(Dictionary<JointType, Tuple<Point, TrackingState>> joints, DrawingContext dc)
         {
-            SkeletonVis.DrawBody(jointPts, dc, SkeletonVis.defaultTrackedBonePen);
+            SkeletonVis.DrawBody(joints, dc, SkeletonVis.defaultTrackedBonePen);
         }
 
-        public static void DrawBody(Dictionary<JointType, Tuple<TrackingState, Point>> jointPts, DrawingContext dc, Pen bonePen)
+        public static void DrawBody(Dictionary<JointType, Tuple<Point, TrackingState>> joints, DrawingContext dc, Pen bonePen)
         {
             // Draw joints
-            foreach (JointType jointType in jointPts.Keys)
+            foreach (Tuple<Point, TrackingState> joint in joints.Values)
             {
-                TrackingState jointTS = jointPts[jointType].Item1;
-                Point jointPt = jointPts[jointType].Item2;
-                if (jointTS == TrackingState.NotTracked)
+                Point coordinate = joint.Item1;
+                TrackingState trackingState = joint.Item2;
+                if (trackingState == TrackingState.NotTracked)
                 {
                     continue;
                 }
-                else if (jointTS == TrackingState.Tracked)
+                else if (trackingState == TrackingState.Tracked)
                 {
-                    SkeletonVis.DrawJoint(jointPt, dc, SkeletonVis.trackedJointBrush, SkeletonVis.jointThickness);
+                    SkeletonVis.DrawJoint(coordinate, dc, SkeletonVis.trackedJointBrush, SkeletonVis.jointThickness);
                 }
-                else if (jointTS == TrackingState.Inferred)
+                else if (trackingState == TrackingState.Inferred)
                 {
-                    SkeletonVis.DrawJoint(jointPt, dc, SkeletonVis.inferredJointBrush, SkeletonVis.jointThickness);
+                    SkeletonVis.DrawJoint(coordinate, dc, SkeletonVis.inferredJointBrush, SkeletonVis.jointThickness);
                 }
             }
 
             // Draw bones
             foreach (var bone in BodyStructure.Bones)
             {
-                JointType jointType0 = bone.Item1;
-                JointType jointType1 = bone.Item2;
-                TrackingState joint0TS = jointPts[jointType0].Item1;
-                TrackingState joint1TS = jointPts[jointType1].Item1;
-                Point jointPt0 = jointPts[jointType0].Item2;
-                Point jointPt1 = jointPts[jointType1].Item2;
+                JointType jt0 = bone.Item1;
+                JointType jt1 = bone.Item2;
+                Point jointPt0 = joints[jt0].Item1;
+                Point jointPt1 = joints[jt1].Item1;
+                TrackingState joint0TS = joints[jt0].Item2;
+                TrackingState joint1TS = joints[jt1].Item2;
                 if (joint0TS == TrackingState.NotTracked || joint1TS == TrackingState.NotTracked)
                 {
                     continue;

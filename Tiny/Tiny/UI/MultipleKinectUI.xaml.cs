@@ -72,7 +72,6 @@ namespace Tiny.UI
             using (DrawingContext dc = this.bodyDrawingGroup.Open())
             {
                 SkeletonVis.DrawBackground(frameWidth, frameHeight, dc);
-
                 int personIdx = 0;
                 foreach (Tracker.Result.Person person in result.People)
                 {
@@ -85,18 +84,16 @@ namespace Tiny.UI
                         if (skeletonKinectBody.IsTracked)
                         {
                             Dictionary<JointType, SJoint> joints = skeletonKinectBody.Joints;
-                            Dictionary<JointType, Tuple<TrackingState, Point>> jointPts = new Dictionary<JointType, Tuple<TrackingState, Point>>();
+                            Dictionary<JointType, Tuple<Point, TrackingState>> jointPts = new Dictionary<JointType, Tuple<Point, TrackingState>>();
                             foreach (JointType jt in joints.Keys)
                             {
-                                SJoint joint = joints[jt];
-                                Point jointPt = new Point(joint.DepthSpacePoint.X, joint.DepthSpacePoint.Y);
-                                jointPts[jt] = Tuple.Create(joint.TrackingState, jointPt);
+                                Point point = new Point(joints[jt].DepthSpacePoint.X, joints[jt].DepthSpacePoint.Y);
+                                jointPts[jt] = Tuple.Create(point, joints[jt].TrackingState);
                             }
                             SkeletonVis.DrawBody(jointPts, dc, personPen);
                         }
                     }
                 }
-
                 SkeletonVis.DrawClipRegion(frameWidth, frameHeight, this.bodyDrawingGroup);
             }
         }

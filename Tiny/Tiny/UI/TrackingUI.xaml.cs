@@ -24,7 +24,43 @@ namespace Tiny.UI
 {
     public partial class TrackingUI : Window, INotifyPropertyChanged
     {
+        public class JointSketch
+        {
+            public CameraSpacePoint Coordinate { get; private set; }
+            public TrackingState TrackingState { get; private set; }
+
+            public JointSketch(CameraSpacePoint coordinate, TrackingState trackingState)
+            {
+                this.Coordinate = coordinate;
+                this.TrackingState = trackingState;
+            }
+        }
+
+        public class SkeletonSketch
+        {
+            public Dictionary<JointType, JointSketch> Joints { get; private set; }
+
+            public SkeletonSketch(Dictionary<JointType, JointSketch> joints) {
+                this.Joints = joints;
+            }
+        }
+
+        public class PersonSketch
+        {
+            public Pen Pen { get; private set; }
+            public IEnumerable<SkeletonSketch> SkeletonSketches { get; private set; }
+
+            public PersonSketch(Pen pen, IEnumerable<SkeletonSketch> skeletonSketches)
+            {
+                this.Pen = pen;
+                this.SkeletonSketches = skeletonSketches;
+            }
+        }
+
         private string referenceKinectIP;
+        private bool showAllFOV;
+        private readonly string ViewMode_All = "All";
+        private readonly string ViewMode_Average = "Average";
         private string trackingStatusText;
 
         private DrawingGroup bodyDrawingGroup;
@@ -38,8 +74,11 @@ namespace Tiny.UI
         {
             InitializeComponent();
             this.DataContext = this;
+            this.showAllFOV = false;
+            this.SetupViewModeMenu();
             this.referenceKinectIP = null;
             this.TrackingStatusText = Properties.Resources.TRACKING_CALIBRATION;
+            
             this.bodyDrawingGroup = new DrawingGroup();
             this.bodyImageSource = new DrawingImage(this.bodyDrawingGroup);
             // A person will have the same color
@@ -54,6 +93,19 @@ namespace Tiny.UI
             this.kinectSensor = KinectSensor.GetDefault();
             this.kinectSensor.Open();
             this.coordinateMapper = this.kinectSensor.CoordinateMapper;
+        }
+
+        private void SetupViewModeMenu()
+        {
+            MenuItem all = new MenuItem();
+            all.Header = this.ViewMode_All;
+            all.Click += this.ViewModeItem_Click;
+            this.ViewModeMenu.Items.Add(all);
+
+            MenuItem average = new MenuItem();
+            average.Header = this.ViewMode_Average;
+            average.Click += this.ViewModeItem_Click;
+            this.ViewModeMenu.Items.Add(average);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -108,7 +160,7 @@ namespace Tiny.UI
             {
                 MenuItem kinectIPItem = new MenuItem();
                 kinectIPItem.Header = fov.ClientIP.ToString();
-                kinectIPItem.Click += KinectIPItem_Click;
+                kinectIPItem.Click += ReferenceKinectItem_Click;
                 this.ReferenceKinectMenu.Items.Add(kinectIPItem);
                 
                 if (kinectIPItem.Header.ToString().Equals(this.referenceKinectIP))
@@ -120,13 +172,6 @@ namespace Tiny.UI
             {
                 this.ReferenceKinectBtn.Content = "Reference Kinect";
             }
-        }
-
-        private void KinectIPItem_Click(object sender, RoutedEventArgs e)
-        {
-            string referenceKinectIP = (sender as MenuItem).Header.ToString();
-            this.referenceKinectIP = referenceKinectIP;
-            this.ReferenceKinectBtn.Content = referenceKinectIP;
         }
 
         private Tracker.Result.KinectFOV GetReferenceKinectFOV(IEnumerable<Tracker.Result.KinectFOV> fovs)
@@ -148,7 +193,6 @@ namespace Tiny.UI
             {
                 return;
             }
-
             Tracker.Result.KinectFOV referenceFOV = this.GetReferenceKinectFOV(result.FOVs);
             KinectCamera.Dimension referenceDim = referenceFOV.Dimension;
             int frameWidth = referenceDim.DepthFrameWidth;
@@ -156,57 +200,144 @@ namespace Tiny.UI
             using (DrawingContext dc = this.bodyDrawingGroup.Open())
             {
                 SkeletonVis.DrawBackground(frameWidth, frameHeight, dc);
-
-                IEnumerable<Tracker.Result.Person> people = result.People;
-                int personIdx = 0;
-                foreach (Tracker.Result.Person person in people)
+            }
+            int personIdx = 0;
+            foreach (Tracker.Result.Person person in result.People)
+            {
+                TrackingSkeleton referenceSkeleton = person.FindSkeletonInFOV(referenceFOV);
+                List<SkeletonSketch> skeletonSketches = new List<SkeletonSketch>();
+                foreach (Tracker.Result.SkeletonMatch match in person.SkeletonMatches)
                 {
-                    TrackingSkeleton referenceSkeleton = null;
-                    foreach (Tracker.Result.SkeletonMatch match in person.SkeletonMatches)
-                    {
-                        if (match.FOV.Equals(referenceFOV))
-                        {
-                            referenceSkeleton = match.Skeleton;
-                            break;
-                        }
-                    }
-                    double referenceAngle = referenceSkeleton.InitialAngle;
-                    WCoordinate referencePosition = referenceSkeleton.InitialPosition;
+                    WBody body = match.Skeleton.CurrentPosition.Worldview;
+                    KinectBody kinectBody = WBody.TransformToKinectBody(body, referenceSkeleton.InitialAngle, referenceSkeleton.InitialPosition);
 
-                    Pen personPen = this.personColors[personIdx++];
-                    foreach (Tracker.Result.SkeletonMatch match in person.SkeletonMatches)
+                    Dictionary<JointType, JointSketch> jointSketches = new Dictionary<JointType, JointSketch>();
+                    foreach (JointType jt in kinectBody.Joints.Keys)
                     {
-                        WBody worldviewBody = match.Skeleton.CurrentPosition.Worldview;
-                        KinectSkeleton kinectSkeleton = WBody.TransformBodyToKinectSkeleton(worldviewBody, referenceAngle, referencePosition);
-                        Dictionary<JointType, Tuple<TrackingState, Point>> jointPts = new Dictionary<JointType, Tuple<TrackingState, Point>>();
-                        foreach (JointType jointType in kinectSkeleton.Joints.Keys)
-                        {
-                            TrackingState jointTS = worldviewBody.Joints[jointType].TrackingState;
-                            CameraSpacePoint position = kinectSkeleton.Joints[jointType];
-                            if (position.Z < 0)
-                            {
-                                position.Z = 0.1f;
-                            }
-                            DepthSpacePoint depthSpacePoint = this.coordinateMapper.MapCameraPointToDepthSpace(position);
-                            jointPts[jointType] = Tuple.Create(jointTS, new Point(depthSpacePoint.X, depthSpacePoint.Y));
-                        }
-                        
-                        SkeletonVis.DrawBody(jointPts, dc, personPen);
+                        jointSketches[jt] = new JointSketch(kinectBody.Joints[jt], body.Joints[jt].TrackingState);
                     }
+                    skeletonSketches.Add(new SkeletonSketch(jointSketches));
                 }
-                
-                SkeletonVis.DrawClipRegion(frameWidth, frameHeight, this.bodyDrawingGroup);
+                Pen pen = this.personColors[personIdx++];
+                PersonSketch personSketch = new PersonSketch(pen, skeletonSketches);
+                if (this.showAllFOV)
+                {
+                    this.DrawAllSkeletons(personSketch);
+                }
+                else
+                {
+                    this.DrawAverageSkeletons(personSketch);
+                }
+            }
+            SkeletonVis.DrawClipRegion(frameWidth, frameHeight, this.bodyDrawingGroup);
+        }
+
+        private void DrawAllSkeletons(PersonSketch personSketch)
+        {
+            foreach (SkeletonSketch skeletonSketch in personSketch.SkeletonSketches)
+            {
+                Dictionary<JointType, Tuple<Point, TrackingState>> joints = new Dictionary<JointType, Tuple<Point, TrackingState>>();
+                foreach (JointType jt in skeletonSketch.Joints.Keys)
+                {
+                    TrackingState trackingState = skeletonSketch.Joints[jt].TrackingState;
+                    CameraSpacePoint position = skeletonSketch.Joints[jt].Coordinate;
+                    if (position.Z < 0)
+                    {
+                        position.Z = 0.1f;
+                    }
+                    DepthSpacePoint dsPt = this.coordinateMapper.MapCameraPointToDepthSpace(position);
+                    joints[jt] = Tuple.Create(new Point(dsPt.X, dsPt.Y), trackingState);
+                }
+                using (DrawingContext dc = this.bodyDrawingGroup.Open())
+                {
+                    SkeletonVis.DrawBody(joints, dc, personSketch.Pen);
+                }
             }
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void DrawAverageSkeletons(PersonSketch personSketch)
         {
-            Button senderBtn = sender as Button;
-            senderBtn.ContextMenu.IsEnabled = true;
-            senderBtn.ContextMenu.PlacementTarget = senderBtn;
-            senderBtn.ContextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
-            senderBtn.ContextMenu.IsOpen = true;
+            Dictionary<JointType, CameraSpacePoint> sumJoints = new Dictionary<JointType,CameraSpacePoint>();
+            Dictionary<JointType, int> jointsCount = new Dictionary<JointType, int>();
+            foreach (SkeletonSketch skeletonSketch in personSketch.SkeletonSketches)
+            {
+                foreach (JointType jt in skeletonSketch.Joints.Keys)
+                {
+                    if (sumJoints.ContainsKey(jt))
+                    {
+                        CameraSpacePoint accumulatePt = new CameraSpacePoint();
+                        accumulatePt.X = sumJoints[jt].X + skeletonSketch.Joints[jt].Coordinate.X;
+                        accumulatePt.Y = sumJoints[jt].Y + skeletonSketch.Joints[jt].Coordinate.Y;
+                        accumulatePt.Z = sumJoints[jt].Z + skeletonSketch.Joints[jt].Coordinate.Z;
+                        sumJoints[jt] = accumulatePt;
+                        jointsCount[jt] += 1;
+                    }
+                    else
+                    {
+                        sumJoints[jt] = skeletonSketch.Joints[jt].Coordinate;
+                        jointsCount[jt] = 1;
+                    }
+                }
+            }
+            Dictionary<JointType, Tuple<Point, TrackingState>> joints = new Dictionary<JointType, Tuple<Point, TrackingState>>();
+            foreach (JointType jt in sumJoints.Keys)
+            {
+                CameraSpacePoint position = new CameraSpacePoint();
+                position.X = sumJoints[jt].X / jointsCount[jt];
+                position.Y = sumJoints[jt].Y / jointsCount[jt];
+                position.Z = sumJoints[jt].Y / jointsCount[jt];
+                if (position.Z < 0)
+                {
+                    position.Z = 0.1f;
+                }
+                DepthSpacePoint dsPt = this.coordinateMapper.MapCameraPointToDepthSpace(position);
+                joints[jt] = Tuple.Create(new Point(dsPt.X, dsPt.Y), TrackingState.Tracked);
+            }
+            using (DrawingContext dc = this.bodyDrawingGroup.Open())
+            {
+                SkeletonVis.DrawBody(joints, dc, personSketch.Pen);
+            }
         }
+
+        private void ReferenceKinectButton_Click(object sender, RoutedEventArgs e)
+        {
+            Button referenceKinectBtn = sender as Button;
+            referenceKinectBtn.ContextMenu.IsEnabled = true;
+            referenceKinectBtn.ContextMenu.PlacementTarget = referenceKinectBtn;
+            referenceKinectBtn.ContextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
+            referenceKinectBtn.ContextMenu.IsOpen = true;
+        }
+
+        private void ReferenceKinectItem_Click(object sender, RoutedEventArgs e)
+        {
+            string referenceKinectIP = (sender as MenuItem).Header.ToString();
+            this.referenceKinectIP = referenceKinectIP;
+            this.ReferenceKinectBtn.Content = referenceKinectIP;
+        }
+
+        private void ViewModeBtn_Click(object sender, RoutedEventArgs e)
+        {
+            Button viewModeBtn = sender as Button;
+            viewModeBtn.ContextMenu.IsEnabled = true;
+            viewModeBtn.ContextMenu.PlacementTarget = viewModeBtn;
+            viewModeBtn.ContextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
+            viewModeBtn.ContextMenu.IsOpen = true;
+        }
+
+        private void ViewModeItem_Click(object sender, RoutedEventArgs e)
+        {
+            string viewMode = (sender as MenuItem).Header.ToString();
+            if (viewMode.Equals(this.ViewMode_Average))
+            {
+                this.showAllFOV = false;
+            }
+            else
+            {
+                this.showAllFOV = true;
+            }
+            this.ViewModeBtn.Content = viewMode;
+        }
+
     }
 }
 

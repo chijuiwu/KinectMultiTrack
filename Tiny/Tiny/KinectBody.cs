@@ -7,11 +7,11 @@ using Microsoft.Kinect;
 
 namespace Tiny
 {
-    public class KinectSkeleton
+    public class KinectBody
     {
         public Dictionary<JointType, CameraSpacePoint> Joints { get; private set; }
 
-        public KinectSkeleton()
+        public KinectBody()
         {
             this.Joints = new Dictionary<JointType, CameraSpacePoint>();
         }

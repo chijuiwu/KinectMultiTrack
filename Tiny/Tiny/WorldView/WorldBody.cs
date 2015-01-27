@@ -111,9 +111,9 @@ namespace Tiny.WorldView
         }
 
         // Joints transformed back to the Kinect camera space point
-        public static KinectSkeleton TransformBodyToKinectSkeleton(WBody body, double initialAngle, WCoordinate centrePoint)
+        public static KinectBody TransformToKinectBody(WBody body, double initialAngle, WCoordinate centrePoint)
         {
-            KinectSkeleton kinectSkeleton = new KinectSkeleton();
+            KinectBody kinectSkeleton = new KinectBody();
 
             foreach (JointType jointType in body.Joints.Keys)
             {
