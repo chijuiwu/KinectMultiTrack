@@ -107,10 +107,13 @@ namespace Tiny
                 skeleton.InitialAngle = WBody.GetInitialAngle(frameZeroth.Bodies[personIdx]);
                 // initial position = average of all previous positions
                 // TODO: May break if bodies count differ from the first frame
-                SBody[] previousPositions = new SBody[calibrationFrames.Length];
+                List<SBody> previousPositions = new List<SBody>();
                 for (int frameIdx = 0; frameIdx < calibrationFrames.Length; frameIdx++)
                 {
-                    previousPositions[frameIdx] = calibrationFrames[frameIdx].Bodies[personIdx];
+                    if (calibrationFrames[frameIdx].Bodies.Count > personIdx)
+                    {
+                        previousPositions.Add(calibrationFrames[frameIdx].Bodies[personIdx]);
+                    }
                 }
                 skeleton.InitialPosition = WBody.GetInitialPosition(previousPositions);
                 this.skeletons[trackingId] = skeleton;

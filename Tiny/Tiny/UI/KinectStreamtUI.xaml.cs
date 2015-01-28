@@ -42,10 +42,10 @@ namespace Tiny.UI
 
         internal void UpdateBodyFrame(SBodyFrame bodyFrame)
         {
-            this.Dispatcher.Invoke((Action)(() =>
-            {
-                this.PerformUpdateBodyFrame(bodyFrame);
-            }));
+            //this.Dispatcher.Invoke((Action)(() =>
+            //{
+            //    this.PerformUpdateBodyFrame(bodyFrame);
+            //}));
         }
 
         private void PerformUpdateBodyFrame(SBodyFrame bodyFrame)

@@ -136,7 +136,6 @@ namespace Tiny.UI
         {
             this.Dispatcher.Invoke((Action)(() =>
             {
-                //this.UpdateReferenceKinectMenu(result.FOVs);
                 this.DisplayBodyFrames(result);
             }));
         }
@@ -161,6 +160,7 @@ namespace Tiny.UI
                 return;
             }
             Tracker.Result.KinectFOV referenceFOV = this.GetReferenceKinectFOV(result.FOVs);
+            Debug.WriteLine("reference fov:" + referenceFOV.ClientIP);
             KinectCamera.Dimension referenceDim = referenceFOV.Dimension;
             int frameWidth = referenceDim.DepthFrameWidth;
             int frameHeight = referenceDim.DepthFrameHeight;
@@ -172,6 +172,7 @@ namespace Tiny.UI
             foreach (Tracker.Result.Person person in result.People)
             {
                 TrackingSkeleton referenceSkeleton = person.FindSkeletonInFOV(referenceFOV);
+                Debug.WriteLine("reference skeleton: " + referenceSkeleton);
                 List<SkeletonSketch> skeletonSketches = new List<SkeletonSketch>();
                 foreach (Tracker.Result.SkeletonMatch match in person.SkeletonMatches)
                 {

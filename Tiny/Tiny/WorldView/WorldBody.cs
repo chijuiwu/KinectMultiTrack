@@ -44,7 +44,7 @@ namespace Tiny.WorldView
 
         // Get the initial centre position of user's body
         // Each item in the array is a body at a particular frame in the initial data collection sequence
-        public static WCoordinate GetInitialPosition(SBody[] userInitialBodies)
+        public static WCoordinate GetInitialPosition(List<SBody> userInitialBodies)
         {
             float totalAverageX = 0;
             float totalAverageY = 0;
@@ -77,9 +77,9 @@ namespace Tiny.WorldView
                 totalAverageZ += sumOfZs / BodyStructure.Joints.Count;
             }
 
-            float centreX = totalAverageX / userInitialBodies.Length;
-            float centreY = totalAverageY / userInitialBodies.Length;
-            float centreZ = totalAverageZ / userInitialBodies.Length;
+            float centreX = totalAverageX / userInitialBodies.Count;
+            float centreY = totalAverageY / userInitialBodies.Count;
+            float centreZ = totalAverageZ / userInitialBodies.Count;
             return new WCoordinate(centreX, centreY, centreZ);
         }
 
