@@ -25,7 +25,7 @@ namespace KinectClient
     /// </summary>
     public partial class KinectClientUI : Window, INotifyPropertyChanged
     {
-        private const string kinectServerAddress = "138.251.213.248";
+        private const string kinectServerAddress = "138.251.213.82";
         private const string localhost = "127.0.0.1";
         private const int kinectServerPort = 12345;
         private KinectSocket kinectSocket;
