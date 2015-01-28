@@ -41,13 +41,28 @@ namespace Tiny
         {
             get
             {
-                return this.Positions.Peek();
+                if (this.Positions.Count > 0)
+                {
+                    return this.Positions.Peek();
+                }
+                else
+                {
+                    return null;
+                }
             }
         }
 
         public TrackingSkeleton(ulong id)
         {
             this.Id = id;
+            this.Positions = new Stack<TrackingSkeleton.Position>();
+        }
+
+        public TrackingSkeleton(ulong id, double initAngle, WCoordinate initPos)
+        {
+            this.Id = id;
+            this.InitialAngle = initAngle;
+            this.InitialPosition = initPos;
             this.Positions = new Stack<TrackingSkeleton.Position>();
         }
 
@@ -69,12 +84,18 @@ namespace Tiny
         }
 
         // Copy only the current positions
-        public static TrackingSkeleton Copy(TrackingSkeleton person)
+        public static TrackingSkeleton Copy(TrackingSkeleton skeleton)
         {
-            Stack<TrackingSkeleton.Position> currentPos = new Stack<TrackingSkeleton.Position>();
-            currentPos.Push(TrackingSkeleton.Position.Copy(person.Positions.Peek()));
-            TrackingSkeleton copy = new TrackingSkeleton(person.Id, person.InitialAngle, person.InitialPosition, currentPos);
-            return copy;
+            if (skeleton.Positions.Count > 0)
+            {
+                Stack<TrackingSkeleton.Position> currentPos = new Stack<TrackingSkeleton.Position>();
+                currentPos.Push(TrackingSkeleton.Position.Copy(skeleton.Positions.Peek()));
+                return new TrackingSkeleton(skeleton.Id, skeleton.InitialAngle, skeleton.InitialPosition, currentPos);
+            }
+            else
+            {
+                return new TrackingSkeleton(skeleton.Id, skeleton.InitialAngle, skeleton.InitialPosition);
+            }
         }
 
         public override string ToString()

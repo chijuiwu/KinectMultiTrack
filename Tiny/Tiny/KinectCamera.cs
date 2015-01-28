@@ -46,7 +46,10 @@ namespace Tiny
             {
                 foreach (TrackingSkeleton skeleton in this.skeletons.Values)
                 {
-                    yield return TrackingSkeleton.Copy(skeleton);
+                    if (skeleton.Positions.Count > 0)
+                    {
+                        yield return TrackingSkeleton.Copy(skeleton);
+                    }
                 }
             }
         }
@@ -100,11 +103,8 @@ namespace Tiny
             for (int personIdx = 0; personIdx < frameZeroth.Bodies.Count; personIdx++)
             {
                 ulong trackingId = frameZeroth.Bodies[personIdx].TrackingId;
-
                 TrackingSkeleton skeleton = new TrackingSkeleton(trackingId);
-
                 skeleton.InitialAngle = WBody.GetInitialAngle(frameZeroth.Bodies[personIdx]);
-
                 // initial position = average of all previous positions
                 // TODO: May break if bodies count differ from the first frame
                 SBody[] previousPositions = new SBody[calibrationFrames.Length];
@@ -113,8 +113,7 @@ namespace Tiny
                     previousPositions[frameIdx] = calibrationFrames[frameIdx].Bodies[personIdx];
                 }
                 skeleton.InitialPosition = WBody.GetInitialPosition(previousPositions);
-
-                this.skeletons.Add(trackingId, skeleton);
+                this.skeletons[trackingId] = skeleton;
             }
             this.calibrated = true;
             this.FrameDimension = new KinectCamera.Dimension(frameZeroth.DepthFrameWidth, frameZeroth.DepthFrameHeight);

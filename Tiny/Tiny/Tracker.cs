@@ -159,6 +159,7 @@ namespace Tiny
                 {
                     foreach (KinectCamera kinect in this.kinectsDict.Values)
                     {
+                        Debug.WriteLine("calibration");
                         kinect.Calibrate();
                     }
                 }

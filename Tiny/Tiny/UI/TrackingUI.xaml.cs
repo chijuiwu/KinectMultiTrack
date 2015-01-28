@@ -166,7 +166,7 @@ namespace Tiny.UI
             int frameHeight = referenceDim.DepthFrameHeight;
             using (DrawingContext dc = this.bodyDrawingGroup.Open())
             {
-                SkeletonVis.DrawBackground(frameWidth, frameHeight, dc);
+                this.DrawBackground(frameWidth, frameHeight, dc);
             }
             int personIdx = 0;
             foreach (Tracker.Result.Person person in result.People)
@@ -196,7 +196,7 @@ namespace Tiny.UI
                     this.DrawAverageSkeletons(personSketch);
                 }
             }
-            SkeletonVis.DrawClipRegion(frameWidth, frameHeight, this.bodyDrawingGroup);
+            this.DrawClipRegion(frameWidth, frameHeight, this.bodyDrawingGroup);
         }
 
         private void DrawAllSkeletons(PersonSketch personSketch)
@@ -217,7 +217,7 @@ namespace Tiny.UI
                 }
                 using (DrawingContext dc = this.bodyDrawingGroup.Open())
                 {
-                    SkeletonVis.DrawBody(joints, dc, personSketch.Pen);
+                    this.DrawBody(joints, dc, personSketch.Pen);
                 }
             }
         }
@@ -262,8 +262,94 @@ namespace Tiny.UI
             }
             using (DrawingContext dc = this.bodyDrawingGroup.Open())
             {
-                SkeletonVis.DrawBody(joints, dc, personSketch.Pen);
+                this.DrawBody(joints, dc, personSketch.Pen);
             }
+        }
+
+        private static readonly Brush backgroundBrush = Brushes.Black;
+
+        // Joints
+        private static readonly double jointThickness = 3;
+        private static readonly Brush trackedJointBrush = new SolidColorBrush(Color.FromArgb(255, 68, 192, 68));
+        private static readonly Brush inferredJointBrush = Brushes.Yellow;
+
+        // Bones
+        private static readonly Pen defaultTrackedBonePen = new Pen(Brushes.Blue, 6);
+        private static readonly Pen inferredBonePen = new Pen(Brushes.Gray, 1);
+
+        private void DrawBackground(int frameWidth, int frameHeight, DrawingContext dc)
+        {
+            dc.DrawRectangle(TrackingUI.backgroundBrush, null, new Rect(0.0, 0.0, frameWidth, frameHeight));
+        }
+
+        private void DrawClipRegion(int frameWidth, int frameHeight, DrawingGroup dg)
+        {
+            dg.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, frameWidth, frameHeight));
+        }
+
+        private void DrawBody(Dictionary<JointType, Tuple<Point, TrackingState>> joints, DrawingContext dc)
+        {
+            this.DrawBody(joints, dc, TrackingUI.defaultTrackedBonePen);
+        }
+
+        private void DrawBody(Dictionary<JointType, Tuple<Point, TrackingState>> joints, DrawingContext dc, Pen bonePen)
+        {
+            // Draw bones
+            foreach (var bone in BodyStructure.Bones)
+            {
+                JointType jt0 = bone.Item1;
+                JointType jt1 = bone.Item2;
+                Point jointPt0 = joints[jt0].Item1;
+                Point jointPt1 = joints[jt1].Item1;
+                TrackingState joint0TS = joints[jt0].Item2;
+                TrackingState joint1TS = joints[jt1].Item2;
+                if (joint0TS == TrackingState.NotTracked || joint1TS == TrackingState.NotTracked)
+                {
+                    continue;
+                }
+                else if (joint0TS == TrackingState.Tracked && joint1TS == TrackingState.Tracked)
+                {
+                    this.DrawBone(jointPt0, jointPt1, dc, bonePen);
+                }
+                else
+                {
+                    this.DrawBone(jointPt0, jointPt1, dc, TrackingUI.inferredBonePen);
+                }
+            }
+            // Draw joints
+            foreach (Tuple<Point, TrackingState> joint in joints.Values)
+            {
+                Point coordinate = joint.Item1;
+                TrackingState trackingState = joint.Item2;
+                if (trackingState == TrackingState.NotTracked)
+                {
+                    continue;
+                }
+                else if (trackingState == TrackingState.Tracked)
+                {
+                    this.DrawJoint(coordinate, dc, TrackingUI.trackedJointBrush, TrackingUI.jointThickness);
+                }
+                else if (trackingState == TrackingState.Inferred)
+                {
+                    this.DrawJoint(coordinate, dc, TrackingUI.inferredJointBrush, TrackingUI.jointThickness);
+                }
+            }
+        }
+
+        private void DrawJoint(Point joint, DrawingContext dc, Brush brush, double thickness)
+        {
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                dc.DrawEllipse(brush, null, joint, thickness, thickness);
+            }));
+        }
+
+        private void DrawBone(Point from, Point to, DrawingContext dc, Pen pen)
+        {
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                dc.DrawLine(pen, from, to);
+            }));
         }
 
         private void ReferenceKinectButton_Click(object sender, RoutedEventArgs e)

@@ -15,9 +15,6 @@ namespace Tiny
 {
     public class TrackingServer
     {
-        // HACK
-        private IPEndPoint referenceKinectIP;
-
         private TcpListener kinectListener;
         private Thread acceptKinectConnectionThread;
 
@@ -98,12 +95,17 @@ namespace Tiny
             NetworkStream clientStream = client.GetStream();
             
             Debug.WriteLine(Tiny.Properties.Resources.CONNECTION_START + clientIP);
-            Thread addCameraThread = new Thread(() => this.NewKinectCameraConnected(clientIP));
-            addCameraThread.SetApartmentState(ApartmentState.STA);
-            addCameraThread.Start();
+            Boolean cameraRecorded = false;
 
             while (true)
             {
+                if (!cameraRecorded && this.NewKinectCameraConnected != null)
+                {
+                    Thread addCameraThread = new Thread(() => this.NewKinectCameraConnected(clientIP));
+                    addCameraThread.Start();
+                    cameraRecorded = true;
+                }
+
                 try
                 {
                     if (!client.Connected) break;
@@ -130,7 +132,6 @@ namespace Tiny
             }
             this.tracker.RemoveClient(clientIP);
             Thread removeCameraThread = new Thread(() => this.KinectCameraRemoved(clientIP));
-            removeCameraThread.SetApartmentState(ApartmentState.STA);
             removeCameraThread.Start();
             clientStream.Close();
             clientStream.Dispose();
@@ -143,8 +144,8 @@ namespace Tiny
             this.MultipleKinectUpdate(result);
             this.TrackingUpdate(result);
 
-            Thread loggingThread = new Thread(new ParameterizedThreadStart(this.StartLoggingThread));
-            loggingThread.Start(result);
+            //Thread loggingThread = new Thread(new ParameterizedThreadStart(this.StartLoggingThread));
+            //loggingThread.Start(result);
         }
 
         private void StartLoggingThread(object obj)

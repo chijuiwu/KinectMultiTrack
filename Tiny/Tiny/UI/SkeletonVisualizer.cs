@@ -8,6 +8,7 @@ using KinectSerializer;
 using System.Windows;
 using System.Windows.Media;
 using SkeletonVis = Tiny.UI.SkeletonVisualizer;
+using System.Windows.Threading;
 
 namespace Tiny.UI
 {
@@ -85,12 +86,20 @@ namespace Tiny.UI
 
         private static void DrawJoint(Point joint, DrawingContext dc, Brush brush, double thickness)
         {
-            dc.DrawEllipse(brush, null, joint, thickness, thickness);
+            dc.Dispatcher.Invoke((Action)(() =>
+            {
+                dc.DrawEllipse(brush, null, joint, thickness, thickness);
+            }));
+            //dc.DrawEllipse(brush, null, joint, thickness, thickness);
         }
 
         private static void DrawBone(Point from, Point to, DrawingContext dc, Pen pen)
         {
-            dc.DrawLine(pen, from, to);
+            dc.Dispatcher.Invoke((Action)(() =>
+            {
+                dc.DrawLine(pen, from, to);
+            }));
+            //dc.DrawLine(pen, from, to);
         }
     }
 }
