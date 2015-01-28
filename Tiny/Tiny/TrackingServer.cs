@@ -98,9 +98,9 @@ namespace Tiny
             NetworkStream clientStream = client.GetStream();
             
             Debug.WriteLine(Tiny.Properties.Resources.CONNECTION_START + clientIP);
-            Thread cameraUpdateThread = new Thread(() => this.StartCameraUpdateThread(clientIP));
-            cameraUpdateThread.SetApartmentState(ApartmentState.STA);
-            cameraUpdateThread.Start();
+            Thread addCameraThread = new Thread(() => this.NewKinectCameraConnected(clientIP));
+            addCameraThread.SetApartmentState(ApartmentState.STA);
+            addCameraThread.Start();
 
             while (true)
             {
@@ -129,7 +129,9 @@ namespace Tiny
                 }
             }
             this.tracker.RemoveClient(clientIP);
-            this.KinectCameraRemoved(clientIP);
+            Thread removeCameraThread = new Thread(() => this.KinectCameraRemoved(clientIP));
+            removeCameraThread.SetApartmentState(ApartmentState.STA);
+            removeCameraThread.Start();
             clientStream.Close();
             clientStream.Dispose();
             client.Close();
@@ -149,11 +151,6 @@ namespace Tiny
         {
             Tracker.Result result = obj as Tracker.Result;
             this.logger.Write(result);
-        }
-
-        private void StartCameraUpdateThread(IPEndPoint clientIP)
-        {
-            this.NewKinectCameraConnected(clientIP);
         }
     }
 }

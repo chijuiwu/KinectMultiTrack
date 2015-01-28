@@ -289,13 +289,16 @@ namespace Tiny.UI
 
         internal void RemoveKinectCamera(IPEndPoint clientIP)
         {
-            this.ReferenceKinectMenu.Items.Remove(this.referenceKinectIPs[clientIP.ToString()]);
-            this.referenceKinectIPs.Remove(clientIP.ToString());
-            if (this.currentReferenceKinectIP.Equals(clientIP))
+            this.Dispatcher.Invoke((Action)(() =>
             {
-                this.ReferenceKinectBtn.Content = "Reference Kinect";
-                this.currentReferenceKinectIP = "";
-            }
+                this.ReferenceKinectMenu.Items.Remove(this.referenceKinectIPs[clientIP.ToString()]);
+                this.referenceKinectIPs.Remove(clientIP.ToString());
+                if (this.currentReferenceKinectIP.Equals(clientIP))
+                {
+                    this.ReferenceKinectBtn.Content = "Reference Kinect";
+                    this.currentReferenceKinectIP = "";
+                }
+            }));
         }
 
         private void ReferenceKinectItem_Click(object sender, RoutedEventArgs e)

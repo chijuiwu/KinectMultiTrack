@@ -12,6 +12,9 @@ namespace Tiny
 {
     public class TrackingSkeleton
     {
+        // 100 seconds
+        private readonly int MAX_POSITIONS = 3000;
+
         public class Position
         {
             public SBody Kinect { get; private set; }
@@ -58,6 +61,10 @@ namespace Tiny
 
         public void UpdatePosition(SBody body, WBody worldviewBody)
         {
+            if (this.Positions.Count() > MAX_POSITIONS)
+            {
+                this.Positions.Clear();
+            }
             this.Positions.Push(new TrackingSkeleton.Position(body, worldviewBody));
         }
 

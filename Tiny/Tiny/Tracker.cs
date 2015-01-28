@@ -162,13 +162,11 @@ namespace Tiny
                         kinect.Calibrate();
                     }
                 }
-                // Get a copy of the current positions of users
                 this.kinectsDict[clientIP].ProcessFrames(bodyframe);
                 List<Result.KinectFOV> fovs = new List<Result.KinectFOV>();
-                foreach (IPEndPoint kinectId in this.kinectsDict.Keys)
+                foreach (IPEndPoint kinectIP in this.kinectsDict.Keys)
                 {
-                    KinectCamera.Dimension dimension = this.kinectsDict[kinectId].FrameDimension;
-                    fovs.Add(new Result.KinectFOV((uint)fovs.Count, kinectId, dimension));
+                    fovs.Add(new Result.KinectFOV((uint)fovs.Count, kinectIP, this.kinectsDict[kinectIP].FrameDimension));
                 }
                 IEnumerable<Result.Person> people = this.MatchSkeletonsAndPeople(fovs);
                 return new Result(fovs, people);
