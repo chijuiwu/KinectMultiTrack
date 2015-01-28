@@ -203,6 +203,7 @@ namespace Tiny
             while(skeletonsList.Any())
             {
                 IEnumerable<Tuple<Result.KinectFOV, TrackingSkeleton>> skeletonsOfPerson = this.GroupSkeletons(skeletonsList);
+                Debug.WriteLine("Matches Found: " + skeletonsOfPerson.Count());
                 foreach (Tuple<Result.KinectFOV, TrackingSkeleton> skeleton in skeletonsOfPerson)
                 {
                     skeletonsList.Remove(skeleton);
@@ -210,11 +211,13 @@ namespace Tiny
                 List<Result.SkeletonMatch> matches = new List<Result.SkeletonMatch>();
                 foreach (Tuple<Result.KinectFOV, TrackingSkeleton> skeleton in skeletonsOfPerson)
                 {
-                    new Result.SkeletonMatch((uint)matches.Count, skeleton.Item1, skeleton.Item2));
+                    Debug.WriteLine("Match: [FOV: " + skeleton.Item1.ClientIP + ", Skeleton: " + skeleton.Item2 + "]");
+                    matches.Add(new Result.SkeletonMatch((uint)matches.Count, skeleton.Item1, skeleton.Item2));
                 }
                 Result.Person person = new Result.Person((uint)people.Count, matches);
                 people.Add(person);
             }
+            Debug.WriteLine("Total People: " + people.Count);
             return people;
         }
 

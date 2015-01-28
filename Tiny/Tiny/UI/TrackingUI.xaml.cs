@@ -160,47 +160,53 @@ namespace Tiny.UI
                 return;
             }
             Tracker.Result.KinectFOV referenceFOV = this.GetReferenceKinectFOV(result.FOVs);
-            Debug.WriteLine("reference fov:" + referenceFOV.ClientIP);
+            Debug.WriteLine("Reference FOV: " + referenceFOV.ClientIP);
+            this.currentReferenceKinectIP = referenceFOV.ClientIP.ToString();
             KinectCamera.Dimension referenceDim = referenceFOV.Dimension;
+            
             int frameWidth = referenceDim.DepthFrameWidth;
             int frameHeight = referenceDim.DepthFrameHeight;
             using (DrawingContext dc = this.bodyDrawingGroup.Open())
             {
                 this.DrawBackground(frameWidth, frameHeight, dc);
-            }
-            int personIdx = 0;
-            foreach (Tracker.Result.Person person in result.People)
-            {
-                TrackingSkeleton referenceSkeleton = person.FindSkeletonInFOV(referenceFOV);
-                Debug.WriteLine("reference skeleton: " + referenceSkeleton);
-                List<SkeletonSketch> skeletonSketches = new List<SkeletonSketch>();
-                foreach (Tracker.Result.SkeletonMatch match in person.SkeletonMatches)
+                int personIdx = 0;
+                foreach (Tracker.Result.Person person in result.People)
                 {
-                    WBody body = match.Skeleton.CurrentPosition.Worldview;
-                    KinectBody kinectBody = WBody.TransformToKinectBody(body, referenceSkeleton.InitialAngle, referenceSkeleton.InitialPosition);
-
-                    Dictionary<JointType, JointSketch> jointSketches = new Dictionary<JointType, JointSketch>();
-                    foreach (JointType jt in kinectBody.Joints.Keys)
+                    TrackingSkeleton referenceSkeleton = person.FindSkeletonInFOV(referenceFOV);
+                    // HACK
+                    if (referenceSkeleton == null)
                     {
-                        jointSketches[jt] = new JointSketch(kinectBody.Joints[jt], body.Joints[jt].TrackingState);
+                        continue;
                     }
-                    skeletonSketches.Add(new SkeletonSketch(jointSketches));
+                    List<SkeletonSketch> skeletonSketches = new List<SkeletonSketch>();
+                    foreach (Tracker.Result.SkeletonMatch match in person.SkeletonMatches)
+                    {
+                        WBody body = match.Skeleton.CurrentPosition.Worldview;
+                        KinectBody kinectBody = WBody.TransformToKinectBody(body, referenceSkeleton.InitialAngle, referenceSkeleton.InitialPosition);
+
+                        Dictionary<JointType, JointSketch> jointSketches = new Dictionary<JointType, JointSketch>();
+                        foreach (JointType jt in kinectBody.Joints.Keys)
+                        {
+                            jointSketches[jt] = new JointSketch(kinectBody.Joints[jt], body.Joints[jt].TrackingState);
+                        }
+                        skeletonSketches.Add(new SkeletonSketch(jointSketches));
+                    }
+                    Pen pen = this.personColors[personIdx++];
+                    PersonSketch personSketch = new PersonSketch(pen, skeletonSketches);
+                    if (this.showAllFOV)
+                    {
+                        this.DrawAllSkeletons(personSketch, dc);
+                    }
+                    else
+                    {
+                        this.DrawAverageSkeletons(personSketch, dc);
+                    }
                 }
-                Pen pen = this.personColors[personIdx++];
-                PersonSketch personSketch = new PersonSketch(pen, skeletonSketches);
-                if (this.showAllFOV)
-                {
-                    this.DrawAllSkeletons(personSketch);
-                }
-                else
-                {
-                    this.DrawAverageSkeletons(personSketch);
-                }
+                this.DrawClipRegion(frameWidth, frameHeight, this.bodyDrawingGroup);
             }
-            this.DrawClipRegion(frameWidth, frameHeight, this.bodyDrawingGroup);
         }
 
-        private void DrawAllSkeletons(PersonSketch personSketch)
+        private void DrawAllSkeletons(PersonSketch personSketch, DrawingContext dc)
         {
             foreach (SkeletonSketch skeletonSketch in personSketch.SkeletonSketches)
             {
@@ -216,14 +222,11 @@ namespace Tiny.UI
                     DepthSpacePoint dsPt = this.coordinateMapper.MapCameraPointToDepthSpace(position);
                     joints[jt] = Tuple.Create(new Point(dsPt.X, dsPt.Y), trackingState);
                 }
-                using (DrawingContext dc = this.bodyDrawingGroup.Open())
-                {
-                    this.DrawBody(joints, dc, personSketch.Pen);
-                }
+                this.DrawBody(joints, dc, personSketch.Pen);
             }
         }
 
-        private void DrawAverageSkeletons(PersonSketch personSketch)
+        private void DrawAverageSkeletons(PersonSketch personSketch, DrawingContext dc)
         {
             Dictionary<JointType, CameraSpacePoint> sumJoints = new Dictionary<JointType,CameraSpacePoint>();
             Dictionary<JointType, int> jointsCount = new Dictionary<JointType, int>();
@@ -242,7 +245,11 @@ namespace Tiny.UI
                     }
                     else
                     {
-                        sumJoints[jt] = skeletonSketch.Joints[jt].Coordinate;
+                        CameraSpacePoint newPt = new CameraSpacePoint();
+                        newPt.X = skeletonSketch.Joints[jt].Coordinate.X;
+                        newPt.Y = skeletonSketch.Joints[jt].Coordinate.Y;
+                        newPt.Z = skeletonSketch.Joints[jt].Coordinate.Z;
+                        sumJoints[jt] = newPt;
                         jointsCount[jt] = 1;
                     }
                 }
@@ -251,9 +258,9 @@ namespace Tiny.UI
             foreach (JointType jt in sumJoints.Keys)
             {
                 CameraSpacePoint position = new CameraSpacePoint();
-                position.X = sumJoints[jt].X / jointsCount[jt];
-                position.Y = sumJoints[jt].Y / jointsCount[jt];
-                position.Z = sumJoints[jt].Y / jointsCount[jt];
+                position.X = sumJoints[jt].X / (float)jointsCount[jt];
+                position.Y = sumJoints[jt].Y / (float)jointsCount[jt];
+                position.Z = sumJoints[jt].Z / (float)jointsCount[jt];
                 if (position.Z < 0)
                 {
                     position.Z = 0.1f;
@@ -261,10 +268,7 @@ namespace Tiny.UI
                 DepthSpacePoint dsPt = this.coordinateMapper.MapCameraPointToDepthSpace(position);
                 joints[jt] = Tuple.Create(new Point(dsPt.X, dsPt.Y), TrackingState.Tracked);
             }
-            using (DrawingContext dc = this.bodyDrawingGroup.Open())
-            {
-                this.DrawBody(joints, dc, personSketch.Pen);
-            }
+            this.DrawBody(joints, dc, personSketch.Pen);
         }
 
         private static readonly Brush backgroundBrush = Brushes.Black;
@@ -339,18 +343,12 @@ namespace Tiny.UI
 
         private void DrawJoint(Point joint, DrawingContext dc, Brush brush, double thickness)
         {
-            this.Dispatcher.Invoke((Action)(() =>
-            {
-                dc.DrawEllipse(brush, null, joint, thickness, thickness);
-            }));
+            dc.DrawEllipse(brush, null, joint, thickness, thickness);
         }
 
         private void DrawBone(Point from, Point to, DrawingContext dc, Pen pen)
         {
-            this.Dispatcher.Invoke((Action)(() =>
-            {
-                dc.DrawLine(pen, from, to);
-            }));
+            dc.DrawLine(pen, from, to);
         }
 
         private void ReferenceKinectButton_Click(object sender, RoutedEventArgs e)
