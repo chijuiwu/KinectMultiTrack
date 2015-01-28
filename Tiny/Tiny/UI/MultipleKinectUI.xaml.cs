@@ -65,7 +65,6 @@ namespace Tiny.UI
             {
                 return;
             }
-
             KinectCamera.Dimension firstFOVDim = result.FOVs.First().Dimension;
             int frameWidth = firstFOVDim.DepthFrameWidth;
             int frameHeight = firstFOVDim.DepthFrameHeight;
@@ -76,27 +75,22 @@ namespace Tiny.UI
                 int personIdx = 0;
                 foreach (Tracker.Result.Person person in result.People)
                 {
-                    Pen personPen = this.personColors[personIdx++];
-
+                    Pen pen = this.personColors[personIdx++];
                     foreach (Tracker.Result.SkeletonMatch match in person.SkeletonMatches)
                     {
-                        TrackingSkeleton.Position skeletonPos = match.Skeleton.CurrentPosition;
-                        SBody skeletonKinectBody = skeletonPos.Kinect;
-                        if (skeletonKinectBody.IsTracked)
+                        SBody body = match.Skeleton.CurrentPosition.Kinect;
+                        Dictionary<JointType, SJoint> joints = body.Joints;
+                        Dictionary<JointType, Tuple<Point, TrackingState>> jointPts = new Dictionary<JointType, Tuple<Point, TrackingState>>();
+                        foreach (JointType jt in joints.Keys)
                         {
-                            Dictionary<JointType, SJoint> joints = skeletonKinectBody.Joints;
-                            Dictionary<JointType, Tuple<Point, TrackingState>> jointPts = new Dictionary<JointType, Tuple<Point, TrackingState>>();
-                            foreach (JointType jt in joints.Keys)
-                            {
-                                Point point = new Point(joints[jt].DepthSpacePoint.X, joints[jt].DepthSpacePoint.Y);
-                                jointPts[jt] = Tuple.Create(point, joints[jt].TrackingState);
-                            }
-                            this.DrawBody(jointPts, dc, personPen);
+                            Point point = new Point(joints[jt].DepthSpacePoint.X, joints[jt].DepthSpacePoint.Y);
+                            jointPts[jt] = Tuple.Create(point, joints[jt].TrackingState);
                         }
+                        this.DrawBody(jointPts, dc, pen);
                     }
                 }
-                this.DrawClipRegion(frameWidth, frameHeight, this.bodyDrawingGroup);
             }
+            this.DrawClipRegion(frameWidth, frameHeight, this.bodyDrawingGroup);
         }
 
         private static readonly Brush backgroundBrush = Brushes.Black;
@@ -171,18 +165,12 @@ namespace Tiny.UI
 
         private void DrawJoint(Point joint, DrawingContext dc, Brush brush, double thickness)
         {
-            this.Dispatcher.Invoke((Action)(() =>
-            {
-                dc.DrawEllipse(brush, null, joint, thickness, thickness);
-            }));
+            dc.DrawEllipse(brush, null, joint, thickness, thickness);
         }
 
         private void DrawBone(Point from, Point to, DrawingContext dc, Pen pen)
         {
-            this.Dispatcher.Invoke((Action)(() =>
-            {
-                dc.DrawLine(pen, from, to);
-            }));
+            dc.DrawLine(pen, from, to);
         }
     }
 }

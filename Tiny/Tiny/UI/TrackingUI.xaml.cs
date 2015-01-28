@@ -24,39 +24,6 @@ namespace Tiny.UI
 {
     public partial class TrackingUI : Window, INotifyPropertyChanged
     {
-        public class JointSketch
-        {
-            public CameraSpacePoint Coordinate { get; private set; }
-            public TrackingState TrackingState { get; private set; }
-
-            public JointSketch(CameraSpacePoint coordinate, TrackingState trackingState)
-            {
-                this.Coordinate = coordinate;
-                this.TrackingState = trackingState;
-            }
-        }
-
-        public class SkeletonSketch
-        {
-            public Dictionary<JointType, JointSketch> Joints { get; private set; }
-
-            public SkeletonSketch(Dictionary<JointType, JointSketch> joints) {
-                this.Joints = joints;
-            }
-        }
-
-        public class PersonSketch
-        {
-            public Pen Pen { get; private set; }
-            public IEnumerable<SkeletonSketch> SkeletonSketches { get; private set; }
-
-            public PersonSketch(Pen pen, IEnumerable<SkeletonSketch> skeletonSketches)
-            {
-                this.Pen = pen;
-                this.SkeletonSketches = skeletonSketches;
-            }
-        }
-
         private Dictionary<string, MenuItem> referenceKinectIPs;
         private string currentReferenceKinectIP;
         private bool showAllFOV;
@@ -163,9 +130,9 @@ namespace Tiny.UI
             Debug.WriteLine("Reference FOV: " + referenceFOV.ClientIP);
             this.currentReferenceKinectIP = referenceFOV.ClientIP.ToString();
             KinectCamera.Dimension referenceDim = referenceFOV.Dimension;
-            
             int frameWidth = referenceDim.DepthFrameWidth;
             int frameHeight = referenceDim.DepthFrameHeight;
+
             using (DrawingContext dc = this.bodyDrawingGroup.Open())
             {
                 this.DrawBackground(frameWidth, frameHeight, dc);
@@ -178,37 +145,37 @@ namespace Tiny.UI
                     {
                         continue;
                     }
-                    List<SkeletonSketch> skeletonSketches = new List<SkeletonSketch>();
+                    List<SkeletonShape> skeletonShapes = new List<SkeletonShape>();
                     foreach (Tracker.Result.SkeletonMatch match in person.SkeletonMatches)
                     {
                         WBody body = match.Skeleton.CurrentPosition.Worldview;
                         KinectBody kinectBody = WBody.TransformToKinectBody(body, referenceSkeleton.InitialAngle, referenceSkeleton.InitialPosition);
 
-                        Dictionary<JointType, JointSketch> jointSketches = new Dictionary<JointType, JointSketch>();
+                        Dictionary<JointType, JointShape> jointShapes = new Dictionary<JointType, JointShape>();
                         foreach (JointType jt in kinectBody.Joints.Keys)
                         {
-                            jointSketches[jt] = new JointSketch(kinectBody.Joints[jt], body.Joints[jt].TrackingState);
+                            jointShapes[jt] = new JointShape(kinectBody.Joints[jt], body.Joints[jt].TrackingState);
                         }
-                        skeletonSketches.Add(new SkeletonSketch(jointSketches));
+                        skeletonShapes.Add(new SkeletonShape(jointShapes));
                     }
                     Pen pen = this.personColors[personIdx++];
-                    PersonSketch personSketch = new PersonSketch(pen, skeletonSketches);
+                    PersonShape personShape = new PersonShape(pen, skeletonShapes);
                     if (this.showAllFOV)
                     {
-                        this.DrawAllSkeletons(personSketch, dc);
+                        this.DrawAllSkeletons(personShape, dc);
                     }
                     else
                     {
-                        this.DrawAverageSkeletons(personSketch, dc);
+                        this.DrawAverageSkeletons(personShape, dc);
                     }
                 }
                 this.DrawClipRegion(frameWidth, frameHeight, this.bodyDrawingGroup);
             }
         }
 
-        private void DrawAllSkeletons(PersonSketch personSketch, DrawingContext dc)
+        private void DrawAllSkeletons(PersonShape personSketch, DrawingContext dc)
         {
-            foreach (SkeletonSketch skeletonSketch in personSketch.SkeletonSketches)
+            foreach (SkeletonShape skeletonSketch in personSketch.SkeletonSketches)
             {
                 Dictionary<JointType, Tuple<Point, TrackingState>> joints = new Dictionary<JointType, Tuple<Point, TrackingState>>();
                 foreach (JointType jt in skeletonSketch.Joints.Keys)
@@ -226,11 +193,11 @@ namespace Tiny.UI
             }
         }
 
-        private void DrawAverageSkeletons(PersonSketch personSketch, DrawingContext dc)
+        private void DrawAverageSkeletons(PersonShape personSketch, DrawingContext dc)
         {
             Dictionary<JointType, CameraSpacePoint> sumJoints = new Dictionary<JointType,CameraSpacePoint>();
             Dictionary<JointType, int> jointsCount = new Dictionary<JointType, int>();
-            foreach (SkeletonSketch skeletonSketch in personSketch.SkeletonSketches)
+            foreach (SkeletonShape skeletonSketch in personSketch.SkeletonSketches)
             {
                 foreach (JointType jt in skeletonSketch.Joints.Keys)
                 {
