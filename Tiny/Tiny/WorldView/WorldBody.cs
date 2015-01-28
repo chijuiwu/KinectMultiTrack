@@ -60,12 +60,15 @@ namespace Tiny.WorldView
                 {
                     if (!body.Joints.ContainsKey(jointType))
                     {
-                        throw new UntrackedJointException("[Getting initial centre position]: " + jointType + " not unavialble");
+                        //throw new UntrackedJointException("[Getting initial centre position]: " + jointType + " not unavialble");
+
+                        continue;
                     }
                     SJoint joint = body.Joints[jointType];
                     if (joint.TrackingState.Equals(TrackingState.NotTracked))
                     {
-                        throw new UntrackedJointException("[Getting initial centre position]: " + jointType + " not tracked");
+                        //throw new UntrackedJointException("[Getting initial centre position]: " + jointType + " not tracked");
+                        continue;
                     }
                     sumOfXs += joint.CameraSpacePoint.X;
                     sumOfYs += joint.CameraSpacePoint.Y;

@@ -169,8 +169,8 @@ namespace Tiny.UI
                         this.DrawAverageSkeletons(personShape, dc);
                     }
                 }
-                this.DrawClipRegion(frameWidth, frameHeight, this.bodyDrawingGroup);
             }
+            this.DrawClipRegion(frameWidth, frameHeight, this.bodyDrawingGroup);
         }
 
         private void DrawAllSkeletons(PersonShape personSketch, DrawingContext dc)
