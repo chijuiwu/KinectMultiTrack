@@ -118,142 +118,115 @@ namespace Tiny
         {
             lock (syncWriteLock)
             {
-                using (StreamWriter rawData = new StreamWriter(TrackingLogger.FILE_RAW, true))
+                using (StreamWriter rawFile = new StreamWriter(TrackingLogger.FILE_RAW, true))
                 {
                     foreach (Tracker.Result.Person person in result.People)
                     {
-                        Dictionary<JointType, CameraSpacePoint> sumJoints = new Dictionary<JointType, CameraSpacePoint>();
-                        Dictionary<JointType, int> jointsCount = new Dictionary<JointType, int>();
-
-                        Tracker.Result.SkeletonMatch reference = person.SkeletonMatches.First();
-                        Tracker.Result.KinectFOV referenceFOV = reference.FOV;
-                        TrackingSkeleton referenceSkeleton = reference.Skeleton;
-
-                        foreach (Tracker.Result.SkeletonMatch match in person.SkeletonMatches)
+                        IEnumerable<Tuple<Tracker.Result.SkeletonMatch, Dictionary<JointType, CameraSpacePoint>>> rawCoordinates = TrackingUtils.GetRawCoordinates(person);
+                        foreach (Tuple<Tracker.Result.SkeletonMatch, Dictionary<JointType, CameraSpacePoint>> coordinateTuple in rawCoordinates)
                         {
+                            Tracker.Result.SkeletonMatch match = coordinateTuple.Item1;
+                            Dictionary<JointType, CameraSpacePoint> coordinates = coordinateTuple.Item2;
+
                             // Timestamp, Person#, Skeleton#, FOV#
-                            rawData.Write(result.Timestamp + ", " + person.Id + ", " + match.Id + ", " + match.FOV.Id);
-
-                            TrackingSkeleton matchSkeleton = match.Skeleton;
-                            WBody position = matchSkeleton.CurrentPosition.Worldview;
-                            KinectBody body = WBody.TransformToKinectBody(position, referenceSkeleton.InitialAngle, referenceSkeleton.InitialPosition);
-
-                            string prefix = ", ";
+                            rawFile.Write(result.Timestamp + ", " + person.Id + ", " + match.Id + ", " + match.FOV.Id);
+                            // Joint_X, Joint_Y, Joint_Z
+                            string prefix = ",";
                             foreach (JointType jt in BodyStructure.Joints)
                             {
-                                rawData.Write(prefix);
-                                if (body.Joints.ContainsKey(jt))
+                                rawFile.Write(prefix);
+                                if (coordinates.ContainsKey(jt))
                                 {
-                                    // Joint_X, Joint_Y, Joint_Z
-                                    rawData.Write(body.Joints[jt].X + ", " + body.Joints[jt].Y + ", " + body.Joints[jt].Z);
-                                    if (sumJoints.ContainsKey(jt))
-                                    {
-                                        CameraSpacePoint accumulatePt = new CameraSpacePoint();
-                                        accumulatePt.X = sumJoints[jt].X + body.Joints[jt].X;
-                                        accumulatePt.Y = sumJoints[jt].Y + body.Joints[jt].Y;
-                                        accumulatePt.Z = sumJoints[jt].Z + body.Joints[jt].Z;
-                                        sumJoints[jt] = accumulatePt;
-                                        jointsCount[jt] += 1;
-                                    }
-                                    else
-                                    {
-                                        sumJoints[jt] = body.Joints[jt];
-                                        jointsCount[jt] = 1;
-                                    }
+                                    rawFile.Write(coordinates[jt].X + ", " + coordinates[jt].Y + ", " + coordinates[jt].Z);
                                 }
                                 else
                                 {
-                                    rawData.Write(TrackingLogger.NA + ", " + TrackingLogger.NA + ", " + TrackingLogger.NA);
+                                    rawFile.Write(TrackingLogger.NA + ", " + TrackingLogger.NA + ", " + TrackingLogger.NA);
                                 }
                             }
-                            rawData.WriteLine();
-                        } // Skeleton Match
-
+                            // newline
+                            rawFile.WriteLine();
+                        }
                         // Averages
-                        Dictionary<JointType, CameraSpacePoint> averages = new Dictionary<JointType, CameraSpacePoint>();
-                        foreach (JointType jt in sumJoints.Keys)
-                        {
-                            CameraSpacePoint averageJoint = new CameraSpacePoint();
-                            averageJoint.X = sumJoints[jt].X / jointsCount[jt];
-                            averageJoint.Y = sumJoints[jt].Y / jointsCount[jt];
-                            averageJoint.Z = sumJoints[jt].Z / jointsCount[jt];
-                            averages[jt] = averageJoint;
-                        }
+                        Dictionary<JointType, CameraSpacePoint> averages = TrackingUtils.GetAverages(rawCoordinates);
                         this.WriteAverages(averages, result.Timestamp, person.Id);
-                        this.WriteDifferences(averages, result.Timestamp, person);
+
+                        // Differences
+                        IEnumerable<Tuple<Tracker.Result.SkeletonMatch, Dictionary<JointType, CameraSpacePoint>>> differences = TrackingUtils.GetDifferences(rawCoordinates, averages);
+                        this.WriteDifferences(differences, result.Timestamp, person.Id);
                     } // Person
-                } // Raw Data
+                } // Stream Writer
             }
         }
 
-        private void WriteAverages(Dictionary<JointType, CameraSpacePoint> averages, long timestamp, uint personId)
-        {
-            using (StreamWriter averageData = new StreamWriter(TrackingLogger.FILE_AVERAGE, true))
-            {
-                // Timestamp, Person#
-                averageData.Write(timestamp + ", " + personId);
+        //private void WriteAverages(Dictionary<JointType, CameraSpacePoint> averages, long timestamp, uint personId)
+        //{
+        //    using (StreamWriter averageData = new StreamWriter(TrackingLogger.FILE_AVERAGE, true))
+        //    {
+        //        // Timestamp, Person#
+        //        averageData.Write(timestamp + ", " + personId);
 
-                string prefix = ", ";
-                foreach (JointType jt in BodyStructure.Joints)
-                {
-                    if (averages[jt].X != 0 && averages[jt].Y != 0 && averages[jt].Z != 0)
-                    {
-                        averageData.Write(prefix);
-                        CameraSpacePoint joint = averages[jt];
-                        // Joint_X, Joint_Y, Joint_Z
-                        averageData.Write(joint.X + ", " + joint.Y + ", " + joint.Z);
-                    }
-                    else
-                    {
-                        averageData.Write(TrackingLogger.NA + ", " + TrackingLogger.NA + ", " + TrackingLogger.NA);
-                    }
-                }
-                averageData.WriteLine();
-            }
-        }
-        private void WriteDifferences(Dictionary<JointType, CameraSpacePoint> averages, long timestamp, Tracker.Result.Person person)
-        {
-            using (StreamWriter differenceData = new StreamWriter(TrackingLogger.FILE_DIFFERENCE, true))
-            {
-                Tracker.Result.SkeletonMatch reference = person.SkeletonMatches.First();
-                Tracker.Result.KinectFOV referenceFOV = reference.FOV;
-                TrackingSkeleton referenceSkeleton = reference.Skeleton;
-                double referenceAngle = referenceSkeleton.InitialAngle;
-                WCoordinate referencePosition = referenceSkeleton.InitialPosition;
+        //        string prefix = ", ";
+        //        foreach (JointType jt in BodyStructure.Joints)
+        //        {
+        //            if (averages[jt].X != 0 && averages[jt].Y != 0 && averages[jt].Z != 0)
+        //            {
+        //                averageData.Write(prefix);
+        //                CameraSpacePoint joint = averages[jt];
+        //                // Joint_X, Joint_Y, Joint_Z
+        //                averageData.Write(joint.X + ", " + joint.Y + ", " + joint.Z);
+        //            }
+        //            else
+        //            {
+        //                averageData.Write(TrackingLogger.NA + ", " + TrackingLogger.NA + ", " + TrackingLogger.NA);
+        //            }
+        //        }
+        //        averageData.WriteLine();
+        //    }
+        //}
+        //private void WriteDifferences(Dictionary<JointType, CameraSpacePoint> averages, long timestamp, Tracker.Result.Person person)
+        //{
+        //    using (StreamWriter differenceData = new StreamWriter(TrackingLogger.FILE_DIFFERENCE, true))
+        //    {
+        //        Tracker.Result.SkeletonMatch reference = person.SkeletonMatches.First();
+        //        Tracker.Result.KinectFOV referenceFOV = reference.FOV;
+        //        TrackingSkeleton referenceSkeleton = reference.Skeleton;
+        //        double referenceAngle = referenceSkeleton.InitialAngle;
+        //        WCoordinate referencePosition = referenceSkeleton.InitialPosition;
 
-                foreach (Tracker.Result.SkeletonMatch match in person.SkeletonMatches)
-                {
-                    // Timestamp, Person#, Skeleton#, FOV#
-                    differenceData.Write(timestamp + ", " + person.Id + ", " + match.Id + ", " + match.FOV.Id);
+        //        foreach (Tracker.Result.SkeletonMatch match in person.SkeletonMatches)
+        //        {
+        //            // Timestamp, Person#, Skeleton#, FOV#
+        //            differenceData.Write(timestamp + ", " + person.Id + ", " + match.Id + ", " + match.FOV.Id);
 
-                    TrackingSkeleton matchSkeleton = match.Skeleton;
-                    WBody position = matchSkeleton.CurrentPosition.Worldview;
-                    KinectBody body = WBody.TransformToKinectBody(position, referenceAngle, referencePosition);
+        //            TrackingSkeleton matchSkeleton = match.Skeleton;
+        //            WBody position = matchSkeleton.CurrentPosition.Worldview;
+        //            KinectBody body = WBody.TransformToKinectBody(position, referenceAngle, referencePosition);
 
-                    string prefix = ", ";
-                    foreach (JointType jt in BodyStructure.Joints)
-                    {
-                        differenceData.Write(prefix);
-                        if (body.Joints.ContainsKey(jt))
-                        {
-                            CameraSpacePoint joint = body.Joints[jt];
-                            CameraSpacePoint average = averages[jt];
-                            CameraSpacePoint difference = new CameraSpacePoint();
-                            // Square difference
-                            difference.X = (float)Math.Pow(joint.X - average.X, 2);
-                            difference.Y = (float)Math.Pow(joint.Y - average.Y, 2);
-                            difference.Z = (float)Math.Pow(joint.Z - average.Z, 2);
-                            // Joint_X, Joint_Y, Joint_Z
-                            differenceData.Write(difference.X + ", " + difference.Y + ", " + difference.Z);
-                        }
-                        else
-                        {
-                            differenceData.Write(TrackingLogger.NA + ", " + TrackingLogger.NA + ", " + TrackingLogger.NA);
-                        }
-                    }
-                    differenceData.WriteLine();
-                } // Skeleton Match
-            }
-        }
+        //            string prefix = ", ";
+        //            foreach (JointType jt in BodyStructure.Joints)
+        //            {
+        //                differenceData.Write(prefix);
+        //                if (body.Joints.ContainsKey(jt))
+        //                {
+        //                    CameraSpacePoint joint = body.Joints[jt];
+        //                    CameraSpacePoint average = averages[jt];
+        //                    CameraSpacePoint difference = new CameraSpacePoint();
+        //                    // Square difference
+        //                    difference.X = (float)Math.Pow(joint.X - average.X, 2);
+        //                    difference.Y = (float)Math.Pow(joint.Y - average.Y, 2);
+        //                    difference.Z = (float)Math.Pow(joint.Z - average.Z, 2);
+        //                    // Joint_X, Joint_Y, Joint_Z
+        //                    differenceData.Write(difference.X + ", " + difference.Y + ", " + difference.Z);
+        //                }
+        //                else
+        //                {
+        //                    differenceData.Write(TrackingLogger.NA + ", " + TrackingLogger.NA + ", " + TrackingLogger.NA);
+        //                }
+        //            }
+        //            differenceData.WriteLine();
+        //        } // Skeleton Match
+        //    }
+        //}
     }
 }

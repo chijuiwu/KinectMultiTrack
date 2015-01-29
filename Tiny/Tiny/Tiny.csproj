@@ -78,7 +78,8 @@
     <Compile Include="Exceptions\UntrackedJointException.cs" />
     <Compile Include="KinectBody.cs" />
     <Compile Include="KinectCamera.cs" />
-    <Compile Include="TrackerUtils.cs" />
+    <Compile Include="TrackingLogger.cs" />
+    <Compile Include="TrackingUtils.cs" />
     <Compile Include="UI\JointShape.cs" />
     <Compile Include="UI\PersonShape.cs" />
     <Compile Include="UI\SkeletonVisualizer.cs" />
@@ -149,6 +150,7 @@
       <Name>KinectSerializer</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
