@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +8,6 @@ namespace Tiny.Exceptions
 {
     public class UntrackedJointException : Exception
     {
-
         public UntrackedJointException(string message)
             : base(message)
         {

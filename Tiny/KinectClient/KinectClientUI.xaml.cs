@@ -52,7 +52,7 @@ namespace KinectClient
         {
             InitializeComponent();
 
-            this.kinectSocket = new KinectSocket(localhost, kinectServerPort);
+            this.kinectSocket = new KinectSocket(kinectServerAddress, kinectServerPort);
 
             this.DataContext = this;
             this.KinectStatusText = Properties.Resources.KinectUninitialized;

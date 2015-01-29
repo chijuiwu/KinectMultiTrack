@@ -26,11 +26,11 @@ namespace Tiny.WorldView
 
             if (shoulderLeft.TrackingState.Equals(TrackingState.NotTracked))
             {
-                throw new UntrackedJointException("[Getting initial angle]: ShoulderLeft joint not tracked");
+                throw new UntrackedJointException("[Calculating initial angle]: ShoulderLeft joint not tracked");
             }
             else if (shoulderRight.TrackingState.Equals(TrackingState.NotTracked))
             {
-                throw new UntrackedJointException("[Getting initial angle]: ShoulderRight joint not tracked");
+                throw new UntrackedJointException("[Calculating initial angle]: ShoulderRight joint not tracked");
             }
 
             CameraSpacePoint shoulderLeftPos = shoulderLeft.CameraSpacePoint;
@@ -50,39 +50,44 @@ namespace Tiny.WorldView
             float totalAverageY = 0;
             float totalAverageZ = 0;
 
+            int countBodies = 0;
             foreach (SBody body in userInitialBodies)
             {
-                float sumOfXs = 0;
-                float sumOfYs = 0;
-                float sumOfZs = 0;
-
-                foreach (JointType jointType in BodyStructure.Joints)
+                if (!body.IsTracked)
                 {
-                    if (!body.Joints.ContainsKey(jointType))
-                    {
-                        //throw new UntrackedJointException("[Getting initial centre position]: " + jointType + " not unavialble");
-
-                        continue;
-                    }
-                    SJoint joint = body.Joints[jointType];
-                    if (joint.TrackingState.Equals(TrackingState.NotTracked))
-                    {
-                        //throw new UntrackedJointException("[Getting initial centre position]: " + jointType + " not tracked");
-                        continue;
-                    }
-                    sumOfXs += joint.CameraSpacePoint.X;
-                    sumOfYs += joint.CameraSpacePoint.Y;
-                    sumOfZs += joint.CameraSpacePoint.Z;
+                    continue;
                 }
-
-                totalAverageX += sumOfXs / BodyStructure.Joints.Count;
-                totalAverageY += sumOfYs / BodyStructure.Joints.Count;
-                totalAverageZ += sumOfZs / BodyStructure.Joints.Count;
+                countBodies++;
+                float sumXs = 0;
+                float sumYs = 0;
+                float sumZs = 0;
+                int countXs = 0;
+                int countYs = 0;
+                int countZs = 0;
+                foreach (JointType jt in BodyStructure.Joints)
+                {
+                    if (!body.Joints.ContainsKey(jt))
+                    {
+                        continue;
+                    }
+                    if (body.Joints[jt].TrackingState.Equals(TrackingState.NotTracked))
+                    {
+                        continue;
+                    }
+                    sumXs += body.Joints[jt].CameraSpacePoint.X;
+                    sumYs += body.Joints[jt].CameraSpacePoint.Y;
+                    sumZs += body.Joints[jt].CameraSpacePoint.Z;
+                    countXs++;
+                    countYs++;
+                    countZs++;
+                }
+                totalAverageX += sumXs / (float)countXs;
+                totalAverageY += sumYs / (float)countYs;
+                totalAverageZ += sumZs / (float)countZs;
             }
-
-            float centreX = totalAverageX / userInitialBodies.Count;
-            float centreY = totalAverageY / userInitialBodies.Count;
-            float centreZ = totalAverageZ / userInitialBodies.Count;
+            float centreX = totalAverageX / (float)countBodies;
+            float centreY = totalAverageY / (float)countBodies;
+            float centreZ = totalAverageZ / (float)countBodies;
             return new WCoordinate(centreX, centreY, centreZ);
         }
 

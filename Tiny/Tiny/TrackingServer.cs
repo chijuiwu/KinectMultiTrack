@@ -22,7 +22,7 @@ namespace Tiny
         private MultipleKinectUI multipleKinectUI;
         private TrackingUI trackingUI;
 
-        private TrackerUtils.Logger logger;
+        private TrackingLogger.TrackingLogger TrackingLogger;
 
         private event KinectCameraHandler NewKinectCameraConnected;
         private event KinectCameraHandler KinectCameraRemoved;
@@ -49,7 +49,7 @@ namespace Tiny
             trackingUIThread.SetApartmentState(ApartmentState.STA);
             trackingUIThread.Start();
 
-            this.logger = new TrackerUtils.Logger();
+            this.TrackingLogger = new TrackingLogger();
         }
 
         // Run the tracking server
@@ -151,7 +151,7 @@ namespace Tiny
         private void StartLoggingThread(object obj)
         {
             Tracker.Result result = obj as Tracker.Result;
-            this.logger.Write(result);
+            this.TrackingLogger.Write(result);
         }
     }
 }
