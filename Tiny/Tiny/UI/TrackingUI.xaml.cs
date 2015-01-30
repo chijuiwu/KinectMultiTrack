@@ -49,7 +49,7 @@ namespace Tiny.UI
 
             this.referenceKinectIPs = new Dictionary<string, MenuItem>();
             this.currentReferenceKinectIP = "";
-            this.currentViewMode = ViewMode.Skeletons;
+            this.currentViewMode = ViewMode.All;
             this.TrackingStatusText = Properties.Resources.TRACKING_CALIBRATION;
             
             this.bodyDrawingGroup = new DrawingGroup();

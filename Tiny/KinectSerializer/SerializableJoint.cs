@@ -13,7 +13,7 @@ namespace KinectSerializer
     public class SJoint : ISerializable
     {
         public const string NameTrackingState = "TrackingState";
-        public const string NameJointType = "Type";
+        public const string NameJointType = "JointType";
         public const string NameCamperaSpacePoint = "CameraSpacePoint";
         public const string NameDepthSpacePoint = "DepthSpacePoint";
         public const string NameOrientation = "Orientation";

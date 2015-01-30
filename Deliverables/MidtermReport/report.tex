@@ -1,0 +1,161 @@
+
+\documentclass[paper=a4, fontsize=11pt]{scrartcl}
+\usepackage[T1]{fontenc}
+\usepackage{fourier}
+
+\usepackage[english]{babel}															% English language/hyphenation
+\usepackage[protrusion=true,expansion=true]{microtype}	
+\usepackage{amsmath,amsfonts,amsthm} % Math packages
+\usepackage[pdftex]{graphicx}	
+\usepackage{url}
+\usepackage[margin=1in]{geometry}
+
+%%% Custom sectioning
+\usepackage{sectsty}
+\allsectionsfont{\centering \normalfont\scshape}
+
+
+%%% Custom headers/footers (fancyhdr package)
+\usepackage{fancyhdr}
+\pagestyle{fancyplain}
+\fancyhead{}											% No page header
+\fancyfoot[L]{}											% Empty 
+\fancyfoot[C]{}											% Empty
+\fancyfoot[R]{\thepage}									% Pagenumbering
+\renewcommand{\headrulewidth}{0pt}			% Remove header underlines
+\renewcommand{\footrulewidth}{0pt}				% Remove footer underlines
+\setlength{\headheight}{10pt}
+\setlength{\headsep}{10pt}
+\setlength{\textheight}{700pt}
+\setlength{\footskip}{50pt}
+
+%%% Equation and float numbering
+\numberwithin{equation}{section}		% Equationnumbering: section.eq#
+\numberwithin{figure}{section}			% Figurenumbering: section.fig#
+\numberwithin{table}{section}				% Tablenumbering: section.tab#
+
+
+%%% Maketitle metadata
+\newcommand{\horrule}[1]{\rule{\linewidth}{#1}} 	% Horizontal rule
+
+\title{
+		\vspace{-3ex}
+		\usefont{OT1}{bch}{b}{n}
+		\normalfont \normalsize \textsc{School of Computer Science} \\ [25pt]
+		\horrule{0.5pt} \\[0.4cm]
+		\huge Tiny: Tracking People using Multiple Kinects \\
+		\horrule{2pt} \\[0.5cm]
+		\vspace{-2ex}
+}
+\author{
+		\normalfont 								\normalsize
+        Chi-Jui Wu\\[-3pt]		\normalsize
+        \today
+}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Project}
+
+People detection and tracking in realtime are essential aspects of surveillance, medical monitoring, personalized robotics, and interactive systems. The task of detecting and tracking moving targets in real world environment using time-of-flight cameras is non-trivial. There are many sources of tracking errors, including sensor data noise, illumination levels, changing backgrounds, and occlusion. The current project aims to resolve the problem of occlusion in tracking people using multiple Kinects.
+
+Real world environments are complex, unpredictable, and dynamic. Occlusion occurs when a tracked target is masked by other objects in the field of view of one or more cameras. The position and movements of the occluded target are unknown, hence increasing the difficulity of detection and tracking. There are two types of occlusions that are unfavorable to any tracking algorithm. Static occlusion refers to stationary objects that obstruct the visibility of the targets, for instance, a wall blocking the view of a target. Dynamic occlusion arises from the interactions of targets in the environment. An example would be two people walking past each other, where one person temporarily blocks the view of the other person. The proposed algorithm would consider both types of occlusions.
+
+\subsection{Contributions}
+
+The goal of the project can be best illustrated in Figure \ref{fig:occlusion_description}. Both targets are occluded by the red obstacle, hence invisible to the Kinect on the other side of the obstacle. However, they are still visible to the other Kinect. The algorithm would use depth sensor information from multiple Kinects to track targets when they are not occluded, partially occluded, and fully occluded. Essentially, the algorithm leverages multiple Kinects and larger field of views to reconstruct the skeletons of the targets that would otherwise be impossible with a single Kinect. The algorithm makes tracking feasible by merging different field of views from multiple Kinects into a new aritifical coordinate system.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.8\textwidth]{occlusion_description}
+	\caption{The problem of occlusion}
+	\label{fig:occlusion_description}
+\end{figure}
+
+\section{Background}
+
+\subsection{Kinect}
+
+\section{Setup}
+
+The current project is written in C\# and uses the Microsoft Kinect SDK (v.2.0.1410.019000). The current Kinect SDK does not support multiple Kinects on a single machine; as a result, two machines are used for running two Kinects. Machine 1 is the server which runs the tracking algorithm. It has a 2.9 GHz CPU and 8.0 GB RAM. Machine 2 has a 2.3 GHz CPU and 8.0 GB RAM. Both machines runs the Microsoft Windows 8 Operating System, and they stream Kinect frames to the server on Machine 1. The server must start first before running the clients.
+
+\section{Method}
+
+\subsection{Sockets}
+
+TPC soockets are used to transmit serialized Kinect skeleton data from the client to the server.
+
+\subsection{Serialization}
+
+Kinect frames are not serializable by default in the Kinect SDK. A library is written to serialize Kinect data into bytes, which would allow clients to trasnmit them to the server through TPC sockets. The following data are serialized and transmitted:
+
+\begin{itemize}
+	\item BodyFrame
+		\begin{enumerate}
+			\item Timestamp
+			\item Depth frame width
+			\item Depth frame height
+		\end{enumerate}
+	\item Body
+		\begin{enumerate}
+			\item Is tracked
+			\item Tracking id
+		\end{enumerate}
+	\item Joint
+	  	\begin{enumerate}
+			\item Tracking state
+			\item Joint type
+			\item Camera space point
+			\item Depth space point
+			\item Orientation
+		\end{enumerate}
+\end{itemize}
+
+These data are then deserialized on the server-side. For more information on the data types, visit the Microsoft Kinect documentation [1].
+
+\subsection{Calibration}
+
+The tracking algorithm should calibrate all of the Kinects connected to the server. The process calculates the initial angle and center position of each skeleton with resepct to every Kinect. The initial angle is defined as the angle between the Kinect and the skeleton [INSERT Code Initial Angle]. The center position is defined as the average position of all the joints in the skeleton [INSERT Code Center Position]. These information are essential for converting 3D coordinates in the Kinect camera space to 3D coordinates in the world view coordinate system. This step is the foundation of matching skeletons across different Kinect field of views. Later, the algorithm would match skeletons from different field of views that have the most proximity to each other.
+
+The 3D coordinates (x, y, z) in the Kinect camera space are expressed in meters. The origin of the coordinate system (0, 0, 0) is the center position of the IR sensor on Kinect [2]. The x axis grows to the left of the sensor. The y axis grows upward. The z axis grows outward from the direction the sensor. See [Image 1].
+
+[Describe the worldview coordinate system]
+
+[Insert image 1]
+The Kinect Camera Space
+
+The server synchronizes the calibration, which is perfomred only once prior to the tracking process. For every Kinect, the algorithm uses the most recent 120 Kinect Body frames, or an equivalent of four seconds, to perform calibration. The server will automatically start the calibration process once it has received sufficient frames from all the clients. The calibration algorithm is taken from [2].
+
+\subsubsection{Initial angle}
+
+\subsubsection{Initial center postion}
+
+\subsubsection{Tracking}
+
+\section{Testing}
+
+Figure \ref{fig:fov1_all} shows the tracking of one person without occlusion using two Kinects. The left image displays the skeletons of the same person from two difference Kinects' perspective. The right image displays the person's position calculated by the tracking algorithm after matching the skeletons belonging to that person. The skeleton in white color represents the average position of the skeletons from different Kinect FOVs. 
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.8\textwidth]{fov1_all}
+	\caption{Tracking of one person with respect to the Kinect FOV of the left skeleton}
+	\label{fig:fov1_all}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.8\textwidth]{fov2_all}
+	\caption{Tracking of one person with respect to the Kinect FOV of the right skeleton}
+	\label{fig:fov2_all}
+\end{figure}
+
+\section{Evaluation}
+
+\section{References}
+
+
+\end{document}
