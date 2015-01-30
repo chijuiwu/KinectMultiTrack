@@ -22,7 +22,7 @@ namespace Tiny
         private MultipleKinectUI multipleKinectUI;
         private TrackingUI trackingUI;
 
-        private TrackingLogger.TrackingLogger TrackingLogger;
+        private TrackingLogger TrackingLogger;
 
         private event KinectCameraHandler NewKinectCameraConnected;
         private event KinectCameraHandler KinectCameraRemoved;

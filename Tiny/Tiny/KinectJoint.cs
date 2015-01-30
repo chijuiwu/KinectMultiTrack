@@ -6,18 +6,17 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Kinect;
 
-
-namespace Tiny.UI
+namespace Tiny
 {
-    class JointShape
+    public class KinectJoint
     {
-        public CameraSpacePoint Coordinate { get; private set; }
         public TrackingState TrackingState { get; private set; }
+        public CameraSpacePoint Coordinate { get; private set; }
 
-        public JointShape(CameraSpacePoint coordinate, TrackingState trackingState)
+        public KinectJoint(TrackingState state, CameraSpacePoint coordinate)
         {
+            this.TrackingState = state;
             this.Coordinate = coordinate;
-            this.TrackingState = trackingState;
         }
     }
 }

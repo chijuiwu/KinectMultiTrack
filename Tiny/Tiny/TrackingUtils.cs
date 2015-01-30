@@ -11,7 +11,7 @@ namespace Tiny
 {
     public class TrackingUtils
     {
-        public static Tracker.Result.SkeletonMatch GetReferenceMatch(Tracker.Result.Person person)
+        public static Tracker.Result.SkeletonMatch GetLocalSkeletonReference(Tracker.Result.Person person)
         {
             foreach (Tracker.Result.SkeletonMatch match in person.SkeletonMatches)
             {
@@ -23,78 +23,67 @@ namespace Tiny
             return person.SkeletonMatches.First();
         }
 
-        public static IEnumerable<Tuple<Tracker.Result.SkeletonMatch, Dictionary<JointType, CameraSpacePoint>>> GetRawCoordinates(Tracker.Result.Person person)
+        public static Dictionary<JointType, KinectJoint> GetKinectJoints(Tracker.Result.SkeletonMatch match, TrackingSkeleton reference)
         {
-            Tracker.Result.SkeletonMatch reference = TrackingUtils.GetReferenceMatch(person);
-            Tracker.Result.KinectFOV referenceFOV = reference.FOV;
-            TrackingSkeleton referenceSkeleton = reference.Skeleton;
-
-            List<Tuple<Tracker.Result.SkeletonMatch, Dictionary<JointType, CameraSpacePoint>>> raw = new List<Tuple<Tracker.Result.SkeletonMatch, Dictionary<JointType, CameraSpacePoint>>>();
-            foreach (Tracker.Result.SkeletonMatch match in person.SkeletonMatches)
-            {
-                WBody position = match.Skeleton.CurrentPosition.Worldview;
-                KinectBody body = WBody.TransformToKinectBody(position, referenceSkeleton.InitialAngle, referenceSkeleton.InitialPosition);
-                raw.Add(Tuple.Create(match, body.Joints));
-            }
-            return raw;
+            WBody position = match.Skeleton.CurrentPosition.Worldview;
+            KinectBody body = WBody.TransformToKinectBody(position, reference.InitialAngle, reference.InitialPosition);
+            return body.Joints;
         }
 
-        public static Dictionary<JointType, CameraSpacePoint> GetAverages(IEnumerable<Tuple<Tracker.Result.SkeletonMatch, Dictionary<JointType, CameraSpacePoint>>> raw)
+        public static Dictionary<JointType, KinectJoint> GetAverages(IEnumerable<Dictionary<JointType, KinectJoint>> coordinates)
         {
             Dictionary<JointType, CameraSpacePoint> sum = new Dictionary<JointType, CameraSpacePoint>();
             Dictionary<JointType, int> count = new Dictionary<JointType, int>();
-
-            foreach (Dictionary<JointType, CameraSpacePoint> jointPositions in raw.Select(t=>t.Item2))
+            foreach (Dictionary<JointType, KinectJoint> joints in coordinates)
             {
-                foreach (JointType jt in jointPositions.Keys)
+                foreach (JointType jt in joints.Keys)
                 {
                     if (sum.ContainsKey(jt))
                     {
                         CameraSpacePoint newSum = new CameraSpacePoint();
-                        newSum.X = sum[jt].X + jointPositions[jt].X;
-                        newSum.Y = sum[jt].Y + jointPositions[jt].Y;
-                        newSum.Z = sum[jt].Z + jointPositions[jt].Z;
+                        newSum.X = sum[jt].X + joints[jt].Coordinate.X;
+                        newSum.Y = sum[jt].Y + joints[jt].Coordinate.Y;
+                        newSum.Z = sum[jt].Z + joints[jt].Coordinate.Z;
                         sum[jt] = newSum;
                         count[jt] += 1;
                     }
                     else
                     {
-                        sum[jt] = jointPositions[jt];
+                        sum[jt] = joints[jt].Coordinate;
                         count[jt] = 1;
                     }
                 }
             }
-         
-            Dictionary<JointType, CameraSpacePoint> averages = new Dictionary<JointType, CameraSpacePoint>();
+            Dictionary<JointType, KinectJoint> averages = new Dictionary<JointType, KinectJoint>();
             foreach (JointType jt in sum.Keys)
             {
                 CameraSpacePoint averagePt = new CameraSpacePoint();
                 averagePt.X = sum[jt].X / (float)count[jt];
                 averagePt.Y = sum[jt].Y / (float)count[jt];
                 averagePt.Z = sum[jt].Z / (float)count[jt];
-                averages[jt] = averagePt;
+                averages[jt] = new KinectJoint(TrackingState.Tracked, averagePt);
             }
             return averages;
         }
 
-        public static IEnumerable<Tuple<Tracker.Result.SkeletonMatch, Dictionary<JointType, CameraSpacePoint>>> GetDifferences(IEnumerable<Tuple<Tracker.Result.SkeletonMatch, Dictionary<JointType, CameraSpacePoint>>> raw, Dictionary<JointType, CameraSpacePoint> averages)
+        public static IEnumerable<Tuple<Tracker.Result.SkeletonMatch, Dictionary<JointType, KinectJoint>>> GetDifferences(Dictionary<JointType, KinectJoint> averages, IEnumerable<Tuple<Tracker.Result.SkeletonMatch, Dictionary<JointType, KinectJoint>>> raw)
         {
-            List<Tuple<Tracker.Result.SkeletonMatch, Dictionary<JointType, CameraSpacePoint>>> differences = new List<Tuple<Tracker.Result.SkeletonMatch, Dictionary<JointType, CameraSpacePoint>>>();
-            foreach (Tuple<Tracker.Result.SkeletonMatch, Dictionary<JointType, CameraSpacePoint>> skeletonCoordinatesTuple in raw)
+            List<Tuple<Tracker.Result.SkeletonMatch, Dictionary<JointType, KinectJoint>>> differences = new List<Tuple<Tracker.Result.SkeletonMatch, Dictionary<JointType, KinectJoint>>>();
+            foreach (Tuple<Tracker.Result.SkeletonMatch, Dictionary<JointType, KinectJoint>> skeletonCoordinatesTuple in raw)
             {   
                 Tracker.Result.SkeletonMatch skeletonMatch = skeletonCoordinatesTuple.Item1;
-                Dictionary<JointType, CameraSpacePoint> coordinates = skeletonCoordinatesTuple.Item2;
+                Dictionary<JointType, KinectJoint> coordinates = skeletonCoordinatesTuple.Item2;
 
-                Dictionary<JointType, CameraSpacePoint> differencePerSkeleton = new Dictionary<JointType, CameraSpacePoint>();
+                Dictionary<JointType, KinectJoint> differencePerSkeleton = new Dictionary<JointType, KinectJoint>();
                 foreach (JointType jt in coordinates.Keys)
                 {
-                    CameraSpacePoint rawPt = coordinates[jt];
-                    CameraSpacePoint averagePt = averages[jt];
+                    CameraSpacePoint rawPt = coordinates[jt].Coordinate;
+                    CameraSpacePoint averagePt = averages[jt].Coordinate;
                     CameraSpacePoint differencePt = new CameraSpacePoint();
                     differencePt.X = (float)Math.Pow(rawPt.X - averagePt.X, 2);
                     differencePt.Y = (float)Math.Pow(rawPt.Y - averagePt.Y, 2);
                     differencePt.Z = (float)Math.Pow(rawPt.Z - averagePt.Z, 2);
-                    differencePerSkeleton[jt] = differencePt;
+                    differencePerSkeleton[jt] = new KinectJoint(coordinates[jt].TrackingState, differencePt);
                 }
                 differences.Add(Tuple.Create(skeletonMatch, differencePerSkeleton));
             }

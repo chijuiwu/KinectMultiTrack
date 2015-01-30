@@ -31,8 +31,9 @@
                  HorizontalAlignment="Left" Margin="341,0,0,0" VerticalAlignment="Top" Width="140" Height="30" Click="ViewModeBtn_Click" FontFamily="Microsoft Sans Serif" FontSize="14">
             <Button.ContextMenu>
                 <ContextMenu x:Name="ViewModeMenu">
-                    <MenuItem Header="All" Click="ViewMode_All_Click"/>
+                    <MenuItem Header="Skeletons" Click="ViewMode_Skeletons_Click"/>
                     <MenuItem Header="Average" Click="ViewMode_Average_Click"/>
+                    <MenuItem Header="All" Click="ViewMode_All_Click"/>
                 </ContextMenu>
             </Button.ContextMenu>
         </Button>

@@ -123,10 +123,9 @@ namespace Tiny.WorldView
         {
             KinectBody kinectSkeleton = new KinectBody();
 
-            foreach (JointType jointType in body.Joints.Keys)
+            foreach (JointType jt in body.Joints.Keys)
             {
-                WJoint worldviewJoint = body.Joints[jointType];
-                WCoordinate worldviewJointPos = worldviewJoint.Coordinate;
+                WCoordinate worldviewJoint = body.Joints[jt].Coordinate;
 
                 double sinAngle = Math.Sin(initialAngle);
                 double cosAngle = Math.Cos(initialAngle);
@@ -151,16 +150,16 @@ namespace Tiny.WorldView
                 inverseMatrix[1, 0] = determinant * swappedMatrix[1, 0];
                 inverseMatrix[1, 1] = determinant * swappedMatrix[1, 1];
 
-                float translatedX = (float)(inverseMatrix[0, 0] * worldviewJointPos.X + inverseMatrix[0, 1] * worldviewJointPos.Z);
-                float translatedY = worldviewJointPos.Y;
-                float translatedZ = (float)(inverseMatrix[1, 0] * worldviewJointPos.X + inverseMatrix[1, 1] * worldviewJointPos.Z);
+                float translatedX = (float)(inverseMatrix[0, 0] * worldviewJoint.X + inverseMatrix[0, 1] * worldviewJoint.Z);
+                float translatedY = worldviewJoint.Y;
+                float translatedZ = (float)(inverseMatrix[1, 0] * worldviewJoint.X + inverseMatrix[1, 1] * worldviewJoint.Z);
 
-                CameraSpacePoint jointKinect = new CameraSpacePoint();
-                jointKinect.X = translatedX + centrePoint.X;
-                jointKinect.Y = translatedY + centrePoint.Y;
-                jointKinect.Z = translatedZ + centrePoint.Z;
+                CameraSpacePoint coordinate = new CameraSpacePoint();
+                coordinate.X = translatedX + centrePoint.X;
+                coordinate.Y = translatedY + centrePoint.Y;
+                coordinate.Z = translatedZ + centrePoint.Z;
 
-                kinectSkeleton.Joints[jointType] = jointKinect;
+                kinectSkeleton.Joints[jt] = new KinectJoint(body.Joints[jt].TrackingState, coordinate);
             }
 
             return kinectSkeleton;

@@ -117,28 +117,31 @@ namespace Tiny
         public void Write(Tracker.Result result)
         {
             lock (syncWriteLock)
-            {
-                using (StreamWriter rawFile = new StreamWriter(TrackingLogger.FILE_RAW, true))
+            {   
+                foreach (Tracker.Result.Person person in result.People)
                 {
-                    foreach (Tracker.Result.Person person in result.People)
+                    List<Dictionary<JointType, KinectJoint>> jointsList = new List<Dictionary<JointType, KinectJoint>>();
+                    List<Tuple<Tracker.Result.SkeletonMatch, Dictionary<JointType, KinectJoint>>> skeletonMatchJoints = new List<Tuple<Tracker.Result.SkeletonMatch, Dictionary<JointType, KinectJoint>>>();
+                        
+                    using (StreamWriter rawFile = new StreamWriter(TrackingLogger.FILE_RAW, true))
                     {
-                        IEnumerable<Tuple<Tracker.Result.SkeletonMatch, Dictionary<JointType, CameraSpacePoint>>> rawCoordinates = TrackingUtils.GetRawCoordinates(person);
-                        foreach (Tuple<Tracker.Result.SkeletonMatch, Dictionary<JointType, CameraSpacePoint>> coordinateTuple in rawCoordinates)
+                        Tracker.Result.SkeletonMatch reference = TrackingUtils.GetLocalSkeletonReference(person);
+                        foreach (Tracker.Result.SkeletonMatch match in person.SkeletonMatches)
                         {
-                            Tracker.Result.SkeletonMatch match = coordinateTuple.Item1;
-                            Dictionary<JointType, CameraSpacePoint> coordinates = coordinateTuple.Item2;
-
+                            Dictionary<JointType, KinectJoint> joints = TrackingUtils.GetKinectJoints(match, reference.Skeleton);
+                            jointsList.Add(joints);
+                            skeletonMatchJoints.Add(Tuple.Create(match, joints));
+                            
                             // Timestamp, Person#, Skeleton#, FOV#
                             rawFile.Write(result.Timestamp + ", " + person.Id + ", " + match.Id + ", " + match.FOV.Id);
-
                             // Joint_X, Joint_Y, Joint_Z
                             string prefix = ",";
                             foreach (JointType jt in BodyStructure.Joints)
                             {
                                 rawFile.Write(prefix);
-                                if (coordinates.ContainsKey(jt))
+                                if (joints.ContainsKey(jt))
                                 {
-                                    rawFile.Write(coordinates[jt].X + ", " + coordinates[jt].Y + ", " + coordinates[jt].Z);
+                                    rawFile.Write(joints[jt].Coordinate.X + ", " + joints[jt].Coordinate.Y + ", " + joints[jt].Coordinate.Z);
                                 }
                                 else
                                 {
@@ -148,24 +151,25 @@ namespace Tiny
                             // newline
                             rawFile.WriteLine();
                         }
-                        // Averages
-                        Dictionary<JointType, CameraSpacePoint> averages = TrackingUtils.GetAverages(rawCoordinates);
-                        this.WriteAverages(averages, result.Timestamp, person.Id);
+                    }
+                    // Averages
+                    Dictionary<JointType, KinectJoint> averages = TrackingUtils.GetAverages(jointsList);
+                    this.WriteAverages(result.Timestamp, person.Id, averages);
 
-                        // Differences
-                        IEnumerable<Tuple<Tracker.Result.SkeletonMatch, Dictionary<JointType, CameraSpacePoint>>> differences = TrackingUtils.GetDifferences(rawCoordinates, averages);
-                        this.WriteDifferences(differences, result.Timestamp, person.Id);
-                    } // Person
-                } // Stream Writer
+                    // Differences
+                    IEnumerable<Tuple<Tracker.Result.SkeletonMatch, Dictionary<JointType, KinectJoint>>> differences = TrackingUtils.GetDifferences(averages, skeletonMatchJoints);
+                    this.WriteDifferences(result.Timestamp, person.Id, differences);
+                }
             }
         }
 
-        private void WriteAverages(Dictionary<JointType, CameraSpacePoint> averages, long timestamp, uint personId)
+        private void WriteAverages(long timestamp, uint personId, Dictionary<JointType, KinectJoint> averages)
         {
             using (StreamWriter averageFile = new StreamWriter(TrackingLogger.FILE_AVERAGE, true))
             {
                 // Timestamp, Person#
                 averageFile.Write(timestamp + ", " + personId);
+
                 // Joint_X, Joint_Y, Joint_Z
                 string prefix = ",";
                 foreach (JointType jt in BodyStructure.Joints)
@@ -173,7 +177,7 @@ namespace Tiny
                     averageFile.Write(prefix);
                     if (averages.ContainsKey(jt))
                     {
-                        averageFile.Write(averages[jt].X + ", " + averages[jt].Y + ", " + averages[jt].Z);
+                        averageFile.Write(averages[jt].Coordinate.X + ", " + averages[jt].Coordinate.Y + ", " + averages[jt].Coordinate.Z);
                     }
                     else
                     {
@@ -184,14 +188,14 @@ namespace Tiny
                 averageFile.WriteLine();
             }
         }
-        private void WriteDifferences(IEnumerable<Tuple<Tracker.Result.SkeletonMatch, Dictionary<JointType, CameraSpacePoint>>> differences, long timestamp, uint personId)
+        private void WriteDifferences(long timestamp, uint personId, IEnumerable<Tuple<Tracker.Result.SkeletonMatch, Dictionary<JointType, KinectJoint>>> differences)
         {
             using (StreamWriter differenceFile = new StreamWriter(TrackingLogger.FILE_DIFFERENCE, true))
             {
-                foreach (Tuple<Tracker.Result.SkeletonMatch, Dictionary<JointType, CameraSpacePoint>> coordinateTuple in differences)
+                foreach (Tuple<Tracker.Result.SkeletonMatch, Dictionary<JointType, KinectJoint>> coordinateTuple in differences)
                 {
                     Tracker.Result.SkeletonMatch match = coordinateTuple.Item1;
-                    Dictionary<JointType, CameraSpacePoint> coordinates = coordinateTuple.Item2;
+                    Dictionary<JointType, KinectJoint> coordinates = coordinateTuple.Item2;
 
                     // Timestamp, Person#, Skeleton#, FOV#
                     differenceFile.Write(timestamp + ", " + personId + ", " + match.Id + ", " + match.FOV.Id);
@@ -203,7 +207,7 @@ namespace Tiny
                         differenceFile.Write(prefix);
                         if (coordinates.ContainsKey(jt))
                         {
-                            differenceFile.Write(coordinates[jt].X + ", " + coordinates[jt].Y + ", " + coordinates[jt].Z);
+                            differenceFile.Write(coordinates[jt].Coordinate.X + ", " + coordinates[jt].Coordinate.Y + ", " + coordinates[jt].Coordinate.Z);
                         }
                         else
                         {

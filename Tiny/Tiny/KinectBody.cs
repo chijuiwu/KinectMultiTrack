@@ -9,11 +9,11 @@ namespace Tiny
 {
     public class KinectBody
     {
-        public Dictionary<JointType, CameraSpacePoint> Joints { get; private set; }
+        public Dictionary<JointType, KinectJoint> Joints { get; private set; }
 
         public KinectBody()
         {
-            this.Joints = new Dictionary<JointType, CameraSpacePoint>();
+            this.Joints = new Dictionary<JointType, KinectJoint>();
         }
     }
 }
