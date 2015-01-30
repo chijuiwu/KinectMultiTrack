@@ -70,9 +70,9 @@ namespace Tiny
 
             this.unprocessedBodyFrames = new Stack<SBodyFrame>();
 
-            Thread kinectUIThread = new Thread(new ParameterizedThreadStart(this.StartKinectUIThread));
-            kinectUIThread.SetApartmentState(ApartmentState.STA);
-            kinectUIThread.Start(ip);
+            //Thread kinectUIThread = new Thread(new ParameterizedThreadStart(this.StartKinectUIThread));
+            //kinectUIThread.SetApartmentState(ApartmentState.STA);
+            //kinectUIThread.Start(ip);
         }
 
         private void StartKinectUIThread(object obj)

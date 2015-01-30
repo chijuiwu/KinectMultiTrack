@@ -153,11 +153,11 @@ namespace Tiny.UI
                     List<Dictionary<JointType, KinectJoint>> skeletonJointsList = new List<Dictionary<JointType, KinectJoint>>();
                     foreach (Tracker.Result.SkeletonMatch match in person.SkeletonMatches)
                     {
-                        Dictionary<JointType, KinectJoint> rawCoordinates = TrackingUtils.GetKinectJoints(match, reference);
-                        skeletonJointsList.Add(rawCoordinates);
+                        Dictionary<JointType, KinectJoint> joints = TrackingUtils.GetKinectJoints(match, reference);
+                        skeletonJointsList.Add(joints);
                     }
                     // Average
-                    Dictionary<JointType, KinectJoint> averageCoordinates = TrackingUtils.GetAverages(skeletonJointsList);
+                    Dictionary<JointType, KinectJoint> averageJoints = TrackingUtils.GetAverages(skeletonJointsList);
 
                     Pen pen = this.personColors[personIdx++];
                     if (this.currentViewMode == ViewMode.Skeletons)
@@ -166,11 +166,11 @@ namespace Tiny.UI
                     }
                     else if (this.currentViewMode == ViewMode.Average)
                     {
-                        this.DrawAverageSkeletons(averageCoordinates, dc, pen);
+                        this.DrawAverageSkeletons(averageJoints, dc, pen);
                     }
                     else if (this.currentViewMode == ViewMode.All)
                     {
-                        this.DrawSkeletonsAndAverage(skeletonJointsList, averageCoordinates, dc, pen);
+                        this.DrawSkeletonsAndAverage(skeletonJointsList, averageJoints, dc, pen);
                     }
                 }
             }

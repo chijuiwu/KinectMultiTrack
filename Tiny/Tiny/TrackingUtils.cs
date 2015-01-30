@@ -30,11 +30,11 @@ namespace Tiny
             return body.Joints;
         }
 
-        public static Dictionary<JointType, KinectJoint> GetAverages(IEnumerable<Dictionary<JointType, KinectJoint>> coordinates)
+        public static Dictionary<JointType, KinectJoint> GetAverages(IEnumerable<Dictionary<JointType, KinectJoint>> jointsList)
         {
             Dictionary<JointType, CameraSpacePoint> sum = new Dictionary<JointType, CameraSpacePoint>();
             Dictionary<JointType, int> count = new Dictionary<JointType, int>();
-            foreach (Dictionary<JointType, KinectJoint> joints in coordinates)
+            foreach (Dictionary<JointType, KinectJoint> joints in jointsList)
             {
                 foreach (JointType jt in joints.Keys)
                 {
