@@ -22,5 +22,10 @@ namespace Tiny
             this.server = new TrackingServer(App.port, App.kinects);
             this.server.Run();
         }
+
+        private void Application_Exit(object sender, ExitEventArgs e)
+        {
+            this.server.Stop();
+        }
     }
 }

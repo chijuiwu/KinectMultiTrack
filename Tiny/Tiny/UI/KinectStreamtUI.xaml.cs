@@ -102,7 +102,7 @@ namespace Tiny.UI
         private void DrawBody(Dictionary<JointType, Tuple<Point, TrackingState>> joints, DrawingContext dc, Pen bonePen)
         {
             // Draw bones
-            foreach (var bone in BodyStructure.Bones)
+            foreach (var bone in SkeletonStructure.Bones)
             {
                 JointType jt0 = bone.Item1;
                 JointType jt1 = bone.Item2;

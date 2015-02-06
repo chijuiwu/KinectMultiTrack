@@ -7,7 +7,7 @@ using Microsoft.Kinect;
 
 namespace KinectSerializer
 {
-    public class BodyStructure
+    public class SkeletonStructure
     {
         // All joints
         public static List<JointType> Joints = new List<JointType>()

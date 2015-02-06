@@ -64,7 +64,7 @@ namespace Tiny.WorldView
                 int countXs = 0;
                 int countYs = 0;
                 int countZs = 0;
-                foreach (JointType jt in BodyStructure.Joints)
+                foreach (JointType jt in SkeletonStructure.Joints)
                 {
                     if (!body.Joints.ContainsKey(jt))
                     {

@@ -19,10 +19,9 @@ namespace Tiny
         private Thread acceptKinectConnectionThread;
 
         private Tracker tracker;
+        private int logFlushInterval = 3000;
         private MultipleKinectUI multipleKinectUI;
         private TrackingUI trackingUI;
-
-        private TrackingLogger TrackingLogger;
 
         private event KinectCameraHandler NewKinectCameraConnected;
         private event KinectCameraHandler KinectCameraRemoved;
@@ -33,6 +32,7 @@ namespace Tiny
 
         private event WorldViewHandler TrackingUpdate;
         private delegate void WorldViewHandler(Tracker.Result result);
+
 
         public TrackingServer(int port, int kinectCount)
         {
@@ -49,7 +49,7 @@ namespace Tiny
             trackingUIThread.SetApartmentState(ApartmentState.STA);
             trackingUIThread.Start();
 
-            this.TrackingLogger = new TrackingLogger();
+            Timer logFlushTimer = new Timer(new TimerCallback(this.FlushLogsCallback), null, this.logFlushInterval, this.logFlushInterval);
         }
 
         // Run the tracking server
@@ -57,6 +57,12 @@ namespace Tiny
         {
             this.acceptKinectConnectionThread.Start();
             Debug.WriteLine(Tiny.Properties.Resources.SERVER_START + this.kinectListener.LocalEndpoint);
+        }
+
+        public void Stop()
+        {
+            TrackingLogger.Flush();
+            TrackingLogger.Close();
         }
 
         private void StartMultipleKinectUIThread()
@@ -77,14 +83,19 @@ namespace Tiny
             Dispatcher.Run();
         }
 
+        private void FlushLogsCallback(Object obj)
+        {
+            TrackingLogger.Flush();
+        }
+
         private void AcceptKinectConnectionThread()
         {
             this.kinectListener.Start();
             while (true)
             {
                 TcpClient kinectClient = this.kinectListener.AcceptTcpClient();
-                Thread kinectClientThread = new Thread(new ParameterizedThreadStart(this.HandleKinectConnectionThread));
-                kinectClientThread.Start(kinectClient);
+                Thread kinectClientThread = new Thread(() => this.HandleKinectConnectionThread(kinectClient));
+                kinectClientThread.Start();
             }
         }
 
@@ -144,13 +155,8 @@ namespace Tiny
             this.MultipleKinectUpdate(result);
             this.TrackingUpdate(result);
 
-            Thread loggingThread = new Thread(new ParameterizedThreadStart(this.StartLoggingThread));
-            loggingThread.Start(result);
-        }
-
-        private void StartLoggingThread(object obj)
-        {
-            this.TrackingLogger.Write(obj as Tracker.Result);
+            Thread loggingThread = new Thread(() => TrackingLogger.Write(result));
+            loggingThread.Start();
         }
     }
 }
