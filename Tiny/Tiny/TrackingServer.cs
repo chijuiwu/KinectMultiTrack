@@ -144,8 +144,8 @@ namespace Tiny
             this.MultipleKinectUpdate(result);
             this.TrackingUpdate(result);
 
-            //Thread loggingThread = new Thread(new ParameterizedThreadStart(this.StartLoggingThread));
-            //loggingThread.Start(result);
+            Thread loggingThread = new Thread(new ParameterizedThreadStart(this.StartLoggingThread));
+            loggingThread.Start(result);
         }
 
         private void StartLoggingThread(object obj)

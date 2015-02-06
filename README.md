@@ -5,18 +5,19 @@ This repository is a showcase of my, Chi-Jui Wu, Seniour Honours Project (Disser
 
 The project is about tracking people and resolving occlusion in realistic environments using multiple Kinects.
 
-## TODO...
+## TODO
 
-* Literature review
-* Code refactor
-* Midterm report
-* Testing of differences in world coordinates
+* Code refactoring
+* Report
+* Fix UI lag
+* Fix UI crash/rendering when moving too close to the Kinects
+* Test logging
+* Automate tracking process
 * Extend for angle
-* Extend for more people
-* Testing for occlusions
+* Accommodate for occlusions
 * User study
 
-## Completed...
+## Completed
 
 * DOER and Ethics (26th September, 2014)
 * Presentation (8th October, 2014)
@@ -27,6 +28,8 @@ The project is about tracking people and resolving occlusion in realistic enviro
 * Kinect Client and Server Sockets (5th November, 2014)
 * Kinect Visualizer (13th November, 2014)
 * Kinect Calibration (4th December, 2014)
+* Preliminary Skeleton Matching (30th January, 2015)
+* Display Skeletons wrt Different Kienct FOVs (30th January, 2015)
 
 ## Project Description
 
