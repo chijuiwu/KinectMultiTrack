@@ -150,8 +150,7 @@ namespace Tiny
 
         private void StartLoggingThread(object obj)
         {
-            Tracker.Result result = obj as Tracker.Result;
-            this.TrackingLogger.Write(result);
+            this.TrackingLogger.Write(obj as Tracker.Result);
         }
     }
 }

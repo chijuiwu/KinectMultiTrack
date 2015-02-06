@@ -13,7 +13,7 @@ namespace Tiny
     public class TrackingSkeleton
     {
         // 100 seconds
-        private readonly int MAX_POSITIONS = 3000;
+        private readonly int MAX_POSITIONS_STORED = 3000;
 
         public class Position
         {
@@ -76,7 +76,7 @@ namespace Tiny
 
         public void UpdatePosition(SBody body, WBody worldviewBody)
         {
-            if (this.Positions.Count() > MAX_POSITIONS)
+            if (this.Positions.Count() > MAX_POSITIONS_STORED)
             {
                 this.Positions.Clear();
             }

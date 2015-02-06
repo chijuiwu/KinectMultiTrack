@@ -33,8 +33,7 @@ namespace Tiny.UI
             this.DataContext = this;
             this.bodyDrawingGroup = new DrawingGroup();
             this.bodyImageSource = new DrawingImage(this.bodyDrawingGroup);
-            // HACK: Max 6 Kinects
-            // Frames from a kinect have the same color
+            // HACK: Max 6 people
             this.personColors = new List<Pen>();
             this.personColors.Add(new Pen(Brushes.Red, 6));
             this.personColors.Add(new Pen(Brushes.Orange, 6));
