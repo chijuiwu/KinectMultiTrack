@@ -19,7 +19,9 @@ namespace Tiny
         private Thread acceptKinectConnectionThread;
 
         private Tracker tracker;
-        private int logFlushInterval = 3000;
+        private Stopwatch writeLogStopwatch;
+        private int writeLogInterval = 250;
+        private int flushLogInterval = 3000;
         private MultipleKinectUI multipleKinectUI;
         private TrackingUI trackingUI;
 
@@ -49,7 +51,9 @@ namespace Tiny
             trackingUIThread.SetApartmentState(ApartmentState.STA);
             trackingUIThread.Start();
 
-            Timer logFlushTimer = new Timer(new TimerCallback(this.FlushLogsCallback), null, this.logFlushInterval, this.logFlushInterval);
+            this.writeLogStopwatch = new Stopwatch();
+            this.writeLogStopwatch.Start();
+            Timer flushLogTimer = new Timer(new TimerCallback(this.FlushLogsCallback), null, this.flushLogInterval, this.flushLogInterval);
         }
 
         // Run the tracking server
@@ -83,7 +87,7 @@ namespace Tiny
             Dispatcher.Run();
         }
 
-        private void FlushLogsCallback(Object obj)
+        private void FlushLogsCallback(object obj)
         {
             TrackingLogger.Flush();
         }
@@ -155,8 +159,12 @@ namespace Tiny
             this.MultipleKinectUpdate(result);
             this.TrackingUpdate(result);
 
-            Thread loggingThread = new Thread(() => TrackingLogger.Write(result));
-            loggingThread.Start();
+            if (this.writeLogStopwatch.ElapsedMilliseconds > this.writeLogInterval)
+            {
+                Thread writeLogThread = new Thread(() => TrackingLogger.Write(result));
+                writeLogThread.Start();
+                this.writeLogStopwatch.Restart();
+            }
         }
     }
 }

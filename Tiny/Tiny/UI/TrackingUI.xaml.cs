@@ -156,21 +156,24 @@ namespace Tiny.UI
                         Dictionary<JointType, KinectJoint> joints = TrackingUtils.GetKinectJoints(match, reference);
                         skeletonJointsList.Add(joints);
                     }
-                    // Average
-                    Dictionary<JointType, KinectJoint> averageJoints = TrackingUtils.GetAverages(skeletonJointsList);
 
                     Pen pen = this.personColors[personIdx++];
                     if (this.currentViewMode == ViewMode.Skeletons)
                     {
                         this.DrawSkeletons(skeletonJointsList, dc, pen);
                     }
-                    else if (this.currentViewMode == ViewMode.Average)
+                    else
                     {
-                        this.DrawAverageSkeletons(averageJoints, dc, pen);
-                    }
-                    else if (this.currentViewMode == ViewMode.All)
-                    {
-                        this.DrawSkeletonsAndAverage(skeletonJointsList, averageJoints, dc, pen);
+                        // Average
+                        Dictionary<JointType, KinectJoint> averageJoints = TrackingUtils.GetAverages(skeletonJointsList);
+                        if (this.currentViewMode == ViewMode.Average)
+                        {
+                            this.DrawAverageSkeletons(averageJoints, dc, TrackingUI.averageBonePen);
+                        }
+                        else if (this.currentViewMode == ViewMode.All)
+                        {
+                            this.DrawSkeletonsAndAverage(skeletonJointsList, averageJoints, dc, pen);
+                        }
                     }
                 }
             }
@@ -192,7 +195,7 @@ namespace Tiny.UI
         private void DrawSkeletonsAndAverage(IEnumerable<Dictionary<JointType, KinectJoint>> skeletonJoints, Dictionary<JointType, KinectJoint> average, DrawingContext dc, Pen trackedBonePen)
         {
             this.DrawSkeletons(skeletonJoints, dc, trackedBonePen);
-            this.DrawAverageSkeletons(average, dc, TrackingUI.specialTrackedBonePen);
+            this.DrawAverageSkeletons(average, dc, TrackingUI.averageBonePen);
         }
 
         private void RenderJoints(Dictionary<JointType, KinectJoint> coordinates, DrawingContext dc, Pen pen)
@@ -221,7 +224,7 @@ namespace Tiny.UI
         // Bones
         private static readonly Pen defaultTrackedBonePen = new Pen(Brushes.Blue, 6);
         private static readonly Pen inferredBonePen = new Pen(Brushes.Gray, 1);
-        private static readonly Pen specialTrackedBonePen = new Pen(Brushes.White, 6);
+        private static readonly Pen averageBonePen = new Pen(Brushes.White, 6);
 
         private void DrawBackground(int frameWidth, int frameHeight, DrawingContext dc)
         {
