@@ -33,6 +33,7 @@ namespace Tiny
         }
 
         public ulong Id { get; private set; }
+        public long Timestamp { get; private set; }
         public double InitialAngle { get; set; }
         public WCoordinate InitialPosition { get; set; }
         public Stack<TrackingSkeleton.Position> Positions { get; private set; }
@@ -52,30 +53,34 @@ namespace Tiny
             }
         }
 
-        public TrackingSkeleton(ulong id)
+        public TrackingSkeleton(ulong id, long timestamp)
         {
             this.Id = id;
+            this.Timestamp = timestamp;
             this.Positions = new Stack<TrackingSkeleton.Position>();
         }
 
-        public TrackingSkeleton(ulong id, double initAngle, WCoordinate initPos)
+        public TrackingSkeleton(ulong id, long timestamp, double initAngle, WCoordinate initPos)
         {
             this.Id = id;
+            this.Timestamp = timestamp;
             this.InitialAngle = initAngle;
             this.InitialPosition = initPos;
             this.Positions = new Stack<TrackingSkeleton.Position>();
         }
 
-        public TrackingSkeleton(ulong id, double initAngle, WCoordinate initPos, Stack<TrackingSkeleton.Position> positions)
+        public TrackingSkeleton(ulong id, long timestamp, double initAngle, WCoordinate initPos, Stack<TrackingSkeleton.Position> positions)
         {
             this.Id = id;
+            this.Timestamp = timestamp;
             this.InitialAngle = initAngle;
             this.InitialPosition = initPos;
             this.Positions = positions;
         }
 
-        public void UpdatePosition(SBody body, WBody worldviewBody)
+        public void UpdatePosition(long timestamp, SBody body, WBody worldviewBody)
         {
+            this.Timestamp = timestamp;
             if (this.Positions.Count() > MAX_POSITIONS_STORED)
             {
                 this.Positions.Clear();
@@ -90,11 +95,11 @@ namespace Tiny
             {
                 Stack<TrackingSkeleton.Position> currentPos = new Stack<TrackingSkeleton.Position>();
                 currentPos.Push(TrackingSkeleton.Position.Copy(skeleton.Positions.Peek()));
-                return new TrackingSkeleton(skeleton.Id, skeleton.InitialAngle, skeleton.InitialPosition, currentPos);
+                return new TrackingSkeleton(skeleton.Id, skeleton.Timestamp, skeleton.InitialAngle, skeleton.InitialPosition, currentPos);
             }
             else
             {
-                return new TrackingSkeleton(skeleton.Id, skeleton.InitialAngle, skeleton.InitialPosition);
+                return new TrackingSkeleton(skeleton.Id, skeleton.Timestamp, skeleton.InitialAngle, skeleton.InitialPosition);
             }
         }
 

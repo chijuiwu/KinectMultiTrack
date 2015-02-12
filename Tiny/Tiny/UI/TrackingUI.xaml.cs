@@ -151,7 +151,7 @@ namespace Tiny.UI
 
                     // Skeletons
                     List<Dictionary<JointType, KinectJoint>> skeletonJointsList = new List<Dictionary<JointType, KinectJoint>>();
-                    foreach (Tracker.Result.SkeletonMatch match in person.SkeletonMatches)
+                    foreach (Tracker.Result.Replica match in person.Replicas)
                     {
                         Dictionary<JointType, KinectJoint> joints = TrackingUtils.GetKinectJoints(match, reference);
                         skeletonJointsList.Add(joints);

@@ -18,46 +18,22 @@ namespace KinectSerializer
         public const string NameTrackingId = "TrackingId";
         public const string NameJointsDictionary = "JointsDict";
 
-        private bool isTracked;
-        private ulong trackingId;
-        private Dictionary<JointType, SJoint> jointsDict;
-
-        public bool IsTracked
-        {
-            get
-            {
-                return this.isTracked;
-            }
-        }
-
-        public ulong TrackingId
-        {
-            get
-            {
-                return this.trackingId;
-            }
-        }
-
-        public Dictionary<JointType, SJoint> Joints
-        {
-            get
-            {
-                return this.jointsDict;
-            }
-        }
+        public bool IsTracked { get; private set; }
+        public ulong TrackingId { get; private set; }
+        public Dictionary<JointType, SJoint> Joints { get; private set; }
 
         public SBody(bool isTracked, ulong trackingId)
         {
-            this.isTracked = isTracked;
-            this.trackingId = trackingId;
-            this.jointsDict = new Dictionary<JointType, SJoint>();
+            this.IsTracked = isTracked;
+            this.TrackingId = trackingId;
+            this.Joints = new Dictionary<JointType, SJoint>();
         }
 
         protected SBody(SerializationInfo info, StreamingContext ctx)
         {
-            this.isTracked = (bool)info.GetValue(SBody.NameIsTracked, typeof(bool));
-            this.trackingId = (ulong)info.GetValue(SBody.NameTrackingId, typeof(ulong));
-            this.jointsDict = (Dictionary<JointType, SJoint>)info.GetValue(SBody.NameJointsDictionary, typeof(Dictionary<JointType, SJoint>));
+            this.IsTracked = (bool)info.GetValue(SBody.NameIsTracked, typeof(bool));
+            this.TrackingId = (ulong)info.GetValue(SBody.NameTrackingId, typeof(ulong));
+            this.Joints = (Dictionary<JointType, SJoint>)info.GetValue(SBody.NameJointsDictionary, typeof(Dictionary<JointType, SJoint>));
         }
 
         [SecurityPermission(SecurityAction.Demand, SerializationFormatter = true)]
@@ -65,7 +41,7 @@ namespace KinectSerializer
         {
             info.AddValue(SBody.NameIsTracked, this.IsTracked, typeof(bool));
             info.AddValue(SBody.NameTrackingId, this.TrackingId, typeof(ulong));
-            info.AddValue(SBody.NameJointsDictionary, this.jointsDict, typeof(Dictionary<JointType, SJoint>));
+            info.AddValue(SBody.NameJointsDictionary, this.Joints, typeof(Dictionary<JointType, SJoint>));
         }
 
         public static SBody Copy(SBody body)

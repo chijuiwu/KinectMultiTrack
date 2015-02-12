@@ -75,7 +75,7 @@ namespace Tiny.UI
                 foreach (Tracker.Result.Person person in result.People)
                 {
                     Pen pen = this.personColors[personIdx++];
-                    foreach (Tracker.Result.SkeletonMatch match in person.SkeletonMatches)
+                    foreach (Tracker.Result.Replica match in person.Replicas)
                     {
                         SBody body = match.Skeleton.CurrentPosition.Kinect;
                         Dictionary<JointType, SJoint> joints = body.Joints;

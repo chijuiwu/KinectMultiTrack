@@ -19,10 +19,10 @@ namespace KinectSerializer
         public const string NameDepthFrameWidth = "DepthFrameWidth";
         public const string NameDepthFrameHeight = "DepthFrameHeight";
 
-        private long timeStamp;
-        private int depthFrameWidth;
-        private int depthFrameHeight;
-        private List<SBody> bodies;
+        public long TimeStamp { get; private set; }
+        public int DepthFrameWidth { get; private set; }
+        public int DepthFrameHeight { get; private set; }
+        public List<SBody> Bodies { get; private set; }
 
         public SBodyFrame(TimeSpan relativeTime, FrameDescription depthFrameDescription)
             : this(relativeTime.Ticks, depthFrameDescription.Width, depthFrameDescription.Height)
@@ -31,64 +31,32 @@ namespace KinectSerializer
 
         public SBodyFrame(long timeStamp, int depthFrameWidth, int depthFrameHeight)
         {
-            this.timeStamp = timeStamp;
-            this.depthFrameWidth = depthFrameWidth;
-            this.depthFrameHeight = depthFrameHeight;
-            this.bodies = new List<SBody>();
+            this.TimeStamp = timeStamp;
+            this.DepthFrameWidth = depthFrameWidth;
+            this.DepthFrameHeight = depthFrameHeight;
+            this.Bodies = new List<SBody>();
         }
 
         public void addSerializableBody(SBody body)
         {
-            this.bodies.Add(body);
+            this.Bodies.Add(body);
         }
 
         protected SBodyFrame(SerializationInfo info, StreamingContext ctx)
         {
-            this.timeStamp = (long)info.GetValue(SBodyFrame.NameTimeStamp, typeof(long));
-            this.bodies = (List<SBody>)info.GetValue(SBodyFrame.NameBodyList, typeof(List<SBody>));
-            this.depthFrameWidth = (int)info.GetValue(SBodyFrame.NameDepthFrameWidth, typeof(int));
-            this.depthFrameHeight = (int)info.GetValue(SBodyFrame.NameDepthFrameHeight, typeof(int));
+            this.TimeStamp = (long)info.GetValue(SBodyFrame.NameTimeStamp, typeof(long));
+            this.Bodies = (List<SBody>)info.GetValue(SBodyFrame.NameBodyList, typeof(List<SBody>));
+            this.DepthFrameWidth = (int)info.GetValue(SBodyFrame.NameDepthFrameWidth, typeof(int));
+            this.DepthFrameHeight = (int)info.GetValue(SBodyFrame.NameDepthFrameHeight, typeof(int));
         }
 
         [SecurityPermission(SecurityAction.Demand, SerializationFormatter = true)]
         public void GetObjectData(SerializationInfo info, StreamingContext ctx)
         {
-            info.AddValue(SBodyFrame.NameTimeStamp, this.timeStamp, typeof(long));
-            info.AddValue(SBodyFrame.NameBodyList, this.bodies, typeof(List<SBody>));
-            info.AddValue(SBodyFrame.NameDepthFrameWidth, this.depthFrameWidth, typeof(int));
-            info.AddValue(SBodyFrame.NameDepthFrameHeight, this.depthFrameHeight, typeof(int));
-        }
-
-        public long TimeStamp
-        {
-            get
-            {
-                return this.timeStamp;
-            }
-        }
-
-        public List<SBody> Bodies
-        {
-            get
-            {
-                return this.bodies;
-            }
-        }
-
-        public int DepthFrameWidth
-        {
-            get
-            {
-                return this.depthFrameWidth;
-            }
-        }
-
-        public int DepthFrameHeight
-        {
-            get
-            {
-                return this.depthFrameHeight;
-            }
+            info.AddValue(SBodyFrame.NameTimeStamp, this.TimeStamp, typeof(long));
+            info.AddValue(SBodyFrame.NameBodyList, this.Bodies, typeof(List<SBody>));
+            info.AddValue(SBodyFrame.NameDepthFrameWidth, this.DepthFrameWidth, typeof(int));
+            info.AddValue(SBodyFrame.NameDepthFrameHeight, this.DepthFrameHeight, typeof(int));
         }
 
         public static SBodyFrame Copy(SBodyFrame bodyFrame)

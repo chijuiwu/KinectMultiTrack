@@ -100,12 +100,13 @@ namespace Tiny
             }
             this.unprocessedBodyFrames.Clear();
 
-            SBodyFrame frameZeroth = calibrationFrames[0];
-            for (int personIdx = 0; personIdx < frameZeroth.Bodies.Count; personIdx++)
+            SBodyFrame frameFirst = calibrationFrames[0];
+            SBodyFrame frameLast = calibrationFrames[Tracker.CALIBRATION_FRAMES - 1];
+            for (int personIdx = 0; personIdx < frameFirst.Bodies.Count; personIdx++)
             {
-                ulong trackingId = frameZeroth.Bodies[personIdx].TrackingId;
-                TrackingSkeleton skeleton = new TrackingSkeleton(trackingId);
-                skeleton.InitialAngle = WBody.GetInitialAngle(frameZeroth.Bodies[personIdx]);
+                ulong trackingId = frameFirst.Bodies[personIdx].TrackingId;
+                TrackingSkeleton skeleton = new TrackingSkeleton(trackingId, frameLast.TimeStamp);
+                skeleton.InitialAngle = WBody.GetInitialAngle(frameFirst.Bodies[personIdx]);
                 // initial position = average of all previous positions
                 // TODO: May break if bodies count differ from the first frame
                 List<SBody> previousPositions = new List<SBody>();
@@ -120,7 +121,7 @@ namespace Tiny
                 this.skeletons[trackingId] = skeleton;
             }
             this.calibrated = true;
-            this.FrameDimension = new KinectCamera.Dimension(frameZeroth.DepthFrameWidth, frameZeroth.DepthFrameHeight);
+            this.FrameDimension = new KinectCamera.Dimension(frameFirst.DepthFrameWidth, frameFirst.DepthFrameHeight);
         }
 
         public void ProcessFrames(SBodyFrame bodyFrame)
@@ -138,7 +139,7 @@ namespace Tiny
                     {
                         TrackingSkeleton skeleton = this.skeletons[body.TrackingId];
                         WBody worldBody = WBody.Create(body, skeleton.InitialAngle, skeleton.InitialPosition);
-                        skeleton.UpdatePosition(body, worldBody);
+                        skeleton.UpdatePosition(bodyFrame.TimeStamp, body, worldBody);
                     }
                     // ignore bodies that do not match with any tracking id
                 }

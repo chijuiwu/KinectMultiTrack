@@ -39,13 +39,13 @@ namespace Tiny
                 }
             }
 
-            public class SkeletonMatch
+            public class Replica
             {
                 public uint Id { get; private set; }
                 public KinectFOV FOV { get; private set; }
                 public TrackingSkeleton Skeleton { get; private set; }
 
-                public SkeletonMatch(uint id, KinectFOV fov, TrackingSkeleton skeleton)
+                public Replica(uint id, KinectFOV fov, TrackingSkeleton skeleton)
                 {
                     this.Id = id;
                     this.FOV = fov;
@@ -66,17 +66,17 @@ namespace Tiny
             public class Person
             {
                 public uint Id { get; private set; }
-                public IEnumerable<SkeletonMatch> SkeletonMatches { get; private set; }
+                public IEnumerable<Replica> Replicas { get; private set; }
 
-                public Person(uint id, IEnumerable<SkeletonMatch> skeletons)
+                public Person(uint id, IEnumerable<Replica> skeletons)
                 {
                     this.Id = id;
-                    this.SkeletonMatches = skeletons;
+                    this.Replicas = skeletons;
                 }
 
                 public TrackingSkeleton FindSkeletonInFOV(KinectFOV fov)
                 {
-                    foreach (SkeletonMatch match in this.SkeletonMatches)
+                    foreach (Replica match in this.Replicas)
                     {
                         if (match.FOV.Equals(fov))
                         {
@@ -89,9 +89,9 @@ namespace Tiny
                 public override string ToString()
                 {
                     StringBuilder sb = new StringBuilder();
-                    sb.Append("[Skeletons: ").Append(this.SkeletonMatches.Count()).Append("]: ");
+                    sb.Append("[Skeletons: ").Append(this.Replicas.Count()).Append("]: ");
                     String prefix = "";
-                    foreach (SkeletonMatch match in this.SkeletonMatches)
+                    foreach (Replica match in this.Replicas)
                     {
                         sb.Append(prefix);
                         prefix = ",";
@@ -107,7 +107,7 @@ namespace Tiny
 
             public Result(IEnumerable<Result.KinectFOV> fovs, IEnumerable<Result.Person> people)
             {
-                this.Timestamp = DateTime.UtcNow.Ticks;
+                this.Timestamp = DateTime.UtcNow.Ticks / TimeSpan.TicksPerMillisecond;
                 this.FOVs = fovs;
                 this.People = people;
             }
@@ -208,11 +208,11 @@ namespace Tiny
                 {
                     skeletonsList.Remove(skeleton);
                 }
-                List<Result.SkeletonMatch> matches = new List<Result.SkeletonMatch>();
+                List<Result.Replica> matches = new List<Result.Replica>();
                 foreach (Tuple<Result.KinectFOV, TrackingSkeleton> skeleton in skeletonsOfPerson)
                 {
                     Debug.WriteLine("Match: [FOV: " + skeleton.Item1.ClientIP + ", Skeleton: " + skeleton.Item2 + "]");
-                    matches.Add(new Result.SkeletonMatch((uint)matches.Count, skeleton.Item1, skeleton.Item2));
+                    matches.Add(new Result.Replica((uint)matches.Count, skeleton.Item1, skeleton.Item2));
                 }
                 Result.Person person = new Result.Person((uint)people.Count, matches);
                 people.Add(person);
