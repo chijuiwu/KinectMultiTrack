@@ -11,6 +11,7 @@
 \usepackage[margin=1in]{geometry}
 \usepackage{float}
 \usepackage{listings}
+\usepackage{svg}
 
 \lstset{
   aboveskip=3mm,
@@ -66,6 +67,12 @@
 \maketitle
 
 \section{Project}
+
+\begin{figure}[htbp]
+  \centering
+  \includesvg{image}
+  \caption{svg image}
+\end{figure}
 
 Realtime people detection and tracking are essential aspects of surveillance, medical monitoring, personalized robotics, and interactive systems. The task of detecting and tracking moving targets in real world environment using time-of-flight cameras is non-trivial. There are many sources of tracking errors, including sensor data noise, illumination levels, changing backgrounds, and occlusion. The current project aims to resolve the problem of occlusion in tracking people using multiple Kinects.
 

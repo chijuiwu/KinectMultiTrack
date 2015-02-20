@@ -107,7 +107,7 @@ for joint_idx = 1:joint_count
     single_joint_table(:,9) = diff_data(:,diff_joint_idx+3);
     single_joint_table(:,10) = ones(row_count,1)*avg_data(1,avg_joint_idx+7);
     % plot    
-    plotJoint(joint_name, single_joint_table);
+%     plotSingleJoint(joint_name, single_joint_table);
 end
 
 % Average joint plot
@@ -168,7 +168,7 @@ plotAllJoints(all_joints_table);
 % Hack: For 1 scenario 1 person
 % 
 all_scenarios_table = zeros(1,scenarios_c_count);
-all_scenarios_table(1,1:2) = [0 0];
+all_scenarios_table(1,1:2) = [1 0];
 time_dependent_dd_avg = mean(all_joints_table(:,all_c_dd_avg));
 time_dependent_dd_sd = std(all_joints_table(:,all_c_dd_avg));
 all_scenarios_table(1,3:4) = [time_dependent_dd_avg time_dependent_dd_sd];

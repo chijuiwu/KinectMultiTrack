@@ -11,16 +11,22 @@ time_dependent_sd_dd = all_scenarios_table(:,scenarios_c_dd_sd);
 figure;
 hold on;
 errorbar(x,time_dependent_avg_dd,time_dependent_sd_dd,'-xr');
-% set(gcf,'visible','off');
-% ylim([0 0.2]);
+set(gca,'XLim',[0.5 scenario_count+0.5])
 set(gca,'XTick',1:1,'XTickLabel',scenario_types);
+set(gca, 'XTick',get(gca,'XTick'),'fontsize',10);
+rotateticklabel(gca, -90);
 hold off;
 
 title(plot_title);
-xlabel('Scenarios');
-ylabel('Distance(m)');
-legend('Time depedent Avg. \Delta x','Location','northeastoutside');
-print('-dpdf', '-painters', plot_filename);
+x_axis_label = xlabel('Scenarios');
+set(x_axis_label,'Position',get(x_axis_label,'Position')-[0,1.7,0]);
+ylabel('Distance(cm)');
+legend('Time indepedent Avg. \Delta x','Location','northeastoutside');
+
+set(gcf, 'PaperPositionMode', 'manual');
+set(gcf, 'PaperUnits', 'normalized');
+set(gcf, 'PaperPosition', [0 0 1 0.7])
+print('-dsvg', '-painters', plot_filename);
 
 end
 

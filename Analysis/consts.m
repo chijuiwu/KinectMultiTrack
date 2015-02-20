@@ -25,27 +25,28 @@ joint_types = {
     'WristL'
     'WristR'
 };
-joint_count = 25;
+joint_count = length(joint_types);
 
 scenario_types = {
     'Stationary'
 };
+scenario_count = length(scenario_types);
 
 %
 % Log
 % 
 log_c_tracking_timestamp = 1;
 log_c_person = 2;
-log_col_skeleton = 3;
-log_col_fov = 4;
-log_col_skeleton_timestamp = 5;
-log_col_headers = log_c_tracking_timestamp:log_col_skeleton_timestamp;
+log_c_skeleton = 3;
+log_c_fov = 4;
+log_c_skeleton_timestamp = 5;
+log_c_headers = log_c_tracking_timestamp:log_c_skeleton_timestamp;
 log_c_joint = 6;
 log_data_per_joint = 3;
-col_x = log_c_joint;
-col_y = log_c_joint+1;
-col_z = log_c_joint+2;
-log_c_count = length(log_col_headers) + joint_count*log_data_per_joint;
+log_c_x = log_c_joint;
+log_c_y = log_c_joint+1;
+log_c_z = log_c_joint+2;
+log_c_count = length(log_c_headers) + joint_count*log_data_per_joint;
 
 % Differences Data
 %

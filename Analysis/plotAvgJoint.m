@@ -20,20 +20,20 @@ dd_sd = avgerage_joint_table(:,average_c_dd_sd);
 figure;
 hold on;
 x_h = shadedErrorBar(x,dx_avg,dx_sd,'-r', 1);
-y_h= shadedErrorBar(x,dy_avg,dy_sd,'-g', 1);
+y_h = shadedErrorBar(x,dy_avg,dy_sd,'-g', 1);
 z_h = shadedErrorBar(x,dz_avg,dz_sd,'-b', 1);
 d_h = shadedErrorBar(x,dd_avg,dd_sd,'-k', 1);
-ylim([0 0.25]);
-xlim([0 30]);
-% set(gcf,'visible','off')
 hold off;
 
 title(plot_title);
 xlabel('Time(s)');
-ylabel('Distance(m)');
-% legend([x_h,y_h,z_h,d_h], 'Avg. \Delta x','Avg. \Delta y','Avg. \Delta z','Avg. \Delta d','Location','northeastoutside');
-legend('Avg. \Delta x','Avg. \Delta y','Avg. \Delta z','Avg. \Delta d','Location','northeastoutside');
-print('-dpdf', '-painters', plot_filename);
+ylabel('Distance(cm)');
+legend([x_h.mainLine,y_h.mainLine,z_h.mainLine,d_h.mainLine],'Avg. \Delta x','Avg. \Delta y','Avg. \Delta z','Avg. \Delta d','Location','northeastoutside');
+
+set(gcf, 'PaperPositionMode', 'manual');
+set(gcf, 'PaperUnits', 'normalized');
+set(gcf, 'PaperPosition', [0 0 1 0.5])
+print('-dsvg', '-painters', plot_filename);
 
 end
 

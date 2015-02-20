@@ -17,23 +17,24 @@ dd_sd = all_joints_table(:,all_c_dd_sd);
 
 figure;
 hold on;
-shadedErrorBar(x,dx_avg,dx_sd,'-r', 1);
-shadedErrorBar(x,dy_avg,dy_sd,'-g', 1);
-shadedErrorBar(x,dz_avg,dz_sd,'-b', 1);
-shadedErrorBar(x,dd_avg,dd_sd,'-k', 1);
-% errorbar(x,dx_avg,dx_sd,'-r','LineStyle','none','Marker','x');
-% errorbar(x,dy_avg,dy_sd,'-g','LineStyle','none','Marker','x');
-% errorbar(x,dz_avg,dz_sd,'-b','LineStyle','none','Marker','x');
-% errorbar(x,dd_avg,dd_sd,'-k','LineStyle','none','Marker','o');
-% ylim([0 0.3]);
-% set(gcf,'visible','off');
+errorbar(x,dx_avg,dx_sd,'-r','LineStyle','none','Marker','x');
+errorbar(x,dy_avg,dy_sd,'-g','LineStyle','none','Marker','x');
+errorbar(x,dz_avg,dz_sd,'-b','LineStyle','none','Marker','x');
+errorbar(x,dd_avg,dd_sd,'-k','LineStyle','none','Marker','o');
+set(gca,'XLim',[0.5 joint_count+0.5])
 set(gca,'XTick',1:joint_count,'XTickLabel',joint_types);
+rotateticklabel(gca, -90);
 hold off;
 
 title(plot_title);
-xlabel('Joints');
-ylabel('Distance(m)');
+x_axis_label = xlabel('Joints');
+set(x_axis_label,'Position',get(x_axis_label,'Position')-[0,4.5,0]);
+ylabel('Distance(cm)');
 legend('\Delta x','\Delta y','\Delta z','\Delta d','Location','northeastoutside');
-print('-dpdf', '-painters', plot_filename);
+
+set(gcf, 'PaperPositionMode', 'manual');
+set(gcf, 'PaperUnits', 'normalized');
+set(gcf, 'PaperPosition', [0 0 1 0.6])
+print('-dsvg', '-painters', plot_filename);
 
 end
