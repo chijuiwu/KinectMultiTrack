@@ -19,18 +19,19 @@ dd_sd = avgerage_joint_table(:,average_c_dd_sd);
 
 figure;
 hold on;
-shadedErrorBar(x,dx_avg,dx_sd,'-r', 1);
-shadedErrorBar(x,dy_avg,dy_sd,'-g', 1);
-shadedErrorBar(x,dz_avg,dz_sd,'-b', 1);
-shadedErrorBar(x,dd_avg,dd_sd,'-k', 1);
+x_h = shadedErrorBar(x,dx_avg,dx_sd,'-r', 1);
+y_h= shadedErrorBar(x,dy_avg,dy_sd,'-g', 1);
+z_h = shadedErrorBar(x,dz_avg,dz_sd,'-b', 1);
+d_h = shadedErrorBar(x,dd_avg,dd_sd,'-k', 1);
 ylim([0 0.25]);
-xlim([0 30000]);
+xlim([0 30]);
 % set(gcf,'visible','off')
 hold off;
 
 title(plot_title);
-xlabel('Time(ms)');
+xlabel('Time(s)');
 ylabel('Distance(m)');
+% legend([x_h,y_h,z_h,d_h], 'Avg. \Delta x','Avg. \Delta y','Avg. \Delta z','Avg. \Delta d','Location','northeastoutside');
 legend('Avg. \Delta x','Avg. \Delta y','Avg. \Delta z','Avg. \Delta d','Location','northeastoutside');
 print('-dpdf', '-painters', plot_filename);
 

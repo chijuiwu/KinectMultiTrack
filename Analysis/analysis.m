@@ -22,7 +22,8 @@ for row_idx = 1:numel(unique_timestamps)
     selected_t = skeletons_data(skeletons_data(:,log_c_tracking_timestamp)==timestamp,:);
     
     % For each person
-    for person_id = unique_persons
+    for person_idx = 1:numel(unique_persons)
+        person_id = unique_persons(person_idx);
         diff_at_t(2) = person_id;
         selected_p = selected_t(selected_t(:,log_c_person)==person_id,:);    
         
@@ -106,7 +107,7 @@ for joint_idx = 1:joint_count
     single_joint_table(:,9) = diff_data(:,diff_joint_idx+3);
     single_joint_table(:,10) = ones(row_count,1)*avg_data(1,avg_joint_idx+7);
     % plot    
-%     plotJoint(joint_name, single_joint_table);
+    plotJoint(joint_name, single_joint_table);
 end
 
 % Average joint plot

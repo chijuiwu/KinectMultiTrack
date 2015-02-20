@@ -23,12 +23,12 @@ shadedErrorBar(x,dist_dx,dx_sd,'-r', 1);
 shadedErrorBar(x,dist_dy,dy_sd,'-g', 1);
 shadedErrorBar(x,dist_dz,dz_sd,'-b', 1);
 shadedErrorBar(x,dist_dd,dd_sd,'-k', 1);
-xlim([0 30000]);
+xlim([0 30]);
 set(gcf,'visible','off')
 hold off;
 
 title(plot_title);
-xlabel('Time(ms)');
+xlabel('Time(s)');
 ylabel('Distance(m)');
 legend('\Delta x','\Delta y','\Delta z','\Delta d','Location','northeastoutside');
 print('-dpdf', '-painters', plot_filename);

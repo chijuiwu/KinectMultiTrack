@@ -34,6 +34,6 @@ title(plot_title);
 xlabel('Joints');
 ylabel('Distance(m)');
 legend('\Delta x','\Delta y','\Delta z','\Delta d','Location','northeastoutside');
-print('-dpng', '-painters', plot_filename);
+print('-dpdf', '-painters', plot_filename);
 
 end

@@ -159,12 +159,12 @@ namespace Tiny
             this.MultipleKinectUpdate(result);
             this.TrackingUpdate(result);
 
-            if (this.writeLogStopwatch.ElapsedMilliseconds > this.writeLogInterval)
-            {
-                Thread writeLogThread = new Thread(() => TrackingLogger.Write(result));
-                writeLogThread.Start();
-                this.writeLogStopwatch.Restart();
-            }
+            //if (this.writeLogStopwatch.ElapsedMilliseconds > this.writeLogInterval)
+            //{
+            //    Thread writeLogThread = new Thread(() => TrackingLogger.Write(result));
+            //    writeLogThread.Start();
+            //    this.writeLogStopwatch.Restart();
+            //}
         }
     }
 }

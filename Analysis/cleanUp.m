@@ -12,7 +12,6 @@ multiple_entries = find(count > 1);
 timestamp_multiple_entries_idx = find(ismember(timestamp, multiple_entries));
 
 skeletons_data = raw_data(timestamp_multiple_entries_idx,:);
-skeletons_data(:,1) = skeletons_data(:,log_c_tracking_timestamp) - skeletons_data(1,log_c_tracking_timestamp);
+skeletons_data(:,1) = (skeletons_data(:,log_c_tracking_timestamp) - skeletons_data(1,log_c_tracking_timestamp))/1001;
 
 end
-
