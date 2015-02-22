@@ -138,17 +138,15 @@ namespace Tiny.WorldView
 
                 double determinant = 1 / (matrix[0, 0] * matrix[1, 1] - matrix[0, 1] * matrix[1, 0]);
 
-                double[,] swappedMatrix = new double[2, 2];
-                swappedMatrix[0, 0] = matrix[1, 1];
-                swappedMatrix[0, 1] = -matrix[0, 1];
-                swappedMatrix[1, 0] = -matrix[1, 0];
-                swappedMatrix[1, 1] = matrix[0, 0];
-
                 double[,] inverseMatrix = new double[2, 2];
-                inverseMatrix[0, 0] = determinant * swappedMatrix[0, 0];
-                inverseMatrix[0, 1] = determinant * swappedMatrix[0, 1];
-                inverseMatrix[1, 0] = determinant * swappedMatrix[1, 0];
-                inverseMatrix[1, 1] = determinant * swappedMatrix[1, 1];
+                inverseMatrix[0, 0] = matrix[1, 1];
+                inverseMatrix[0, 1] = -matrix[0, 1];
+                inverseMatrix[1, 0] = -matrix[1, 0];
+                inverseMatrix[1, 1] = matrix[0, 0];
+                inverseMatrix[0, 0] = determinant * inverseMatrix[0, 0];
+                inverseMatrix[0, 1] = determinant * inverseMatrix[0, 1];
+                inverseMatrix[1, 0] = determinant * inverseMatrix[1, 0];
+                inverseMatrix[1, 1] = determinant * inverseMatrix[1, 1];
 
                 float translatedX = (float)(inverseMatrix[0, 0] * worldviewJoint.X + inverseMatrix[0, 1] * worldviewJoint.Z);
                 float translatedY = worldviewJoint.Y;
