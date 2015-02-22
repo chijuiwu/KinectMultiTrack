@@ -9,9 +9,9 @@ namespace Tiny.WorldView
 {
     public class WCoordinate
     {
-        public float X { get; set; }
-        public float Y { get; set; }
-        public float Z { get; set; }
+        public float X { get; private set; }
+        public float Y { get; private set; }
+        public float Z { get; private set; }
 
         public WCoordinate(float x, float y, float z)
         {

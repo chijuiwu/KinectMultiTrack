@@ -30,6 +30,10 @@ namespace KinectClient
         private const int kinectServerPort = 12345;
         private KinectSocket kinectSocket;
 
+        // Kinect position and angle
+        private const double kinectAngle = 0;
+        private const double kinectHeight = 100;
+
         private KinectSensor kinectSensor;
         private string kinectStatusText;
         private CoordinateMapper coordinateMapper;
@@ -52,7 +56,7 @@ namespace KinectClient
         {
             InitializeComponent();
 
-            this.kinectSocket = new KinectSocket(localhost, kinectServerPort);
+            this.kinectSocket = new KinectSocket(kinectServerAddress, kinectServerPort);
 
             this.DataContext = this;
             this.KinectStatusText = Properties.Resources.KinectUninitialized;
@@ -172,23 +176,23 @@ namespace KinectClient
                             IReadOnlyDictionary<JointType, Joint> joints = body.Joints;
                             IReadOnlyDictionary<JointType, JointOrientation> jointOrientations = body.JointOrientations;
 
-                            Dictionary<JointType, Point> jointPoints = new Dictionary<JointType, Point>();
+                            Dictionary<JointType, Point> drawableJointPts = new Dictionary<JointType, Point>();
                             foreach (JointType jointType in joints.Keys)
                             {
                                 Joint joint = joints[jointType];
                                 TrackingState trackingState = joint.TrackingState;
                                 JointOrientation orientation = jointOrientations[jointType];
-                                CameraSpacePoint position = joint.Position;
-                                if (position.Z < 0)
+                                CameraSpacePoint csPt = joint.Position;
+                                if (csPt.Z < 0)
                                 {
-                                    position.Z = 0.1f;
+                                    csPt.Z = 0.1f;
                                 }
-                                DepthSpacePoint depthSpacePoint = this.coordinateMapper.MapCameraPointToDepthSpace(position);
-                                jointPoints[jointType] = new Point(depthSpacePoint.X, depthSpacePoint.Y);
+                                DepthSpacePoint dsPt = this.coordinateMapper.MapCameraPointToDepthSpace(csPt);
+                                drawableJointPts[jointType] = new Point(dsPt.X, dsPt.Y);
                                 // serialize KinectJoint
-                                serializableBody.Joints[jointType] = new SJoint(trackingState, jointType, orientation, position, depthSpacePoint);
+                                serializableBody.Joints[jointType] = new SJoint(trackingState, jointType, orientation, csPt, dsPt);
                             }
-                            this.DrawBody(joints, jointPoints, dc, this.bodyColor, this.inferredBonePen, this.trackedJointBrush, this.inferredJointBrush);
+                            this.DrawBody(joints, drawableJointPts, dc, this.bodyColor, this.inferredBonePen, this.trackedJointBrush, this.inferredJointBrush);
                             // construct serializable KinectBodyFrame
                             serializableBodyFrame.addSerializableBody(serializableBody);
                         }

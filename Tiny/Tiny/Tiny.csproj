@@ -83,8 +83,8 @@
     <Compile Include="KinectBody.cs" />
     <Compile Include="KinectCamera.cs" />
     <Compile Include="KinectJoint.cs" />
-    <Compile Include="TrackingLogger.cs" />
-    <Compile Include="TrackingUtils.cs" />
+    <Compile Include="TrackerLogger.cs" />
+    <Compile Include="TrackerUtils.cs" />
     <Compile Include="UI\SkeletonVisualizer.cs" />
     <Compile Include="UI\TrackingUI.xaml.cs">
       <DependentUpon>TrackingUI.xaml</DependentUpon>
@@ -102,7 +102,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="TrackingServer.cs" />
+    <Compile Include="TrackerServer.cs" />
     <Compile Include="UI\MultipleKinectUI.xaml.cs">
       <DependentUpon>MultipleKinectUI.xaml</DependentUpon>
       <SubType>Code</SubType>

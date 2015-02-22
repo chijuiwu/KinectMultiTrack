@@ -133,8 +133,8 @@ namespace Tiny.UI
             Tracker.Result.KinectFOV referenceFOV = this.GetReferenceKinectFOV(result.FOVs);
             this.currentReferenceKinectIP = referenceFOV.ClientIP.ToString();
 
-            int frameWidth = referenceFOV.Dimension.DepthFrameWidth;
-            int frameHeight = referenceFOV.Dimension.DepthFrameHeight;
+            int frameWidth = referenceFOV.Specification.DepthFrameWidth;
+            int frameHeight = referenceFOV.Specification.DepthFrameHeight;
 
             using (DrawingContext dc = this.bodyDrawingGroup.Open())
             {
@@ -142,7 +142,7 @@ namespace Tiny.UI
                 int personIdx = 0;
                 foreach (Tracker.Result.Person person in result.People)
                 {
-                    TrackingSkeleton reference = person.FindSkeletonInFOV(referenceFOV);
+                    TSkeleton reference = person.FindSkeletonInFOV(referenceFOV);
                     // HACK
                     if (reference == null)
                     {
@@ -151,9 +151,9 @@ namespace Tiny.UI
 
                     // Skeletons
                     List<Dictionary<JointType, KinectJoint>> skeletonJointsList = new List<Dictionary<JointType, KinectJoint>>();
-                    foreach (Tracker.Result.Replica match in person.Replicas)
+                    foreach (Tracker.Result.SkeletonReplica match in person.Replicas)
                     {
-                        Dictionary<JointType, KinectJoint> joints = TrackingUtils.GetKinectJoints(match, reference);
+                        Dictionary<JointType, KinectJoint> joints = TUtils.GetKinectJoints(match, reference);
                         skeletonJointsList.Add(joints);
                     }
 
@@ -165,7 +165,7 @@ namespace Tiny.UI
                     else
                     {
                         // Average
-                        Dictionary<JointType, KinectJoint> averageJoints = TrackingUtils.GetAverages(skeletonJointsList);
+                        Dictionary<JointType, KinectJoint> averageJoints = TUtils.GetAverages(skeletonJointsList);
                         if (this.currentViewMode == ViewMode.Average)
                         {
                             this.DrawAverageSkeletons(averageJoints, dc, TrackingUI.averageBonePen);
@@ -295,7 +295,7 @@ namespace Tiny.UI
             dc.DrawLine(pen, from, to);
         }
 
-        private void ReferenceKinectButton_Click(object sender, RoutedEventArgs e)
+        private void ReferenceKinectBtn_Click(object sender, RoutedEventArgs e)
         {
             Button referenceKinectBtn = sender as Button;
             referenceKinectBtn.ContextMenu.IsEnabled = true;
@@ -362,6 +362,11 @@ namespace Tiny.UI
         {
             this.currentViewMode = ViewMode.All;
             this.ViewModeBtn.Content = ViewMode.All;
+        }
+
+        private void SetupBtn_Click(object sender, RoutedEventArgs e)
+        {
+            // Setup
         }
     }
 }

@@ -16,10 +16,10 @@ namespace Tiny
         public const int port = 12345;
         public const int kinects = 2;
 
-        private TrackingServer server;
+        private TServer server;
 
         public App() {
-            this.server = new TrackingServer(App.port, App.kinects);
+            this.server = new TServer(App.port, App.kinects);
             this.server.Run();
         }
 

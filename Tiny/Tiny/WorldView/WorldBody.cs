@@ -18,12 +18,11 @@ namespace Tiny.WorldView
             this.Joints = new Dictionary<JointType, WJoint>();
         }
 
-        // Get the initial angle between user and Kinect
+        // Return the initial angle between user and Kinect
         public static double GetInitialAngle(SBody body)
         {
             SJoint shoulderLeft = body.Joints[JointType.ShoulderLeft];
             SJoint shoulderRight = body.Joints[JointType.ShoulderRight];
-
             if (shoulderLeft.TrackingState.Equals(TrackingState.NotTracked))
             {
                 throw new UntrackedJointException("[Calculating initial angle]: ShoulderLeft joint not tracked");
@@ -32,38 +31,24 @@ namespace Tiny.WorldView
             {
                 throw new UntrackedJointException("[Calculating initial angle]: ShoulderRight joint not tracked");
             }
-
             CameraSpacePoint shoulderLeftPos = shoulderLeft.CameraSpacePoint;
             CameraSpacePoint shoulderRightPos = shoulderRight.CameraSpacePoint;
-
-            float lengthAdjacent = shoulderRightPos.X - shoulderLeftPos.X;
             float lengthOpposite = shoulderRightPos.Z - shoulderLeftPos.Z;
-
-            return Math.Atan(lengthOpposite / lengthAdjacent);
+            float lengthAdjacent = shoulderRightPos.X - shoulderLeftPos.X;
+            return Math.Atan2(lengthOpposite, lengthAdjacent);
         }
 
-        // Get the initial centre position of user's body
-        // Each item in the array is a body at a particular frame in the initial data collection sequence
-        public static WCoordinate GetInitialPosition(List<SBody> userInitialBodies)
+        // Return the initial centre position of the user's body
+        // Each item in the array is the body at a given time frame during the initial data collection
+        public static WCoordinate GetInitialPosition(List<SBody> initialBodies)
         {
-            float totalAverageX = 0;
-            float totalAverageY = 0;
-            float totalAverageZ = 0;
-
+            float totalAverageX = 0, totalAverageY = 0, totalAverageZ = 0;
             int countBodies = 0;
-            foreach (SBody body in userInitialBodies)
+            foreach (SBody body in initialBodies)
             {
-                if (!body.IsTracked)
-                {
-                    continue;
-                }
                 countBodies++;
-                float sumXs = 0;
-                float sumYs = 0;
-                float sumZs = 0;
-                int countXs = 0;
-                int countYs = 0;
-                int countZs = 0;
+                float sumXs = 0, sumYs = 0, sumZs = 0;
+                int countXs = 0, countYs = 0, countZs = 0;
                 foreach (JointType jt in SkeletonStructure.Joints)
                 {
                     if (!body.Joints.ContainsKey(jt))
@@ -92,19 +77,18 @@ namespace Tiny.WorldView
         }
 
         // Joints transformed to the origin of the world coordinate system
-        public static WBody Create(SBody body, double initialAngle, WCoordinate centrePoint)
+        public static WBody Create(SBody body, double initialAngle, WCoordinate initialCenterPosition)
         {
             WBody worldviewBody = new WBody();
-
             foreach (JointType jointType in body.Joints.Keys)
             {
                 SJoint joint = body.Joints[jointType];
                 CameraSpacePoint jointPosition = joint.CameraSpacePoint;
 
                 // Translation
-                float translatedX = jointPosition.X - centrePoint.X;
-                float translatedY = jointPosition.Y - centrePoint.Y;
-                float translatedZ = jointPosition.Z - centrePoint.Z;
+                float translatedX = jointPosition.X - initialCenterPosition.X;
+                float translatedY = jointPosition.Y - initialCenterPosition.Y;
+                float translatedZ = jointPosition.Z - initialCenterPosition.Z;
 
                 // Rotation
                 float transformedX = (float)(translatedX * Math.Cos(initialAngle) + translatedZ * Math.Sin(initialAngle));
@@ -114,7 +98,6 @@ namespace Tiny.WorldView
                 WCoordinate coordinate = new WCoordinate(transformedX, transformedY, transformedZ);
                 worldviewBody.Joints[jointType] = new WJoint(coordinate, joint.TrackingState);
             }
-
             return worldviewBody;
         }
 

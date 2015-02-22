@@ -64,7 +64,7 @@ namespace Tiny.UI
             {
                 return;
             }
-            KinectCamera.Dimension firstFOVDim = result.FOVs.First().Dimension;
+            KinectCamera.Specification firstFOVDim = result.FOVs.First().Specification;
             int frameWidth = firstFOVDim.DepthFrameWidth;
             int frameHeight = firstFOVDim.DepthFrameHeight;
 
@@ -75,7 +75,7 @@ namespace Tiny.UI
                 foreach (Tracker.Result.Person person in result.People)
                 {
                     Pen pen = this.personColors[personIdx++];
-                    foreach (Tracker.Result.Replica match in person.Replicas)
+                    foreach (Tracker.Result.SkeletonReplica match in person.Replicas)
                     {
                         SBody body = match.Skeleton.CurrentPosition.Kinect;
                         Dictionary<JointType, SJoint> joints = body.Joints;

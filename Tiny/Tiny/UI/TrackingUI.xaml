@@ -18,9 +18,13 @@
 
         <Label x:Name="Label" Grid.Row="0" Content="Tracking" HorizontalAlignment="Center" VerticalAlignment="Top" RenderTransformOrigin="-0.079,0.5" Margin="25,0,562,0" FontWeight="Bold" FontSize="16" FontFamily="Microsoft Sans Serif" Width="85"/>
 
+        <Button Grid.Row="0" x:Name="SetupBtn" Content="Setup" 
+                ContextMenuService.IsEnabled="False"
+                HorizontalAlignment="Left" Margin="149,0,0,0" Width="140" Click="SetupBtn_Click"  Height="30" VerticalAlignment="Top" FontFamily="Microsoft Sans Serif" FontSize="14">
+        </Button>        
         <Button Grid.Row="0" x:Name="ReferenceKinectBtn" Content="Reference Kinect" 
                 ContextMenuService.IsEnabled="False"
-                HorizontalAlignment="Left" Margin="149,0,0,0" Width="140" Click="ReferenceKinectButton_Click" Height="30" VerticalAlignment="Top" FontFamily="Microsoft Sans Serif" FontSize="14">
+                HorizontalAlignment="Left" Margin="309,0,0,0" Width="140" Click="ReferenceKinectBtn_Click" Height="30" VerticalAlignment="Top" FontFamily="Microsoft Sans Serif" FontSize="14">
             <Button.ContextMenu>
                 <ContextMenu x:Name="ReferenceKinectMenu">
                 </ContextMenu>
@@ -28,7 +32,7 @@
         </Button>
         <Button  Grid.Row="0" x:Name="ViewModeBtn" Content="View Mode"
                  ContextMenuService.IsEnabled="False"
-                 HorizontalAlignment="Left" Margin="341,0,0,0" VerticalAlignment="Top" Width="140" Height="30" Click="ViewModeBtn_Click" FontFamily="Microsoft Sans Serif" FontSize="14">
+                 HorizontalAlignment="Left" Margin="466,0,0,0" VerticalAlignment="Top" Width="140" Height="30" Click="ViewModeBtn_Click" FontFamily="Microsoft Sans Serif" FontSize="14">
             <Button.ContextMenu>
                 <ContextMenu x:Name="ViewModeMenu">
                     <MenuItem Header="Skeletons" Click="ViewMode_Skeletons_Click"/>

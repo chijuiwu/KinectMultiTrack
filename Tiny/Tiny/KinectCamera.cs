@@ -16,21 +16,26 @@ namespace Tiny
 {
     public class KinectCamera
     {
-        public class Dimension
+        public class Specification
         {
             public int DepthFrameWidth { get; private set; }
             public int DepthFrameHeight { get; private set; }
+            public double Angle { get; private set; }
+            public double Height { get; private set; }
 
-            public Dimension(int depthFrameWidth, int depthFrameHeight)
+            public Specification(int depthFrameWidth, int depthFrameHeight)
             {
                 this.DepthFrameWidth = depthFrameWidth;
                 this.DepthFrameHeight = depthFrameHeight;
+                // TODO: Update these values
+                this.Angle = 0;
+                this.Height = 0;
             }
         }
 
-        public KinectCamera.Dimension FrameDimension { get; private set; }
+        public KinectCamera.Specification CameraSpecification { get; private set; }
         private bool calibrated;
-        private Dictionary<ulong, TrackingSkeleton> skeletons;
+        private Dictionary<ulong, TSkeleton> skeletons;
 
         private Stack<SBodyFrame> unprocessedBodyFrames;
 
@@ -40,15 +45,15 @@ namespace Tiny
         public event KinectUIHandler DisposeKinectUI;
         public delegate void KinectUIHandler();
 
-        public IEnumerable<TrackingSkeleton> Skeletons
+        public IEnumerable<TSkeleton> Skeletons
         {
             get
             {
-                foreach (TrackingSkeleton skeleton in this.skeletons.Values)
+                foreach (TSkeleton skeleton in this.skeletons.Values)
                 {
                     if (skeleton.Positions.Count > 0)
                     {
-                        yield return TrackingSkeleton.Copy(skeleton);
+                        yield return TSkeleton.Copy(skeleton);
                     }
                 }
             }
@@ -65,8 +70,8 @@ namespace Tiny
         public KinectCamera(string ip)
         {
             this.calibrated = false;
-            this.FrameDimension = null;
-            this.skeletons = new Dictionary<ulong, TrackingSkeleton>();
+            this.CameraSpecification = null;
+            this.skeletons = new Dictionary<ulong, TSkeleton>();
 
             this.unprocessedBodyFrames = new Stack<SBodyFrame>();
 
@@ -93,35 +98,34 @@ namespace Tiny
         public void Calibrate()
         {
             SBodyFrame[] calibrationFrames = new SBodyFrame[Tracker.CALIBRATION_FRAMES];
-            int calibrationFramesCount = 0;
-            while (calibrationFramesCount < Tracker.CALIBRATION_FRAMES)
+            // add from back back the 
+            int calibrationFramesToAdd = Tracker.CALIBRATION_FRAMES;
+            while (calibrationFramesToAdd > 0)
             {
-                calibrationFrames[calibrationFramesCount++] = this.unprocessedBodyFrames.Pop();
+                calibrationFrames[--calibrationFramesToAdd] = this.unprocessedBodyFrames.Pop();
             }
-            this.unprocessedBodyFrames.Clear();
-
-            SBodyFrame frameFirst = calibrationFrames[0];
-            SBodyFrame frameLast = calibrationFrames[Tracker.CALIBRATION_FRAMES - 1];
-            for (int personIdx = 0; personIdx < frameFirst.Bodies.Count; personIdx++)
+            SBodyFrame frame0th = calibrationFrames[0];
+            SBodyFrame frameNth = calibrationFrames[calibrationFrames.Length-1];
+            for (int personIdx = 0; personIdx < frame0th.Bodies.Count; personIdx++)
             {
-                ulong trackingId = frameFirst.Bodies[personIdx].TrackingId;
-                TrackingSkeleton skeleton = new TrackingSkeleton(trackingId, frameLast.TimeStamp);
-                skeleton.InitialAngle = WBody.GetInitialAngle(frameFirst.Bodies[personIdx]);
-                // initial position = average of all previous positions
-                // TODO: May break if bodies count differ from the first frame
-                List<SBody> previousPositions = new List<SBody>();
+                ulong trackingId = frame0th.Bodies[personIdx].TrackingId;
+                // Use 0th frame to get the initial angle
+                double initAngle = WBody.GetInitialAngle(frame0th.Bodies[personIdx]);
+                // initial position = average of previous positions in frames where that person exists
+                List<SBody> previousPosList = new List<SBody>();
                 for (int frameIdx = 0; frameIdx < calibrationFrames.Length; frameIdx++)
                 {
                     if (calibrationFrames[frameIdx].Bodies.Count > personIdx)
                     {
-                        previousPositions.Add(calibrationFrames[frameIdx].Bodies[personIdx]);
+                        previousPosList.Add(calibrationFrames[frameIdx].Bodies[personIdx]);
                     }
                 }
-                skeleton.InitialPosition = WBody.GetInitialPosition(previousPositions);
+                WCoordinate initPos = WBody.GetInitialPosition(previousPosList);
+                TSkeleton skeleton = new TSkeleton(trackingId, frameNth.TimeStamp, initAngle, initPos);
                 this.skeletons[trackingId] = skeleton;
             }
             this.calibrated = true;
-            this.FrameDimension = new KinectCamera.Dimension(frameFirst.DepthFrameWidth, frameFirst.DepthFrameHeight);
+            this.CameraSpecification = new KinectCamera.Specification(frame0th.DepthFrameWidth, frame0th.DepthFrameHeight);
         }
 
         public void ProcessFrames(SBodyFrame bodyFrame)
@@ -137,7 +141,7 @@ namespace Tiny
                 {
                     if (this.skeletons.ContainsKey(body.TrackingId))
                     {
-                        TrackingSkeleton skeleton = this.skeletons[body.TrackingId];
+                        TSkeleton skeleton = this.skeletons[body.TrackingId];
                         WBody worldBody = WBody.Create(body, skeleton.InitialAngle, skeleton.InitialPosition);
                         skeleton.UpdatePosition(bodyFrame.TimeStamp, body, worldBody);
                     }

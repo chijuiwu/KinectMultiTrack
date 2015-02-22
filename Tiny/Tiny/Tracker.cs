@@ -15,6 +15,7 @@ namespace Tiny
 {
     public class Tracker
     {
+        // 4 Seconds
         public const int CALIBRATION_FRAMES = 120;
         private bool calibrated = false;
 
@@ -29,23 +30,23 @@ namespace Tiny
             {
                 public uint Id { get; private set; }
                 public IPEndPoint ClientIP { get; private set; }
-                public KinectCamera.Dimension Dimension { get; private set; }
+                public KinectCamera.Specification Specification { get; private set; }
 
-                public KinectFOV(uint id, IPEndPoint clientIP, KinectCamera.Dimension dimension)
+                public KinectFOV(uint id, IPEndPoint clientIP, KinectCamera.Specification specification)
                 {
                     this.Id = id;
                     this.ClientIP = clientIP;
-                    this.Dimension = dimension;
+                    this.Specification = specification;
                 }
             }
 
-            public class Replica
+            public class SkeletonReplica
             {
                 public uint Id { get; private set; }
                 public KinectFOV FOV { get; private set; }
-                public TrackingSkeleton Skeleton { get; private set; }
+                public TSkeleton Skeleton { get; private set; }
 
-                public Replica(uint id, KinectFOV fov, TrackingSkeleton skeleton)
+                public SkeletonReplica(uint id, KinectFOV fov, TSkeleton skeleton)
                 {
                     this.Id = id;
                     this.FOV = fov;
@@ -66,17 +67,17 @@ namespace Tiny
             public class Person
             {
                 public uint Id { get; private set; }
-                public IEnumerable<Replica> Replicas { get; private set; }
+                public IEnumerable<SkeletonReplica> Replicas { get; private set; }
 
-                public Person(uint id, IEnumerable<Replica> skeletons)
+                public Person(uint id, IEnumerable<SkeletonReplica> skeletons)
                 {
                     this.Id = id;
                     this.Replicas = skeletons;
                 }
 
-                public TrackingSkeleton FindSkeletonInFOV(KinectFOV fov)
+                public TSkeleton FindSkeletonInFOV(KinectFOV fov)
                 {
-                    foreach (Replica match in this.Replicas)
+                    foreach (SkeletonReplica match in this.Replicas)
                     {
                         if (match.FOV.Equals(fov))
                         {
@@ -91,7 +92,7 @@ namespace Tiny
                     StringBuilder sb = new StringBuilder();
                     sb.Append("[Skeletons: ").Append(this.Replicas.Count()).Append("]: ");
                     String prefix = "";
-                    foreach (Replica match in this.Replicas)
+                    foreach (SkeletonReplica match in this.Replicas)
                     {
                         sb.Append(prefix);
                         prefix = ",";
@@ -134,7 +135,8 @@ namespace Tiny
             {
                 foreach (KinectCamera kinect in this.kinectsDict.Values)
                 {
-                    if (kinect.UnprocessedFramesCount < Tracker.CALIBRATION_FRAMES)
+                    // TODO: Remove HACK!!! so i have time to adjust position
+                    if (kinect.UnprocessedFramesCount < Tracker.CALIBRATION_FRAMES*2)
                     {
                         return false;
                     }
@@ -167,7 +169,7 @@ namespace Tiny
                 List<Result.KinectFOV> fovs = new List<Result.KinectFOV>();
                 foreach (IPEndPoint kinectIP in this.kinectsDict.Keys)
                 {
-                    fovs.Add(new Result.KinectFOV((uint)fovs.Count, kinectIP, this.kinectsDict[kinectIP].FrameDimension));
+                    fovs.Add(new Result.KinectFOV((uint)fovs.Count, kinectIP, this.kinectsDict[kinectIP].CameraSpecification));
                 }
                 if (!this.calibrated)
                 {
@@ -185,12 +187,12 @@ namespace Tiny
             Debug.WriteLine("Matching skeleton...");
             Debug.WriteLine("FOV: " + fovs.Count());
 
-            List<Tuple<Result.KinectFOV, TrackingSkeleton>> skeletonsList = new List<Tuple<Result.KinectFOV, TrackingSkeleton>>();
+            List<Tuple<Result.KinectFOV, TSkeleton>> skeletonsList = new List<Tuple<Result.KinectFOV, TSkeleton>>();
             foreach (Result.KinectFOV fov in fovs)
             {
                 KinectCamera kinect = this.kinectsDict[fov.ClientIP];
                 Debug.WriteLine("Kinect: " + fov.ClientIP + " People: " + kinect.Skeletons.Count());
-                foreach (TrackingSkeleton skeleton in kinect.Skeletons)
+                foreach (TSkeleton skeleton in kinect.Skeletons)
                 {
                     skeletonsList.Add(Tuple.Create(fov, skeleton));
                 }
@@ -202,17 +204,17 @@ namespace Tiny
             // TODO: Deal with occlusion (One person may not appear in all FOVs)
             while(skeletonsList.Any())
             {
-                IEnumerable<Tuple<Result.KinectFOV, TrackingSkeleton>> skeletonsOfPerson = this.GroupSkeletons(skeletonsList);
+                IEnumerable<Tuple<Result.KinectFOV, TSkeleton>> skeletonsOfPerson = this.GroupSkeletons(skeletonsList);
                 Debug.WriteLine("Matches Found: " + skeletonsOfPerson.Count());
-                foreach (Tuple<Result.KinectFOV, TrackingSkeleton> skeleton in skeletonsOfPerson)
+                foreach (Tuple<Result.KinectFOV, TSkeleton> skeleton in skeletonsOfPerson)
                 {
                     skeletonsList.Remove(skeleton);
                 }
-                List<Result.Replica> matches = new List<Result.Replica>();
-                foreach (Tuple<Result.KinectFOV, TrackingSkeleton> skeleton in skeletonsOfPerson)
+                List<Result.SkeletonReplica> matches = new List<Result.SkeletonReplica>();
+                foreach (Tuple<Result.KinectFOV, TSkeleton> skeleton in skeletonsOfPerson)
                 {
                     Debug.WriteLine("Match: [FOV: " + skeleton.Item1.ClientIP + ", Skeleton: " + skeleton.Item2 + "]");
-                    matches.Add(new Result.Replica((uint)matches.Count, skeleton.Item1, skeleton.Item2));
+                    matches.Add(new Result.SkeletonReplica((uint)matches.Count, skeleton.Item1, skeleton.Item2));
                 }
                 Result.Person person = new Result.Person((uint)people.Count, matches);
                 people.Add(person);
@@ -222,22 +224,22 @@ namespace Tiny
         }
 
         // Match people in other Kinect FOV by their positions in World View
-        private IEnumerable<Tuple<Result.KinectFOV, TrackingSkeleton>> GroupSkeletons(IEnumerable<Tuple<Result.KinectFOV, TrackingSkeleton>> skeletons)
+        private IEnumerable<Tuple<Result.KinectFOV, TSkeleton>> GroupSkeletons(IEnumerable<Tuple<Result.KinectFOV, TSkeleton>> skeletons)
         {
             // Find matches for the first skeleton
             Result.KinectFOV targetFOV = skeletons.First().Item1;
-            TrackingSkeleton targetSkeleton = skeletons.First().Item2;
-            List<Tuple<Result.KinectFOV, TrackingSkeleton>> skeletonsOfPerson = new List<Tuple<Result.KinectFOV, TrackingSkeleton>>() { skeletons.First() };
+            TSkeleton targetSkeleton = skeletons.First().Item2;
+            List<Tuple<Result.KinectFOV, TSkeleton>> skeletonsOfPerson = new List<Tuple<Result.KinectFOV, TSkeleton>>() { skeletons.First() };
 
-            Dictionary<Result.KinectFOV, Tuple<TrackingSkeleton, double>> mostSimilarSkeletons = new Dictionary<Result.KinectFOV, Tuple<TrackingSkeleton, double>>();
-            foreach (Tuple<Result.KinectFOV, TrackingSkeleton> skeleton in skeletons)
+            Dictionary<Result.KinectFOV, Tuple<TSkeleton, double>> mostSimilarSkeletons = new Dictionary<Result.KinectFOV, Tuple<TSkeleton, double>>();
+            foreach (Tuple<Result.KinectFOV, TSkeleton> skeleton in skeletons)
             {
                 Result.KinectFOV otherFOV = skeleton.Item1;
-                TrackingSkeleton otherSkeleton = skeleton.Item2;
+                TSkeleton otherSkeleton = skeleton.Item2;
                 if (!otherFOV.Equals(targetFOV) && !otherSkeleton.Equals(targetSkeleton))
                 {
-                    TrackingSkeleton.Position pos0 = targetSkeleton.CurrentPosition;
-                    TrackingSkeleton.Position pos1 = otherSkeleton.CurrentPosition;
+                    TSkeleton.Position pos0 = targetSkeleton.CurrentPosition;
+                    TSkeleton.Position pos1 = otherSkeleton.CurrentPosition;
                     // HACK
                     if (pos0 == null || pos1 == null)
                     {

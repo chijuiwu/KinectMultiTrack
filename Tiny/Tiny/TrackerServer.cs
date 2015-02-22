@@ -13,7 +13,7 @@ using Tiny.UI;
 
 namespace Tiny
 {
-    public class TrackingServer
+    public class TServer
     {
         private TcpListener kinectListener;
         private Thread acceptKinectConnectionThread;
@@ -36,7 +36,7 @@ namespace Tiny
         private delegate void WorldViewHandler(Tracker.Result result);
 
 
-        public TrackingServer(int port, int kinectCount)
+        public TServer(int port, int kinectCount)
         {
             this.kinectListener = new TcpListener(IPAddress.Any, port);
             this.acceptKinectConnectionThread = new Thread(new ThreadStart(this.AcceptKinectConnectionThread));
@@ -65,8 +65,8 @@ namespace Tiny
 
         public void Stop()
         {
-            TrackingLogger.Flush();
-            TrackingLogger.Close();
+            TLogger.Flush();
+            TLogger.Close();
         }
 
         private void StartMultipleKinectUIThread()
@@ -89,7 +89,7 @@ namespace Tiny
 
         private void FlushLogsCallback(object obj)
         {
-            TrackingLogger.Flush();
+            TLogger.Flush();
         }
 
         private void AcceptKinectConnectionThread()

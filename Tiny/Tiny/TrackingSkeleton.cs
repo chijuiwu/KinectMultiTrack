@@ -10,7 +10,7 @@ using Tiny.WorldView;
 
 namespace Tiny
 {
-    public class TrackingSkeleton
+    public class TSkeleton
     {
         // 100 seconds
         private readonly int MAX_POSITIONS_STORED = 3000;
@@ -34,11 +34,12 @@ namespace Tiny
 
         public ulong Id { get; private set; }
         public long Timestamp { get; private set; }
-        public double InitialAngle { get; set; }
-        public WCoordinate InitialPosition { get; set; }
-        public Stack<TrackingSkeleton.Position> Positions { get; private set; }
+        public double InitialAngle { get; private set; }
+        public WCoordinate InitialPosition { get; private set; }
+        public float InitialDistance { get; private set; } // distance(z-value) from the reference Kinect
+        public Stack<TSkeleton.Position> Positions { get; private set; }
 
-        public TrackingSkeleton.Position CurrentPosition
+        public TSkeleton.Position CurrentPosition
         {
             get
             {
@@ -53,29 +54,14 @@ namespace Tiny
             }
         }
 
-        public TrackingSkeleton(ulong id, long timestamp)
-        {
-            this.Id = id;
-            this.Timestamp = timestamp;
-            this.Positions = new Stack<TrackingSkeleton.Position>();
-        }
-
-        public TrackingSkeleton(ulong id, long timestamp, double initAngle, WCoordinate initPos)
+        public TSkeleton(ulong id, long timestamp, double initAngle, WCoordinate initPos)
         {
             this.Id = id;
             this.Timestamp = timestamp;
             this.InitialAngle = initAngle;
             this.InitialPosition = initPos;
-            this.Positions = new Stack<TrackingSkeleton.Position>();
-        }
-
-        public TrackingSkeleton(ulong id, long timestamp, double initAngle, WCoordinate initPos, Stack<TrackingSkeleton.Position> positions)
-        {
-            this.Id = id;
-            this.Timestamp = timestamp;
-            this.InitialAngle = initAngle;
-            this.InitialPosition = initPos;
-            this.Positions = positions;
+            this.InitialDistance = this.InitialPosition.Z;
+            this.Positions = new Stack<TSkeleton.Position>();
         }
 
         public void UpdatePosition(long timestamp, SBody body, WBody worldviewBody)
@@ -85,21 +71,21 @@ namespace Tiny
             {
                 this.Positions.Clear();
             }
-            this.Positions.Push(new TrackingSkeleton.Position(body, worldviewBody));
+            this.Positions.Push(new TSkeleton.Position(body, worldviewBody));
         }
 
         // Copy only the current positions
-        public static TrackingSkeleton Copy(TrackingSkeleton skeleton)
+        public static TSkeleton Copy(TSkeleton skeleton)
         {
             if (skeleton.Positions.Count > 0)
             {
-                Stack<TrackingSkeleton.Position> currentPos = new Stack<TrackingSkeleton.Position>();
-                currentPos.Push(TrackingSkeleton.Position.Copy(skeleton.Positions.Peek()));
-                return new TrackingSkeleton(skeleton.Id, skeleton.Timestamp, skeleton.InitialAngle, skeleton.InitialPosition, currentPos);
+                TSkeleton copy = new TSkeleton(skeleton.Id, skeleton.Timestamp, skeleton.InitialAngle, skeleton.InitialPosition);
+                copy.Positions.Push(Position.Copy(skeleton.CurrentPosition));
+                return copy;
             }
             else
             {
-                return new TrackingSkeleton(skeleton.Id, skeleton.Timestamp, skeleton.InitialAngle, skeleton.InitialPosition);
+                return new TSkeleton(skeleton.Id, skeleton.Timestamp, skeleton.InitialAngle, skeleton.InitialPosition);
             }
         }
 
@@ -120,7 +106,7 @@ namespace Tiny
                 return false;
             }
             
-            TrackingSkeleton p = obj as TrackingSkeleton;
+            TSkeleton p = obj as TSkeleton;
             if ((Object)p == null)
             {
                 return false;
@@ -129,7 +115,7 @@ namespace Tiny
             return (this.Id == p.Id) && (this.InitialAngle == p.InitialAngle) && (this.InitialPosition == p.InitialPosition);
         }
 
-        public bool Equals(TrackingSkeleton p)
+        public bool Equals(TSkeleton p)
         {
             return (this.Id == p.Id) && (this.InitialAngle == p.InitialAngle) && (this.InitialPosition == p.InitialPosition);
         }
