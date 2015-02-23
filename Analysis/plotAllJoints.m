@@ -28,7 +28,7 @@ hold off;
 
 title(plot_title);
 x_axis_label = xlabel('Joints');
-set(x_axis_label,'Position',get(x_axis_label,'Position')-[0,4.5,0]);
+set(x_axis_label,'Position',get(x_axis_label,'Position')-[0,4,0]);
 ylabel('Distance(cm)');
 legend('\Delta x','\Delta y','\Delta z','\Delta d','Location','northeastoutside');
 

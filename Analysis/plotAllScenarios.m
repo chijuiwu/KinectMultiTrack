@@ -19,7 +19,7 @@ hold off;
 
 title(plot_title);
 x_axis_label = xlabel('Scenarios');
-set(x_axis_label,'Position',get(x_axis_label,'Position')-[0,1.7,0]);
+set(x_axis_label,'Position',get(x_axis_label,'Position')-[0,1.5,0]);
 ylabel('Distance(cm)');
 legend('Time indepedent Avg. \Delta x','Location','northeastoutside');
 

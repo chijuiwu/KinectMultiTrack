@@ -122,9 +122,9 @@ namespace Tiny.WorldView
                 inverseMatrix[1,0] = determinant * inverseMatrix[1,0];
                 inverseMatrix[1,1] = determinant * inverseMatrix[1,1];
 
-                float translatedX = (float)(inverseMatrix[0,0]*worldviewJoint.X + inverseMatrix[1,0]*worldviewJoint.X);
+                float translatedX = (float)(worldviewJoint.X*inverseMatrix[0,0] + worldviewJoint.Z*inverseMatrix[1,0]);
                 float translatedY = worldviewJoint.Y;
-                float translatedZ = (float)(inverseMatrix[0,1]*worldviewJoint.Z + inverseMatrix[1,1]*worldviewJoint.Z);
+                float translatedZ = (float)(worldviewJoint.X*inverseMatrix[0,1] + worldviewJoint.Z*inverseMatrix[1,1]);
 
                 CameraSpacePoint kinectJointPt = new CameraSpacePoint();
                 kinectJointPt.X = translatedX + initialCentrePosition.X;

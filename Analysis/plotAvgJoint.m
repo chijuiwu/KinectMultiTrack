@@ -23,6 +23,7 @@ x_h = shadedErrorBar(x,dx_avg,dx_sd,'-r', 1);
 y_h = shadedErrorBar(x,dy_avg,dy_sd,'-g', 1);
 z_h = shadedErrorBar(x,dz_avg,dz_sd,'-b', 1);
 d_h = shadedErrorBar(x,dd_avg,dd_sd,'-k', 1);
+xlim([0,30]);
 hold off;
 
 title(plot_title);

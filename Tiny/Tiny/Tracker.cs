@@ -136,7 +136,7 @@ namespace Tiny
                 foreach (KinectCamera kinect in this.kinectsDict.Values)
                 {
                     // TODO: Remove HACK!!! so i have time to adjust position
-                    if (kinect.UnprocessedFramesCount < Tracker.CALIBRATION_FRAMES*2)
+                    if (kinect.UnprocessedFramesCount < Tracker.CALIBRATION_FRAMES*3)
                     {
                         return false;
                     }
