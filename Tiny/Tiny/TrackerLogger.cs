@@ -150,12 +150,10 @@ namespace Tiny
             {
                 Tracker.Result.SkeletonReplica replica = coordinateTuple.Item1;
                 Dictionary<JointType, KinectJoint> joints = coordinateTuple.Item2;
-
-                // headers
-                writer.Write(TLogger.scenario + ", " + timestamp + ", " + personId + ", ");
-                writer.Write(replica.Id + ", " + replica.Skeleton.InitialAngle, replica.Skeleton.InitialDistance + ", " + replica.Skeleton.Timestamp + ", ");
-                writer.Write(replica.FOV.Id + ", " + replica.FOV.Specification.Angle + ", " + replica.FOV.Specification.Height);
-
+                // Headers
+                writer.Write(String.Format("{0}, {1}, {2}, ", TLogger.scenario, timestamp, personId));
+                writer.Write(String.Format("{0}, {1}, {2}, {3}, ", replica.Id, replica.Skeleton.InitialAngle, replica.Skeleton.InitialDistance, replica.Skeleton.Timestamp));
+                writer.Write(String.Format("{0}, {1}, {2}", replica.FOV.Id, replica.FOV.Specification.Angle, replica.FOV.Specification.Height));
                 // Joint_X, Joint_Y, Joint_Z
                 TLogger.WriteJointsData(writer, joints);
             }
@@ -170,11 +168,11 @@ namespace Tiny
                 writer.Write(prefix);
                 if (joints.ContainsKey(jt))
                 {
-                    writer.Write(joints[jt].Coordinate.X + ", " + joints[jt].Coordinate.Y + ", " + joints[jt].Coordinate.Z);
+                    writer.Write(String.Format("{0}, {1}, {2}", joints[jt].Coordinate.X, joints[jt].Coordinate.Y, joints[jt].Coordinate.Z));
                 }
                 else
                 {
-                    writer.Write(TLogger.NA + ", " + TLogger.NA + ", " + TLogger.NA);
+                    writer.Write(String.Format("{0}, {1}, {2}", TLogger.NA, TLogger.NA, TLogger.NA));
                 }
             }
             // newline

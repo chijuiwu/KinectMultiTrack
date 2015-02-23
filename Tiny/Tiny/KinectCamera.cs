@@ -28,8 +28,8 @@ namespace Tiny
                 this.DepthFrameWidth = depthFrameWidth;
                 this.DepthFrameHeight = depthFrameHeight;
                 // TODO: Update these values
-                this.Angle = 0;
-                this.Height = 0;
+                this.Angle = 0.0;
+                this.Height = 0.0;
             }
         }
 

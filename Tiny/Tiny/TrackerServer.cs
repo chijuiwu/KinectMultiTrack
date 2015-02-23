@@ -156,15 +156,14 @@ namespace Tiny
         private void StartTrackingUpdateThread(IPEndPoint clientIP, SBodyFrame bodyFrame)
         {
             Tracker.Result result = this.tracker.Synchronize(clientIP, bodyFrame);
-            this.MultipleKinectUpdate(result);
-            this.TrackingUpdate(result);
-
-            //if (this.writeLogStopwatch.ElapsedMilliseconds > this.writeLogInterval)
-            //{
-            //    Thread writeLogThread = new Thread(() => TrackingLogger.Write(result));
-            //    writeLogThread.Start();
-            //    this.writeLogStopwatch.Restart();
-            //}
+            //this.MultipleKinectUpdate(result);
+            //this.TrackingUpdate(result);
+            if (this.writeLogStopwatch.ElapsedMilliseconds > this.writeLogInterval)
+            {
+                Thread writeLogThread = new Thread(() => TLogger.Write(result));
+                writeLogThread.Start();
+                this.writeLogStopwatch.Restart();
+            }
         }
     }
 }

@@ -185,19 +185,19 @@ namespace Tiny
         // TODO: Check if joints are inferred
         private IEnumerable<Result.Person> AssignSkeletonsToPeople(IEnumerable<Result.KinectFOV> fovs)
         {
-            Debug.WriteLine("Matching skeleton...");
-            Debug.WriteLine("FOV: " + fovs.Count());
+            //Debug.WriteLine("Matching skeleton...");
+            //Debug.WriteLine("FOV: " + fovs.Count());
             List<Tuple<Result.KinectFOV, TSkeleton>> skeletonsList = new List<Tuple<Result.KinectFOV, TSkeleton>>();
             foreach (Result.KinectFOV fov in fovs)
             {
                 KinectCamera kinect = this.kinectsDict[fov.ClientIP];
-                Debug.WriteLine("Kinect: " + fov.ClientIP + " People: " + kinect.Skeletons.Count());
+                //Debug.WriteLine("Kinect: " + fov.ClientIP + " People: " + kinect.Skeletons.Count());
                 foreach (TSkeleton skeleton in kinect.Skeletons)
                 {
                     skeletonsList.Add(Tuple.Create(fov, skeleton));
                 }
             }
-            Debug.WriteLine("Total Skeletons: " + skeletonsList.Count);
+            //Debug.WriteLine("Total Skeletons: " + skeletonsList.Count);
 
             List<Result.Person> people = new List<Result.Person>();
             // TODO: Validate result
@@ -205,18 +205,18 @@ namespace Tiny
             while(skeletonsList.Any())
             {
                 IEnumerable<Tuple<Result.KinectFOV, TSkeleton>> personSkeletons = this.GroupSkeletons(skeletonsList);
-                Debug.WriteLine("Matches Found: " + personSkeletons.Count());
+                //Debug.WriteLine("Matches Found: " + personSkeletons.Count());
                 List<Result.SkeletonReplica> matches = new List<Result.SkeletonReplica>();
                 foreach (Tuple<Result.KinectFOV, TSkeleton> skeleton in personSkeletons)
                 {
-                    Debug.WriteLine("Match: [FOV: " + skeleton.Item1.ClientIP + ", Skeleton: " + skeleton.Item2 + "]");
+                    //Debug.WriteLine("Match: [FOV: " + skeleton.Item1.ClientIP + ", Skeleton: " + skeleton.Item2 + "]");
                     matches.Add(new Result.SkeletonReplica((uint)matches.Count, skeleton.Item1, skeleton.Item2));
                     skeletonsList.Remove(skeleton);
                 }
                 Result.Person person = new Result.Person((uint)people.Count, matches);
                 people.Add(person);
             }
-            Debug.WriteLine("Total People: " + people.Count);
+            //Debug.WriteLine("Total People: " + people.Count);
             return people;
         }
 
