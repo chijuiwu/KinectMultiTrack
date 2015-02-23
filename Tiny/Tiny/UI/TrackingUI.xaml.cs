@@ -148,31 +148,29 @@ namespace Tiny.UI
                     {
                         continue;
                     }
-
-                    // Skeletons
-                    List<Dictionary<JointType, KinectJoint>> skeletonJointsList = new List<Dictionary<JointType, KinectJoint>>();
+                    // All skeletons
+                    HashSet<Dictionary<JointType, KinectJoint>> skeletonJointSet = new HashSet<Dictionary<JointType, KinectJoint>>();
                     foreach (Tracker.Result.SkeletonReplica match in person.Replicas)
                     {
-                        Dictionary<JointType, KinectJoint> joints = TUtils.GetKinectJoints(match, reference);
-                        skeletonJointsList.Add(joints);
+                        skeletonJointSet.Add(TUtils.GetKinectJoints(match, reference));
                     }
 
                     Pen pen = this.personColors[personIdx++];
                     if (this.currentViewMode == ViewMode.Skeletons)
                     {
-                        this.DrawSkeletons(skeletonJointsList, dc, pen);
+                        this.DrawSkeletons(skeletonJointSet, dc, pen);
                     }
                     else
                     {
                         // Average
-                        Dictionary<JointType, KinectJoint> averageJoints = TUtils.GetAverages(skeletonJointsList);
+                        Dictionary<JointType, KinectJoint> averageJoints = TUtils.GetAverages(skeletonJointSet);
                         if (this.currentViewMode == ViewMode.Average)
                         {
                             this.DrawAverageSkeletons(averageJoints, dc, TrackingUI.averageBonePen);
                         }
                         else if (this.currentViewMode == ViewMode.All)
                         {
-                            this.DrawSkeletonsAndAverage(skeletonJointsList, averageJoints, dc, pen);
+                            this.DrawSkeletonsAndAverage(skeletonJointSet, averageJoints, dc, pen);
                         }
                     }
                 }
@@ -248,6 +246,10 @@ namespace Tiny.UI
             {
                 JointType jt0 = bone.Item1;
                 JointType jt1 = bone.Item2;
+                if (!joints.ContainsKey(jt0) || !joints.ContainsKey(jt1))
+                {
+                    continue;
+                }
                 Point jointPt0 = joints[jt0].Item1;
                 Point jointPt1 = joints[jt1].Item1;
                 TrackingState joint0TS = joints[jt0].Item2;

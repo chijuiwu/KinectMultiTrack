@@ -146,6 +146,7 @@ namespace Tiny.WorldView
             return copy;
         }
 
+        // Normalize against the number of joints
         public static double CalculateDifferences(WBody body0, WBody body1)
         {
             double diff = 0;
@@ -156,7 +157,7 @@ namespace Tiny.WorldView
                 WJoint joint1 = body1.Joints[jt];
                 diff += WCoordinate.CalculateDifference(joint0.Coordinate, joint1.Coordinate);
             }
-            return diff;
+            return diff/(double)commonJoints.Count();
         }
     }
 }

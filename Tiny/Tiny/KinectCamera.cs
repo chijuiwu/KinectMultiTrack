@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Text;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Diagnostics;
@@ -33,6 +34,7 @@ namespace Tiny
             }
         }
 
+        public uint Id { get; private set; }
         public KinectCamera.Specification CameraSpecification { get; private set; }
         private bool calibrated;
         private Dictionary<ulong, TSkeleton> skeletons;
@@ -67,8 +69,9 @@ namespace Tiny
             }
         }
 
-        public KinectCamera(string ip)
+        public KinectCamera(string ip, uint id)
         {
+            this.Id = id;
             this.calibrated = false;
             this.CameraSpecification = null;
             this.skeletons = new Dictionary<ulong, TSkeleton>();

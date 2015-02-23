@@ -66,7 +66,7 @@ namespace Tiny.WorldView
 
         public static float CalculateDifference(WCoordinate c0, WCoordinate c1)
         {
-            return (float)Math.Sqrt(c0.X * c1.X + c0.Y * c1.Y + c0.Z * c1.Z);
+            return (float)Math.Sqrt(Math.Pow(c0.X-c1.X, 2) + Math.Pow(c0.Y-c1.Y, 2) + Math.Pow(c0.Z-c1.Z, 2));
         }
     }
 }

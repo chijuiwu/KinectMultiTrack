@@ -30,27 +30,33 @@ namespace Tiny
             return body.Joints;
         }
 
-        public static Dictionary<JointType, KinectJoint> GetAverages(IEnumerable<Dictionary<JointType, KinectJoint>> jointsList)
+        // 
+        public static Dictionary<JointType, KinectJoint> GetAverages(IEnumerable<Dictionary<JointType, KinectJoint>> kinectCollection)
         {
             Dictionary<JointType, CameraSpacePoint> sum = new Dictionary<JointType, CameraSpacePoint>();
-            Dictionary<JointType, int> count = new Dictionary<JointType, int>();
-            foreach (Dictionary<JointType, KinectJoint> joints in jointsList)
+            Dictionary<JointType, uint> count = new Dictionary<JointType, uint>();
+            foreach (Dictionary<JointType, KinectJoint> kinectJoints in kinectCollection)
             {
-                foreach (JointType jt in joints.Keys)
+                foreach (JointType jt in kinectJoints.Keys)
                 {
-                    if (sum.ContainsKey(jt))
+                    if (kinectJoints[jt].TrackingState == TrackingState.Inferred)
                     {
-                        CameraSpacePoint newSum = new CameraSpacePoint();
-                        newSum.X = sum[jt].X + joints[jt].Coordinate.X;
-                        newSum.Y = sum[jt].Y + joints[jt].Coordinate.Y;
-                        newSum.Z = sum[jt].Z + joints[jt].Coordinate.Z;
-                        sum[jt] = newSum;
-                        count[jt] += 1;
+                        // Don't use inferred points to calculate the average
+                        continue;
+                    }
+                    if (!sum.ContainsKey(jt))
+                    {
+                        sum[jt] = kinectJoints[jt].Coordinate;
+                        count[jt] = 1;
                     }
                     else
                     {
-                        sum[jt] = joints[jt].Coordinate;
-                        count[jt] = 1;
+                        CameraSpacePoint newSum = new CameraSpacePoint();
+                        newSum.X = sum[jt].X + kinectJoints[jt].Coordinate.X;
+                        newSum.Y = sum[jt].Y + kinectJoints[jt].Coordinate.Y;
+                        newSum.Z = sum[jt].Z + kinectJoints[jt].Coordinate.Z;
+                        sum[jt] = newSum;
+                        count[jt]++;
                     }
                 }
             }

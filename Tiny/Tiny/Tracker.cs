@@ -28,14 +28,14 @@ namespace Tiny
         {
             public class KinectFOV
             {
-                public uint Id { get; private set; }
                 public IPEndPoint ClientIP { get; private set; }
+                public uint Id { get; private set; }
                 public KinectCamera.Specification Specification { get; private set; }
 
-                public KinectFOV(uint id, IPEndPoint clientIP, KinectCamera.Specification specification)
+                public KinectFOV(IPEndPoint clientIP, uint id, KinectCamera.Specification specification)
                 {
-                    this.Id = id;
                     this.ClientIP = clientIP;
+                    this.Id = id;
                     this.Specification = specification;
                 }
             }
@@ -153,7 +153,7 @@ namespace Tiny
         {
             if (!this.kinectsDict.ContainsKey(clientIP))
             {
-                this.kinectsDict[clientIP] = new KinectCamera(clientIP.ToString());
+                this.kinectsDict[clientIP] = new KinectCamera(clientIP.ToString(), (uint)this.kinectsDict.Count);
             }
             lock (syncFrameLock)
             {
@@ -165,13 +165,18 @@ namespace Tiny
                     }
                     this.calibrated = true;
                 }
+                bool trackingBegun = true;
                 this.kinectsDict[clientIP].ProcessFrames(bodyframe);
                 List<Result.KinectFOV> fovs = new List<Result.KinectFOV>();
                 foreach (IPEndPoint kinectIP in this.kinectsDict.Keys)
                 {
-                    fovs.Add(new Result.KinectFOV((uint)fovs.Count, kinectIP, this.kinectsDict[kinectIP].CameraSpecification));
+                    KinectCamera kinect = this.kinectsDict[kinectIP];
+                    fovs.Add(new Result.KinectFOV(kinectIP, kinect.Id, kinect.CameraSpecification));
+                    if (kinect.Skeletons.Count() == 0) {
+                        trackingBegun = false;
+                    }
                 }
-                if (!this.calibrated)
+                if (!this.calibrated || !trackingBegun)
                 {
                     return new Result(fovs, Enumerable.Empty<Result.Person>());
                 }
@@ -182,77 +187,64 @@ namespace Tiny
             }
         }
 
-        // TODO: Check if joints are inferred
         private IEnumerable<Result.Person> AssignSkeletonsToPeople(IEnumerable<Result.KinectFOV> fovs)
         {
-            //Debug.WriteLine("Matching skeleton...");
-            //Debug.WriteLine("FOV: " + fovs.Count());
-            List<Tuple<Result.KinectFOV, TSkeleton>> skeletonsList = new List<Tuple<Result.KinectFOV, TSkeleton>>();
+            HashSet<Tuple<Result.KinectFOV, TSkeleton>> skeletonsSet = new HashSet<Tuple<Result.KinectFOV, TSkeleton>>();
             foreach (Result.KinectFOV fov in fovs)
             {
                 KinectCamera kinect = this.kinectsDict[fov.ClientIP];
-                //Debug.WriteLine("Kinect: " + fov.ClientIP + " People: " + kinect.Skeletons.Count());
                 foreach (TSkeleton skeleton in kinect.Skeletons)
                 {
-                    skeletonsList.Add(Tuple.Create(fov, skeleton));
+                    skeletonsSet.Add(Tuple.Create(fov, skeleton));
                 }
             }
-            //Debug.WriteLine("Total Skeletons: " + skeletonsList.Count);
-
             List<Result.Person> people = new List<Result.Person>();
             // TODO: Validate result
-            // TODO: Deal with occlusion (One person may not appear in all FOVs)
-            while(skeletonsList.Any())
+            while(skeletonsSet.Any())
             {
-                IEnumerable<Tuple<Result.KinectFOV, TSkeleton>> personSkeletons = this.GroupSkeletons(skeletonsList);
-                //Debug.WriteLine("Matches Found: " + personSkeletons.Count());
-                List<Result.SkeletonReplica> matches = new List<Result.SkeletonReplica>();
+                IEnumerable<Tuple<Result.KinectFOV, TSkeleton>> personSkeletons = this.GroupClosestSkeletons(skeletonsSet);
+                HashSet<Result.SkeletonReplica> matches = new HashSet<Result.SkeletonReplica>();
                 foreach (Tuple<Result.KinectFOV, TSkeleton> skeleton in personSkeletons)
                 {
-                    //Debug.WriteLine("Match: [FOV: " + skeleton.Item1.ClientIP + ", Skeleton: " + skeleton.Item2 + "]");
                     matches.Add(new Result.SkeletonReplica((uint)matches.Count, skeleton.Item1, skeleton.Item2));
-                    skeletonsList.Remove(skeleton);
+                    skeletonsSet.Remove(skeleton);
                 }
-                Result.Person person = new Result.Person((uint)people.Count, matches);
-                people.Add(person);
+                people.Add(new Result.Person((uint)people.Count, matches));
             }
-            //Debug.WriteLine("Total People: " + people.Count);
             return people;
         }
 
-        // Match people in other Kinect FOV by their positions in World View
-        private IEnumerable<Tuple<Result.KinectFOV, TSkeleton>> GroupSkeletons(IEnumerable<Tuple<Result.KinectFOV, TSkeleton>> skeletons)
+        // Match people in other Kinect FOV by their positions in Worldview
+        // TODO: Deal with full occlusion
+        // TODO: Check if joints are inferred
+        private IEnumerable<Tuple<Result.KinectFOV, TSkeleton>> GroupClosestSkeletons(IEnumerable<Tuple<Result.KinectFOV, TSkeleton>> skeletons)
         {
+            List<Tuple<Result.KinectFOV, TSkeleton>> personSkeletons = new List<Tuple<Result.KinectFOV, TSkeleton>>() { skeletons.First() };
             // Find matches for the first skeleton
             Result.KinectFOV targetFOV = skeletons.First().Item1;
             TSkeleton targetSkeleton = skeletons.First().Item2;
-            List<Tuple<Result.KinectFOV, TSkeleton>> personSkeletons = new List<Tuple<Result.KinectFOV, TSkeleton>>() { skeletons.First() };
 
-            Dictionary<Result.KinectFOV, Tuple<TSkeleton, double>> mostSimilarSkeletons = new Dictionary<Result.KinectFOV, Tuple<TSkeleton, double>>();
+            Dictionary<Result.KinectFOV, Tuple<TSkeleton, double>> similarSkeletonsDict = new Dictionary<Result.KinectFOV, Tuple<TSkeleton, double>>();
             foreach (Tuple<Result.KinectFOV, TSkeleton> skeleton in skeletons)
             {
                 Result.KinectFOV otherFOV = skeleton.Item1;
                 TSkeleton otherSkeleton = skeleton.Item2;
-                if (!otherFOV.Equals(targetFOV) && !otherSkeleton.Equals(targetSkeleton))
+                // Look for skeletons in other FOV
+                if (!otherFOV.Equals(targetFOV))
                 {
                     TSkeleton.Position pos0 = targetSkeleton.CurrentPosition;
                     TSkeleton.Position pos1 = otherSkeleton.CurrentPosition;
-                    // HACK
-                    if (pos0 == null || pos1 == null)
-                    {
-                        mostSimilarSkeletons[otherFOV] = Tuple.Create(otherSkeleton, Double.MinValue);
-                        continue;
-                    }
                     double diff = WBody.CalculateDifferences(pos0.Worldview, pos1.Worldview);
-                    if ((mostSimilarSkeletons.ContainsKey(otherFOV) && diff < mostSimilarSkeletons[otherFOV].Item2) || !mostSimilarSkeletons.ContainsKey(otherFOV))
+                    // Keep track of the smallest difference skeletons in other FOVs
+                    if (!similarSkeletonsDict.ContainsKey(otherFOV) || diff < similarSkeletonsDict[otherFOV].Item2)
                     {
-                        mostSimilarSkeletons[otherFOV] = Tuple.Create(otherSkeleton, diff);
+                        similarSkeletonsDict[otherFOV] = Tuple.Create(otherSkeleton, diff);
                     }
                 }
             }
-            foreach (Result.KinectFOV fov in mostSimilarSkeletons.Keys)
+            foreach (Result.KinectFOV fov in similarSkeletonsDict.Keys)
             {
-                personSkeletons.Add(Tuple.Create(fov, mostSimilarSkeletons[fov].Item1));
+                personSkeletons.Add(Tuple.Create(fov, similarSkeletonsDict[fov].Item1));
             }
             return personSkeletons;
         }

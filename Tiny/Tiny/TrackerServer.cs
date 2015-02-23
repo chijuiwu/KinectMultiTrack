@@ -157,13 +157,13 @@ namespace Tiny
         {
             Tracker.Result result = this.tracker.Synchronize(clientIP, bodyFrame);
             //this.MultipleKinectUpdate(result);
-            //this.TrackingUpdate(result);
-            if (this.writeLogStopwatch.ElapsedMilliseconds > this.writeLogInterval)
-            {
-                Thread writeLogThread = new Thread(() => TLogger.Write(result));
-                writeLogThread.Start();
-                this.writeLogStopwatch.Restart();
-            }
+            this.TrackingUpdate(result);
+            //if (this.writeLogStopwatch.ElapsedMilliseconds > this.writeLogInterval)
+            //{
+            //    Thread writeLogThread = new Thread(() => TLogger.Write(result));
+            //    writeLogThread.Start();
+            //    this.writeLogStopwatch.Restart();
+            //}
         }
     }
 }
