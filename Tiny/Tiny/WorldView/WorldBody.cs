@@ -18,7 +18,7 @@ namespace Tiny.WorldView
             this.Joints = new Dictionary<JointType, WJoint>();
         }
 
-        // Return the initial angle between user and Kinect
+        // Return the initial angle between the user and Kinect
         public static double GetInitialAngle(SBody body)
         {
             SJoint shoulderLeft = body.Joints[JointType.ShoulderLeft];
@@ -43,19 +43,16 @@ namespace Tiny.WorldView
         public static WCoordinate GetInitialPosition(List<SBody> initialBodies)
         {
             float totalAverageX = 0, totalAverageY = 0, totalAverageZ = 0;
-            int countBodies = 0;
+            int bodyCount = 0;
             foreach (SBody body in initialBodies)
             {
-                countBodies++;
+                bodyCount++;
                 float sumXs = 0, sumYs = 0, sumZs = 0;
                 int countXs = 0, countYs = 0, countZs = 0;
+                // HACK: Assume all joints are present
                 foreach (JointType jt in SkeletonStructure.Joints)
                 {
-                    if (!body.Joints.ContainsKey(jt))
-                    {
-                        continue;
-                    }
-                    if (body.Joints[jt].TrackingState.Equals(TrackingState.NotTracked))
+                    if (!body.Joints.ContainsKey(jt) || body.Joints[jt].TrackingState == TrackingState.NotTracked)
                     {
                         continue;
                     }
@@ -70,9 +67,9 @@ namespace Tiny.WorldView
                 totalAverageY += sumYs / (float)countYs;
                 totalAverageZ += sumZs / (float)countZs;
             }
-            float centreX = totalAverageX / (float)countBodies;
-            float centreY = totalAverageY / (float)countBodies;
-            float centreZ = totalAverageZ / (float)countBodies;
+            float centreX = totalAverageX / (float)bodyCount;
+            float centreY = totalAverageY / (float)bodyCount;
+            float centreZ = totalAverageZ / (float)bodyCount;
             return new WCoordinate(centreX, centreY, centreZ);
         }
 
@@ -80,29 +77,26 @@ namespace Tiny.WorldView
         public static WBody Create(SBody body, double initialAngle, WCoordinate initialCenterPosition)
         {
             WBody worldviewBody = new WBody();
-            foreach (JointType jointType in body.Joints.Keys)
+            foreach (JointType jt in body.Joints.Keys)
             {
-                SJoint joint = body.Joints[jointType];
-                CameraSpacePoint jointPosition = joint.CameraSpacePoint;
-
+                SJoint joint = body.Joints[jt];
+                CameraSpacePoint jtPos = joint.CameraSpacePoint;
                 // Translation
-                float translatedX = jointPosition.X - initialCenterPosition.X;
-                float translatedY = jointPosition.Y - initialCenterPosition.Y;
-                float translatedZ = jointPosition.Z - initialCenterPosition.Z;
-
+                float translatedX = jtPos.X - initialCenterPosition.X;
+                float translatedY = jtPos.Y - initialCenterPosition.Y;
+                float translatedZ = jtPos.Z - initialCenterPosition.Z;
                 // Rotation
                 float transformedX = (float)(translatedX * Math.Cos(initialAngle) + translatedZ * Math.Sin(initialAngle));
                 float transformedY = translatedY;
                 float transformedZ = (float)(translatedZ * Math.Cos(initialAngle) - translatedX * Math.Sin(initialAngle));
-
-                WCoordinate coordinate = new WCoordinate(transformedX, transformedY, transformedZ);
-                worldviewBody.Joints[jointType] = new WJoint(coordinate, joint.TrackingState);
+                WCoordinate worldviewJoint = new WCoordinate(transformedX, transformedY, transformedZ);
+                worldviewBody.Joints[jt] = new WJoint(worldviewJoint, joint.TrackingState);
             }
             return worldviewBody;
         }
 
         // Joints transformed back to the Kinect camera space point
-        public static KinectBody TransformToKinectBody(WBody body, double initialAngle, WCoordinate centrePoint)
+        public static KinectBody TransformToKinectBody(WBody body, double initialAngle, WCoordinate initialCentrePosition)
         {
             KinectBody kinectSkeleton = new KinectBody();
 
@@ -112,37 +106,32 @@ namespace Tiny.WorldView
 
                 double sinAngle = Math.Sin(initialAngle);
                 double cosAngle = Math.Cos(initialAngle);
-
                 double[,] matrix = new double[2, 2];
-                matrix[0, 0] = cosAngle;
-                matrix[0, 1] = sinAngle;
-                matrix[1, 0] = -sinAngle;
-                matrix[1, 1] = cosAngle;
+                matrix[0,0] = cosAngle;
+                matrix[0,1] = -sinAngle;
+                matrix[1,0] = sinAngle;
+                matrix[1,1] = cosAngle;
+                double determinant = 1 / (matrix[0,0]*matrix[1,1] - matrix[0,1]*matrix[1,0]);
+                double[,] inverseMatrix = new double[2,2];
+                inverseMatrix[0,0] = matrix[1,1];
+                inverseMatrix[0,1] = -matrix[0,1];
+                inverseMatrix[1,0] = -matrix[1,0];
+                inverseMatrix[1,1] = matrix[0,0];
+                inverseMatrix[0,0] = determinant * inverseMatrix[0,0];
+                inverseMatrix[0,1] = determinant * inverseMatrix[0,1];
+                inverseMatrix[1,0] = determinant * inverseMatrix[1,0];
+                inverseMatrix[1,1] = determinant * inverseMatrix[1,1];
 
-                double determinant = 1 / (matrix[0, 0] * matrix[1, 1] - matrix[0, 1] * matrix[1, 0]);
-
-                double[,] inverseMatrix = new double[2, 2];
-                inverseMatrix[0, 0] = matrix[1, 1];
-                inverseMatrix[0, 1] = -matrix[0, 1];
-                inverseMatrix[1, 0] = -matrix[1, 0];
-                inverseMatrix[1, 1] = matrix[0, 0];
-                inverseMatrix[0, 0] = determinant * inverseMatrix[0, 0];
-                inverseMatrix[0, 1] = determinant * inverseMatrix[0, 1];
-                inverseMatrix[1, 0] = determinant * inverseMatrix[1, 0];
-                inverseMatrix[1, 1] = determinant * inverseMatrix[1, 1];
-
-                float translatedX = (float)(inverseMatrix[0, 0] * worldviewJoint.X + inverseMatrix[0, 1] * worldviewJoint.Z);
+                float translatedX = (float)(inverseMatrix[0,0]*worldviewJoint.X + inverseMatrix[1,0]*worldviewJoint.X);
                 float translatedY = worldviewJoint.Y;
-                float translatedZ = (float)(inverseMatrix[1, 0] * worldviewJoint.X + inverseMatrix[1, 1] * worldviewJoint.Z);
+                float translatedZ = (float)(inverseMatrix[0,1]*worldviewJoint.Z + inverseMatrix[1,1]*worldviewJoint.Z);
 
-                CameraSpacePoint coordinate = new CameraSpacePoint();
-                coordinate.X = translatedX + centrePoint.X;
-                coordinate.Y = translatedY + centrePoint.Y;
-                coordinate.Z = translatedZ + centrePoint.Z;
-
-                kinectSkeleton.Joints[jt] = new KinectJoint(body.Joints[jt].TrackingState, coordinate);
+                CameraSpacePoint kinectJointPt = new CameraSpacePoint();
+                kinectJointPt.X = translatedX + initialCentrePosition.X;
+                kinectJointPt.Y = translatedY + initialCentrePosition.Y;
+                kinectJointPt.Z = translatedZ + initialCentrePosition.Z;
+                kinectSkeleton.Joints[jt] = new KinectJoint(body.Joints[jt].TrackingState, kinectJointPt);
             }
-
             return kinectSkeleton;
         }
 
@@ -161,10 +150,10 @@ namespace Tiny.WorldView
         {
             double diff = 0;
             IEnumerable<JointType> commonJoints = body0.Joints.Keys.Intersect(body1.Joints.Keys);
-            foreach (JointType jointType in commonJoints)
+            foreach (JointType jt in commonJoints)
             {
-                WJoint joint0 = body0.Joints[jointType];
-                WJoint joint1 = body1.Joints[jointType];
+                WJoint joint0 = body0.Joints[jt];
+                WJoint joint1 = body1.Joints[jt];
                 diff += WCoordinate.CalculateDifference(joint0.Coordinate, joint1.Coordinate);
             }
             return diff;
