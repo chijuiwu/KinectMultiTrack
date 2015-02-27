@@ -1,0 +1,16 @@
+\BOOKMARK [1][-]{section*.4}{Introduction}{}% 1
+\BOOKMARK [2][-]{section*.5}{Contributions}{section*.4}% 2
+\BOOKMARK [2][-]{section*.6}{Previous Work}{section*.4}% 3
+\BOOKMARK [1][-]{section*.7}{Kinect}{}% 4
+\BOOKMARK [1][-]{section*.8}{Current Approach}{}% 5
+\BOOKMARK [2][-]{section*.9}{Multiple Kinects and Sockets}{section*.8}% 6
+\BOOKMARK [3][-]{section*.10}{Serialization}{section*.9}% 7
+\BOOKMARK [2][-]{section*.11}{Calibration}{section*.8}% 8
+\BOOKMARK [2][-]{section*.12}{Tracking}{section*.8}% 9
+\BOOKMARK [1][-]{section*.13}{Testing}{}% 10
+\BOOKMARK [2][-]{section*.14}{Occlusion}{section*.13}% 11
+\BOOKMARK [1][-]{section*.15}{Evaluation}{}% 12
+\BOOKMARK [2][-]{section*.16}{Occlusion}{section*.15}% 13
+\BOOKMARK [1][-]{section*.17}{Acknowledgments}{}% 14
+\BOOKMARK [1][-]{section*.18}{HACK}{}% 15
+\BOOKMARK [1][-]{section*.19}{REFERENCES }{}% 16

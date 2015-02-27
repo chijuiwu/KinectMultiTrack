@@ -1,0 +1,186 @@
+\documentclass{sigchi}
+
+% Use this command to override the default ACM copyright statement
+% (e.g. for preprints).  Consult the conference website for the
+% camera-ready copyright statement.
+
+
+%% EXAMPLE BEGIN -- HOW TO OVERRIDE THE DEFAULT COPYRIGHT STRIP -- (July 22, 2013 - Paul Baumann)
+\toappear{
+{\emph{University of St Andrews}}, April 3, 2015, United Kingdom. \\
+Copyright \copyright~Chi-Jui Wu. \\
+}
+%% EXAMPLE END -- HOW TO OVERRIDE THE DEFAULT COPYRIGHT STRIP -- (July 22, 2013 - Paul Baumann)
+
+
+% Arabic page numbers for submission.  Remove this line to eliminate
+% page numbers for the camera ready copy
+
+%\pagenumbering{arabic}
+
+% Load basic packages
+\usepackage{balance}  % to better equalize the last page
+\usepackage{graphics} % for EPS, load graphicx instead
+%\usepackage[T1]{fontenc}
+\usepackage{txfonts}
+\usepackage{times}    % comment if you want LaTeX's default font
+\usepackage[pdftex]{hyperref}
+% \usepackage{url}      % llt: nicely formatted URLs
+\usepackage{color}
+\usepackage{textcomp}
+\usepackage{booktabs}
+\usepackage{ccicons}
+\usepackage{todonotes}
+
+% llt: Define a global style for URLs, rather that the default one
+\makeatletter
+\def\url@leostyle{%
+  \@ifundefined{selectfont}{\def\UrlFont{\sf}}{\def\UrlFont{\small\bf\ttfamily}}}
+\makeatother
+\urlstyle{leo}
+
+% To make various LaTeX processors do the right thing with page size.
+\def\pprw{8.5in}
+\def\pprh{11in}
+\special{papersize=\pprw,\pprh}
+\setlength{\paperwidth}{\pprw}
+\setlength{\paperheight}{\pprh}
+\setlength{\pdfpagewidth}{\pprw}
+\setlength{\pdfpageheight}{\pprh}
+
+% Make sure hyperref comes last of your loaded packages, to give it a
+% fighting chance of not being over-written, since its job is to
+% redefine many LaTeX commands.
+\definecolor{linkColor}{RGB}{6,125,233}
+\hypersetup{%
+  pdftitle={SIGCHI Conference Proceedings Format},
+  pdfauthor={LaTeX},
+  pdfkeywords={SIGCHI, proceedings, archival format},
+  bookmarksnumbered,
+  pdfstartview={FitH},
+  colorlinks,
+  citecolor=black,
+  filecolor=black,
+  linkcolor=black,
+  urlcolor=linkColor,
+  breaklinks=true,
+}
+
+% create a shortcut to typeset table headings
+% \newcommand\tabhead[1]{\small\textbf{#1}}
+
+% End of preamble. Here it comes the document.
+\begin{document}
+
+\title{Tracking People with Multiple Kinects}
+
+\numberofauthors{1}
+\author{%
+  \alignauthor{Chi-Jui Wu\\
+    \affaddr{Computer Science, University of St Andrews}\\
+    \affaddr{United Kingdom}\\
+    \email{cjw21@st-andrews.ac.uk}}\\
+}
+
+\maketitle
+
+\begin{abstract}
+Abstract.
+\end{abstract}
+
+\keywords{Tracking; Kinect; Calibration; HCI}
+
+\category{H.5.m.}{Information Interfaces and Presentation
+  (e.g. HCI)}{Miscellaneous}{}{}
+
+\section{Introduction}
+
+SECTION
+
+\subsection{Contributions}
+
+\subsection{Previous Work}
+
+\section{Kinect}
+
+SECTION
+
+\section{Current Approach}
+
+SECTION
+
+\subsection{Multiple Kinects and Sockets}
+
+\subsubsection{Serialization}
+
+\subsection{Calibration}
+
+\subsection{Tracking}
+
+\section{Testing}
+
+SECTION
+
+\subsection{Occlusion}
+
+\section{Evaluation}
+
+SECTION
+
+\subsection{Occlusion}
+
+\section{Acknowledgments}
+
+SECTION
+
+\section{HACK}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi posuere viverra justo, a congue neque consectetur ac. Nam quis fringilla urna. In non nulla varius, porta mauris vel, volutpat mauris. Vivamus porta est quam, a facilisis sapien varius in. In accumsan risus nec leo dictum dictum. Duis ullamcorper dictum velit, sit amet egestas elit consectetur ac. Nam non leo nec lectus iaculis ultricies.
+
+Nam varius dictum dui, ut efficitur ante vehicula a. In hac habitasse platea dictumst. Vestibulum eu metus porttitor lorem vehicula lobortis convallis vel tellus. Aenean tempus iaculis purus. Nullam non nulla tristique ex bibendum eleifend pulvinar et dolor. Donec venenatis diam sem, non molestie dolor volutpat rutrum. Praesent fringilla aliquet quam eget consequat. Vivamus sit amet dolor ex. Quisque justo quam, commodo id diam sed, scelerisque elementum felis. Nulla facilisi.
+
+In non dolor velit. Morbi nunc turpis, pharetra nec ipsum sed, venenatis dictum urna. Etiam sapien nisl, scelerisque sit amet dapibus vitae, venenatis vel arcu. Nam mi lorem, efficitur vitae nibh id, malesuada viverra libero. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eu suscipit felis, sit amet cursus est. Mauris tempor interdum elementum. Cras non sagittis leo. Quisque mattis lorem justo, ac volutpat ipsum rhoncus ut. Aliquam erat volutpat. Maecenas sagittis turpis augue, id condimentum nisi euismod a. Nulla efficitur malesuada pellentesque.
+
+Nullam tempor pulvinar augue non viverra. Mauris id varius leo, eu porta mauris. Praesent vitae justo vestibulum, hendrerit libero sed, lacinia dolor. Praesent commodo pellentesque faucibus. Nam laoreet felis fringilla nisi gravida, ac efficitur est bibendum. Aliquam nec lobortis nulla. Donec porta dignissim tortor, ut fringilla lectus sagittis eget. Cras eget hendrerit dui.
+
+Nunc hendrerit ornare rhoncus. Donec at mauris risus. Donec feugiat, urna in eleifend lacinia, metus lectus scelerisque lectus, eu luctus elit ante vitae magna. Maecenas velit risus, euismod in varius a, tristique id leo. Aliquam pretium lobortis eros sed vulputate. Nullam in risus commodo, lobortis urna eget, elementum risus. Sed quis metus id nibh aliquam congue non sed odio. Maecenas sit amet egestas dui, ac elementum dui. Interdum et malesuada fames ac ante ipsum primis in faucibus. Phasellus vehicula commodo pretium. Nullam nunc elit, mollis sit amet cursus eu, scelerisque a nisl. Suspendisse est ligula, finibus quis quam sed, molestie volutpat leo. Morbi luctus ipsum vitae velit dapibus ultrices. Maecenas laoreet, lacus at accumsan sagittis, nisi ante consequat dolor, porta finibus orci risus porta leo.
+
+\cite{microsoft_kinect_namespace}
+\cite{microsoft_kinect_coordinates}
+\cite{wei_kinect_calibration}
+\cite{eggert_four_algorithms}
+\cite{horn_unit_quaternions}
+
+
+% Balancing columns in a ref list is a bit of a pain because you
+% either use a hack like flushend or balance, or manually insert
+% a column break.  http://www.tex.ac.uk/cgi-bin/texfaq2html?label=balance
+% multicols doesn't work because we're already in two-column mode,
+% and flushend isn't awesome, so I choose balance.  See this
+% for more info: http://cs.brown.edu/system/software/latex/doc/balance.pdf
+%
+% Note that in a perfect world balance wants to be in the first
+% column of the last page.
+%
+% If balance doesn't work for you, you can remove that and
+% hard-code a column break into the bbl file right before you
+% submit:
+%
+% http://stackoverflow.com/questions/2149854/how-to-manually-equalize-columns-
+% in-an-ieee-paper-if-using-bibtex
+%
+% Or, just remove \balance and give up on balancing the last page.
+%
+\balance{}
+
+% REFERENCES FORMAT
+% References must be the same font size as other body text.
+\bibliographystyle{SIGCHI-Reference-Format}
+\bibliography{report_bib}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

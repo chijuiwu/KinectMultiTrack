@@ -149,7 +149,7 @@ namespace Tiny
             }
         }
 
-        public Result Synchronize(IPEndPoint clientIP, SBodyFrame bodyframe)
+        public Result SynchronizeTracking(IPEndPoint clientIP, SBodyFrame bodyframe)
         {
             if (!this.kinectsDict.ContainsKey(clientIP))
             {

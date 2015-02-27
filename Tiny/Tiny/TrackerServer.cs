@@ -15,31 +15,34 @@ namespace Tiny
 {
     public class TServer
     {
-        private TcpListener kinectListener;
-        private Thread acceptKinectConnectionThread;
+        private readonly TcpListener serverKinectTCPListener;
+        private readonly Thread serverThread;
 
-        private Tracker tracker;
-        private Stopwatch writeLogStopwatch;
-        private int writeLogInterval = 250;
-        private int flushLogInterval = 3000;
+        private static const uint SEC_IN_MILLISEC = 1000;
+        private static const uint WRITE_LOG_INTERVAL = 1/4 * SEC_IN_MILLISEC;
+        private static const uint FLUSH_LOG_INTERVAL = 3 * SEC_IN_MILLISEC;
+        private static const uint FRAME_IN_SEC = 60;
+        //private static const uint TRACKING_INTERVAL;
+        private readonly Stopwatch writeLogStopwatch;
+        private readonly Stopwatch flushLogStopwatch;
+        private readonly Stopwatch trackerStopwatch;
+
+        private readonly Tracker tracker;
         private MultipleKinectUI multipleKinectUI;
         private TrackingUI trackingUI;
 
-        private event KinectCameraHandler NewKinectCameraConnected;
-        private event KinectCameraHandler KinectCameraRemoved;
+        private event KinectCameraHandler OnAddedKinectCamera;
+        private event KinectCameraHandler OnRemovedKinectCamera;
         private delegate void KinectCameraHandler(IPEndPoint kinectClientIP);
-
-        private event KinectFrameHandler MultipleKinectUpdate;
+        private event KinectFrameHandler MultipleKinectUIUpdate;
         private delegate void KinectFrameHandler(Tracker.Result result);
-
-        private event WorldViewHandler TrackingUpdate;
+        private event WorldViewHandler TrackingUIUpdate;
         private delegate void WorldViewHandler(Tracker.Result result);
-
 
         public TServer(int port, int kinectCount)
         {
-            this.kinectListener = new TcpListener(IPAddress.Any, port);
-            this.acceptKinectConnectionThread = new Thread(new ThreadStart(this.AcceptKinectConnectionThread));
+            this.serverKinectTCPListener = new TcpListener(IPAddress.Any, port);
+            this.serverThread = new Thread(new ThreadStart(this.ServerWorkerThread));
             
             this.tracker = new Tracker(kinectCount);
 
@@ -52,19 +55,25 @@ namespace Tiny
             trackingUIThread.Start();
 
             this.writeLogStopwatch = new Stopwatch();
-            this.writeLogStopwatch.Start();
-            Timer flushLogTimer = new Timer(new TimerCallback(this.FlushLogsCallback), null, this.flushLogInterval, this.flushLogInterval);
+            this.flushLogStopwatch = new Stopwatch();
+            this.trackerStopwatch = new Stopwatch();
         }
 
         // Run the tracking server
         public void Run()
         {
-            this.acceptKinectConnectionThread.Start();
-            Debug.WriteLine(Tiny.Properties.Resources.SERVER_START + this.kinectListener.LocalEndpoint);
+            this.serverKinectTCPListener.Start();
+            this.serverThread.Start();
+            this.writeLogStopwatch.Start();
+            Debug.WriteLine(Tiny.Properties.Resources.SERVER_START + this.serverKinectTCPListener.LocalEndpoint);
         }
 
         public void Stop()
         {
+            this.serverThread.Abort();
+            this.writeLogStopwatch.Stop();
+            this.flushLogStopwatch.Stop();
+            this.trackerStopwatch.Stop();
             TLogger.Flush();
             TLogger.Close();
         }
@@ -73,7 +82,7 @@ namespace Tiny
         {
             this.multipleKinectUI = new MultipleKinectUI();
             this.multipleKinectUI.Show();
-            this.MultipleKinectUpdate += this.multipleKinectUI.UpdateDisplay;
+            this.MultipleKinectUIUpdate += this.multipleKinectUI.UpdateDisplay;
             Dispatcher.Run();
         }
 
@@ -81,46 +90,40 @@ namespace Tiny
         {
             this.trackingUI = new TrackingUI();
             this.trackingUI.Show();
-            this.TrackingUpdate += this.trackingUI.UpdateDisplay;
-            this.NewKinectCameraConnected += this.trackingUI.AddKinectCamera;
-            this.KinectCameraRemoved += this.trackingUI.RemoveKinectCamera;
+            this.TrackingUIUpdate += this.trackingUI.UpdateDisplay;
+            this.OnAddedKinectCamera += this.trackingUI.AddKinectCamera;
+            this.OnRemovedKinectCamera += this.trackingUI.RemoveKinectCamera;
             Dispatcher.Run();
         }
 
-        private void FlushLogsCallback(object obj)
+        // Accepts connections and for each thread spaw a new connection
+        private void ServerWorkerThread()
         {
-            TLogger.Flush();
-        }
-
-        private void AcceptKinectConnectionThread()
-        {
-            this.kinectListener.Start();
             while (true)
             {
-                TcpClient kinectClient = this.kinectListener.AcceptTcpClient();
-                Thread kinectClientThread = new Thread(() => this.HandleKinectConnectionThread(kinectClient));
-                kinectClientThread.Start();
+                TcpClient kinectClient = this.serverKinectTCPListener.AcceptTcpClient();
+                Thread kinectFrameThread = new Thread(() => this.ServerKinectFrameWorkerThread(kinectClient));
+                kinectFrameThread.Start();
             }
         }
 
-        private void HandleKinectConnectionThread(object obj)
+        private void ServerKinectFrameWorkerThread(object obj)
         {
             TcpClient client = obj as TcpClient;
             IPEndPoint clientIP = (IPEndPoint)client.Client.RemoteEndPoint;
             NetworkStream clientStream = client.GetStream();
-            
             Debug.WriteLine(Tiny.Properties.Resources.CONNECTION_START + clientIP);
-            Boolean cameraRecorded = false;
+            
+            bool kinectCameraAdded = false;
 
             while (true)
             {
-                if (!cameraRecorded && this.NewKinectCameraConnected != null)
+                if (!kinectCameraAdded && this.OnAddedKinectCamera != null)
                 {
-                    Thread addCameraThread = new Thread(() => this.NewKinectCameraConnected(clientIP));
-                    addCameraThread.Start();
-                    cameraRecorded = true;
+                    Thread fireOnAddKinectCamera = new Thread(() => this.OnAddedKinectCamera(clientIP));
+                    fireOnAddKinectCamera.Start();
+                    kinectCameraAdded = true;
                 }
-
                 try
                 {
                     if (!client.Connected) break;
@@ -128,7 +131,7 @@ namespace Tiny
                     while (!clientStream.DataAvailable) ;
 
                     SBodyFrame bodyFrame = BodyFrameSerializer.Deserialize(clientStream);
-                    Thread trackingUpdateThread = new Thread(() => this.StartTrackingUpdateThread(clientIP, bodyFrame));
+                    Thread trackingUpdateThread = new Thread(() => this.TrackingUpdateThread(clientIP, bodyFrame));
                     trackingUpdateThread.Start();
 
                     // Response content is trivial
@@ -146,18 +149,18 @@ namespace Tiny
                 }
             }
             this.tracker.RemoveClient(clientIP);
-            Thread removeCameraThread = new Thread(() => this.KinectCameraRemoved(clientIP));
-            removeCameraThread.Start();
+            Thread fireOnRemoveKinectCamera = new Thread(() => this.OnRemovedKinectCamera(clientIP));
+            fireOnRemoveKinectCamera.Start();
             clientStream.Close();
             clientStream.Dispose();
             client.Close();
         }
 
-        private void StartTrackingUpdateThread(IPEndPoint clientIP, SBodyFrame bodyFrame)
+        private void TrackingUpdateThread(IPEndPoint clientIP, SBodyFrame bodyFrame)
         {
-            Tracker.Result result = this.tracker.Synchronize(clientIP, bodyFrame);
-            //this.MultipleKinectUpdate(result);
-            this.TrackingUpdate(result);
+            Tracker.Result result = this.tracker.SynchronizeTracking(clientIP, bodyFrame);
+            this.MultipleKinectUIUpdate(result);
+            this.TrackingUIUpdate(result);
             //if (this.writeLogStopwatch.ElapsedMilliseconds > this.writeLogInterval)
             //{
             //    Thread writeLogThread = new Thread(() => TLogger.Write(result));

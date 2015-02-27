@@ -1,21 +1,9 @@
-Tiny: Tracking People Using Multiple Kinects
+Tiny: Tracking People with Multiple Kinects
 ======
 
-This repository is a showcase of my, Chi-Jui Wu, Seniour Honours Project (Dissertation) in the School of Computer Science, University of St Andrews.
+The current work progress of my, Chi-Jui Wu, Seniour Honours Project in the School of Computer Science, University of St Andrews.
 
-The project is about tracking people and resolving occlusion in realistic environments using multiple Kinects.
-
-## TODO
-
-* Code refactoring
-* Report
-* Fix UI lag
-* Fix UI crash/rendering when moving too close to the Kinects
-* Test logging
-* Automate tracking process
-* Extend for angle
-* Accommodate for occlusions
-* User study
+The project is about tracking people and resolving occlusion in realworld environments using multiple Kinects.
 
 ## Completed
 
@@ -30,6 +18,7 @@ The project is about tracking people and resolving occlusion in realistic enviro
 * Kinect Calibration (4th December, 2014)
 * Preliminary Skeleton Matching (30th January, 2015)
 * Display Skeletons wrt Different Kienct FOVs (30th January, 2015)
+* Logging (20th February, 2015)
 
 ## Project Description
 
