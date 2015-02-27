@@ -368,7 +368,9 @@ namespace Tiny.UI
 
         private void SetupBtn_Click(object sender, RoutedEventArgs e)
         {
-            // Setup
+            SetupWindow setupWindow = new SetupWindow();
+            setupWindow.Owner = this;
+            setupWindow.ShowDialog();
         }
     }
 }
