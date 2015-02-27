@@ -1,16 +1,21 @@
-\BOOKMARK [1][-]{section*.4}{Introduction}{}% 1
-\BOOKMARK [2][-]{section*.5}{Contributions}{section*.4}% 2
-\BOOKMARK [2][-]{section*.6}{Previous Work}{section*.4}% 3
-\BOOKMARK [1][-]{section*.7}{Kinect}{}% 4
-\BOOKMARK [1][-]{section*.8}{Current Approach}{}% 5
-\BOOKMARK [2][-]{section*.9}{Multiple Kinects and Sockets}{section*.8}% 6
-\BOOKMARK [3][-]{section*.10}{Serialization}{section*.9}% 7
-\BOOKMARK [2][-]{section*.11}{Calibration}{section*.8}% 8
-\BOOKMARK [2][-]{section*.12}{Tracking}{section*.8}% 9
-\BOOKMARK [1][-]{section*.13}{Testing}{}% 10
-\BOOKMARK [2][-]{section*.14}{Occlusion}{section*.13}% 11
-\BOOKMARK [1][-]{section*.15}{Evaluation}{}% 12
-\BOOKMARK [2][-]{section*.16}{Occlusion}{section*.15}% 13
-\BOOKMARK [1][-]{section*.17}{Acknowledgments}{}% 14
-\BOOKMARK [1][-]{section*.18}{HACK}{}% 15
-\BOOKMARK [1][-]{section*.19}{REFERENCES }{}% 16
+\BOOKMARK [1][-]{section*.5}{Introduction}{}% 1
+\BOOKMARK [2][-]{section*.6}{Problem statement}{section*.5}% 2
+\BOOKMARK [2][-]{section*.8}{Contributions}{section*.5}% 3
+\BOOKMARK [1][-]{section*.9}{Previous Work}{}% 4
+\BOOKMARK [2][-]{section*.10}{Coordiante transfomration}{section*.9}% 5
+\BOOKMARK [3][-]{section*.11}{Tracking using RGB-D data}{section*.10}% 6
+\BOOKMARK [1][-]{section*.12}{Kinect}{}% 7
+\BOOKMARK [1][-]{section*.13}{Current Approach}{}% 8
+\BOOKMARK [2][-]{section*.14}{Multiple Kinects and Sockets}{section*.13}% 9
+\BOOKMARK [3][-]{section*.15}{Serialization}{section*.14}% 10
+\BOOKMARK [2][-]{section*.16}{Calibration}{section*.13}% 11
+\BOOKMARK [2][-]{section*.17}{Tracking}{section*.13}% 12
+\BOOKMARK [1][-]{section*.18}{Testing}{}% 13
+\BOOKMARK [2][-]{section*.20}{Occlusion}{section*.18}% 14
+\BOOKMARK [1][-]{section*.21}{Evaluation}{}% 15
+\BOOKMARK [2][-]{section*.22}{User study}{section*.21}% 16
+\BOOKMARK [2][-]{section*.26}{Occlusion}{section*.21}% 17
+\BOOKMARK [1][-]{section*.27}{Extensions}{}% 18
+\BOOKMARK [1][-]{section*.28}{Acknowledgments}{}% 19
+\BOOKMARK [1][-]{section*.29}{HACK}{}% 20
+\BOOKMARK [1][-]{section*.30}{REFERENCES }{}% 21

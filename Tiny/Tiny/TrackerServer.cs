@@ -18,10 +18,10 @@ namespace Tiny
         private readonly TcpListener serverKinectTCPListener;
         private readonly Thread serverThread;
 
-        private static const uint SEC_IN_MILLISEC = 1000;
-        private static const uint WRITE_LOG_INTERVAL = 1/4 * SEC_IN_MILLISEC;
-        private static const uint FLUSH_LOG_INTERVAL = 3 * SEC_IN_MILLISEC;
-        private static const uint FRAME_IN_SEC = 60;
+        private const uint SEC_IN_MILLISEC = 1000;
+        private const uint WRITE_LOG_INTERVAL = 1 / 4 * SEC_IN_MILLISEC;
+        private const uint FLUSH_LOG_INTERVAL = 3 * SEC_IN_MILLISEC;
+        private const uint FRAME_IN_SEC = 60;
         //private static const uint TRACKING_INTERVAL;
         private readonly Stopwatch writeLogStopwatch;
         private readonly Stopwatch flushLogStopwatch;

@@ -93,9 +93,13 @@ namespace Tiny
             this.DisposeKinectUI += this.kinectUI.Dispose;
             Dispatcher.Run();
         }
+
         public void DisposeUI()
         {
-            this.DisposeKinectUI();
+            if (this.kinectUI != null)
+            {
+                this.DisposeKinectUI();
+            }
         }
 
         public void Calibrate()

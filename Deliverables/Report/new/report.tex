@@ -31,6 +31,12 @@ Copyright \copyright~Chi-Jui Wu. \\
 \usepackage{booktabs}
 \usepackage{ccicons}
 \usepackage{todonotes}
+\usepackage{svg}
+\usepackage{amsmath}
+
+% Set figures directory
+\graphicspath{{./figures/}}
+\setsvg{svgpath = figures/}
 
 % llt: Define a global style for URLs, rather that the default one
 \makeatletter
@@ -85,7 +91,7 @@ Copyright \copyright~Chi-Jui Wu. \\
 \maketitle
 
 \begin{abstract}
-Abstract.
+This paper is my undergraduate thesis, completed in School of Computer Science, University of St Andrews, in 2015. The current work is a people tracking system consisted of multiple Kinects. The project aim is to track people in real world environments and resolve the occlusion problem. The final product contains an interactive software for tracking people and an user study on the developed system. The advantages and limitations of the system are discussed.
 \end{abstract}
 
 \keywords{Tracking; Kinect; Calibration; HCI}
@@ -95,61 +101,131 @@ Abstract.
 
 \section{Introduction}
 
-SECTION
+
+
+\subsection{Problem statement}
+
+The task of detecting and tracking moving targets in real world environment is non-trivial. There are many sources of tracking errors, such as sensor data noise and outliers, illumination levels, changing backgrounds, and occlusion. Real world environments are stochastic. Occlusion occurs when a tracked target is masked by other objects in existing fields of view. The position and movement of an occluded subject are unknown, hence increasing the difficulity of detection and tracking. Occlusions can be static and daynamic, as well as partial and full. Static occlusions refer to situations where stationary objects obstrct the visibility of the target, and dynamic occlusions occur during the interactions of many targets. Partial and full occlusion cases are when the target is partially and fully blocked from the view, respectively. THe current work attempts to resolve all different types of occlusion.
+
+The problem is illustrated in Figure \ref{fig:occlusion_problem}.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.9\columnwidth]{occlusion_problem}
+  \caption{The occlusion problem}
+  \label{fig:occlusion_problem}
+\end{figure}
 
 \subsection{Contributions}
 
-\subsection{Previous Work}
+Replicate current research. Resolve the problem of occlusion using multiple Kinects. 
+
+\section{Previous Work}
+
+Existing people detection and tracking techniques. Tracking people in surveillance video and in realtime. Tracking using mobile and wearable devices. Motion sensors and wireless. Time-of-flight and structured-light cameras.
+
+[Paper: Particle filter to track multiple people for visual surveillance]
+[Paper: Tracking People in Video Sequences by Clustering Feature Motion Paths]
+[Paper: Evaluation of realtime people tracking for indoor environments using ubiquitous motion sensors and limited wireless network infrastructure]
+[Paper: Tracking people under heavy occlusions by layered data association]
+[Paper: Detection and Tracking of Occluded People]
+
+\subsubsection{Coordiante transfomration}
+
+\cite{wei_kinect_calibration}
+\cite{eggert_four_algorithms}
+\cite{horn_unit_quaternions}
+
+\subsubsection{Tracking using RGB-D data}
+
+[Paper: Tracking people within groups using RGB-D data]
+[Paper: Detecting and tracking people in real time with RGB-D camera]
+[Paper: Applications for a people detection and tracking algorithm using a time-of-flight camera]
+\*[Paper: Real-time Human Motion Tracking using Multiple Depth Cameras]
+[Paper: Human Detection Using Depth Information by Kinect]
 
 \section{Kinect}
 
-SECTION
+The specification and components. Include image Larger field of views. Give examples.
 
 \section{Current Approach}
 
-SECTION
+The system topology
 
 \subsection{Multiple Kinects and Sockets}
 
+Clients sends the Kinect body stream to the server
+
 \subsubsection{Serialization}
+
+BodyFrame, Body, Joint. The important elements are the tracking state, joint type, amd camera space point.
+
+\cite{microsoft_kinect_namespace}
+\cite{microsoft_kinect_coordinates}
 
 \subsection{Calibration}
 
+Discuss the techniques from Wei et al.
+
 \subsection{Tracking}
+
+Skeletons from different Kinects matched based on spatial information. Filling the gaps of skeletons.
 
 \section{Testing}
 
-SECTION
+Interactive application. View the average and individual skeletons from different Kinect fields of views.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.9\columnwidth]{ui}
+  \caption{UI}
+  \label{fig:ui}
+\end{figure}
 
 \subsection{Occlusion}
 
+Show persistent tracking in occluded environments. Demonstrate the system works with complex human interactions.
+ 
 \section{Evaluation}
 
-SECTION
+Discuss results. Compre them with Wei et al.
+
+\subsection{User study}
+
+\begin{figure}
+  \centering
+  \includesvg[width=0.9\columnwidth]{stationary_p0_d7_all}
+  \caption{One person all joints}~\label{fig:one_person_all}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includesvg[width=0.9\columnwidth]{stationary_p0_d7_average}
+  \caption{One person average}~\label{fig:one_person_average}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includesvg[width=0.9\columnwidth]{scenarios}
+  \caption{All scenarios}~\label{fig:scenarios}
+\end{figure}
 
 \subsection{Occlusion}
+
+User study with multiple people and object occlusion.
+
+\section{Extensions}
+
+SECTION
 
 \section{Acknowledgments}
 
 SECTION
 
+
+
 \section{HACK}
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi posuere viverra justo, a congue neque consectetur ac. Nam quis fringilla urna. In non nulla varius, porta mauris vel, volutpat mauris. Vivamus porta est quam, a facilisis sapien varius in. In accumsan risus nec leo dictum dictum. Duis ullamcorper dictum velit, sit amet egestas elit consectetur ac. Nam non leo nec lectus iaculis ultricies.
-
-Nam varius dictum dui, ut efficitur ante vehicula a. In hac habitasse platea dictumst. Vestibulum eu metus porttitor lorem vehicula lobortis convallis vel tellus. Aenean tempus iaculis purus. Nullam non nulla tristique ex bibendum eleifend pulvinar et dolor. Donec venenatis diam sem, non molestie dolor volutpat rutrum. Praesent fringilla aliquet quam eget consequat. Vivamus sit amet dolor ex. Quisque justo quam, commodo id diam sed, scelerisque elementum felis. Nulla facilisi.
-
-In non dolor velit. Morbi nunc turpis, pharetra nec ipsum sed, venenatis dictum urna. Etiam sapien nisl, scelerisque sit amet dapibus vitae, venenatis vel arcu. Nam mi lorem, efficitur vitae nibh id, malesuada viverra libero. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eu suscipit felis, sit amet cursus est. Mauris tempor interdum elementum. Cras non sagittis leo. Quisque mattis lorem justo, ac volutpat ipsum rhoncus ut. Aliquam erat volutpat. Maecenas sagittis turpis augue, id condimentum nisi euismod a. Nulla efficitur malesuada pellentesque.
-
-Nullam tempor pulvinar augue non viverra. Mauris id varius leo, eu porta mauris. Praesent vitae justo vestibulum, hendrerit libero sed, lacinia dolor. Praesent commodo pellentesque faucibus. Nam laoreet felis fringilla nisi gravida, ac efficitur est bibendum. Aliquam nec lobortis nulla. Donec porta dignissim tortor, ut fringilla lectus sagittis eget. Cras eget hendrerit dui.
-
-Nunc hendrerit ornare rhoncus. Donec at mauris risus. Donec feugiat, urna in eleifend lacinia, metus lectus scelerisque lectus, eu luctus elit ante vitae magna. Maecenas velit risus, euismod in varius a, tristique id leo. Aliquam pretium lobortis eros sed vulputate. Nullam in risus commodo, lobortis urna eget, elementum risus. Sed quis metus id nibh aliquam congue non sed odio. Maecenas sit amet egestas dui, ac elementum dui. Interdum et malesuada fames ac ante ipsum primis in faucibus. Phasellus vehicula commodo pretium. Nullam nunc elit, mollis sit amet cursus eu, scelerisque a nisl. Suspendisse est ligula, finibus quis quam sed, molestie volutpat leo. Morbi luctus ipsum vitae velit dapibus ultrices. Maecenas laoreet, lacus at accumsan sagittis, nisi ante consequat dolor, porta finibus orci risus porta leo.
-
-\cite{microsoft_kinect_namespace}
-\cite{microsoft_kinect_coordinates}
-\cite{wei_kinect_calibration}
-\cite{eggert_four_algorithms}
-\cite{horn_unit_quaternions}
 
 
 % Balancing columns in a ref list is a bit of a pain because you
