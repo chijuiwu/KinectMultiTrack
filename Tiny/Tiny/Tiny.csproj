@@ -89,6 +89,7 @@
     <Compile Include="KinectJoint.cs" />
     <Compile Include="TrackerLogger.cs" />
     <Compile Include="TrackerUtils.cs" />
+    <Compile Include="TrackerResult.cs" />
     <Compile Include="UI\SetupWindow.xaml.cs">
       <DependentUpon>SetupWindow.xaml</DependentUpon>
     </Compile>

@@ -17,113 +17,23 @@ namespace Tiny
     {
         // 4 Seconds
         public const int CALIBRATION_FRAMES = 120;
-        private bool calibrated = false;
+        private bool allKinectCamerasCalibrated = false;
 
         private readonly int KINECT_COUNT;
-        private ConcurrentDictionary<IPEndPoint, KinectCamera> kinectsDict;
+        private ConcurrentDictionary<IPEndPoint, KinectCamera> kinectClients;
 
         private readonly object syncFrameLock = new object();
-
-        public class Result
-        {
-            public class KinectFOV
-            {
-                public IPEndPoint ClientIP { get; private set; }
-                public uint Id { get; private set; }
-                public KinectCamera.Specification Specification { get; private set; }
-
-                public KinectFOV(IPEndPoint clientIP, uint id, KinectCamera.Specification specification)
-                {
-                    this.ClientIP = clientIP;
-                    this.Id = id;
-                    this.Specification = specification;
-                }
-            }
-
-            public class SkeletonReplica
-            {
-                public uint Id { get; private set; }
-                public KinectFOV FOV { get; private set; }
-                public TSkeleton Skeleton { get; private set; }
-
-                public SkeletonReplica(uint id, KinectFOV fov, TSkeleton skeleton)
-                {
-                    this.Id = id;
-                    this.FOV = fov;
-                    this.Skeleton = skeleton;
-                }
-
-                public override string ToString()
-                {
-                    StringBuilder sb = new StringBuilder();
-                    sb.Append("[");
-                    sb.Append("FOV: ").Append(this.FOV.ClientIP).Append(", ");
-                    sb.Append("Skeleton: ").Append(this.Skeleton);
-                    sb.Append("]");
-                    return sb.ToString();
-                }
-            }
-
-            public class Person
-            {
-                public uint Id { get; private set; }
-                public IEnumerable<SkeletonReplica> Replicas { get; private set; }
-
-                public Person(uint id, IEnumerable<SkeletonReplica> skeletons)
-                {
-                    this.Id = id;
-                    this.Replicas = skeletons;
-                }
-
-                public TSkeleton FindSkeletonInFOV(KinectFOV fov)
-                {
-                    foreach (SkeletonReplica match in this.Replicas)
-                    {
-                        if (match.FOV.Equals(fov))
-                        {
-                            return match.Skeleton;
-                        }
-                    }
-                    return null;
-                }
-
-                public override string ToString()
-                {
-                    StringBuilder sb = new StringBuilder();
-                    sb.Append("[Skeletons: ").Append(this.Replicas.Count()).Append("]: ");
-                    String prefix = "";
-                    foreach (SkeletonReplica match in this.Replicas)
-                    {
-                        sb.Append(prefix);
-                        prefix = ",";
-                        sb.Append(match);
-                    }
-                    return sb.ToString();
-                }
-            }
-
-            public long Timestamp { get; private set; }
-            public IEnumerable<Result.KinectFOV> FOVs { get; private set; }
-            public IEnumerable<Result.Person> People { get; private set; }
-
-            public Result(IEnumerable<Result.KinectFOV> fovs, IEnumerable<Result.Person> people)
-            {
-                this.Timestamp = DateTime.UtcNow.Ticks / TimeSpan.TicksPerMillisecond;
-                this.FOVs = fovs;
-                this.People = people;
-            }
-        }
 
         public Tracker(int kinectCount)
         {
             this.KINECT_COUNT = kinectCount;
-            this.kinectsDict = new ConcurrentDictionary<IPEndPoint, KinectCamera>();
+            this.kinectClients = new ConcurrentDictionary<IPEndPoint, KinectCamera>();
         }
 
         public void RemoveClient(IPEndPoint clientIP)
         {
             KinectCamera kinect;
-            if (this.kinectsDict.TryRemove(clientIP, out kinect))
+            if (this.kinectClients.TryRemove(clientIP, out kinect))
             {
                 kinect.DisposeUI();
             }
@@ -131,52 +41,50 @@ namespace Tiny
 
         private bool RequireCalibration()
         {
-            if (this.kinectsDict.Count == this.KINECT_COUNT && !this.calibrated)
+            bool required = true;
+            if (this.kinectClients.Count == this.KINECT_COUNT && !this.allKinectCamerasCalibrated)
             {
-                foreach (KinectCamera kinect in this.kinectsDict.Values)
+                foreach (KinectCamera kinect in this.kinectClients.Values)
                 {
                     // TODO: Remove HACK!!! so i have time to adjust position
-                    if (kinect.UnprocessedFramesCount < Tracker.CALIBRATION_FRAMES*3)
+                    if (kinect.UnprocessedFramesCount < Tracker.CALIBRATION_FRAMES * 3)
                     {
-                        return false;
+                        required = false;
+                        break;
                     }
                 }
-                return true;
             }
-            else
-            {
-                return false;
-            }
+            return required;
         }
 
         public Result SynchronizeTracking(IPEndPoint clientIP, SBodyFrame bodyframe)
         {
-            if (!this.kinectsDict.ContainsKey(clientIP))
+            if (!this.kinectClients.ContainsKey(clientIP))
             {
-                this.kinectsDict[clientIP] = new KinectCamera(clientIP.ToString(), (uint)this.kinectsDict.Count);
+                this.kinectClients[clientIP] = new KinectCamera(clientIP.ToString(), (uint)this.kinectClients.Count);
             }
             lock (syncFrameLock)
             {
-                if (this.RequireCalibration())
+                if (!this.allKinectCamerasCalibrated && this.RequireCalibration())
                 {
-                    foreach (KinectCamera kinect in this.kinectsDict.Values)
+                    foreach (KinectCamera kinect in this.kinectClients.Values)
                     {
                         kinect.Calibrate();
                     }
-                    this.calibrated = true;
+                    this.allKinectCamerasCalibrated = true;
                 }
                 bool trackingBegun = true;
-                this.kinectsDict[clientIP].ProcessFrames(bodyframe);
+                this.kinectClients[clientIP].ProcessFrames(bodyframe);
                 List<Result.KinectFOV> fovs = new List<Result.KinectFOV>();
-                foreach (IPEndPoint kinectIP in this.kinectsDict.Keys)
+                foreach (IPEndPoint kinectIP in this.kinectClients.Keys)
                 {
-                    KinectCamera kinect = this.kinectsDict[kinectIP];
+                    KinectCamera kinect = this.kinectClients[kinectIP];
                     fovs.Add(new Result.KinectFOV(kinectIP, kinect.Id, kinect.CameraSpecification));
                     if (kinect.Skeletons.Count() == 0) {
                         trackingBegun = false;
                     }
                 }
-                if (!this.calibrated || !trackingBegun)
+                if (!this.allKinectCamerasCalibrated || !trackingBegun)
                 {
                     return new Result(fovs, Enumerable.Empty<Result.Person>());
                 }
@@ -192,7 +100,7 @@ namespace Tiny
             HashSet<Tuple<Result.KinectFOV, TSkeleton>> skeletonsSet = new HashSet<Tuple<Result.KinectFOV, TSkeleton>>();
             foreach (Result.KinectFOV fov in fovs)
             {
-                KinectCamera kinect = this.kinectsDict[fov.ClientIP];
+                KinectCamera kinect = this.kinectClients[fov.ClientIP];
                 foreach (TSkeleton skeleton in kinect.Skeletons)
                 {
                     skeletonsSet.Add(Tuple.Create(fov, skeleton));
