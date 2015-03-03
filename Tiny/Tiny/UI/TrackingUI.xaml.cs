@@ -35,8 +35,8 @@ namespace Tiny.UI
         private ViewMode currentViewMode;
         private string trackingStatusText;
 
-        private DrawingGroup bodyDrawingGroup;
-        private DrawingImage bodyImageSource;
+        private DrawingGroup trackingDrawingGroup;
+        private DrawingImage trackingViewSource;
         private List<Pen> personColors;
 
         private KinectSensor kinectSensor;
@@ -52,8 +52,8 @@ namespace Tiny.UI
             this.currentViewMode = ViewMode.All;
             this.TrackingStatusText = Properties.Resources.TRACKING_CALIBRATION;
             
-            this.bodyDrawingGroup = new DrawingGroup();
-            this.bodyImageSource = new DrawingImage(this.bodyDrawingGroup);
+            this.trackingDrawingGroup = new DrawingGroup();
+            this.trackingViewSource = new DrawingImage(this.trackingDrawingGroup);
             // A person will have the same color
             this.personColors = new List<Pen>();
             this.personColors.Add(new Pen(Brushes.Red, 6));
@@ -70,11 +70,11 @@ namespace Tiny.UI
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public ImageSource BodyStreamImageSource
+        public ImageSource TrackingViewSource
         {
             get
             {
-                return this.bodyImageSource;
+                return this.trackingViewSource;
             }
         }
 
@@ -136,7 +136,7 @@ namespace Tiny.UI
             int frameWidth = referenceFOV.Specification.DepthFrameWidth;
             int frameHeight = referenceFOV.Specification.DepthFrameHeight;
 
-            using (DrawingContext dc = this.bodyDrawingGroup.Open())
+            using (DrawingContext dc = this.trackingDrawingGroup.Open())
             {
                 this.DrawBackground(frameWidth, frameHeight, dc);
                 int personIdx = 0;
@@ -175,7 +175,7 @@ namespace Tiny.UI
                     }
                 }
             }
-            this.DrawClipRegion(frameWidth, frameHeight, this.bodyDrawingGroup);
+            this.DrawClipRegion(frameWidth, frameHeight, this.trackingDrawingGroup);
         }
 
         private void DrawSkeletons(IEnumerable<Dictionary<JointType, KinectJoint>> skeletonJointsEnumeration, DrawingContext dc, Pen trackedBonePen)
@@ -371,6 +371,11 @@ namespace Tiny.UI
             SetupWindow setupWindow = new SetupWindow();
             setupWindow.Owner = this;
             setupWindow.ShowDialog();
+        }
+
+        private void StartBtn_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

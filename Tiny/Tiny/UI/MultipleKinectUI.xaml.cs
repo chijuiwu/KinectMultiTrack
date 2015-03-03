@@ -23,16 +23,16 @@ namespace Tiny.UI
 {
     public partial class MultipleKinectUI : Window
     {
-        private DrawingGroup bodyDrawingGroup;
-        private DrawingImage bodyImageSource;
+        private DrawingGroup multipleKinectDrawingGroup;
+        private DrawingImage multipleKinectViewSource;
         private List<Pen> personColors;
 
         public MultipleKinectUI()
         {
             InitializeComponent();
             this.DataContext = this;
-            this.bodyDrawingGroup = new DrawingGroup();
-            this.bodyImageSource = new DrawingImage(this.bodyDrawingGroup);
+            this.multipleKinectDrawingGroup = new DrawingGroup();
+            this.multipleKinectViewSource = new DrawingImage(this.multipleKinectDrawingGroup);
             // HACK: Max 6 people
             this.personColors = new List<Pen>();
             this.personColors.Add(new Pen(Brushes.Red, 6));
@@ -42,11 +42,11 @@ namespace Tiny.UI
             this.personColors.Add(new Pen(Brushes.Indigo, 6));
             this.personColors.Add(new Pen(Brushes.Violet, 6));
         }
-        public ImageSource BodyStreamImageSource
+        public ImageSource MultipleKinectViewSource
         {
             get
             {
-                return this.bodyImageSource;
+                return this.multipleKinectViewSource;
             }
         }
 
@@ -68,7 +68,7 @@ namespace Tiny.UI
             int frameWidth = firstFOVDim.DepthFrameWidth;
             int frameHeight = firstFOVDim.DepthFrameHeight;
 
-            using (DrawingContext dc = this.bodyDrawingGroup.Open())
+            using (DrawingContext dc = this.multipleKinectDrawingGroup.Open())
             {
                 this.DrawBackground(frameWidth, frameHeight, dc);
                 int personIdx = 0;
@@ -89,7 +89,7 @@ namespace Tiny.UI
                     }
                 }
             }
-            this.DrawClipRegion(frameWidth, frameHeight, this.bodyDrawingGroup);
+            this.DrawClipRegion(frameWidth, frameHeight, this.multipleKinectDrawingGroup);
         }
 
         private static readonly Brush backgroundBrush = Brushes.Black;

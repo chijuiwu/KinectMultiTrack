@@ -39,8 +39,8 @@ namespace KinectClient
         private CoordinateMapper coordinateMapper;
         private BodyFrameReader bodyFrameReader;
         private Body[] bodies;
-        private DrawingGroup bodyDrawingGroup;
-        private DrawingImage bodyImageSource;
+        private DrawingGroup clientBodyDrawingGroup;
+        private DrawingImage clientBodyViewSource;
         private Pen bodyColor;
         private FrameDescription depthFrameDescription;
         private int displayWidth;
@@ -65,11 +65,11 @@ namespace KinectClient
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public ImageSource BodyStreamImageSource
+        public ImageSource ClientBodyStreamViewSource
         {
             get
             {
-                return this.bodyImageSource;
+                return this.clientBodyViewSource;
             }
         }
 
@@ -107,8 +107,8 @@ namespace KinectClient
             this.bodyFrameReader = this.kinectSensor.BodyFrameSource.OpenReader();
             this.bodies = new Body[this.kinectSensor.BodyFrameSource.BodyCount];
 
-            this.bodyDrawingGroup = new DrawingGroup();
-            this.bodyImageSource = new DrawingImage(this.bodyDrawingGroup);
+            this.clientBodyDrawingGroup = new DrawingGroup();
+            this.clientBodyViewSource = new DrawingImage(this.clientBodyDrawingGroup);
             this.bodyColor = new Pen(Brushes.Blue, 6);
         }
 
@@ -161,7 +161,7 @@ namespace KinectClient
 
             if (dataReceived)
             {
-                using (DrawingContext dc = this.bodyDrawingGroup.Open())
+                using (DrawingContext dc = this.clientBodyDrawingGroup.Open())
                 {
                     dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, this.displayWidth, this.displayHeight));
                     foreach (Body body in this.bodies)
@@ -197,7 +197,7 @@ namespace KinectClient
                             serializableBodyFrame.addSerializableBody(serializableBody);
                         }
                     }
-                    this.bodyDrawingGroup.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, this.displayWidth, this.displayHeight));
+                    this.clientBodyDrawingGroup.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, this.displayWidth, this.displayHeight));
                 }
                 // send
                 this.kinectSocket.SendSerializedKinectBodyFrame(serializableBodyFrame);

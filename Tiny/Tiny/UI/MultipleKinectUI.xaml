@@ -1,7 +1,7 @@
 ﻿<Window x:Class="Tiny.UI.MultipleKinectUI"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="KinectServer"
+        Title="Server - Multiple-Kinect View"
         Height="600" Width="700">
     <Window.Resources>
         <SolidColorBrush x:Key="MediumGreyBrush" Color="#ff6e6e6e" />
@@ -11,15 +11,18 @@
 
     <Grid Margin="10 10 10 10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="50" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-
-        <Label x:Name="Label" Grid.Row="0" Content="Multiple Kinects" HorizontalAlignment="Center" VerticalAlignment="Top" RenderTransformOrigin="-0.079,0.5" Margin="282,0,250,0" FontWeight="Bold" FontSize="16" FontFamily="Microsoft Sans Serif" Width="140"/>
+        
+        <StackPanel Grid.Row="0" Background="Gray" Orientation="Horizontal">
+            <Label x:Name="Label"  Content="Multiple Kinects" FontWeight="Bold" FontSize="16" FontFamily="Microsoft Sans Serif" VerticalAlignment="Center"/>
+        </StackPanel>
 
         <Viewbox Grid.Row="1" HorizontalAlignment="Center">
-            <Image Source="{Binding BodyStreamImageSource}" Stretch="UniformToFill" />
+            <Image Source="{Binding MultipleKinectViewSource}" Stretch="UniformToFill" />
         </Viewbox>
+
     </Grid>
 </Window>
 
