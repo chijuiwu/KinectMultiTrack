@@ -39,12 +39,12 @@ namespace Tiny
         private event WorldViewHandler TrackingUIUpdate;
         private delegate void WorldViewHandler(TResult result);
 
-        public TServer(int port, int kinectCount)
+        public TServer(int port, uint kinects)
         {
             this.serverKinectTCPListener = new TcpListener(IPAddress.Any, port);
             this.serverThread = new Thread(new ThreadStart(this.ServerWorkerThread));
             
-            this.tracker = new Tracker(kinectCount);
+            this.tracker = new Tracker(kinects);
 
             Thread multipleKinectUIThread = new Thread(new ThreadStart(this.StartMultipleKinectUIThread));
             multipleKinectUIThread.SetApartmentState(ApartmentState.STA);

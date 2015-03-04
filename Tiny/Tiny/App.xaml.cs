@@ -13,13 +13,13 @@ namespace Tiny
     /// </summary>
     public partial class App : Application
     {
-        public const int port = 12345;
-        public const int kinects = 2;
+        public const int serverPort = 12345;
+        public const uint kinects = 2;
 
         private TServer server;
 
         public App() {
-            this.server = new TServer(App.port, App.kinects);
+            this.server = new TServer(App.serverPort, App.kinects);
             this.server.Run();
         }
 

@@ -16,15 +16,15 @@ namespace Tiny
     public class Tracker
     {
         // 4 Seconds
-        public const int CALIBRATION_FRAMES = 120;
-        private bool allKinectCamerasCalibrated = false;
+        public const uint MIN_CALIBRATION_FRAMES = 120;
 
-        private readonly int KINECT_COUNT;
+        private readonly uint KINECT_COUNT;
+        private bool systemCalibrated = false;
+
         private ConcurrentDictionary<IPEndPoint, KinectCamera> kinectClients;
-
         private readonly object syncFrameLock = new object();
 
-        public Tracker(int kinectCount)
+        public Tracker(uint kinectCount)
         {
             this.KINECT_COUNT = kinectCount;
             this.kinectClients = new ConcurrentDictionary<IPEndPoint, KinectCamera>();
@@ -39,58 +39,65 @@ namespace Tiny
             }
         }
 
-        private bool RequireCalibration()
+        private bool KinectsNeedCalibration()
         {
-            bool required = true;
-            if (this.kinectClients.Count == this.KINECT_COUNT && !this.allKinectCamerasCalibrated)
+            if (this.kinectClients.Count == this.KINECT_COUNT)
             {
                 foreach (KinectCamera kinect in this.kinectClients.Values)
                 {
-                    // TODO: Remove HACK!!! so i have time to adjust position
-                    if (kinect.UnprocessedFramesCount < Tracker.CALIBRATION_FRAMES * 3)
+                    // TODO: Remove HACK!!! Instead, show progress bar
+                    if (kinect.Calibrated || kinect.UncalibratedFramesCount < Tracker.MIN_CALIBRATION_FRAMES * 3)
                     {
-                        required = false;
-                        break;
+                        return false;
                     }
                 }
             }
-            return required;
+            return true;
         }
 
-        public TResult SynchronizeTracking(IPEndPoint clientIP, SBodyFrame bodyframe)
+        private void TryCalibration()
         {
-            if (!this.kinectClients.ContainsKey(clientIP))
+            if (this.KinectsNeedCalibration())
             {
-                this.kinectClients[clientIP] = new KinectCamera(clientIP.ToString(), (uint)this.kinectClients.Count);
+                foreach (KinectCamera kinect in this.kinectClients.Values)
+                {
+                    kinect.Calibrate();
+                }
+                this.systemCalibrated = true;
+            }
+        } 
+
+        public TResult SynchronizeTracking(IPEndPoint source, SBodyFrame bodyframe)
+        {
+            if (!this.kinectClients.ContainsKey(source))
+            {
+                // Pass in height and tilt angle
+                this.kinectClients[source] = new KinectCamera(source.ToString(), (uint)this.kinectClients.Count, 0.0, 0.0);
             }
             lock (syncFrameLock)
             {
-                if (!this.allKinectCamerasCalibrated && this.RequireCalibration())
+                if (!this.systemCalibrated)
                 {
-                    foreach (KinectCamera kinect in this.kinectClients.Values)
-                    {
-                        kinect.Calibrate();
-                    }
-                    this.allKinectCamerasCalibrated = true;
+                    this.TryCalibration();
                 }
                 bool trackingBegun = true;
-                this.kinectClients[clientIP].ProcessFrames(bodyframe);
-                List<TResult.KinectFOV> fovs = new List<TResult.KinectFOV>();
+                this.kinectClients[source].ProcessFrames(bodyframe);
+                List<TResult.KinectFOV> runningFOVs = new List<TResult.KinectFOV>();
                 foreach (IPEndPoint kinectIP in this.kinectClients.Keys)
                 {
                     KinectCamera kinect = this.kinectClients[kinectIP];
-                    fovs.Add(new TResult.KinectFOV(kinectIP, kinect.Id, kinect.CameraSpecification));
+                    runningFOVs.Add(new TResult.KinectFOV(kinectIP, kinect.Id, kinect.CameraSpecification));
                     if (kinect.Skeletons.Count() == 0) {
                         trackingBegun = false;
                     }
                 }
-                if (!this.allKinectCamerasCalibrated || !trackingBegun)
+                if (!this.systemCalibrated || !trackingBegun)
                 {
-                    return new TResult(fovs, Enumerable.Empty<TResult.Person>());
+                    return new TResult(runningFOVs, Enumerable.Empty<TResult.Person>());
                 }
                 else
                 {
-                    return new TResult(fovs, this.AssignSkeletonsToPeople(fovs));
+                    return new TResult(runningFOVs, this.AssignSkeletonsToPeople(runningFOVs));
                 }
             }
         }

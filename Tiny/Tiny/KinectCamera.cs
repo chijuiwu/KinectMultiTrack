@@ -19,28 +19,22 @@ namespace Tiny
     {
         public class Specification
         {
-            public int DepthFrameWidth { get; private set; }
-            public int DepthFrameHeight { get; private set; }
-            public double Angle { get; private set; }
-            public double Height { get; private set; }
+            public int DepthFrameWidth { get; set; }
+            public int DepthFrameHeight { get; set; }
+            public double Height { get; set; }
+            public double TiltAngle { get; set; }
 
-            public Specification(int depthFrameWidth, int depthFrameHeight)
+            public Specification()
             {
-                this.DepthFrameWidth = depthFrameWidth;
-                this.DepthFrameHeight = depthFrameHeight;
-                // TODO: Update these values
-                this.Angle = 0.0;
-                this.Height = 0.0;
             }
         }
 
         public uint Id { get; private set; }
+        public bool Calibrated { get; private set; }
         public KinectCamera.Specification CameraSpecification { get; private set; }
-        private bool calibrated;
         private Dictionary<ulong, TSkeleton> skeletons;
-
         private Stack<SBodyFrame> unprocessedBodyFrames;
-
+        
         private KinectStreamUI kinectUI;
         public event KinectBodyFrameHandler UpdateKinectUI;
         public delegate void KinectBodyFrameHandler(SBodyFrame bodyFrame);
@@ -61,7 +55,7 @@ namespace Tiny
             }
         }
 
-        public int UnprocessedFramesCount
+        public int UncalibratedFramesCount
         {
             get
             {
@@ -69,13 +63,14 @@ namespace Tiny
             }
         }
 
-        public KinectCamera(string ip, uint id)
+        public KinectCamera(string ip, uint id, double height, double tiltAngle)
         {
             this.Id = id;
-            this.calibrated = false;
-            this.CameraSpecification = null;
+            this.Calibrated = false;
+            this.CameraSpecification = new Specification();
+            this.CameraSpecification.Height = height;
+            this.CameraSpecification.TiltAngle = tiltAngle;
             this.skeletons = new Dictionary<ulong, TSkeleton>();
-
             this.unprocessedBodyFrames = new Stack<SBodyFrame>();
 
             //Commented because multi-threading issues
@@ -104,9 +99,9 @@ namespace Tiny
 
         public void Calibrate()
         {
-            SBodyFrame[] calibrationFrames = new SBodyFrame[Tracker.CALIBRATION_FRAMES];
+            SBodyFrame[] calibrationFrames = new SBodyFrame[Tracker.MIN_CALIBRATION_FRAMES];
             // add from back back the 
-            int calibrationFramesToAdd = Tracker.CALIBRATION_FRAMES;
+            uint calibrationFramesToAdd = Tracker.MIN_CALIBRATION_FRAMES;
             while (calibrationFramesToAdd > 0)
             {
                 calibrationFrames[--calibrationFramesToAdd] = this.unprocessedBodyFrames.Pop();
@@ -131,14 +126,15 @@ namespace Tiny
                 TSkeleton skeleton = new TSkeleton(trackingId, frameNth.TimeStamp, initAngle, initPos);
                 this.skeletons[trackingId] = skeleton;
             }
-            this.calibrated = true;
-            this.CameraSpecification = new KinectCamera.Specification(frame0th.DepthFrameWidth, frame0th.DepthFrameHeight);
+            this.Calibrated = true;
+            this.CameraSpecification.DepthFrameWidth = frame0th.DepthFrameWidth;
+            this.CameraSpecification.DepthFrameHeight = frame0th.DepthFrameHeight;
         }
 
         public void ProcessFrames(SBodyFrame bodyFrame)
         {
             Debug.WriteLine(Resources.PROCESS_BODYFRAME + bodyFrame.TimeStamp);
-            if (!this.calibrated)
+            if (!this.Calibrated)
             {
                 this.unprocessedBodyFrames.Push(bodyFrame);
             }

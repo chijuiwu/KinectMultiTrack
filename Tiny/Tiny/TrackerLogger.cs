@@ -153,7 +153,7 @@ namespace Tiny
                 // Headers
                 writer.Write(String.Format("{0}, {1}, {2}, ", TLogger.scenario, timestamp, personId));
                 writer.Write(String.Format("{0}, {1}, {2}, {3}, ", replica.Id, replica.Skeleton.InitialAngle, replica.Skeleton.InitialDistance, replica.Skeleton.Timestamp));
-                writer.Write(String.Format("{0}, {1}, {2}", replica.FOV.Id, replica.FOV.Specification.Angle, replica.FOV.Specification.Height));
+                writer.Write(String.Format("{0}, {1}, {2}", replica.FOV.Id, replica.FOV.Specification.TiltAngle, replica.FOV.Specification.Height));
                 // Joint_X, Joint_Y, Joint_Z
                 TLogger.WriteJointsData(writer, joints);
             }
