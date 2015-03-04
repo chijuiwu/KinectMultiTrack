@@ -108,15 +108,15 @@ namespace Tiny
             TLogger.scenario = scenario;
         }
 
-        public static void Write(Tracker.Result result)
+        public static void Write(TResult result)
         {
             lock (WRITE_LOCK)
             {   
-                foreach (Tracker.Result.Person person in result.People)
+                foreach (TResult.Person person in result.People)
                 {
-                    Tracker.Result.SkeletonReplica reference = TUtils.GetLocalSkeletonReference(person);
-                    List<Tuple<Tracker.Result.SkeletonReplica, Dictionary<JointType, KinectJoint>>> skeletonCoordinates = new List<Tuple<Tracker.Result.SkeletonReplica, Dictionary<JointType, KinectJoint>>>();
-                    foreach (Tracker.Result.SkeletonReplica match in person.Replicas)
+                    TResult.SkeletonReplica reference = TUtils.GetLocalSkeletonReference(person);
+                    List<Tuple<TResult.SkeletonReplica, Dictionary<JointType, KinectJoint>>> skeletonCoordinates = new List<Tuple<TResult.SkeletonReplica, Dictionary<JointType, KinectJoint>>>();
+                    foreach (TResult.SkeletonReplica match in person.Replicas)
                     {
                         Dictionary<JointType, KinectJoint> joints = TUtils.GetKinectJoints(match, reference.Skeleton);
                         skeletonCoordinates.Add(Tuple.Create(match, joints));
@@ -129,7 +129,7 @@ namespace Tiny
                     //TrackingLogger.WriteData(TrackingLogger.WRITER_AVG, result.Timestamp, person.Id, averages);
 
                     //// Differences
-                    //IEnumerable<Tuple<Tracker.Result.SkeletonMatch, Dictionary<JointType, KinectJoint>>> differences = TrackingUtils.GetDifferences(averages, skeletonCoordinates);
+                    //IEnumerable<Tuple<TResult.SkeletonMatch, Dictionary<JointType, KinectJoint>>> differences = TrackingUtils.GetDifferences(averages, skeletonCoordinates);
                     //TrackingLogger.WriteData(TrackingLogger.WRITER_DIFF, result.Timestamp, person.Id, skeletonCoordinates);
                 }
             }
@@ -144,11 +144,11 @@ namespace Tiny
         //    TLogger.WriteJointsData(writer, averages);
         //}
 
-        private static void WriteData(StreamWriter writer, long timestamp, uint personId, IEnumerable<Tuple<Tracker.Result.SkeletonReplica, Dictionary<JointType, KinectJoint>>> coordinates)
+        private static void WriteData(StreamWriter writer, long timestamp, uint personId, IEnumerable<Tuple<TResult.SkeletonReplica, Dictionary<JointType, KinectJoint>>> coordinates)
         {
-            foreach (Tuple<Tracker.Result.SkeletonReplica, Dictionary<JointType, KinectJoint>> coordinateTuple in coordinates)
+            foreach (Tuple<TResult.SkeletonReplica, Dictionary<JointType, KinectJoint>> coordinateTuple in coordinates)
             {
-                Tracker.Result.SkeletonReplica replica = coordinateTuple.Item1;
+                TResult.SkeletonReplica replica = coordinateTuple.Item1;
                 Dictionary<JointType, KinectJoint> joints = coordinateTuple.Item2;
                 // Headers
                 writer.Write(String.Format("{0}, {1}, {2}, ", TLogger.scenario, timestamp, personId));

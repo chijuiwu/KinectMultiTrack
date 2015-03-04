@@ -11,9 +11,9 @@ namespace Tiny
 {
     public class TUtils
     {
-        public static Tracker.Result.SkeletonReplica GetLocalSkeletonReference(Tracker.Result.Person person)
+        public static TResult.SkeletonReplica GetLocalSkeletonReference(TResult.Person person)
         {
-            foreach (Tracker.Result.SkeletonReplica match in person.Replicas)
+            foreach (TResult.SkeletonReplica match in person.Replicas)
             {
                 if (match.FOV.ClientIP.Address.ToString().Equals("127.0.0.1"))
                 {
@@ -23,7 +23,7 @@ namespace Tiny
             return person.Replicas.First();
         }
 
-        public static Dictionary<JointType, KinectJoint> GetKinectJoints(Tracker.Result.SkeletonReplica match, TSkeleton reference)
+        public static Dictionary<JointType, KinectJoint> GetKinectJoints(TResult.SkeletonReplica match, TSkeleton reference)
         {
             WBody position = match.Skeleton.CurrentPosition.Worldview;
             KinectBody body = WBody.TransformToKinectBody(position, reference.InitialAngle, reference.InitialPosition);
@@ -72,12 +72,12 @@ namespace Tiny
             return averages;
         }
 
-        public static IEnumerable<Tuple<Tracker.Result.SkeletonReplica, Dictionary<JointType, KinectJoint>>> GetDifferences(Dictionary<JointType, KinectJoint> averages, IEnumerable<Tuple<Tracker.Result.SkeletonReplica, Dictionary<JointType, KinectJoint>>> raw)
+        public static IEnumerable<Tuple<TResult.SkeletonReplica, Dictionary<JointType, KinectJoint>>> GetDifferences(Dictionary<JointType, KinectJoint> averages, IEnumerable<Tuple<TResult.SkeletonReplica, Dictionary<JointType, KinectJoint>>> raw)
         {
-            List<Tuple<Tracker.Result.SkeletonReplica, Dictionary<JointType, KinectJoint>>> differences = new List<Tuple<Tracker.Result.SkeletonReplica, Dictionary<JointType, KinectJoint>>>();
-            foreach (Tuple<Tracker.Result.SkeletonReplica, Dictionary<JointType, KinectJoint>> skeletonCoordinatesTuple in raw)
+            List<Tuple<TResult.SkeletonReplica, Dictionary<JointType, KinectJoint>>> differences = new List<Tuple<TResult.SkeletonReplica, Dictionary<JointType, KinectJoint>>>();
+            foreach (Tuple<TResult.SkeletonReplica, Dictionary<JointType, KinectJoint>> skeletonCoordinatesTuple in raw)
             {   
-                Tracker.Result.SkeletonReplica skeletonMatch = skeletonCoordinatesTuple.Item1;
+                TResult.SkeletonReplica skeletonMatch = skeletonCoordinatesTuple.Item1;
                 Dictionary<JointType, KinectJoint> coordinates = skeletonCoordinatesTuple.Item2;
 
                 Dictionary<JointType, KinectJoint> differencePerSkeleton = new Dictionary<JointType, KinectJoint>();

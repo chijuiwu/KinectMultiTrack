@@ -50,7 +50,7 @@ namespace Tiny.UI
             }
         }
 
-        public void UpdateDisplay(Tracker.Result result)
+        public void UpdateDisplay(TResult result)
         {
             this.Dispatcher.Invoke((Action)(() =>
             {
@@ -58,7 +58,7 @@ namespace Tiny.UI
             }));
         }
 
-        private void DisplayBodyFrames(Tracker.Result result)
+        private void DisplayBodyFrames(TResult result)
         {
             if (!result.People.Any())
             {
@@ -72,10 +72,10 @@ namespace Tiny.UI
             {
                 this.DrawBackground(frameWidth, frameHeight, dc);
                 int personIdx = 0;
-                foreach (Tracker.Result.Person person in result.People)
+                foreach (TResult.Person person in result.People)
                 {
                     Pen pen = this.personColors[personIdx++];
-                    foreach (Tracker.Result.SkeletonReplica match in person.Replicas)
+                    foreach (TResult.SkeletonReplica match in person.Replicas)
                     {
                         SBody body = match.Skeleton.CurrentPosition.Kinect;
                         Dictionary<JointType, SJoint> joints = body.Joints;

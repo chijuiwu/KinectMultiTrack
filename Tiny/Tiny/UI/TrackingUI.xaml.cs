@@ -103,7 +103,7 @@ namespace Tiny.UI
                                                             : Properties.Resources.TRACKING_CALIBRATION;
         }
 
-        public void UpdateDisplay(Tracker.Result result)
+        public void UpdateDisplay(TResult result)
         {
             this.Dispatcher.Invoke((Action)(() =>
             {
@@ -111,10 +111,10 @@ namespace Tiny.UI
             }));
         }
 
-        private Tracker.Result.KinectFOV GetReferenceKinectFOV(IEnumerable<Tracker.Result.KinectFOV> fovs)
+        private TResult.KinectFOV GetReferenceKinectFOV(IEnumerable<TResult.KinectFOV> fovs)
         {
-            Tracker.Result.KinectFOV referenceFOV = fovs.First();
-            foreach (Tracker.Result.KinectFOV fov in fovs)
+            TResult.KinectFOV referenceFOV = fovs.First();
+            foreach (TResult.KinectFOV fov in fovs)
             {
                 if (fov.ClientIP.ToString().Equals(this.currentReferenceKinectIP))
                 {
@@ -124,13 +124,13 @@ namespace Tiny.UI
             return referenceFOV;
         }
 
-        private void DisplayBodyFrames(Tracker.Result result)
+        private void DisplayBodyFrames(TResult result)
         {
             if (!result.People.Any())
             {
                 return;
             }
-            Tracker.Result.KinectFOV referenceFOV = this.GetReferenceKinectFOV(result.FOVs);
+            TResult.KinectFOV referenceFOV = this.GetReferenceKinectFOV(result.FOVs);
             this.currentReferenceKinectIP = referenceFOV.ClientIP.ToString();
 
             int frameWidth = referenceFOV.Specification.DepthFrameWidth;
@@ -140,7 +140,7 @@ namespace Tiny.UI
             {
                 this.DrawBackground(frameWidth, frameHeight, dc);
                 int personIdx = 0;
-                foreach (Tracker.Result.Person person in result.People)
+                foreach (TResult.Person person in result.People)
                 {
                     TSkeleton reference = person.FindSkeletonInFOV(referenceFOV);
                     // HACK
@@ -150,7 +150,7 @@ namespace Tiny.UI
                     }
                     // All skeletons
                     HashSet<Dictionary<JointType, KinectJoint>> skeletonJointSet = new HashSet<Dictionary<JointType, KinectJoint>>();
-                    foreach (Tracker.Result.SkeletonReplica match in person.Replicas)
+                    foreach (TResult.SkeletonReplica match in person.Replicas)
                     {
                         skeletonJointSet.Add(TUtils.GetKinectJoints(match, reference));
                     }
