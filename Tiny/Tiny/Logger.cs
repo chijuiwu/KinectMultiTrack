@@ -12,7 +12,7 @@ using System.IO;
 
 namespace Tiny
 {
-    public class TLogger
+    public class Logger
     {
         private static readonly string NA = "N/A";
         private static readonly string SCENARIO = "Scenario";
@@ -29,17 +29,17 @@ namespace Tiny
         private static readonly string Y = "Y";
         private static readonly string Z = "Z";
 
-        private static string scenario = TLogger.NA;
+        private static string scenario = Logger.NA;
 
         private static readonly string FILE_RAW = "..\\..\\..\\..\\Logs\\raw.csv";
         //private static readonly string FILE_DIFF = "..\\..\\..\\..\\Logs\\difference.csv";
         //private static readonly string FILE_AVG = "..\\..\\..\\..\\Logs\\average.csv";
 
-        private static readonly List<string> HEADERS_RAW = TLogger.GetHeaders();
+        private static readonly List<string> HEADERS_RAW = Logger.GetHeaders();
         //private static readonly List<string> HEADERS_DIFF = TrackingLogger.GetHeaders();
         //private static readonly List<string> HEADERS_AVG = TrackingLogger.GetHeaders();
 
-        private static readonly StreamWriter WRITER_RAW = TLogger.OpenFileWriter(TLogger.FILE_RAW, TLogger.HEADERS_RAW);
+        private static readonly StreamWriter WRITER_RAW = Logger.OpenFileWriter(Logger.FILE_RAW, Logger.HEADERS_RAW);
         //private static readonly StreamWriter WRITER_DIFF = TrackingLogger.OpenFileWriter(TrackingLogger.FILE_DIFF, TrackingLogger.HEADERS_DIFF);
         //private static readonly StreamWriter WRITER_AVG = TrackingLogger.OpenFileWriter(TrackingLogger.FILE_AVG, TrackingLogger.HEADERS_AVG);
 
@@ -48,18 +48,18 @@ namespace Tiny
         private static List<string> GetHeaders()
         {
             List<string> headers = new List<string>() { 
-                TLogger.SCENARIO,
-                TLogger.TRACKER_TIME, 
-                TLogger.PERSON,
-                TLogger.SKEL,
-                TLogger.SKEL_INIT_ANGLE,
-                TLogger.SKEL_INIT_DIST,
-                TLogger.SKEL_TIME,
-                TLogger.KINECT,
-                TLogger.KINECT_TILT_ANGLE,
-                TLogger.KINECT_HEIGHT
+                Logger.SCENARIO,
+                Logger.TRACKER_TIME, 
+                Logger.PERSON,
+                Logger.SKEL,
+                Logger.SKEL_INIT_ANGLE,
+                Logger.SKEL_INIT_DIST,
+                Logger.SKEL_TIME,
+                Logger.KINECT,
+                Logger.KINECT_TILT_ANGLE,
+                Logger.KINECT_HEIGHT
             };
-            TLogger.AddJointHeaders(ref headers);
+            Logger.AddJointHeaders(ref headers);
             return headers;
         }
 
@@ -67,9 +67,9 @@ namespace Tiny
         {
             foreach (JointType jt in SkeletonStructure.Joints)
             {
-                string x = jt.ToString() + "_" + TLogger.X;
-                string y = jt.ToString() + "_" + TLogger.Y;
-                string z = jt.ToString() + "_" + TLogger.Z;
+                string x = jt.ToString() + "_" + Logger.X;
+                string y = jt.ToString() + "_" + Logger.Y;
+                string z = jt.ToString() + "_" + Logger.Z;
                 headers.Add(x);
                 headers.Add(y);
                 headers.Add(z);
@@ -78,7 +78,7 @@ namespace Tiny
 
         private static StreamWriter OpenFileWriter(string filename, List<string> headers)
         {
-            TLogger.CreateFile(filename, headers);
+            Logger.CreateFile(filename, headers);
             return new StreamWriter(filename, true);
         }
 
@@ -105,24 +105,24 @@ namespace Tiny
 
         public static void SetScenarioType(string scenario)
         {
-            TLogger.scenario = scenario;
+            Logger.scenario = scenario;
         }
 
-        public static void Write(TResult result)
+        public static void Write(TrackerResult result)
         {
             lock (WRITE_LOCK)
             {   
-                foreach (TResult.Person person in result.People)
+                foreach (TrackerResult.Person person in result.People)
                 {
-                    TResult.SkeletonReplica reference = TUtils.GetLocalSkeletonReference(person);
-                    List<Tuple<TResult.SkeletonReplica, Dictionary<JointType, KinectJoint>>> skeletonCoordinates = new List<Tuple<TResult.SkeletonReplica, Dictionary<JointType, KinectJoint>>>();
-                    foreach (TResult.SkeletonReplica match in person.Replicas)
+                    TrackerResult.PotentialSkeleton reference = TUtils.GetLocalSkeletonReference(person);
+                    List<Tuple<TrackerResult.PotentialSkeleton, Dictionary<JointType, KinectJoint>>> skeletonCoordinates = new List<Tuple<TrackerResult.PotentialSkeleton, Dictionary<JointType, KinectJoint>>>();
+                    foreach (TrackerResult.PotentialSkeleton match in person.SkeletonsList)
                     {
                         Dictionary<JointType, KinectJoint> joints = TUtils.GetKinectJoints(match, reference.Skeleton);
                         skeletonCoordinates.Add(Tuple.Create(match, joints));
                     }
                     // Raw
-                    TLogger.WriteData(TLogger.WRITER_RAW, result.Timestamp, person.Id, skeletonCoordinates);
+                    Logger.WriteData(Logger.WRITER_RAW, result.Timestamp, person.Id, skeletonCoordinates);
 
                     //// Averages
                     //Dictionary<JointType, KinectJoint> averages = TrackingUtils.GetAverages(skeletonCoordinates.Select(t=>t.Item2));
@@ -144,18 +144,18 @@ namespace Tiny
         //    TLogger.WriteJointsData(writer, averages);
         //}
 
-        private static void WriteData(StreamWriter writer, long timestamp, uint personId, IEnumerable<Tuple<TResult.SkeletonReplica, Dictionary<JointType, KinectJoint>>> coordinates)
+        private static void WriteData(StreamWriter writer, long timestamp, uint personId, IEnumerable<Tuple<TrackerResult.PotentialSkeleton, Dictionary<JointType, KinectJoint>>> coordinates)
         {
-            foreach (Tuple<TResult.SkeletonReplica, Dictionary<JointType, KinectJoint>> coordinateTuple in coordinates)
+            foreach (Tuple<TrackerResult.PotentialSkeleton, Dictionary<JointType, KinectJoint>> coordinateTuple in coordinates)
             {
-                TResult.SkeletonReplica replica = coordinateTuple.Item1;
+                TrackerResult.PotentialSkeleton replica = coordinateTuple.Item1;
                 Dictionary<JointType, KinectJoint> joints = coordinateTuple.Item2;
                 // Headers
-                writer.Write(String.Format("{0}, {1}, {2}, ", TLogger.scenario, timestamp, personId));
+                writer.Write(String.Format("{0}, {1}, {2}, ", Logger.scenario, timestamp, personId));
                 writer.Write(String.Format("{0}, {1}, {2}, {3}, ", replica.Id, replica.Skeleton.InitialAngle, replica.Skeleton.InitialDistance, replica.Skeleton.Timestamp));
                 writer.Write(String.Format("{0}, {1}, {2}", replica.FOV.Id, replica.FOV.Specification.TiltAngle, replica.FOV.Specification.Height));
                 // Joint_X, Joint_Y, Joint_Z
-                TLogger.WriteJointsData(writer, joints);
+                Logger.WriteJointsData(writer, joints);
             }
         }
 
@@ -168,11 +168,11 @@ namespace Tiny
                 writer.Write(prefix);
                 if (joints.ContainsKey(jt))
                 {
-                    writer.Write(String.Format("{0}, {1}, {2}", joints[jt].Coordinate.X, joints[jt].Coordinate.Y, joints[jt].Coordinate.Z));
+                    writer.Write(String.Format("{0}, {1}, {2}", joints[jt].Position.X, joints[jt].Position.Y, joints[jt].Position.Z));
                 }
                 else
                 {
-                    writer.Write(String.Format("{0}, {1}, {2}", TLogger.NA, TLogger.NA, TLogger.NA));
+                    writer.Write(String.Format("{0}, {1}, {2}", Logger.NA, Logger.NA, Logger.NA));
                 }
             }
             // newline
@@ -181,14 +181,14 @@ namespace Tiny
 
         public static void Flush()
         {
-            TLogger.WRITER_RAW.Flush();
+            Logger.WRITER_RAW.Flush();
             //TrackingLogger.WRITER_DIFF.Flush();
             //TrackingLogger.WRITER_AVG.Flush();
         }
 
         public static void Close()
         {
-            TLogger.WRITER_RAW.Close();
+            Logger.WRITER_RAW.Close();
             //TrackingLogger.WRITER_DIFF.Close();
             //TrackingLogger.WRITER_AVG.Close();
         }

@@ -11,12 +11,12 @@ namespace Tiny
     public class KinectJoint
     {
         public TrackingState TrackingState { get; private set; }
-        public CameraSpacePoint Coordinate { get; private set; }
+        public CameraSpacePoint Position { get; private set; }
 
-        public KinectJoint(TrackingState state, CameraSpacePoint coordinate)
+        public KinectJoint(TrackingState state, CameraSpacePoint position)
         {
             this.TrackingState = state;
-            this.Coordinate = coordinate;
+            this.Position = position;
         }
     }
 }

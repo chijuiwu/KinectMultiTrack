@@ -103,7 +103,7 @@ namespace Tiny.UI
                                                             : Properties.Resources.TRACKING_CALIBRATION;
         }
 
-        public void UpdateDisplay(TResult result)
+        public void UpdateDisplay(TrackerResult result)
         {
             this.Dispatcher.Invoke((Action)(() =>
             {
@@ -111,10 +111,10 @@ namespace Tiny.UI
             }));
         }
 
-        private TResult.KinectFOV GetReferenceKinectFOV(IEnumerable<TResult.KinectFOV> fovs)
+        private TrackerResult.KinectFOV GetReferenceKinectFOV(IEnumerable<TrackerResult.KinectFOV> fovs)
         {
-            TResult.KinectFOV referenceFOV = fovs.First();
-            foreach (TResult.KinectFOV fov in fovs)
+            TrackerResult.KinectFOV referenceFOV = fovs.First();
+            foreach (TrackerResult.KinectFOV fov in fovs)
             {
                 if (fov.ClientIP.ToString().Equals(this.currentReferenceKinectIP))
                 {
@@ -124,13 +124,13 @@ namespace Tiny.UI
             return referenceFOV;
         }
 
-        private void DisplayBodyFrames(TResult result)
+        private void DisplayBodyFrames(TrackerResult result)
         {
             if (!result.People.Any())
             {
                 return;
             }
-            TResult.KinectFOV referenceFOV = this.GetReferenceKinectFOV(result.FOVs);
+            TrackerResult.KinectFOV referenceFOV = this.GetReferenceKinectFOV(result.FOVs);
             this.currentReferenceKinectIP = referenceFOV.ClientIP.ToString();
 
             int frameWidth = referenceFOV.Specification.DepthFrameWidth;
@@ -140,9 +140,9 @@ namespace Tiny.UI
             {
                 this.DrawBackground(frameWidth, frameHeight, dc);
                 int personIdx = 0;
-                foreach (TResult.Person person in result.People)
+                foreach (TrackerResult.Person person in result.People)
                 {
-                    TSkeleton reference = person.FindSkeletonInFOV(referenceFOV);
+                    MovingSkeleton reference = person.FindSkeletonInFOV(referenceFOV);
                     // HACK
                     if (reference == null)
                     {
@@ -150,7 +150,7 @@ namespace Tiny.UI
                     }
                     // All skeletons
                     HashSet<Dictionary<JointType, KinectJoint>> skeletonJointSet = new HashSet<Dictionary<JointType, KinectJoint>>();
-                    foreach (TResult.SkeletonReplica match in person.Replicas)
+                    foreach (TrackerResult.PotentialSkeleton match in person.SkeletonsList)
                     {
                         skeletonJointSet.Add(TUtils.GetKinectJoints(match, reference));
                     }
@@ -201,7 +201,7 @@ namespace Tiny.UI
             Dictionary<JointType, Tuple<Point, TrackingState>> drawableJoints = new Dictionary<JointType, Tuple<Point, TrackingState>>();
             foreach (JointType jt in coordinates.Keys)
             {
-                CameraSpacePoint position = coordinates[jt].Coordinate;
+                CameraSpacePoint position = coordinates[jt].Position;
                 if (position.Z < 0)
                 {
                     position.Z = 0.1f;

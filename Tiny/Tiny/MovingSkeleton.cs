@@ -10,7 +10,7 @@ using Tiny.WorldView;
 
 namespace Tiny
 {
-    public class TSkeleton
+    public class MovingSkeleton
     {
         // 100 seconds
         private readonly int MAX_POSITIONS_STORED = 3000;
@@ -37,31 +37,24 @@ namespace Tiny
         public double InitialAngle { get; private set; }
         public WCoordinate InitialPosition { get; private set; }
         public float InitialDistance { get; private set; } // distance(z-value) from the reference Kinect
-        public Stack<TSkeleton.Position> Positions { get; private set; }
+        public Stack<MovingSkeleton.Position> Positions { get; private set; }
 
-        public TSkeleton.Position CurrentPosition
+        public MovingSkeleton.Position CurrentPosition
         {
             get
             {
-                if (this.Positions.Count > 0)
-                {
-                    return this.Positions.Peek();
-                }
-                else
-                {
-                    return null;
-                }
+                return this.Positions.FirstOrDefault();
             }
         }
 
-        public TSkeleton(ulong id, long timestamp, double initAngle, WCoordinate initPos)
+        public MovingSkeleton(ulong id, long timestamp, double initAngle, WCoordinate initPos)
         {
             this.Id = id;
             this.Timestamp = timestamp;
             this.InitialAngle = initAngle;
             this.InitialPosition = initPos;
             this.InitialDistance = this.InitialPosition.Z;
-            this.Positions = new Stack<TSkeleton.Position>();
+            this.Positions = new Stack<MovingSkeleton.Position>();
         }
 
         public void UpdatePosition(long timestamp, SBody body, WBody worldviewBody)
@@ -71,22 +64,19 @@ namespace Tiny
             {
                 this.Positions.Clear();
             }
-            this.Positions.Push(new TSkeleton.Position(body, worldviewBody));
+            this.Positions.Push(new MovingSkeleton.Position(body, worldviewBody));
         }
 
-        // Copy only the current positions
-        public static TSkeleton Copy(TSkeleton skeleton)
+        // Copy only the current position
+        public static MovingSkeleton CurrentCopy(MovingSkeleton skeleton)
         {
-            if (skeleton.Positions.Count > 0)
+            MovingSkeleton copy = new MovingSkeleton(skeleton.Id, skeleton.Timestamp, skeleton.InitialAngle, skeleton.InitialPosition);
+            Position currentPos = skeleton.CurrentPosition;
+            if (currentPos != null)
             {
-                TSkeleton copy = new TSkeleton(skeleton.Id, skeleton.Timestamp, skeleton.InitialAngle, skeleton.InitialPosition);
-                copy.Positions.Push(Position.Copy(skeleton.CurrentPosition));
-                return copy;
+                copy.Positions.Push(Position.Copy(currentPos));
             }
-            else
-            {
-                return new TSkeleton(skeleton.Id, skeleton.Timestamp, skeleton.InitialAngle, skeleton.InitialPosition);
-            }
+            return copy;
         }
 
         public override string ToString()
@@ -106,7 +96,7 @@ namespace Tiny
                 return false;
             }
             
-            TSkeleton p = obj as TSkeleton;
+            MovingSkeleton p = obj as MovingSkeleton;
             if ((Object)p == null)
             {
                 return false;
@@ -115,7 +105,7 @@ namespace Tiny
             return (this.Id == p.Id) && (this.InitialAngle == p.InitialAngle) && (this.InitialPosition == p.InitialPosition);
         }
 
-        public bool Equals(TSkeleton p)
+        public bool Equals(MovingSkeleton p)
         {
             return (this.Id == p.Id) && (this.InitialAngle == p.InitialAngle) && (this.InitialPosition == p.InitialPosition);
         }

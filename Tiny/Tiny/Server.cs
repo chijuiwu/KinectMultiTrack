@@ -35,9 +35,9 @@ namespace Tiny
         private event KinectCameraHandler OnRemovedKinectCamera;
         private delegate void KinectCameraHandler(IPEndPoint kinectClientIP);
         private event KinectFrameHandler MultipleKinectUIUpdate;
-        private delegate void KinectFrameHandler(TResult result);
+        private delegate void KinectFrameHandler(TrackerResult result);
         private event WorldViewHandler TrackingUIUpdate;
-        private delegate void WorldViewHandler(TResult result);
+        private delegate void WorldViewHandler(TrackerResult result);
 
         public TServer(int port, uint kinects)
         {
@@ -74,8 +74,8 @@ namespace Tiny
             this.writeLogStopwatch.Stop();
             this.flushLogStopwatch.Stop();
             this.trackerStopwatch.Stop();
-            TLogger.Flush();
-            TLogger.Close();
+            Logger.Flush();
+            Logger.Close();
         }
 
         private void StartMultipleKinectUIThread()
@@ -158,7 +158,11 @@ namespace Tiny
 
         private void TrackingUpdateThread(IPEndPoint clientIP, SBodyFrame bodyFrame)
         {
-            TResult result = this.tracker.SynchronizeTracking(clientIP, bodyFrame);
+            TrackerResult result = this.tracker.SynchronizeTracking(clientIP, bodyFrame);
+            if (result.Equals(TrackerResult.Empty))
+            {
+                return;
+            }
             this.MultipleKinectUIUpdate(result);
             this.TrackingUIUpdate(result);
             //if (this.writeLogStopwatch.ElapsedMilliseconds > this.writeLogInterval)

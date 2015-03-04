@@ -50,7 +50,7 @@ namespace Tiny.UI
             }
         }
 
-        public void UpdateDisplay(TResult result)
+        public void UpdateDisplay(TrackerResult result)
         {
             this.Dispatcher.Invoke((Action)(() =>
             {
@@ -58,13 +58,13 @@ namespace Tiny.UI
             }));
         }
 
-        private void DisplayBodyFrames(TResult result)
+        private void DisplayBodyFrames(TrackerResult result)
         {
             if (!result.People.Any())
             {
                 return;
             }
-            KinectCamera.Specification firstFOVDim = result.FOVs.First().Specification;
+            KinectClient.Specification firstFOVDim = result.FOVs.First().Specification;
             int frameWidth = firstFOVDim.DepthFrameWidth;
             int frameHeight = firstFOVDim.DepthFrameHeight;
 
@@ -72,10 +72,10 @@ namespace Tiny.UI
             {
                 this.DrawBackground(frameWidth, frameHeight, dc);
                 int personIdx = 0;
-                foreach (TResult.Person person in result.People)
+                foreach (TrackerResult.Person person in result.People)
                 {
                     Pen pen = this.personColors[personIdx++];
-                    foreach (TResult.SkeletonReplica match in person.Replicas)
+                    foreach (TrackerResult.PotentialSkeleton match in person.SkeletonsList)
                     {
                         SBody body = match.Skeleton.CurrentPosition.Kinect;
                         Dictionary<JointType, SJoint> joints = body.Joints;

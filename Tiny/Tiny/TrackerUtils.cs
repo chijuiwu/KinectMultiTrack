@@ -11,19 +11,19 @@ namespace Tiny
 {
     public class TUtils
     {
-        public static TResult.SkeletonReplica GetLocalSkeletonReference(TResult.Person person)
+        public static TrackerResult.PotentialSkeleton GetLocalSkeletonReference(TrackerResult.Person person)
         {
-            foreach (TResult.SkeletonReplica match in person.Replicas)
+            foreach (TrackerResult.PotentialSkeleton match in person.SkeletonsList)
             {
                 if (match.FOV.ClientIP.Address.ToString().Equals("127.0.0.1"))
                 {
                     return match;
                 }
             }
-            return person.Replicas.First();
+            return person.SkeletonsList.First();
         }
 
-        public static Dictionary<JointType, KinectJoint> GetKinectJoints(TResult.SkeletonReplica match, TSkeleton reference)
+        public static Dictionary<JointType, KinectJoint> GetKinectJoints(TrackerResult.PotentialSkeleton match, MovingSkeleton reference)
         {
             WBody position = match.Skeleton.CurrentPosition.Worldview;
             KinectBody body = WBody.TransformToKinectBody(position, reference.InitialAngle, reference.InitialPosition);
@@ -46,15 +46,15 @@ namespace Tiny
                     }
                     if (!sum.ContainsKey(jt))
                     {
-                        sum[jt] = kinectJoints[jt].Coordinate;
+                        sum[jt] = kinectJoints[jt].Position;
                         count[jt] = 1;
                     }
                     else
                     {
                         CameraSpacePoint newSum = new CameraSpacePoint();
-                        newSum.X = sum[jt].X + kinectJoints[jt].Coordinate.X;
-                        newSum.Y = sum[jt].Y + kinectJoints[jt].Coordinate.Y;
-                        newSum.Z = sum[jt].Z + kinectJoints[jt].Coordinate.Z;
+                        newSum.X = sum[jt].X + kinectJoints[jt].Position.X;
+                        newSum.Y = sum[jt].Y + kinectJoints[jt].Position.Y;
+                        newSum.Z = sum[jt].Z + kinectJoints[jt].Position.Z;
                         sum[jt] = newSum;
                         count[jt]++;
                     }
@@ -72,19 +72,19 @@ namespace Tiny
             return averages;
         }
 
-        public static IEnumerable<Tuple<TResult.SkeletonReplica, Dictionary<JointType, KinectJoint>>> GetDifferences(Dictionary<JointType, KinectJoint> averages, IEnumerable<Tuple<TResult.SkeletonReplica, Dictionary<JointType, KinectJoint>>> raw)
+        public static IEnumerable<Tuple<TrackerResult.PotentialSkeleton, Dictionary<JointType, KinectJoint>>> GetDifferences(Dictionary<JointType, KinectJoint> averages, IEnumerable<Tuple<TrackerResult.PotentialSkeleton, Dictionary<JointType, KinectJoint>>> raw)
         {
-            List<Tuple<TResult.SkeletonReplica, Dictionary<JointType, KinectJoint>>> differences = new List<Tuple<TResult.SkeletonReplica, Dictionary<JointType, KinectJoint>>>();
-            foreach (Tuple<TResult.SkeletonReplica, Dictionary<JointType, KinectJoint>> skeletonCoordinatesTuple in raw)
+            List<Tuple<TrackerResult.PotentialSkeleton, Dictionary<JointType, KinectJoint>>> differences = new List<Tuple<TrackerResult.PotentialSkeleton, Dictionary<JointType, KinectJoint>>>();
+            foreach (Tuple<TrackerResult.PotentialSkeleton, Dictionary<JointType, KinectJoint>> skeletonCoordinatesTuple in raw)
             {   
-                TResult.SkeletonReplica skeletonMatch = skeletonCoordinatesTuple.Item1;
+                TrackerResult.PotentialSkeleton skeletonMatch = skeletonCoordinatesTuple.Item1;
                 Dictionary<JointType, KinectJoint> coordinates = skeletonCoordinatesTuple.Item2;
 
                 Dictionary<JointType, KinectJoint> differencePerSkeleton = new Dictionary<JointType, KinectJoint>();
                 foreach (JointType jt in coordinates.Keys)
                 {
-                    CameraSpacePoint rawPt = coordinates[jt].Coordinate;
-                    CameraSpacePoint averagePt = averages[jt].Coordinate;
+                    CameraSpacePoint rawPt = coordinates[jt].Position;
+                    CameraSpacePoint averagePt = averages[jt].Position;
                     CameraSpacePoint differencePt = new CameraSpacePoint();
                     differencePt.X = (float)Math.Pow(rawPt.X - averagePt.X, 2);
                     differencePt.Y = (float)Math.Pow(rawPt.Y - averagePt.Y, 2);

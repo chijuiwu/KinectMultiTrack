@@ -7,16 +7,15 @@ using System.Net;
 
 namespace Tiny
 {
-    public class TResult
+    public class TrackerResult
     {
-        
         public class KinectFOV
         {
-            public IPEndPoint ClientIP { get; private set; }
             public uint Id { get; private set; }
-            public KinectCamera.Specification Specification { get; private set; }
+            public IPEndPoint ClientIP { get; private set; }
+            public KinectClient.Specification Specification { get; private set; }
 
-            public KinectFOV(IPEndPoint clientIP, uint id, KinectCamera.Specification specification)
+            public KinectFOV(IPEndPoint clientIP, uint id, KinectClient.Specification specification)
             {
                 this.ClientIP = clientIP;
                 this.Id = id;
@@ -24,13 +23,18 @@ namespace Tiny
             }
         }
 
-        public class SkeletonReplica
+        public class PotentialSkeleton
         {
-            public uint Id { get; private set; }
+            public uint Id { get; set; }
             public KinectFOV FOV { get; private set; }
-            public TSkeleton Skeleton { get; private set; }
+            public MovingSkeleton Skeleton { get; private set; }
 
-            public SkeletonReplica(uint id, KinectFOV fov, TSkeleton skeleton)
+            public PotentialSkeleton(KinectFOV fov, MovingSkeleton skeleton)
+                : this(UInt32.MaxValue, fov, skeleton)
+            {
+            }
+
+            public PotentialSkeleton(uint id, KinectFOV fov, MovingSkeleton skeleton)
             {
                 this.Id = id;
                 this.FOV = fov;
@@ -50,18 +54,24 @@ namespace Tiny
 
         public class Person
         {
-            public uint Id { get; private set; }
-            public IEnumerable<SkeletonReplica> Replicas { get; private set; }
+            public uint Id { get; set; }
+            public IEnumerable<PotentialSkeleton> SkeletonsList { get; private set; }
 
-            public Person(uint id, IEnumerable<SkeletonReplica> skeletons)
+            public Person(IEnumerable<PotentialSkeleton> skeletons)
+                : this(UInt32.MaxValue, skeletons)
             {
-                this.Id = id;
-                this.Replicas = skeletons;
+
             }
 
-            public TSkeleton FindSkeletonInFOV(KinectFOV fov)
+            public Person(uint id, IEnumerable<PotentialSkeleton> skeletons)
             {
-                foreach (SkeletonReplica match in this.Replicas)
+                this.Id = id;
+                this.SkeletonsList = skeletons;
+            }
+
+            public MovingSkeleton FindSkeletonInFOV(KinectFOV fov)
+            {
+                foreach (PotentialSkeleton match in this.SkeletonsList)
                 {
                     if (match.FOV.Equals(fov))
                     {
@@ -74,9 +84,9 @@ namespace Tiny
             public override string ToString()
             {
                 StringBuilder sb = new StringBuilder();
-                sb.Append("[Skeletons: ").Append(this.Replicas.Count()).Append("]: ");
+                sb.Append("[Skeletons: ").Append(this.SkeletonsList.Count()).Append("]: ");
                 String prefix = "";
-                foreach (SkeletonReplica match in this.Replicas)
+                foreach (PotentialSkeleton match in this.SkeletonsList)
                 {
                     sb.Append(prefix);
                     prefix = ",";
@@ -89,8 +99,9 @@ namespace Tiny
         public long Timestamp { get; private set; }
         public IEnumerable<KinectFOV> FOVs { get; private set; }
         public IEnumerable<Person> People { get; private set; }
+        public static const TrackerResult Empty = new TrackerResult(Enumerable.Empty<KinectFOV>(), Enumerable.Empty<TrackerResult.Person>());
 
-        public TResult(IEnumerable<KinectFOV> fovs, IEnumerable<Person> people)
+        public TrackerResult(IEnumerable<KinectFOV> fovs, IEnumerable<Person> people)
         {
             this.Timestamp = DateTime.UtcNow.Ticks / TimeSpan.TicksPerMillisecond;
             this.FOVs = fovs;
