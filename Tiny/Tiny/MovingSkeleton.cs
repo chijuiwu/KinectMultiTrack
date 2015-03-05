@@ -25,11 +25,6 @@ namespace Tiny
                 this.Kinect = kinect;
                 this.Worldview = worldview;
             }
-
-            public static Position Copy(Position c)
-            {
-                return new Position(SBody.Copy(c.Kinect), WBody.Copy(c.Worldview));
-            }
         }
 
         public ulong TrackingId { get; private set; }
@@ -65,18 +60,6 @@ namespace Tiny
                 this.Positions.Clear();
             }
             this.Positions.Push(new MovingSkeleton.Position(body, worldviewBody));
-        }
-
-        // Copy only the current position
-        public static MovingSkeleton CurrentCopy(MovingSkeleton skeleton)
-        {
-            MovingSkeleton copy = new MovingSkeleton(skeleton.TrackingId, skeleton.Timestamp, skeleton.InitialAngle, skeleton.InitialPosition);
-            Position currentPos = skeleton.CurrentPosition;
-            if (currentPos != null)
-            {
-                copy.Positions.Push(Position.Copy(currentPos));
-            }
-            return copy;
         }
 
         public override string ToString()

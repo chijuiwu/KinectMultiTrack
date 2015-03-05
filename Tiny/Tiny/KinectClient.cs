@@ -29,7 +29,7 @@ namespace Tiny
         public bool Calibrated { get; private set; }
         public bool IsTracking { get; private set; }
         public KinectClient.Specification CameraSpecification { get; private set; }
-        private readonly Dictionary<ulong, MovingSkeleton> skeletonsDict;
+        private readonly Dictionary<ulong, MovingSkeleton> movingSkeletonsDict;
         private readonly Stack<SBodyFrame> unprocessedBodyFrames;
         
         private KinectStreamUI kinectUI;
@@ -38,13 +38,13 @@ namespace Tiny
         public event KinectUIHandler DisposeKinectUI;
         public delegate void KinectUIHandler();
 
-        public IEnumerable<MovingSkeleton> CurrentlyMovingSkeletons
+        public IEnumerable<MovingSkeleton> MovingSkeletons
         {
             get
             {
-                foreach (MovingSkeleton skeleton in this.skeletonsDict.Values)
+                foreach (MovingSkeleton skeleton in this.movingSkeletonsDict.Values)
                 {
-                    yield return MovingSkeleton.CurrentCopy(skeleton);
+                    yield return skeleton;
                 }
             }
         }
@@ -66,7 +66,7 @@ namespace Tiny
             this.CameraSpecification = new Specification();
             this.CameraSpecification.Height = height;
             this.CameraSpecification.TiltAngle = tiltAngle;
-            this.skeletonsDict = new Dictionary<ulong, MovingSkeleton>();
+            this.movingSkeletonsDict = new Dictionary<ulong, MovingSkeleton>();
             this.unprocessedBodyFrames = new Stack<SBodyFrame>();
 
             //Commented because multi-threading issues
@@ -120,16 +120,15 @@ namespace Tiny
                 }
                 WCoordinate initPos = WBody.GetInitialPosition(previousPosList);
                 MovingSkeleton skeleton = new MovingSkeleton(trackingId, frameNth.TimeStamp, initAngle, initPos);
-                this.skeletonsDict[trackingId] = skeleton;
+                this.movingSkeletonsDict[trackingId] = skeleton;
             }
             this.Calibrated = true;
             this.CameraSpecification.DepthFrameWidth = frame0th.DepthFrameWidth;
             this.CameraSpecification.DepthFrameHeight = frame0th.DepthFrameHeight;
         }
 
-        public void ProcessFrames(SBodyFrame bodyFrame)
+        public void StoreFrame(SBodyFrame bodyFrame)
         {
-            Debug.WriteLine(Resources.PROCESS_BODYFRAME + bodyFrame.TimeStamp);
             if (!this.Calibrated)
             {
                 this.unprocessedBodyFrames.Push(bodyFrame);
@@ -138,13 +137,16 @@ namespace Tiny
             {
                 foreach (SBody body in bodyFrame.Bodies)
                 {
-                    if (this.skeletonsDict.ContainsKey(body.TrackingId))
+                    if (this.movingSkeletonsDict.ContainsKey(body.TrackingId))
                     {
-                        MovingSkeleton skeleton = this.skeletonsDict[body.TrackingId];
+                        MovingSkeleton skeleton = this.movingSkeletonsDict[body.TrackingId];
                         WBody worldBody = WBody.Create(body, skeleton.InitialAngle, skeleton.InitialPosition);
                         skeleton.UpdatePosition(bodyFrame.TimeStamp, body, worldBody);
                     }
-                    // ignore bodies that do not match with any tracking id
+                    else
+                    {
+                         // TODO: Fire unknown skeleton detected
+                    }
                 }
             }
             if (this.UpdateKinectUI != null)

@@ -76,7 +76,7 @@ namespace Tiny.WorldView
         // Joints transformed to the origin of the world coordinate system
         public static WBody Create(SBody body, double initialAngle, WCoordinate initialCenterPosition)
         {
-            WBody worldviewBody = new WBody();
+            WBody wvBody = new WBody();
             foreach (JointType jt in body.Joints.Keys)
             {
                 SJoint joint = body.Joints[jt];
@@ -90,9 +90,9 @@ namespace Tiny.WorldView
                 float transformedY = translatedY;
                 float transformedZ = (float)(translatedZ * Math.Cos(initialAngle) - translatedX * Math.Sin(initialAngle));
                 WCoordinate worldviewJoint = new WCoordinate(transformedX, transformedY, transformedZ);
-                worldviewBody.Joints[jt] = new WJoint(worldviewJoint, joint.TrackingState);
+                wvBody.Joints[jt] = new WJoint(worldviewJoint, joint.TrackingState);
             }
-            return worldviewBody;
+            return wvBody;
         }
 
         // Joints transformed back to the Kinect camera space point
@@ -111,6 +111,7 @@ namespace Tiny.WorldView
                 matrix[0,1] = -sinAngle;
                 matrix[1,0] = sinAngle;
                 matrix[1,1] = cosAngle;
+
                 double determinant = 1 / (matrix[0,0]*matrix[1,1] - matrix[0,1]*matrix[1,0]);
                 double[,] inverseMatrix = new double[2,2];
                 inverseMatrix[0,0] = matrix[1,1];

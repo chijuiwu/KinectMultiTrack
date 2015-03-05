@@ -93,6 +93,7 @@ namespace Tiny
 
         public TrackerResult SynchronizeTracking(IPEndPoint source, SBodyFrame frame)
         {
+            // Put this code elsewhere
             if (!this.kinectClients.ContainsKey(source))
             {
                 // Pass in height and tilt angle
@@ -112,7 +113,7 @@ namespace Tiny
                 }
                 if (this.systemCalibrated && this.systemTracking)
                 {
-                    this.PeopleTracking(frame);
+                    this.PeopleTracking(source, frame);
                 }
                 return this.currentResult;
             }
@@ -127,7 +128,7 @@ namespace Tiny
             {
                 TrackerResult.KinectFOV fov = KinectClient.ExtractFOVInfo(kinect);
                 currentFOVsList.Add(fov);
-                foreach (MovingSkeleton movingSkeleton in kinect.CurrentlyMovingSkeletons) {
+                foreach (MovingSkeleton movingSkeleton in kinect.MovingSkeletons) {
                     currentSkeletonsList.Add(new TrackerResult.PotentialSkeleton(fov, movingSkeleton));
                 }
             }
@@ -200,9 +201,9 @@ namespace Tiny
         #endregion
 
         #region People Tracking
-        private void PeopleTracking(SBodyFrame frame)
+        private void PeopleTracking(IPEndPoint source, SBodyFrame frame)
         {
-            //this.kinectClients[source].ProcessFrames(frame);
+            this.kinectClients[source].StoreFrame(frame);
         }
         #endregion
     }
