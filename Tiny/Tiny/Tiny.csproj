@@ -90,6 +90,7 @@
     <Compile Include="Logger.cs" />
     <Compile Include="TrackerUtils.cs" />
     <Compile Include="TrackerResult.cs" />
+    <Compile Include="UI\Common.cs" />
     <Compile Include="UI\SetupWindow.xaml.cs">
       <DependentUpon>SetupWindow.xaml</DependentUpon>
     </Compile>

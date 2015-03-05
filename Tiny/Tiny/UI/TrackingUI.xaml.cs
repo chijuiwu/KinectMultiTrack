@@ -35,12 +35,25 @@ namespace Tiny.UI
         private ViewMode currentViewMode;
         private string trackingStatusText;
 
+        private int displayWidth, displayHeight;
         private DrawingGroup trackingDrawingGroup;
         private DrawingImage trackingViewSource;
-        private List<Pen> personColors;
 
         private KinectSensor kinectSensor;
         private CoordinateMapper coordinateMapper;
+
+        // Background
+        private static readonly Brush backgroundBrush = Brushes.Black;
+
+        // Joints
+        private static readonly double jointThickness = 3;
+        private static readonly Brush trackedJointBrush = new SolidColorBrush(Color.FromArgb(255, 68, 192, 68));
+        private static readonly Brush inferredJointBrush = Brushes.Yellow;
+
+        // Bones
+        private static readonly Pen defaultTrackedBonePen = new Pen(Brushes.Blue, 6);
+        private static readonly Pen inferredBonePen = new Pen(Brushes.Gray, 1);
+        private static readonly Pen averageBonePen = new Pen(Brushes.White, 6);
 
         public TrackingUI()
         {
@@ -54,14 +67,8 @@ namespace Tiny.UI
             
             this.trackingDrawingGroup = new DrawingGroup();
             this.trackingViewSource = new DrawingImage(this.trackingDrawingGroup);
-            // A person will have the same color
-            this.personColors = new List<Pen>();
-            this.personColors.Add(new Pen(Brushes.Red, 6));
-            this.personColors.Add(new Pen(Brushes.Orange, 6));
-            this.personColors.Add(new Pen(Brushes.Green, 6));
-            this.personColors.Add(new Pen(Brushes.Blue, 6));
-            this.personColors.Add(new Pen(Brushes.Indigo, 6));
-            this.personColors.Add(new Pen(Brushes.Violet, 6));
+            this.displayWidth = (int)this.trackingDrawingGroup.Bounds.Width;
+            this.displayHeight = (int)this.trackingDrawingGroup.Bounds.Height;
 
             this.kinectSensor = KinectSensor.GetDefault();
             this.kinectSensor.Open();
@@ -120,10 +127,16 @@ namespace Tiny.UI
 
         private void DisplayBodyFrames(TrackerResult result)
         {
-            if (!result.People.Any())
+            using (DrawingContext dc = this.trackingDrawingGroup.Open())
+            {
+                this.DrawBackground(TrackingUI.backgroundBrush, this.displayWidth, this.displayHeight, dc);
+            }
+
+            if (result.Equals(TrackerResult.Empty))
             {
                 return;
             }
+
             TrackerResult.KinectFOV referenceFOV = this.GetReferenceKinectFOV(result.FOVs);
             this.currentReferenceKinectIP = referenceFOV.ClientIP.ToString();
 
@@ -132,7 +145,6 @@ namespace Tiny.UI
 
             using (DrawingContext dc = this.trackingDrawingGroup.Open())
             {
-                this.DrawBackground(frameWidth, frameHeight, dc);
                 int personIdx = 0;
                 foreach (TrackerResult.Person person in result.People)
                 {
@@ -151,7 +163,7 @@ namespace Tiny.UI
                         bodies.Add(WBody.TransformWorldToKinectBody(matchingSkeleton.Skeleton.CurrentPosition.Worldview, referenceAngle, referencePosition));
                     }
 
-                    Pen personPen = this.personColors[personIdx++];
+                    Pen personPen = Common.PersonColors[personIdx++];
                     if (this.currentViewMode == ViewMode.Skeletons)
                     {
                         this.DrawSkeletons(bodies, dc, personPen);
@@ -195,21 +207,9 @@ namespace Tiny.UI
             this.DrawBody(drawableJoints, dc, pen);
         }
 
-        private static readonly Brush backgroundBrush = Brushes.Black;
-
-        // Joints
-        private static readonly double jointThickness = 3;
-        private static readonly Brush trackedJointBrush = new SolidColorBrush(Color.FromArgb(255, 68, 192, 68));
-        private static readonly Brush inferredJointBrush = Brushes.Yellow;
-
-        // Bones
-        private static readonly Pen defaultTrackedBonePen = new Pen(Brushes.Blue, 6);
-        private static readonly Pen inferredBonePen = new Pen(Brushes.Gray, 1);
-        private static readonly Pen averageBonePen = new Pen(Brushes.White, 6);
-
-        private void DrawBackground(int frameWidth, int frameHeight, DrawingContext dc)
+        private void DrawBackground(Brush color, int frameWidth, int frameHeight, DrawingContext dc)
         {
-            dc.DrawRectangle(TrackingUI.backgroundBrush, null, new Rect(0.0, 0.0, frameWidth, frameHeight));
+            dc.DrawRectangle(color, null, new Rect(0.0, 0.0, frameWidth, frameHeight));
         }
 
         private void DrawClipRegion(int frameWidth, int frameHeight, DrawingGroup dg)

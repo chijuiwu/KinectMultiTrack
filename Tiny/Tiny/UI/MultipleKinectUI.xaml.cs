@@ -25,7 +25,6 @@ namespace Tiny.UI
     {
         private DrawingGroup multipleKinectDrawingGroup;
         private DrawingImage multipleKinectViewSource;
-        private List<Pen> personColors;
 
         public MultipleKinectUI()
         {
@@ -33,14 +32,6 @@ namespace Tiny.UI
             this.DataContext = this;
             this.multipleKinectDrawingGroup = new DrawingGroup();
             this.multipleKinectViewSource = new DrawingImage(this.multipleKinectDrawingGroup);
-            // HACK: Max 6 people
-            this.personColors = new List<Pen>();
-            this.personColors.Add(new Pen(Brushes.Red, 6));
-            this.personColors.Add(new Pen(Brushes.Orange, 6));
-            this.personColors.Add(new Pen(Brushes.Green, 6));
-            this.personColors.Add(new Pen(Brushes.Blue, 6));
-            this.personColors.Add(new Pen(Brushes.Indigo, 6));
-            this.personColors.Add(new Pen(Brushes.Violet, 6));
         }
         public ImageSource MultipleKinectViewSource
         {
@@ -74,7 +65,7 @@ namespace Tiny.UI
                 int personIdx = 0;
                 foreach (TrackerResult.Person person in result.People)
                 {
-                    Pen pen = this.personColors[personIdx++];
+                    Pen pen = Common.PersonColors[personIdx++];
                     foreach (TrackerResult.PotentialSkeleton match in person.Skeletons)
                     {
                         SBody body = match.Skeleton.CurrentPosition.Kinect;
