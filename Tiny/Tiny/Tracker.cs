@@ -50,13 +50,13 @@ namespace Tiny
                 foreach (KinectClient kinect in this.kinectClients.Values)
                 {
                     // TODO: Remove HACK!!! Instead, show progress bar
-                    if (kinect.UncalibratedFramesCount < Tracker.MIN_CALIBRATION_FRAMES * 3)
+                    if (kinect.UncalibratedFramesCount > Tracker.MIN_CALIBRATION_FRAMES * 3)
                     {
-                        return false;
+                        return true;
                     }
                 }
             }
-            return true;
+            return false;
         }
 
         private void TryCalibration()

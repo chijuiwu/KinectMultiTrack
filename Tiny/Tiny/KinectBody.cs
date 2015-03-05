@@ -16,11 +16,11 @@ namespace Tiny
             this.Joints = new Dictionary<JointType, KinectJoint>();
         }
 
-        public static KinectBody GetAverageBody(IEnumerable<KinectBody> kinectCollection)
+        public static KinectBody GetAverageBody(IEnumerable<KinectBody> bodies)
         {
             Dictionary<JointType, CameraSpacePoint> sum = new Dictionary<JointType, CameraSpacePoint>();
             Dictionary<JointType, uint> count = new Dictionary<JointType, uint>();
-            foreach (KinectBody body in kinectCollection)
+            foreach (KinectBody body in bodies)
             {
                 foreach (JointType jt in body.Joints.Keys)
                 {
