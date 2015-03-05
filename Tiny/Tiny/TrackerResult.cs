@@ -9,16 +9,28 @@ namespace Tiny
 {
     public class TrackerResult
     {
+        public long Timestamp { get; private set; }
+        public IEnumerable<KinectFOV> FOVs { get; private set; }
+        public IEnumerable<Person> People { get; private set; }
+        public static const TrackerResult Empty = new TrackerResult(Enumerable.Empty<KinectFOV>(), Enumerable.Empty<TrackerResult.Person>());
+
+        public TrackerResult(IEnumerable<KinectFOV> fovs, IEnumerable<Person> people)
+        {
+            this.Timestamp = DateTime.UtcNow.Ticks / TimeSpan.TicksPerMillisecond;
+            this.FOVs = fovs;
+            this.People = people;
+        }
+
         public class KinectFOV
         {
             public uint Id { get; private set; }
             public IPEndPoint ClientIP { get; private set; }
             public KinectClient.Specification Specification { get; private set; }
 
-            public KinectFOV(IPEndPoint clientIP, uint id, KinectClient.Specification specification)
+            public KinectFOV(uint id, IPEndPoint clientIP, KinectClient.Specification specification)
             {
-                this.ClientIP = clientIP;
                 this.Id = id;
+                this.ClientIP = clientIP;
                 this.Specification = specification;
             }
         }
@@ -60,7 +72,6 @@ namespace Tiny
             public Person(IEnumerable<PotentialSkeleton> skeletons)
                 : this(UInt32.MaxValue, skeletons)
             {
-
             }
 
             public Person(uint id, IEnumerable<PotentialSkeleton> skeletons)
@@ -94,18 +105,6 @@ namespace Tiny
                 }
                 return sb.ToString();
             }
-        }
-
-        public long Timestamp { get; private set; }
-        public IEnumerable<KinectFOV> FOVs { get; private set; }
-        public IEnumerable<Person> People { get; private set; }
-        public static const TrackerResult Empty = new TrackerResult(Enumerable.Empty<KinectFOV>(), Enumerable.Empty<TrackerResult.Person>());
-
-        public TrackerResult(IEnumerable<KinectFOV> fovs, IEnumerable<Person> people)
-        {
-            this.Timestamp = DateTime.UtcNow.Ticks / TimeSpan.TicksPerMillisecond;
-            this.FOVs = fovs;
-            this.People = people;
         }
     }
 }

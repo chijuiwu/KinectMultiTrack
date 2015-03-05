@@ -24,8 +24,8 @@ namespace Tiny
             public double Height { get; set; }
             public double TiltAngle { get; set; }
         }
-
         public readonly uint Id { get; private set; }
+        public readonly IPEndPoint IP { get; private set; }
         public bool Calibrated { get; private set; }
         public bool IsTracking { get; private set; }
         public readonly KinectClient.Specification CameraSpecification { get; private set; }
@@ -38,7 +38,7 @@ namespace Tiny
         public event KinectUIHandler DisposeKinectUI;
         public delegate void KinectUIHandler();
 
-        public IEnumerable<MovingSkeleton> CurrentMovingSkeletons
+        public IEnumerable<MovingSkeleton> CurrentlyMovingSkeletons
         {
             get
             {
@@ -57,9 +57,10 @@ namespace Tiny
             }
         }
 
-        public KinectClient(string ip, uint id, double height, double tiltAngle)
+        public KinectClient(uint id, IPEndPoint ip, double height, double tiltAngle)
         {
             this.Id = id;
+            this.IP = ip;
             this.Calibrated = false;
             this.IsTracking = false;
             this.CameraSpecification = new Specification();
@@ -150,6 +151,11 @@ namespace Tiny
             {
                 this.UpdateKinectUI(bodyFrame);
             }
+        }
+
+        public static TrackerResult.KinectFOV ExtractFOVInfo(KinectClient kinect)
+        {
+            return new TrackerResult.KinectFOV(kinect.Id, kinect.IP, kinect.CameraSpecification);
         }
     }
 }

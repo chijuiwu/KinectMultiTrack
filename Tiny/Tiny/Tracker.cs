@@ -85,7 +85,7 @@ namespace Tiny
             if (!this.kinectClients.ContainsKey(source))
             {
                 // Pass in height and tilt angle
-                this.kinectClients[source] = new KinectClient(source.ToString(), (uint)this.kinectClients.Count, 0.0, 0.0);
+                this.kinectClients[source] = new KinectClient((uint)this.kinectClients.Count, source, 0.0, 0.0);
             }
             lock (syncFrameLock)
             {
@@ -99,89 +99,87 @@ namespace Tiny
                     return TrackerResult.Empty;
                 }
                 this.kinectClients[source].ProcessFrames(frame);
-                return this.GenerateResult();
+                return this.PerformTracking();
             }
         }
 
-        private TrackerResult GenerateResult()
+        private TrackerResult PerformTracking()
         {
+            List<TrackerResult.KinectFOV> currentFOVsList = new List<TrackerResult.KinectFOV>();
             List<TrackerResult.PotentialSkeleton> currentSkeletonsList = new List<TrackerResult.PotentialSkeleton>();
-            foreach (IPEndPoint clientIP in this.kinectClients.Keys)
+            foreach (KinectClient kinect in this.kinectClients.Values)
             {
-                KinectClient kinect = this.kinectClients[clientIP];
-                TrackerResult.KinectFOV fov = new TrackerResult.KinectFOV(clientIP, kinect.Id, kinect.CameraSpecification);
-                foreach (MovingSkeleton skeleton in kinect.CurrentMovingSkeletons) {
-                    TrackerResult.PotentialSkeleton potentialSkeleton = new TrackerResult.PotentialSkeleton(fov, skeleton);
-                    currentSkeletonsList.Add(potentialSkeleton);
+                TrackerResult.KinectFOV fov = KinectClient.ExtractFOVInfo(kinect);
+                currentFOVsList.Add(fov);
+                foreach (MovingSkeleton movingSkeleton in kinect.CurrentlyMovingSkeletons) {
+                    currentSkeletonsList.Add(new TrackerResult.PotentialSkeleton(fov, movingSkeleton));
                 }
             }
 
-            List<TrackerResult.Person> trackedPeople = new List<TrackerResult.Person>();
-            TrackerResult.Person newPerson;
-            while ((newPerson = this.DetectSamePersonSkeletons(ref currentSkeletonsList)) != null) {
-                // TODO: continue;
-            }
-
-            return null;
-        }
-
-        private TrackerResult.Person DetectSamePersonSkeletons(ref List<TrackerResult.PotentialSkeleton>)
-        {
-            return null;
-        }
-
-        private IEnumerable<TrackerResult.Person> AssignSkeletonsToPeople(IEnumerable<TrackerResult.KinectFOV> fovs)
-        {
-            List<TrackerResult.Person> people = new List<TrackerResult.Person>();
-            
-            // TODO: Validate result
-            while(skeletonsSet.Any())
-            {
-                IEnumerable<Tuple<TrackerResult.KinectFOV, MovingSkeleton>> personSkeletons = this.GroupClosestSkeletons(skeletonsSet);
-                HashSet<TrackerResult.PotentialSkeleton> matches = new HashSet<TrackerResult.PotentialSkeleton>();
-                foreach (Tuple<TrackerResult.KinectFOV, MovingSkeleton> skeleton in personSkeletons)
-                {
-                    matches.Add(new TrackerResult.PotentialSkeleton((uint)matches.Count, skeleton.Item1, skeleton.Item2));
-                    skeletonsSet.Remove(skeleton);
+            List<TrackerResult.Person> trackedPeopleList = new List<TrackerResult.Person>();
+            while (true) {
+                TrackerResult.Person person = this.FindPersonWithMultipleSkeletons(ref currentSkeletonsList);
+                if (person == null) {
+                    break;
                 }
-                people.Add(new TrackerResult.Person((uint)people.Count, matches));
+                // Update person id!!
+                person.Id = (uint)trackedPeopleList.Count;
+                trackedPeopleList.Add(person);
             }
-            return people;
+            // Add remaining skeletons as single-skeleton person
+            foreach (TrackerResult.PotentialSkeleton potentialSkeleton in currentSkeletonsList) {
+                // Update skeleton id!!
+                potentialSkeleton.Id = 0;
+                TrackerResult.Person person = new TrackerResult.Person(new List<TrackerResult.PotentialSkeleton>(){potentialSkeleton});
+                // Update person id!!
+                person.Id = (uint)trackedPeopleList.Count;
+                trackedPeopleList.Add(person);
+            }
+
+            return new TrackerResult(currentFOVsList, trackedPeopleList);
         }
 
-        // Match people in other Kinect FOV by their positions in Worldview
-        // TODO: Deal with full occlusion
-        // TODO: Check if joints are inferred
-        private IEnumerable<Tuple<TrackerResult.KinectFOV, MovingSkeleton>> GroupClosestSkeletons(IEnumerable<Tuple<TrackerResult.KinectFOV, MovingSkeleton>> skeletons)
+        // Create person based on different FOVs and proximity in worldview positions
+        // TODO: extend for multiple FOVs (now: 2)
+        // TODO: use previous tracking results
+        private TrackerResult.Person FindPersonWithMultipleSkeletons(ref List<TrackerResult.PotentialSkeleton> skeletonsList)
         {
-            List<Tuple<TrackerResult.KinectFOV, MovingSkeleton>> personSkeletons = new List<Tuple<TrackerResult.KinectFOV, MovingSkeleton>>() { skeletons.First() };
-            // Find matches for the first skeleton
-            TrackerResult.KinectFOV targetFOV = skeletons.First().Item1;
-            MovingSkeleton targetSkeleton = skeletons.First().Item2;
-
-            Dictionary<TrackerResult.KinectFOV, Tuple<MovingSkeleton, double>> similarSkeletonsDict = new Dictionary<TrackerResult.KinectFOV, Tuple<MovingSkeleton, double>>();
-            foreach (Tuple<TrackerResult.KinectFOV, MovingSkeleton> skeleton in skeletons)
+            // Find the best two skeletons
+            double globalDifference = Double.MaxValue;
+            TrackerResult.PotentialSkeleton skeletonMatch1 = null, skeletonMatch2 = null;
+            foreach (TrackerResult.PotentialSkeleton thisSkeleton in skeletonsList)
             {
-                TrackerResult.KinectFOV otherFOV = skeleton.Item1;
-                MovingSkeleton otherSkeleton = skeleton.Item2;
-                // Look for skeletons in other FOV
-                if (!otherFOV.Equals(targetFOV))
+                TrackerResult.KinectFOV fov1 = thisSkeleton.FOV;
+                MovingSkeleton skeleton1 = thisSkeleton.Skeleton;
+                foreach (TrackerResult.PotentialSkeleton thatSkeleton in skeletonsList)
                 {
-                    MovingSkeleton.Position pos0 = targetSkeleton.CurrentPosition;
-                    MovingSkeleton.Position pos1 = otherSkeleton.CurrentPosition;
-                    double diff = WBody.CalculateDifferences(pos0.Worldview, pos1.Worldview);
-                    // Keep track of the smallest difference skeletons in other FOVs
-                    if (!similarSkeletonsDict.ContainsKey(otherFOV) || diff < similarSkeletonsDict[otherFOV].Item2)
+                    TrackerResult.KinectFOV fov2 = thatSkeleton.FOV;
+                    MovingSkeleton skeleton2 = thatSkeleton.Skeleton;
+                    if (!fov1.Equals(fov2))
                     {
-                        similarSkeletonsDict[otherFOV] = Tuple.Create(otherSkeleton, diff);
+                        WBody pos1 = skeleton1.CurrentPosition.Worldview;
+                        WBody pos2 = skeleton2.CurrentPosition.Worldview;
+                        double localDifference = WBody.CalculateDifferences(pos1, pos2);
+                        if (localDifference < globalDifference)
+                        {
+                            globalDifference = localDifference;
+                            skeletonMatch1 = thisSkeleton;
+                            skeletonMatch2 = thatSkeleton;
+                        }
                     }
                 }
             }
-            foreach (TrackerResult.KinectFOV fov in similarSkeletonsDict.Keys)
+
+            if (skeletonMatch1 == null)
             {
-                personSkeletons.Add(Tuple.Create(fov, similarSkeletonsDict[fov].Item1));
+                return null;
             }
-            return personSkeletons;
+            else
+            {
+                skeletonMatch1.Id = 0;
+                skeletonMatch2.Id = 1;
+                return new TrackerResult.Person(new List<TrackerResult.PotentialSkeleton> { skeletonMatch1, skeletonMatch2 });
+            }
         }
     }
 }
