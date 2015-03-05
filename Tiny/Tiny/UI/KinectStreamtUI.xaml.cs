@@ -26,7 +26,7 @@ namespace Tiny.UI
 
         public KinectStreamUI()
         {
-            InitializeComponent();
+            this.InitializeComponent();
             this.DataContext = this;
             this.bodyDrawingGroup = new DrawingGroup();
             this.BodyStreamImageSource = new DrawingImage(this.bodyDrawingGroup);

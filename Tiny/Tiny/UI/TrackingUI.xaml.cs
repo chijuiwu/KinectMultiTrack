@@ -142,11 +142,13 @@ namespace Tiny.UI
                     {
                         continue;
                     }
+                    double referenceAngle = referenceSkeleton.InitialAngle;
+                    WCoordinate referencePosition = referenceSkeleton.InitialPosition;
                     // All skeletons
                     List<KinectBody> bodies = new List<KinectBody>();
                     foreach (TrackerResult.PotentialSkeleton matchingSkeleton in person.Skeletons)
                     {
-                        bodies.Add(WBody.GetKinectBody(matchingSkeleton.Skeleton.CurrentPosition.Worldview, referenceSkeleton));
+                        bodies.Add(WBody.TransformWorldToKinectBody(matchingSkeleton.Skeleton.CurrentPosition.Worldview, referenceAngle, referencePosition));
                     }
 
                     Pen personPen = this.personColors[personIdx++];

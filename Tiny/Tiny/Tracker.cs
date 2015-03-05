@@ -18,17 +18,20 @@ namespace Tiny
         // 4 Seconds
         public const uint MIN_CALIBRATION_FRAMES = 120;
 
-        private readonly uint KINECT_COUNT;
+        private readonly uint KINECTS_COUNT;
         private bool systemCalibrated = false;
         private bool systemTracking = false;
 
-        private ConcurrentDictionary<IPEndPoint, KinectClient> kinectClients;
+        private readonly ConcurrentDictionary<IPEndPoint, KinectClient> kinectClients;
         private readonly object syncFrameLock = new object();
+
+        private TrackerResult currentResult;
 
         public Tracker(uint kinectCount)
         {
-            this.KINECT_COUNT = kinectCount;
+            this.KINECTS_COUNT = kinectCount;
             this.kinectClients = new ConcurrentDictionary<IPEndPoint, KinectClient>();
+            this.currentResult = TrackerResult.Empty;
         }
 
         public void RemoveClient(IPEndPoint clientIP)
@@ -40,9 +43,9 @@ namespace Tiny
             }
         }
 
-        private bool KinectsCalibrationPossible()
+        private bool KinectsMeetCalibrationRequirement()
         {
-            if (this.kinectClients.Count == this.KINECT_COUNT)
+            if (this.kinectClients.Count == this.KINECTS_COUNT)
             {
                 foreach (KinectClient kinect in this.kinectClients.Values)
                 {
@@ -58,7 +61,11 @@ namespace Tiny
 
         private void TryCalibration()
         {
-            if (this.KinectsCalibrationPossible())
+            if (this.systemCalibrated)
+            {
+                return;
+            }
+            if (this.KinectsMeetCalibrationRequirement())
             {
                 foreach (KinectClient kinect in this.kinectClients.Values)
                 {
@@ -70,6 +77,10 @@ namespace Tiny
 
         private void UpdateTrackingStatus()
         {
+            if (this.systemTracking)
+            {
+                return;
+            }
             foreach (KinectClient kinect in this.kinectClients.Values)
             {
                 if (!kinect.IsTracking) {
@@ -92,18 +103,23 @@ namespace Tiny
                 if (!this.systemCalibrated)
                 {
                     this.TryCalibration();
-                    this.UpdateTrackingStatus();
                 }
-                if (!this.systemCalibrated || !this.systemTracking)
+                if (!this.systemTracking)
                 {
-                    return TrackerResult.Empty;
+                    this.UpdateTrackingStatus();
+                    // Initial result
+                    this.currentResult = this.PeopleDetection();
                 }
-                this.kinectClients[source].ProcessFrames(frame);
-                return this.PerformTracking();
+                if (this.systemCalibrated && this.systemTracking)
+                {
+                    this.PeopleTracking(frame);
+                }
+                return this.currentResult;
             }
         }
 
-        private TrackerResult PerformTracking()
+        # region People Detection
+        private TrackerResult PeopleDetection()
         {
             List<TrackerResult.KinectFOV> currentFOVsList = new List<TrackerResult.KinectFOV>();
             List<TrackerResult.PotentialSkeleton> currentSkeletonsList = new List<TrackerResult.PotentialSkeleton>();
@@ -181,5 +197,13 @@ namespace Tiny
                 return new TrackerResult.Person(new List<TrackerResult.PotentialSkeleton> { skeletonMatch1, skeletonMatch2 });
             }
         }
+        #endregion
+
+        #region People Tracking
+        private void PeopleTracking(SBodyFrame frame)
+        {
+            //this.kinectClients[source].ProcessFrames(frame);
+        }
+        #endregion
     }
 }

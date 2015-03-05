@@ -96,7 +96,7 @@ namespace Tiny.WorldView
         }
 
         // Joints transformed back to the Kinect camera space point
-        public static KinectBody TransformToKinectBody(WBody body, double initialAngle, WCoordinate initialCentrePosition)
+        public static KinectBody TransformWorldToKinectBody(WBody body, double initialAngle, WCoordinate initialCentrePosition)
         {
             KinectBody kinectSkeleton = new KinectBody();
 
@@ -158,11 +158,6 @@ namespace Tiny.WorldView
                 diff += WCoordinate.CalculateDifference(joint0.Coordinate, joint1.Coordinate);
             }
             return diff/(double)commonJoints.Count();
-        }
-
-        public static KinectBody GetKinectBody(WBody body, MovingSkeleton reference)
-        {
-            return WBody.TransformToKinectBody(body, reference.InitialAngle, reference.InitialPosition);
         }
     }
 }

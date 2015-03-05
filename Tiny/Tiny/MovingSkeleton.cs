@@ -32,7 +32,7 @@ namespace Tiny
             }
         }
 
-        public ulong Id { get; private set; }
+        public ulong TrackingId { get; private set; }
         public long Timestamp { get; private set; }
         public double InitialAngle { get; private set; }
         public WCoordinate InitialPosition { get; private set; }
@@ -47,9 +47,9 @@ namespace Tiny
             }
         }
 
-        public MovingSkeleton(ulong id, long timestamp, double initAngle, WCoordinate initPos)
+        public MovingSkeleton(ulong trackingId, long timestamp, double initAngle, WCoordinate initPos)
         {
-            this.Id = id;
+            this.TrackingId = trackingId;
             this.Timestamp = timestamp;
             this.InitialAngle = initAngle;
             this.InitialPosition = initPos;
@@ -70,7 +70,7 @@ namespace Tiny
         // Copy only the current position
         public static MovingSkeleton CurrentCopy(MovingSkeleton skeleton)
         {
-            MovingSkeleton copy = new MovingSkeleton(skeleton.Id, skeleton.Timestamp, skeleton.InitialAngle, skeleton.InitialPosition);
+            MovingSkeleton copy = new MovingSkeleton(skeleton.TrackingId, skeleton.Timestamp, skeleton.InitialAngle, skeleton.InitialPosition);
             Position currentPos = skeleton.CurrentPosition;
             if (currentPos != null)
             {
@@ -83,7 +83,7 @@ namespace Tiny
         {
             StringBuilder sb = new StringBuilder();
             sb.Append("[");
-            sb.Append("Id: ").Append(this.Id).Append(", ");
+            sb.Append("Id: ").Append(this.TrackingId).Append(", ");
             sb.Append("Position: ").Append(this.CurrentPosition);
             sb.Append("]");
             return sb.ToString();
@@ -102,12 +102,12 @@ namespace Tiny
                 return false;
             }
 
-            return (this.Id == p.Id) && (this.InitialAngle == p.InitialAngle) && (this.InitialPosition == p.InitialPosition);
+            return (this.TrackingId == p.TrackingId) && (this.InitialAngle == p.InitialAngle) && (this.InitialPosition == p.InitialPosition);
         }
 
         public bool Equals(MovingSkeleton p)
         {
-            return (this.Id == p.Id) && (this.InitialAngle == p.InitialAngle) && (this.InitialPosition == p.InitialPosition);
+            return (this.TrackingId == p.TrackingId) && (this.InitialAngle == p.InitialAngle) && (this.InitialPosition == p.InitialPosition);
         }
 
         public override int GetHashCode()
@@ -115,7 +115,7 @@ namespace Tiny
             unchecked
             {
                 int hash = 17;
-                hash = hash * 23 + this.Id.GetHashCode();
+                hash = hash * 23 + this.TrackingId.GetHashCode();
                 hash = hash * 23 + this.InitialAngle.GetHashCode();
                 hash = hash * 23 + this.InitialPosition.GetHashCode();
                 return hash;

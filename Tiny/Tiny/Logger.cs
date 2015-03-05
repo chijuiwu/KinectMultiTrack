@@ -115,10 +115,12 @@ namespace Tiny
                 foreach (TrackerResult.Person person in result.People)
                 {
                     TrackerResult.PotentialSkeleton reference = TrackerResult.GetLocalSkeletonReference(person);
+                    double referenceAngle = reference.Skeleton.InitialAngle;
+                    WCoordinate referencePosition = reference.Skeleton.InitialPosition;
                     List<Tuple<TrackerResult.PotentialSkeleton, Dictionary<JointType, KinectJoint>>> skeletonCoordinates = new List<Tuple<TrackerResult.PotentialSkeleton, Dictionary<JointType, KinectJoint>>>();
                     foreach (TrackerResult.PotentialSkeleton skeleton in person.Skeletons)
                     {
-                        KinectBody body = WBody.GetKinectBody(skeleton, reference.Skeleton);
+                        KinectBody body = WBody.TransformWorldToKinectBody(skeleton.Skeleton.CurrentPosition.Worldview, referenceAngle, referencePosition);
                         skeletonCoordinates.Add(Tuple.Create(skeleton, body.Joints));
                     }
                     // Raw
