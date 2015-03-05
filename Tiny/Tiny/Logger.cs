@@ -114,12 +114,12 @@ namespace Tiny
             {   
                 foreach (TrackerResult.Person person in result.People)
                 {
-                    TrackerResult.PotentialSkeleton reference = TUtils.GetLocalSkeletonReference(person);
+                    TrackerResult.PotentialSkeleton reference = TrackerResult.GetLocalSkeletonReference(person);
                     List<Tuple<TrackerResult.PotentialSkeleton, Dictionary<JointType, KinectJoint>>> skeletonCoordinates = new List<Tuple<TrackerResult.PotentialSkeleton, Dictionary<JointType, KinectJoint>>>();
-                    foreach (TrackerResult.PotentialSkeleton match in person.SkeletonsList)
+                    foreach (TrackerResult.PotentialSkeleton skeleton in person.Skeletons)
                     {
-                        Dictionary<JointType, KinectJoint> joints = TUtils.GetKinectJoints(match, reference.Skeleton);
-                        skeletonCoordinates.Add(Tuple.Create(match, joints));
+                        KinectBody body = WBody.GetKinectBody(skeleton, reference.Skeleton);
+                        skeletonCoordinates.Add(Tuple.Create(skeleton, body.Joints));
                     }
                     // Raw
                     Logger.WriteData(Logger.WRITER_RAW, result.Timestamp, person.Id, skeletonCoordinates);

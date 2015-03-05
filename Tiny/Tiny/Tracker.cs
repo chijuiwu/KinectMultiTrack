@@ -23,7 +23,7 @@ namespace Tiny
         private bool systemTracking = false;
 
         private ConcurrentDictionary<IPEndPoint, KinectClient> kinectClients;
-        private const object syncFrameLock = new object();
+        private readonly object syncFrameLock = new object();
 
         public Tracker(uint kinectCount)
         {

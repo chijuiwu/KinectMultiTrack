@@ -11,66 +11,6 @@ namespace Tiny
 {
     public class TUtils
     {
-        public static TrackerResult.PotentialSkeleton GetLocalSkeletonReference(TrackerResult.Person person)
-        {
-            foreach (TrackerResult.PotentialSkeleton match in person.SkeletonsList)
-            {
-                if (match.FOV.ClientIP.Address.ToString().Equals("127.0.0.1"))
-                {
-                    return match;
-                }
-            }
-            return person.SkeletonsList.First();
-        }
-
-        public static Dictionary<JointType, KinectJoint> GetKinectJoints(TrackerResult.PotentialSkeleton match, MovingSkeleton reference)
-        {
-            WBody position = match.Skeleton.CurrentPosition.Worldview;
-            KinectBody body = WBody.TransformToKinectBody(position, reference.InitialAngle, reference.InitialPosition);
-            return body.Joints;
-        }
-
-        // 
-        public static Dictionary<JointType, KinectJoint> GetAverages(IEnumerable<Dictionary<JointType, KinectJoint>> kinectCollection)
-        {
-            Dictionary<JointType, CameraSpacePoint> sum = new Dictionary<JointType, CameraSpacePoint>();
-            Dictionary<JointType, uint> count = new Dictionary<JointType, uint>();
-            foreach (Dictionary<JointType, KinectJoint> kinectJoints in kinectCollection)
-            {
-                foreach (JointType jt in kinectJoints.Keys)
-                {
-                    if (kinectJoints[jt].TrackingState == TrackingState.Inferred)
-                    {
-                        // Don't use inferred points to calculate the average
-                        continue;
-                    }
-                    if (!sum.ContainsKey(jt))
-                    {
-                        sum[jt] = kinectJoints[jt].Position;
-                        count[jt] = 1;
-                    }
-                    else
-                    {
-                        CameraSpacePoint newSum = new CameraSpacePoint();
-                        newSum.X = sum[jt].X + kinectJoints[jt].Position.X;
-                        newSum.Y = sum[jt].Y + kinectJoints[jt].Position.Y;
-                        newSum.Z = sum[jt].Z + kinectJoints[jt].Position.Z;
-                        sum[jt] = newSum;
-                        count[jt]++;
-                    }
-                }
-            }
-            Dictionary<JointType, KinectJoint> averages = new Dictionary<JointType, KinectJoint>();
-            foreach (JointType jt in sum.Keys)
-            {
-                CameraSpacePoint averagePt = new CameraSpacePoint();
-                averagePt.X = sum[jt].X / (float)count[jt];
-                averagePt.Y = sum[jt].Y / (float)count[jt];
-                averagePt.Z = sum[jt].Z / (float)count[jt];
-                averages[jt] = new KinectJoint(TrackingState.Tracked, averagePt);
-            }
-            return averages;
-        }
 
         public static IEnumerable<Tuple<TrackerResult.PotentialSkeleton, Dictionary<JointType, KinectJoint>>> GetDifferences(Dictionary<JointType, KinectJoint> averages, IEnumerable<Tuple<TrackerResult.PotentialSkeleton, Dictionary<JointType, KinectJoint>>> raw)
         {

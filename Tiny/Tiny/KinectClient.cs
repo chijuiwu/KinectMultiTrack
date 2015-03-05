@@ -24,11 +24,11 @@ namespace Tiny
             public double Height { get; set; }
             public double TiltAngle { get; set; }
         }
-        public readonly uint Id { get; private set; }
-        public readonly IPEndPoint IP { get; private set; }
+        public uint Id { get; private set; }
+        public IPEndPoint IP { get; private set; }
         public bool Calibrated { get; private set; }
         public bool IsTracking { get; private set; }
-        public readonly KinectClient.Specification CameraSpecification { get; private set; }
+        public KinectClient.Specification CameraSpecification { get; private set; }
         private readonly Dictionary<ulong, MovingSkeleton> skeletonsDict;
         private readonly Stack<SBodyFrame> unprocessedBodyFrames;
         

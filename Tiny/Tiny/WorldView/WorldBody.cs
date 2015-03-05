@@ -146,7 +146,7 @@ namespace Tiny.WorldView
             return copy;
         }
 
-        // Normalize against the number of joints
+        // Normalized with the number of joints
         public static double CalculateDifferences(WBody body0, WBody body1)
         {
             double diff = 0;
@@ -158,6 +158,11 @@ namespace Tiny.WorldView
                 diff += WCoordinate.CalculateDifference(joint0.Coordinate, joint1.Coordinate);
             }
             return diff/(double)commonJoints.Count();
+        }
+
+        public static KinectBody GetKinectBody(WBody body, MovingSkeleton reference)
+        {
+            return WBody.TransformToKinectBody(body, reference.InitialAngle, reference.InitialPosition);
         }
     }
 }

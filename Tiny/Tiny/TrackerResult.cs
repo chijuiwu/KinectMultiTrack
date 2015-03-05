@@ -12,13 +12,25 @@ namespace Tiny
         public long Timestamp { get; private set; }
         public IEnumerable<KinectFOV> FOVs { get; private set; }
         public IEnumerable<Person> People { get; private set; }
-        public static const TrackerResult Empty = new TrackerResult(Enumerable.Empty<KinectFOV>(), Enumerable.Empty<TrackerResult.Person>());
+        public static TrackerResult Empty = new TrackerResult(Enumerable.Empty<KinectFOV>(), Enumerable.Empty<TrackerResult.Person>());
 
         public TrackerResult(IEnumerable<KinectFOV> fovs, IEnumerable<Person> people)
         {
             this.Timestamp = DateTime.UtcNow.Ticks / TimeSpan.TicksPerMillisecond;
             this.FOVs = fovs;
             this.People = people;
+        }
+
+        public static PotentialSkeleton GetLocalSkeletonReference(Person person)
+        {
+            foreach (PotentialSkeleton skeleton in person.Skeletons)
+            {
+                if (skeleton.FOV.ClientIP.Address.ToString().Equals("127.0.0.1"))
+                {
+                    return skeleton;
+                }
+            }
+            return person.Skeletons.First();
         }
 
         public class KinectFOV
@@ -67,7 +79,7 @@ namespace Tiny
         public class Person
         {
             public uint Id { get; set; }
-            public IEnumerable<PotentialSkeleton> SkeletonsList { get; private set; }
+            public IEnumerable<PotentialSkeleton> Skeletons { get; private set; }
 
             public Person(IEnumerable<PotentialSkeleton> skeletons)
                 : this(UInt32.MaxValue, skeletons)
@@ -77,16 +89,16 @@ namespace Tiny
             public Person(uint id, IEnumerable<PotentialSkeleton> skeletons)
             {
                 this.Id = id;
-                this.SkeletonsList = skeletons;
+                this.Skeletons = skeletons;
             }
 
             public MovingSkeleton FindSkeletonInFOV(KinectFOV fov)
             {
-                foreach (PotentialSkeleton match in this.SkeletonsList)
+                foreach (PotentialSkeleton potentialSkeleton in this.Skeletons)
                 {
-                    if (match.FOV.Equals(fov))
+                    if (potentialSkeleton.FOV.Equals(fov))
                     {
-                        return match.Skeleton;
+                        return potentialSkeleton.Skeleton;
                     }
                 }
                 return null;
@@ -95,9 +107,9 @@ namespace Tiny
             public override string ToString()
             {
                 StringBuilder sb = new StringBuilder();
-                sb.Append("[Skeletons: ").Append(this.SkeletonsList.Count()).Append("]: ");
+                sb.Append("[Skeletons: ").Append(this.Skeletons.Count()).Append("]: ");
                 String prefix = "";
-                foreach (PotentialSkeleton match in this.SkeletonsList)
+                foreach (PotentialSkeleton match in this.Skeletons)
                 {
                     sb.Append(prefix);
                     prefix = ",";

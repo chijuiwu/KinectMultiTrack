@@ -97,12 +97,6 @@ namespace Tiny.UI
             }
         }
 
-        public void setCalibrationComplete(bool completed)
-        {
-            this.TrackingStatusText = completed ? Properties.Resources.TRACKING_START
-                                                            : Properties.Resources.TRACKING_CALIBRATION;
-        }
-
         public void UpdateDisplay(TrackerResult result)
         {
             this.Dispatcher.Invoke((Action)(() =>
@@ -142,35 +136,32 @@ namespace Tiny.UI
                 int personIdx = 0;
                 foreach (TrackerResult.Person person in result.People)
                 {
-                    MovingSkeleton reference = person.FindSkeletonInFOV(referenceFOV);
+                    MovingSkeleton referenceSkeleton = person.FindSkeletonInFOV(referenceFOV);
                     // HACK
-                    if (reference == null)
+                    if (referenceSkeleton == null)
                     {
                         continue;
                     }
                     // All skeletons
-                    HashSet<Dictionary<JointType, KinectJoint>> skeletonJointSet = new HashSet<Dictionary<JointType, KinectJoint>>();
-                    foreach (TrackerResult.PotentialSkeleton match in person.SkeletonsList)
+                    List<KinectBody> bodies = new List<KinectBody>();
+                    foreach (TrackerResult.PotentialSkeleton matchingSkeleton in person.Skeletons)
                     {
-                        skeletonJointSet.Add(TUtils.GetKinectJoints(match, reference));
+                        bodies.Add(WBody.GetKinectBody(matchingSkeleton.Skeleton.CurrentPosition.Worldview, referenceSkeleton));
                     }
 
-                    Pen pen = this.personColors[personIdx++];
+                    Pen personPen = this.personColors[personIdx++];
                     if (this.currentViewMode == ViewMode.Skeletons)
                     {
-                        this.DrawSkeletons(skeletonJointSet, dc, pen);
+                        this.DrawSkeletons(bodies, dc, personPen);
                     }
                     else
                     {
                         // Average
-                        Dictionary<JointType, KinectJoint> averageJoints = TUtils.GetAverages(skeletonJointSet);
-                        if (this.currentViewMode == ViewMode.Average)
+                        KinectBody averageBody = KinectBody.GetAverageBody(bodies);
+                        this.DrawSkeletons(new List<KinectBody>(){averageBody}, dc, TrackingUI.averageBonePen);
+                        if (this.currentViewMode == ViewMode.All)
                         {
-                            this.DrawAverageSkeletons(averageJoints, dc, TrackingUI.averageBonePen);
-                        }
-                        else if (this.currentViewMode == ViewMode.All)
-                        {
-                            this.DrawSkeletonsAndAverage(skeletonJointSet, averageJoints, dc, pen);
+                            this.DrawSkeletons(bodies, dc, personPen);
                         }
                     }
                 }
@@ -178,36 +169,26 @@ namespace Tiny.UI
             this.DrawClipRegion(frameWidth, frameHeight, this.trackingDrawingGroup);
         }
 
-        private void DrawSkeletons(IEnumerable<Dictionary<JointType, KinectJoint>> skeletonJointsEnumeration, DrawingContext dc, Pen trackedBonePen)
+        private void DrawSkeletons(IEnumerable<KinectBody> bodies, DrawingContext dc, Pen trackedBonePen)
         {
-            foreach (Dictionary<JointType, KinectJoint> skeletonCoordinates in skeletonJointsEnumeration)
+            foreach (KinectBody body in bodies)
             {
-                this.RenderJoints(skeletonCoordinates, dc, trackedBonePen);
+                this.RenderJoints(body, dc, trackedBonePen);
             }
         }
 
-        private void DrawAverageSkeletons(Dictionary<JointType, KinectJoint> averageCoordinates, DrawingContext dc, Pen trackedBonePen)
-        {
-            this.RenderJoints(averageCoordinates, dc, trackedBonePen);
-        }
-        private void DrawSkeletonsAndAverage(IEnumerable<Dictionary<JointType, KinectJoint>> skeletonJoints, Dictionary<JointType, KinectJoint> average, DrawingContext dc, Pen trackedBonePen)
-        {
-            this.DrawSkeletons(skeletonJoints, dc, trackedBonePen);
-            this.DrawAverageSkeletons(average, dc, TrackingUI.averageBonePen);
-        }
-
-        private void RenderJoints(Dictionary<JointType, KinectJoint> coordinates, DrawingContext dc, Pen pen)
+        private void RenderJoints(KinectBody body, DrawingContext dc, Pen pen)
         {
             Dictionary<JointType, Tuple<Point, TrackingState>> drawableJoints = new Dictionary<JointType, Tuple<Point, TrackingState>>();
-            foreach (JointType jt in coordinates.Keys)
+            foreach (JointType jt in body.Joints.Keys)
             {
-                CameraSpacePoint position = coordinates[jt].Position;
+                CameraSpacePoint position = body.Joints[jt].Position;
                 if (position.Z < 0)
                 {
                     position.Z = 0.1f;
                 }
                 DepthSpacePoint joint2DPt = this.coordinateMapper.MapCameraPointToDepthSpace(position);
-                drawableJoints[jt] = Tuple.Create(new Point(joint2DPt.X, joint2DPt.Y), coordinates[jt].TrackingState);
+                drawableJoints[jt] = Tuple.Create(new Point(joint2DPt.X, joint2DPt.Y), body.Joints[jt].TrackingState);
             }
             this.DrawBody(drawableJoints, dc, pen);
         }

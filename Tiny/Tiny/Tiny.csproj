@@ -85,9 +85,9 @@
     </ApplicationDefinition>
     <Compile Include="Exceptions\UntrackedJointException.cs" />
     <Compile Include="KinectBody.cs" />
-    <Compile Include="KinectCamera.cs" />
+    <Compile Include="KinectClient.cs" />
     <Compile Include="KinectJoint.cs" />
-    <Compile Include="TrackerLogger.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="TrackerUtils.cs" />
     <Compile Include="TrackerResult.cs" />
     <Compile Include="UI\SetupWindow.xaml.cs">
@@ -97,7 +97,7 @@
     <Compile Include="UI\TrackingUI.xaml.cs">
       <DependentUpon>TrackingUI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="TrackingSkeleton.cs" />
+    <Compile Include="MovingSkeleton.cs" />
     <Compile Include="WorldView\WorldBody.cs" />
     <Compile Include="Tracker.cs" />
     <Compile Include="WorldView\WorldCoordinate.cs" />
@@ -110,7 +110,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="TrackerServer.cs" />
+    <Compile Include="Server.cs" />
     <Compile Include="UI\MultipleKinectUI.xaml.cs">
       <DependentUpon>MultipleKinectUI.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -149,7 +149,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
