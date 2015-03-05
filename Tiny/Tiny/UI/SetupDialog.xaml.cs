@@ -17,9 +17,9 @@ namespace Tiny.UI
     /// <summary>
     /// Interaction logic for SetupWindow.xaml
     /// </summary>
-    public partial class SetupWindow : Window
+    public partial class SetupDialog : Window
     {
-        public SetupWindow()
+        public SetupDialog()
         {
             InitializeComponent();
         }
@@ -27,6 +27,11 @@ namespace Tiny.UI
         private void cancelBtn_Click(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void okBtn_Click(object sender, RoutedEventArgs e)
+        {
+            this.DialogResult = true;
         }
     }
 }

@@ -351,9 +351,17 @@ namespace Tiny.UI
 
         private void SetupBtn_Click(object sender, RoutedEventArgs e)
         {
-            SetupWindow setupWindow = new SetupWindow();
-            setupWindow.Owner = this;
-            setupWindow.ShowDialog();
+            SetupDialog setupDialog = new SetupDialog();
+            setupDialog.Owner = this;
+            setupDialog.ShowDialog();
+            if (setupDialog.DialogResult.HasValue && setupDialog.DialogResult.Value)
+            {
+                MessageBox.Show("OK");
+            }
+            else
+            {
+                MessageBox.Show("CANCEL");
+            }
         }
 
         private void StartBtn_Click(object sender, RoutedEventArgs e)
