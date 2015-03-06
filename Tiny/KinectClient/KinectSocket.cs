@@ -34,7 +34,7 @@ namespace KinectClient
         {
             while(true)
             {
-                if (this.connectionToServer != null && this.connectionToServer.Client != null && this.connectionToServer.Connected)
+                if (this.CanWriteToServer())
                 {
                     continue;
                 }
@@ -47,24 +47,25 @@ namespace KinectClient
                 catch (Exception e)
                 {
                     Debug.WriteLine("Connectio to the server failed. Re-trying...", "KinectClient");
-                    if (this.serverStream != null)
-                    {
-                        this.serverStream.Close();
-                        this.serverStream.Dispose();
-                    }
-                    if (this.connectionToServer != null)
-                    {
-                        this.connectionToServer.Close();
-                    }
                 }
             }
         }
 
         public void CloseConnection()
         {
+            Debug.WriteLine("here");
             if (this.connectionThread != null)
             {
                 this.connectionThread.Abort();
+            }
+            if (this.serverStream != null)
+            {
+                this.serverStream.Close();
+                this.serverStream.Dispose();
+            }
+            if (this.connectionToServer != null)
+            {
+                this.connectionToServer.Close();
             }
         }
 
@@ -76,7 +77,7 @@ namespace KinectClient
             }
             else
             {
-                return connectionToServer.Connected && this.serverStream.CanWrite;
+                return this.connectionToServer.Connected && this.serverStream.CanWrite;
             }
         }
 
@@ -97,8 +98,6 @@ namespace KinectClient
                     byte[] bodyInBinary = BodyFrameSerializer.Serialize(serializableBodyFrame);
                     this.serverStream.Write(bodyInBinary, 0, bodyInBinary.Length);
                     this.serverStream.Flush();
-
-                    while (!serverStream.DataAvailable) ;
 
                     byte[] responseRaw = new byte[256];
                     this.serverStream.Read(responseRaw, 0, responseRaw.Length);

@@ -73,6 +73,7 @@ namespace Tiny
         private void Stop()
         {
             this.serverThread.Abort();
+            this.serverKinectTCPListener.Stop();
             this.writeLogStopwatch.Stop();
             this.flushLogStopwatch.Stop();
             this.trackerStopwatch.Stop();
