@@ -33,5 +33,10 @@ namespace Tiny.UI
         {
             this.DialogResult = true;
         }
+
+        private void User_Scenario_All_Click(object sender, RoutedEventArgs e)
+        {
+            ((RadioButton)sender).IsChecked = true;
+        }
     }
 }

@@ -14,7 +14,11 @@ namespace Tiny
 {
     public class Logger
     {
-        private static readonly string NA = "N/A";
+        public static readonly int NA = -1;
+        public static readonly int ALL = 0;
+        public static readonly int STATIONARY = 1;
+        public static readonly int WALK = 2;
+
         private static readonly string SCENARIO = "Scenario";
         private static readonly string TRACKER_TIME = "Tracker_Time";
         private static readonly string PERSON = "Person#";
@@ -29,7 +33,7 @@ namespace Tiny
         private static readonly string Y = "Y";
         private static readonly string Z = "Z";
 
-        private static string scenario = Logger.NA;
+        private static int scenario = Logger.NA;
 
         private static readonly string FILE_RAW = "..\\..\\..\\..\\Logs\\raw.csv";
         //private static readonly string FILE_DIFF = "..\\..\\..\\..\\Logs\\difference.csv";
@@ -103,7 +107,7 @@ namespace Tiny
             }
         }
 
-        public static void SetScenarioType(string scenario)
+        public static void SetScenarioType(int scenario)
         {
             Logger.scenario = scenario;
         }

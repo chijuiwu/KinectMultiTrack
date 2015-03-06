@@ -91,9 +91,9 @@ namespace Tiny.UI
                 foreach (TrackerResult.Person person in result.People)
                 {
                     Pen pen = Common.PersonColors[personIdx++];
-                    foreach (TrackerResult.PotentialSkeleton match in person.Skeletons)
+                    foreach (TrackerResult.PotentialSkeleton pSkeleton in person.Skeletons)
                     {
-                        SBody body = match.Skeleton.CurrentPosition.Kinect;
+                        SBody body = pSkeleton.Skeleton.CurrentPosition.Kinect;
                         Dictionary<JointType, SJoint> joints = body.Joints;
                         Dictionary<JointType, Tuple<Point, TrackingState>> jointPts = new Dictionary<JointType, Tuple<Point, TrackingState>>();
                         foreach (JointType jt in joints.Keys)
@@ -116,11 +116,6 @@ namespace Tiny.UI
         private void DrawClipRegion(int frameWidth, int frameHeight, DrawingGroup dg)
         {
             dg.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, frameWidth, frameHeight));
-        }
-
-        private void DrawBody(Dictionary<JointType, Tuple<Point, TrackingState>> joints, DrawingContext dc)
-        {
-            this.DrawBody(joints, dc, MultipleKinectUI.defaultTrackedBonePen);
         }
 
         private void DrawBody(Dictionary<JointType, Tuple<Point, TrackingState>> joints, DrawingContext dc, Pen bonePen)

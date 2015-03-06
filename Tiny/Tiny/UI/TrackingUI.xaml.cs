@@ -56,6 +56,9 @@ namespace Tiny.UI
         private static readonly Pen inferredBonePen = new Pen(Brushes.Gray, 1);
         private static readonly Pen averageBonePen = new Pen(Brushes.White, 6);
 
+        public event TrackingSetupHandler TrackingSetup;
+        public delegate void TrackingSetupHandler(Setup setup);
+
         public TrackingUI()
         {
             InitializeComponent();
@@ -110,7 +113,11 @@ namespace Tiny.UI
 
         public void ProcessTrackerResult(TrackerResult result)
         {
-            this.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)(() => { DisplayBodyFrames(result); }));
+            //    this.trackingDrawingGroup.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)(() => { DisplayBodyFrames(result); }));
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                this.DisplayBodyFrames(result);
+            }));
         }
 
         private TrackerResult.KinectFOV GetReferenceKinectFOV(IEnumerable<TrackerResult.KinectFOV> fovs)
@@ -162,9 +169,9 @@ namespace Tiny.UI
                     WCoordinate referencePosition = referenceSkeleton.InitialCenterPosition;
                     // All skeletons
                     List<KinectBody> bodies = new List<KinectBody>();
-                    foreach (TrackerResult.PotentialSkeleton matchingSkeleton in person.Skeletons)
+                    foreach (TrackerResult.PotentialSkeleton pSkeleton in person.Skeletons)
                     {
-                        bodies.Add(WBody.TransformWorldToKinectBody(matchingSkeleton.Skeleton.CurrentPosition.Worldview, referenceAngle, referencePosition));
+                        bodies.Add(WBody.TransformWorldToKinectBody(pSkeleton.Skeleton.CurrentPosition.Worldview, referenceAngle, referencePosition));
                     }
 
                     Pen personPen = Common.PersonColors[personIdx++];
@@ -191,24 +198,19 @@ namespace Tiny.UI
         {
             foreach (KinectBody body in bodies)
             {
-                this.RenderJoints(body, dc, trackedBonePen);
-            }
-        }
-
-        private void RenderJoints(KinectBody body, DrawingContext dc, Pen pen)
-        {
-            Dictionary<JointType, Tuple<Point, TrackingState>> drawableJoints = new Dictionary<JointType, Tuple<Point, TrackingState>>();
-            foreach (JointType jt in body.Joints.Keys)
-            {
-                CameraSpacePoint position = body.Joints[jt].Position;
-                if (position.Z < 0)
+                Dictionary<JointType, Tuple<Point, TrackingState>> drawableJoints = new Dictionary<JointType, Tuple<Point, TrackingState>>();
+                foreach (JointType jt in body.Joints.Keys)
                 {
-                    position.Z = 0.1f;
+                    CameraSpacePoint position = body.Joints[jt].Position;
+                    if (position.Z < 0)
+                    {
+                        position.Z = 0.1f;
+                    }
+                    DepthSpacePoint joint2DPt = this.coordinateMapper.MapCameraPointToDepthSpace(position);
+                    drawableJoints[jt] = Tuple.Create(new Point(joint2DPt.X, joint2DPt.Y), body.Joints[jt].TrackingState);
                 }
-                DepthSpacePoint joint2DPt = this.coordinateMapper.MapCameraPointToDepthSpace(position);
-                drawableJoints[jt] = Tuple.Create(new Point(joint2DPt.X, joint2DPt.Y), body.Joints[jt].TrackingState);
+                this.DrawBody(drawableJoints, dc, trackedBonePen);
             }
-            this.DrawBody(drawableJoints, dc, pen);
         }
 
         private void DrawBackground(Brush color, double width, double height, DrawingContext dc)
@@ -350,12 +352,33 @@ namespace Tiny.UI
 
         private void SetupBtn_Click(object sender, RoutedEventArgs e)
         {
-            SetupDialog setupDialog = new SetupDialog();
-            setupDialog.Owner = this;
-            setupDialog.ShowDialog();
-            if (setupDialog.DialogResult.HasValue && setupDialog.DialogResult.Value)
+            SetupDialog setup = new SetupDialog();
+            setup.Owner = this;
+            setup.ShowDialog();
+            if (setup.DialogResult.HasValue && setup.DialogResult.Value)
             {
-                MessageBox.Show("OK");
+                // Kinect
+                float kinectHeight1 = float.Parse(setup.Kinect_1_Height.Text);
+                float kinectTiltAngle1 = float.Parse(setup.Kinect_1_TiltAngle.Text);
+                float kinectHeight2 = float.Parse(setup.Kinect_2_Height.Text);
+                float kinectTiltAngle2 = float.Parse(setup.Kinect_2_TiltAngle.Text);
+
+                // User
+                bool log = Convert.ToBoolean(setup.User_Log.IsChecked);
+                int userId = Convert.ToInt32(setup.User_Id.Text);
+                int scenario = Logger.NA;
+                if (Convert.ToBoolean(setup.User_Scenario_All.IsChecked))
+                {
+                    scenario = Logger.ALL;
+                }
+                else if (Convert.ToBoolean(setup.User_Scenario_Stationary.IsChecked))
+                {
+                    scenario = Logger.STATIONARY;
+                } else if (Convert.ToBoolean(setup.User_Scenario_Walk.IsChecked))
+                {
+                    scenario = Logger.WALK;
+                }
+
             }
             else
             {
