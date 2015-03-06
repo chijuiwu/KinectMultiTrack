@@ -65,7 +65,7 @@ namespace Tiny.UI
 
         public static readonly string UNINITIALIZED = "Uninitialized";
         public static readonly string INITIALIZED = "Initialized";
-        public static readonly string Running = "Running";
+        public static readonly string WAITING_KINECT = "Waiting for Kinects";
         public static readonly string CALIBRATING = "Calibrating";
 
         public TrackingUI()
@@ -144,12 +144,15 @@ namespace Tiny.UI
         private void StartBtn_Click(object sender, RoutedEventArgs e)
         {
             this.OnStartStop(true);
-            this.ShowProgressText(TrackingUI.Running);
+            this.ShowProgressText(TrackingUI.WAITING_KINECT);
         }
 
         public void OnCalibratedStarted()
         {
-            this.ShowProgressText(TrackingUI.CALIBRATING);
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                this.ShowProgressText(TrackingUI.CALIBRATING);
+            }));
         }
 
         private void ShowProgressText(string text)
@@ -184,16 +187,16 @@ namespace Tiny.UI
 
         private void DisplayBodyFrames(TrackerResult result)
         {
+            if (result.Equals(TrackerResult.Empty))
+            {
+                return;
+            }
+
             this.displayWidth = this.TrackingUIViewBox.ActualWidth;
             this.displayHeight = this.TrackingUIViewBox.ActualHeight;
             using (DrawingContext dc = this.trackingDrawingGroup.Open())
             {
                 this.DrawBackground(TrackingUI.backgroundBrush, displayWidth, displayHeight, dc);
-            }
-
-            if (result.Equals(TrackerResult.Empty))
-            {
-                return;
             }
 
             TrackerResult.KinectFOV referenceFOV = this.GetReferenceKinectFOV(result.FOVs);
