@@ -56,8 +56,8 @@ namespace Tiny.UI
         private static readonly Pen inferredBonePen = new Pen(Brushes.Gray, 1);
         private static readonly Pen averageBonePen = new Pen(Brushes.White, 6);
 
-        public event TrackingSetupHandler TrackingSetup;
-        public delegate void TrackingSetupHandler(Setup setup);
+        public event TrackingSetupHandler OnTrackerSetup;
+        public delegate void TrackingSetupHandler(TrackerSetup setup);
 
         public TrackingUI()
         {
@@ -365,7 +365,7 @@ namespace Tiny.UI
 
                 // User
                 bool log = Convert.ToBoolean(setup.User_Log.IsChecked);
-                int userId = Convert.ToInt32(setup.User_Id.Text);
+                int studyId = Convert.ToInt32(setup.User_Study_Id.Text);
                 int scenario = Logger.NA;
                 if (Convert.ToBoolean(setup.User_Scenario_All.IsChecked))
                 {
@@ -378,7 +378,10 @@ namespace Tiny.UI
                 {
                     scenario = Logger.WALK;
                 }
-
+                
+                TrackerSetup.KinectSetup kinectSetup = new TrackerSetup.KinectSetup(Tuple.Create(kinectHeight1, kinectTiltAngle1), Tuple.Create(kinectHeight2, kinectTiltAngle2));
+                TrackerSetup.UserSetup userSetup = new TrackerSetup.UserSetup(log, scenario, studyId);
+                this.OnTrackerSetup(new TrackerSetup(kinectSetup, userSetup));
             }
             else
             {

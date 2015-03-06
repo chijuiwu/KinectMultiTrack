@@ -19,6 +19,7 @@ namespace Tiny
         public static readonly int STATIONARY = 1;
         public static readonly int WALK = 2;
 
+        private static readonly string STUDY = "Study";
         private static readonly string SCENARIO = "Scenario";
         private static readonly string TRACKER_TIME = "Tracker_Time";
         private static readonly string PERSON = "Person#";
@@ -33,25 +34,19 @@ namespace Tiny
         private static readonly string Y = "Y";
         private static readonly string Z = "Z";
 
-        private static int scenario = Logger.NA;
+        public static int CURRENT_STUDY = Logger.NA;
+        public static int CURRENT_SCENARIO = Logger.NA;
 
-        private static readonly string FILE_RAW = "..\\..\\..\\..\\Logs\\raw.csv";
-        //private static readonly string FILE_DIFF = "..\\..\\..\\..\\Logs\\difference.csv";
-        //private static readonly string FILE_AVG = "..\\..\\..\\..\\Logs\\average.csv";
-
+        private static readonly string FILE_DIR = "..\\..\\..\\..\\Logs\\raw.csv";
         private static readonly List<string> HEADERS_RAW = Logger.GetHeaders();
-        //private static readonly List<string> HEADERS_DIFF = TrackingLogger.GetHeaders();
-        //private static readonly List<string> HEADERS_AVG = TrackingLogger.GetHeaders();
-
-        private static readonly StreamWriter WRITER_RAW = Logger.OpenFileWriter(Logger.FILE_RAW, Logger.HEADERS_RAW);
-        //private static readonly StreamWriter WRITER_DIFF = TrackingLogger.OpenFileWriter(TrackingLogger.FILE_DIFF, TrackingLogger.HEADERS_DIFF);
-        //private static readonly StreamWriter WRITER_AVG = TrackingLogger.OpenFileWriter(TrackingLogger.FILE_AVG, TrackingLogger.HEADERS_AVG);
+        private static readonly StreamWriter WRITER_RAW = Logger.OpenFileWriter(Logger.FILE_DIR, Logger.HEADERS_RAW);
 
         private static readonly object WRITE_LOCK = new object();
 
         private static List<string> GetHeaders()
         {
             List<string> headers = new List<string>() { 
+                Logger.STUDY,
                 Logger.SCENARIO,
                 Logger.TRACKER_TIME, 
                 Logger.PERSON,
@@ -107,11 +102,6 @@ namespace Tiny
             }
         }
 
-        public static void SetScenarioType(int scenario)
-        {
-            Logger.scenario = scenario;
-        }
-
         public static void Write(TrackerResult result)
         {
             lock (WRITE_LOCK)
@@ -129,26 +119,9 @@ namespace Tiny
                     }
                     // Raw
                     Logger.WriteData(Logger.WRITER_RAW, result.Timestamp, person.Id, skeletonCoordinates);
-
-                    //// Averages
-                    //Dictionary<JointType, KinectJoint> averages = TrackingUtils.GetAverages(skeletonCoordinates.Select(t=>t.Item2));
-                    //TrackingLogger.WriteData(TrackingLogger.WRITER_AVG, result.Timestamp, person.Id, averages);
-
-                    //// Differences
-                    //IEnumerable<Tuple<TResult.SkeletonMatch, Dictionary<JointType, KinectJoint>>> differences = TrackingUtils.GetDifferences(averages, skeletonCoordinates);
-                    //TrackingLogger.WriteData(TrackingLogger.WRITER_DIFF, result.Timestamp, person.Id, skeletonCoordinates);
                 }
             }
         }
-
-        //private static void WriteData(StreamWriter writer, long timestamp, uint personId, Dictionary<JointType, KinectJoint> averages)
-        //{
-        //    // Timestamp_Tracker, Person#, Skeleton#, FOV#, Timestamp_Skeleton
-        //    writer.Write(timestamp + ", " + personId + ", " + TLogger.NA + ", " + TLogger.NA + ", " + TLogger.NA);
-
-        //    // Joint_X, Joint_Y, Joint_Z
-        //    TLogger.WriteJointsData(writer, averages);
-        //}
 
         private static void WriteData(StreamWriter writer, long timestamp, uint personId, IEnumerable<Tuple<TrackerResult.PotentialSkeleton, Dictionary<JointType, KinectJoint>>> coordinates)
         {
@@ -157,7 +130,7 @@ namespace Tiny
                 TrackerResult.PotentialSkeleton replica = coordinateTuple.Item1;
                 Dictionary<JointType, KinectJoint> joints = coordinateTuple.Item2;
                 // Headers
-                writer.Write(String.Format("{0}, {1}, {2}, ", Logger.scenario, timestamp, personId));
+                writer.Write(String.Format("{0}, {1}, {2}, {3}, ", Logger.CURRENT_STUDY, Logger.CURRENT_SCENARIO, timestamp, personId));
                 writer.Write(String.Format("{0}, {1}, {2}, {3}, ", replica.Id, replica.Skeleton.InitialAngle, replica.Skeleton.InitialDistance, replica.Skeleton.Timestamp));
                 writer.Write(String.Format("{0}, {1}, {2}", replica.FOV.Id, replica.FOV.Specification.TiltAngle, replica.FOV.Specification.Height));
                 // Joint_X, Joint_Y, Joint_Z
@@ -188,15 +161,11 @@ namespace Tiny
         public static void Flush()
         {
             Logger.WRITER_RAW.Flush();
-            //TrackingLogger.WRITER_DIFF.Flush();
-            //TrackingLogger.WRITER_AVG.Flush();
         }
 
         public static void Close()
         {
             Logger.WRITER_RAW.Close();
-            //TrackingLogger.WRITER_DIFF.Close();
-            //TrackingLogger.WRITER_AVG.Close();
         }
     }
 }

@@ -93,7 +93,15 @@ namespace Tiny
             this.TrackingUIUpdate += this.trackingUI.ProcessTrackerResult;
             this.OnAddedKinectCamera += this.trackingUI.AddKinectCamera;
             this.OnRemovedKinectCamera += this.trackingUI.RemoveKinectCamera;
+            this.trackingUI.OnTrackerSetup += this.tracker.Configure;
+            this.trackingUI.OnTrackerSetup += this.ConfigureLog;
             Dispatcher.Run();
+        }
+
+        private void ConfigureLog(TrackerSetup setup)
+        {
+            Logger.SetScenarioType(setup.userSetup.Scenario);
+            Logger.SetStudyId(setup.userSetup.StudyId);
         }
 
         // Accepts connections and for each thread spaw a new connection
