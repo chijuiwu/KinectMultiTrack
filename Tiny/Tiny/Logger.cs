@@ -37,7 +37,8 @@ namespace Tiny
         public static int CURRENT_STUDY = Logger.NA;
         public static int CURRENT_SCENARIO = Logger.NA;
 
-        private static readonly string FILE_DIR = "..\\..\\..\\..\\Logs\\raw.csv";
+        private static readonly string FILE_DIR = "..\\..\\..\\..\\Logs\\";
+        private static readonly string FILE_NAME_FORMAT = "Raw_Study_{0}_Scenario_{1}.csv";
         private static readonly List<string> HEADERS_RAW = Logger.GetHeaders();
         private static readonly StreamWriter WRITER_RAW = Logger.OpenFileWriter(Logger.FILE_DIR, Logger.HEADERS_RAW);
 
@@ -75,10 +76,11 @@ namespace Tiny
             }
         }
 
-        private static StreamWriter OpenFileWriter(string filename, List<string> headers)
+        private static StreamWriter OpenFileWriter(string directory, List<string> headers)
         {
-            Logger.CreateFile(filename, headers);
-            return new StreamWriter(filename, true);
+            string filepath = directory + String.Format(Logger.FILE_NAME_FORMAT, Logger.CURRENT_STUDY, Logger.CURRENT_SCENARIO);
+            Logger.CreateFile(filepath, headers);
+            return new StreamWriter(filepath, true);
         }
 
         private static void CreateFile(string filepath, List<string> headers)

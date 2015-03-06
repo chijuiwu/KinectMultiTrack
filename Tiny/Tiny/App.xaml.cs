@@ -14,18 +14,11 @@ namespace Tiny
     public partial class App : Application
     {
         public const int serverPort = 12345;
-        public const uint kinects = 2;
 
-        private TServer server;
+        private Server server;
 
         public App() {
-            this.server = new TServer(App.serverPort, App.kinects);
-            this.server.Run();
-        }
-
-        private void Application_Exit(object sender, ExitEventArgs e)
-        {
-            this.server.Stop();
+            this.server = new Server(App.serverPort);
         }
     }
 }

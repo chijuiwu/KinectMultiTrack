@@ -7,39 +7,18 @@ using System.Threading.Tasks;
 namespace Tiny
 {
     public class TrackerSetup
-    {   
-        public class KinectSetup
+    {
+        public int KinectsCount { get; private set; }
+        public bool Logging { get; private set; }
+        public int StudyId { get; private set; }
+        public int Scenario { get; private set; }
+
+        public TrackerSetup(int kinectsCount, bool log, int studyId, int scenario)
         {
-            // Height, TiltAngle
-            public IEnumerable<Tuple<float, float>> kinectsSpec { get; private set; }
-
-            public KinectSetup(params Tuple<float, float>[] kinectsSpec)
-            {
-                this.kinectsSpec = kinectsSpec;
-            }
-        }
-
-        public class UserSetup
-        {
-            public bool Log { get; private set; }
-            public int Scenario { get; private set; }
-            public int StudyId { get; private set; }
-
-            public UserSetup(bool log, int scenario, int studyId)
-            {
-                this.Log = log;
-                this.Scenario = scenario;
-                this.StudyId = studyId;
-            }
-        }
-
-        public KinectSetup kinectSetup { get; private set; }
-        public UserSetup userSetup { get; private set; }
-
-        public TrackerSetup(KinectSetup kinectSetup, UserSetup userSetup)
-        {
-            this.kinectSetup = kinectSetup;
-            this.userSetup = userSetup;
+            this.KinectsCount = kinectsCount;
+            this.Logging = log;
+            this.StudyId = studyId;
+            this.Scenario = scenario;
         }
     }
 }

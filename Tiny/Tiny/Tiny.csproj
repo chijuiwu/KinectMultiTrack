@@ -88,7 +88,7 @@
     <Compile Include="KinectClient.cs" />
     <Compile Include="KinectJoint.cs" />
     <Compile Include="Logger.cs" />
-    <Compile Include="TrackerUtils.cs" />
+    <Compile Include="TrackerSetup.cs" />
     <Compile Include="TrackerResult.cs" />
     <Compile Include="UI\Common.cs" />
     <Compile Include="UI\SetupDialog.xaml.cs">

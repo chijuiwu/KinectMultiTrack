@@ -59,6 +59,9 @@ namespace Tiny.UI
         public event TrackingSetupHandler OnTrackerSetup;
         public delegate void TrackingSetupHandler(TrackerSetup setup);
 
+        public event TrackingUIHandler OnStartStop;
+        public delegate void TrackingUIHandler(bool start);
+
         public TrackingUI()
         {
             InitializeComponent();
@@ -67,7 +70,6 @@ namespace Tiny.UI
             this.referenceKinectIPs = new Dictionary<string, MenuItem>();
             this.currentReferenceKinectIP = "";
             this.currentViewMode = ViewMode.All;
-            this.TrackingStatusText = Properties.Resources.TRACKING_CALIBRATION;
             
             this.trackingDrawingGroup = new DrawingGroup();
             this.trackingViewSource = new DrawingImage(this.trackingDrawingGroup);
@@ -76,6 +78,7 @@ namespace Tiny.UI
             this.kinectSensor.Open();
             this.coordinateMapper = this.kinectSensor.CoordinateMapper;
 
+            this.Closing += this.TrackingUI_Closing;
             //using (DrawingContext dc = this.trackingDrawingGroup.Open())
             //{
             //    this.DrawBackground(TrackingUI.backgroundBrush, this.TrackingUIViewBox.ActualWidth, this.TrackingUIViewBox.ActualHeight, dc);
@@ -84,31 +87,49 @@ namespace Tiny.UI
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public ImageSource TrackingViewSource
+        private void SetupBtn_Click(object sender, RoutedEventArgs e)
         {
-            get
+            SetupDialog setup = new SetupDialog();
+            setup.Owner = this;
+            setup.ShowDialog();
+            if (setup.DialogResult.HasValue && setup.DialogResult.Value)
             {
-                return this.trackingViewSource;
+                // Kinect
+                int kinectsCount = Int32.Parse(setup.Kinect_Count.Text);
+
+                // User
+                bool log = Convert.ToBoolean(setup.User_Log.IsChecked);
+                int studyId = Convert.ToInt32(setup.User_Study_Id.Text);
+                int scenario = Logger.NA;
+                if (Convert.ToBoolean(setup.User_Scenario_All.IsChecked))
+                {
+                    scenario = Logger.ALL;
+                }
+                else if (Convert.ToBoolean(setup.User_Scenario_Stationary.IsChecked))
+                {
+                    scenario = Logger.STATIONARY;
+                }
+                else if (Convert.ToBoolean(setup.User_Scenario_Walk.IsChecked))
+                {
+                    scenario = Logger.WALK;
+                }
+
+                this.OnTrackerSetup(new TrackerSetup(kinectsCount, log, studyId, scenario));
+            }
+            else
+            {
+                MessageBox.Show("CANCEL");
             }
         }
 
-        public string TrackingStatusText
+        private void StartBtn_Click(object sender, RoutedEventArgs e)
         {
-            get
-            {
-                return this.trackingStatusText;
-            }
-            set
-            {
-                if (this.trackingStatusText != value)
-                {
-                    this.trackingStatusText = value;
-                    if (this.PropertyChanged != null)
-                    {
-                        this.PropertyChanged(this, new PropertyChangedEventArgs("TrackingStatusText"));
-                    }
-                }
-            }
+            this.OnStartStop(true);
+        }
+
+        private void TrackingUI_Closing(object sender, CancelEventArgs e)
+        {
+            this.OnStartStop(false);
         }
 
         public void ProcessTrackerResult(TrackerResult result)
@@ -348,50 +369,6 @@ namespace Tiny.UI
         {
             this.currentViewMode = ViewMode.All;
             this.ViewModeBtn.Content = ViewMode.All;
-        }
-
-        private void SetupBtn_Click(object sender, RoutedEventArgs e)
-        {
-            SetupDialog setup = new SetupDialog();
-            setup.Owner = this;
-            setup.ShowDialog();
-            if (setup.DialogResult.HasValue && setup.DialogResult.Value)
-            {
-                // Kinect
-                float kinectHeight1 = float.Parse(setup.Kinect_1_Height.Text);
-                float kinectTiltAngle1 = float.Parse(setup.Kinect_1_TiltAngle.Text);
-                float kinectHeight2 = float.Parse(setup.Kinect_2_Height.Text);
-                float kinectTiltAngle2 = float.Parse(setup.Kinect_2_TiltAngle.Text);
-
-                // User
-                bool log = Convert.ToBoolean(setup.User_Log.IsChecked);
-                int studyId = Convert.ToInt32(setup.User_Study_Id.Text);
-                int scenario = Logger.NA;
-                if (Convert.ToBoolean(setup.User_Scenario_All.IsChecked))
-                {
-                    scenario = Logger.ALL;
-                }
-                else if (Convert.ToBoolean(setup.User_Scenario_Stationary.IsChecked))
-                {
-                    scenario = Logger.STATIONARY;
-                } else if (Convert.ToBoolean(setup.User_Scenario_Walk.IsChecked))
-                {
-                    scenario = Logger.WALK;
-                }
-                
-                TrackerSetup.KinectSetup kinectSetup = new TrackerSetup.KinectSetup(Tuple.Create(kinectHeight1, kinectTiltAngle1), Tuple.Create(kinectHeight2, kinectTiltAngle2));
-                TrackerSetup.UserSetup userSetup = new TrackerSetup.UserSetup(log, scenario, studyId);
-                this.OnTrackerSetup(new TrackerSetup(kinectSetup, userSetup));
-            }
-            else
-            {
-                MessageBox.Show("CANCEL");
-            }
-        }
-
-        private void StartBtn_Click(object sender, RoutedEventArgs e)
-        {
-
         }
     }
 }

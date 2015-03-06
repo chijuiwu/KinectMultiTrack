@@ -15,7 +15,7 @@ namespace Tiny
 {
     public class Tracker
     {
-        private readonly uint KINECTS_COUNT;
+        private int expectedKinectsCount;
         // 4 Seconds
         public const uint MIN_CALIBRATION_FRAMES = 120;
         private readonly object syncFrameLock = new object();
@@ -23,12 +23,11 @@ namespace Tiny
 
         private readonly ConcurrentDictionary<IPEndPoint, KinectClient> kinectClients;
 
-        private 
+        private TrackerSetup setup;
         private TrackerResult currentResult;
 
-        public Tracker(uint kinectCount)
+        public Tracker()
         {
-            this.KINECTS_COUNT = kinectCount;
             this.systemCalibrated = false;
             this.kinectClients = new ConcurrentDictionary<IPEndPoint, KinectClient>();
             this.currentResult = TrackerResult.Empty;
@@ -36,7 +35,7 @@ namespace Tiny
 
         public void Configure(TrackerSetup setup)
         {
-            throw new NotImplementedException();
+            this.expectedKinectsCount = setup.KinectsCount;
         }
 
         public void RemoveClient(IPEndPoint clientIP)
@@ -50,7 +49,7 @@ namespace Tiny
 
         private bool KinectsMeetCalibrationRequirement()
         {
-            if (this.kinectClients.Count == this.KINECTS_COUNT)
+            if (this.kinectClients.Count == this.expectedKinectsCount)
             {
                 foreach (KinectClient kinect in this.kinectClients.Values)
                 {
