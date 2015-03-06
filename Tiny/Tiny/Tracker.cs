@@ -22,9 +22,10 @@ namespace Tiny
         private bool systemCalibrated;
 
         private readonly ConcurrentDictionary<IPEndPoint, KinectClient> kinectClients;
-
-        private TrackerSetup setup;
         private TrackerResult currentResult;
+
+        public event TrackerEventHandler CalibrationEvent;
+        public delegate void TrackerEventHandler();
 
         public Tracker()
         {
@@ -73,6 +74,10 @@ namespace Tiny
             if (this.systemCalibrated)
             {
                 return;
+            }
+            if (this.kinectClients.Count == this.expectedKinectsCount)
+            {
+                this.CalibrationEvent();
             }
             if (this.KinectsMeetCalibrationRequirement())
             {

@@ -85,7 +85,9 @@ namespace Tiny
         {
             this.multipleKinectUI = new MultipleKinectUI();
             this.multipleKinectUI.Show();
+
             this.MultipleKinectUIUpdate += this.multipleKinectUI.UpdateDisplay;
+
             Dispatcher.Run();
         }
 
@@ -94,25 +96,28 @@ namespace Tiny
             this.trackingUI = new TrackingUI();
             this.trackingUI.Show();
 
-            this.trackingUI.OnTrackerSetup += this.tracker.Configure;
-            this.trackingUI.OnTrackerSetup += this.ConfigureLog;
-            this.trackingUI.OnStartStop += this.trackingUI_OnStartStop;
-
-            this.TrackingUIUpdate += this.trackingUI.ProcessTrackerResult;
             this.OnAddedKinectCamera += this.trackingUI.AddKinectCamera;
             this.OnRemovedKinectCamera += this.trackingUI.RemoveKinectCamera;
+
+            this.trackingUI.OnTrackerSetup += this.ConfigureServer;
+            this.trackingUI.OnStartStop += this.StartStopServer;
+
+            this.tracker.CalibrationEvent += this.trackingUI.OnCalibratedStarted;
+            this.TrackingUIUpdate += this.trackingUI.ProcessTrackerResult;
 
             Dispatcher.Run();
         }
 
-        private void ConfigureLog(TrackerSetup setup)
+        private void ConfigureServer(TrackerSetup setup)
         {
+            this.tracker.Configure(setup);
+
             this.loggingOn = setup.Logging;
             Logger.CURRENT_STUDY = setup.StudyId;
             Logger.CURRENT_SCENARIO = setup.Scenario;
         }
 
-        void trackingUI_OnStartStop(bool start)
+        void StartStopServer(bool start)
         {
             if (start)
             {
@@ -167,7 +172,7 @@ namespace Tiny
                     clientStream.Write(response, 0, response.Length);
                     clientStream.Flush();
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     Debug.WriteLine(Tiny.Properties.Resources.SERVER_EXCEPTION);
                     clientStream.Close();

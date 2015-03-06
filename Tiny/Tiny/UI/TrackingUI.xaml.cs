@@ -21,10 +21,11 @@ using System.Diagnostics;
 using System.Net;
 using SkeletonVis = Tiny.UI.SkeletonVisualizer;
 using Tiny.WorldView;
+using System.Globalization;
 
 namespace Tiny.UI
 {
-    public partial class TrackingUI : Window, INotifyPropertyChanged
+    public partial class TrackingUI : Window
     {
         private Dictionary<string, MenuItem> referenceKinectIPs;
         private string currentReferenceKinectIP;
@@ -35,10 +36,10 @@ namespace Tiny.UI
             All
         };
         private ViewMode currentViewMode;
-        private string trackingStatusText;
 
         private DrawingGroup trackingDrawingGroup;
         private DrawingImage trackingViewSource;
+        private double displayWidth, displayHeight;
 
         private KinectSensor kinectSensor;
         private CoordinateMapper coordinateMapper;
@@ -62,6 +63,11 @@ namespace Tiny.UI
         public event TrackingUIHandler OnStartStop;
         public delegate void TrackingUIHandler(bool start);
 
+        public static readonly string UNINITIALIZED = "Uninitialized";
+        public static readonly string INITIALIZED = "Initialized";
+        public static readonly string Running = "Running";
+        public static readonly string CALIBRATING = "Calibrating";
+
         public TrackingUI()
         {
             InitializeComponent();
@@ -79,13 +85,25 @@ namespace Tiny.UI
             this.coordinateMapper = this.kinectSensor.CoordinateMapper;
 
             this.Closing += this.TrackingUI_Closing;
-            //using (DrawingContext dc = this.trackingDrawingGroup.Open())
-            //{
-            //    this.DrawBackground(TrackingUI.backgroundBrush, this.TrackingUIViewBox.ActualWidth, this.TrackingUIViewBox.ActualHeight, dc);
-            //}
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public ImageSource TrackingViewSource
+        {
+            get
+            {
+                return this.trackingViewSource;
+            }
+        }
+
+        private void TrackingUI_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.ShowProgressText(TrackingUI.UNINITIALIZED);
+        }
+
+        private void TrackingUI_Closing(object sender, CancelEventArgs e)
+        {
+            this.OnStartStop(false);
+        }
 
         private void SetupBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -115,6 +133,7 @@ namespace Tiny.UI
                 }
 
                 this.OnTrackerSetup(new TrackerSetup(kinectsCount, log, studyId, scenario));
+                this.ShowProgressText(TrackingUI.INITIALIZED);
             }
             else
             {
@@ -125,11 +144,20 @@ namespace Tiny.UI
         private void StartBtn_Click(object sender, RoutedEventArgs e)
         {
             this.OnStartStop(true);
+            this.ShowProgressText(TrackingUI.Running);
         }
 
-        private void TrackingUI_Closing(object sender, CancelEventArgs e)
+        public void OnCalibratedStarted()
         {
-            this.OnStartStop(false);
+            this.ShowProgressText(TrackingUI.CALIBRATING);
+        }
+
+        private void ShowProgressText(string text)
+        {
+            using (DrawingContext dc = this.trackingDrawingGroup.Open())
+            {
+                dc.DrawText(new FormattedText(text, CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Verdana"), 20, Brushes.White), new Point(0, 0));
+            }
         }
 
         public void ProcessTrackerResult(TrackerResult result)
@@ -156,8 +184,8 @@ namespace Tiny.UI
 
         private void DisplayBodyFrames(TrackerResult result)
         {
-            double displayWidth = this.TrackingUIViewBox.ActualWidth;
-            double displayHeight = this.TrackingUIViewBox.ActualHeight;
+            this.displayWidth = this.TrackingUIViewBox.ActualWidth;
+            this.displayHeight = this.TrackingUIViewBox.ActualHeight;
             using (DrawingContext dc = this.trackingDrawingGroup.Open())
             {
                 this.DrawBackground(TrackingUI.backgroundBrush, displayWidth, displayHeight, dc);

@@ -51,6 +51,7 @@ namespace Tiny.UI
                 this.DrawBackground(MultipleKinectUI.backgroundBrush, this.MultiKinectViewBox.ActualWidth, this.MultiKinectViewBox.ActualHeight, dc);
             }
         }
+
         public ImageSource MultipleKinectViewSource
         {
             get

@@ -44,7 +44,7 @@ namespace KinectClient
                     this.connectionToServer.Connect(this.endPoint);
                     this.serverStream = this.connectionToServer.GetStream();
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     Debug.WriteLine("Connectio to the server failed. Re-trying...", "KinectClient");
                 }
@@ -104,7 +104,7 @@ namespace KinectClient
                     string response = Encoding.ASCII.GetString(responseRaw, 0, responseRaw.Length);
                     Debug.WriteLine("OKAY", "Kinect Client");
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     Debug.WriteLine("Failed to transmit data", "Kinect Client");
                 }

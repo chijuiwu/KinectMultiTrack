@@ -19,10 +19,11 @@
             <Label x:Name="Label"  Content="Multiple Kinects" FontWeight="Bold" FontSize="16" FontFamily="Microsoft Sans Serif" VerticalAlignment="Center"/>
         </StackPanel>
 
+        <Border Background="Black" Grid.Row="1">
         <Viewbox x:Name="MultiKinectViewBox" Grid.Row="1" HorizontalAlignment="Center">
             <Image Source="{Binding MultipleKinectViewSource}" Stretch="UniformToFill" />
         </Viewbox>
-
+        </Border>
     </Grid>
 </Window>
 
