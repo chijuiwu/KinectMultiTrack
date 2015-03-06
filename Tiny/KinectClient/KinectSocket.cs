@@ -103,7 +103,7 @@ namespace KinectClient
                     byte[] responseRaw = new byte[256];
                     this.serverStream.Read(responseRaw, 0, responseRaw.Length);
                     string response = Encoding.ASCII.GetString(responseRaw, 0, responseRaw.Length);
-                    Debug.WriteLine("Received " + response + " from: " + this.endPoint, "Kinect Client");
+                    Debug.WriteLine("OKAY", "Kinect Client");
                 }
                 catch (Exception e)
                 {

@@ -169,8 +169,6 @@ namespace Tiny
                 catch (Exception e)
                 {
                     Debug.WriteLine(Tiny.Properties.Resources.SERVER_EXCEPTION);
-                    Debug.WriteLine(e.Message);
-                    Debug.WriteLine(e.StackTrace);
                     clientStream.Close();
                     client.Close();
                 }

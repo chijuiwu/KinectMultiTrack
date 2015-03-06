@@ -127,7 +127,7 @@
     <value>Server exception</value>
   </data>
   <data name="SERVER_RESPONSE_OKAY" xml:space="preserve">
-    <value>Okay</value>
+    <value>Okay\n</value>
   </data>
   <data name="SERVER_START" xml:space="preserve">
     <value>Start server @ </value>
