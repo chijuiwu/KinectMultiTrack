@@ -19,37 +19,52 @@ namespace KinectClient
     {
         private IPEndPoint endPoint;
         private TcpClient connectionToServer;
+        private Thread connectionThread;
         private NetworkStream serverStream;
+
 
         public KinectSocket(string host, int port)
         {
             this.endPoint = new IPEndPoint(IPAddress.Parse(host), port);
+            this.connectionThread = new Thread(new ThreadStart(this.ConnectionWorkerThread));
+            this.connectionThread.Start();
+        }
 
-            try
+        private void ConnectionWorkerThread()
+        {
+            while(true)
             {
-                this.connectionToServer = new TcpClient();
-                this.connectionToServer.Connect(this.endPoint);
-                this.serverStream = this.connectionToServer.GetStream();
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine("Kinect Client: Exception when connecting to the server");
-                Debug.WriteLine(e.Message);
-                Debug.WriteLine(e.StackTrace);
-                this.CloseConnection();
+                if (this.connectionToServer != null && this.connectionToServer.Client != null && this.connectionToServer.Connected)
+                {
+                    continue;
+                }
+                try
+                {
+                    this.connectionToServer = new TcpClient();
+                    this.connectionToServer.Connect(this.endPoint);
+                    this.serverStream = this.connectionToServer.GetStream();
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine("Connectio to the server failed. Re-trying...", "KinectClient");
+                    if (this.serverStream != null)
+                    {
+                        this.serverStream.Close();
+                        this.serverStream.Dispose();
+                    }
+                    if (this.connectionToServer != null)
+                    {
+                        this.connectionToServer.Close();
+                    }
+                }
             }
         }
 
         public void CloseConnection()
         {
-            if (this.serverStream != null)
+            if (this.connectionThread != null)
             {
-                this.serverStream.Close();
-                this.serverStream.Dispose();
-            }
-            if (this.connectionToServer != null)
-            {
-                this.connectionToServer.Close();
+                this.connectionThread.Abort();
             }
         }
 
@@ -67,37 +82,33 @@ namespace KinectClient
 
         public void SendSerializedKinectBodyFrame(SBodyFrame serializableBodyFrame)
         {
-            if (!this.CanWriteToServer()) return;
-            Thread kinectBodyStreamThread = new Thread(usused => StreamKinectBodyFrame((object)serializableBodyFrame));
-            kinectBodyStreamThread.Start();
+            if (this.CanWriteToServer())
+            {
+                this.SendKinectBodyFrame(serializableBodyFrame);
+            }
         }
 
-        private void StreamKinectBodyFrame(object serializableBodyFrameObj)
+        private void SendKinectBodyFrame(SBodyFrame serializableBodyFrame)
         {
-            Debug.Assert(serializableBodyFrameObj.GetType() == typeof(SBodyFrame));
-
-            if (!this.CanWriteToServer()) return;
-
-            SBodyFrame serializableBodyFrame = (SBodyFrame)serializableBodyFrameObj;
-
-            try
+            if (this.CanWriteToServer())
             {
-                byte[] bodyInBinary = BodyFrameSerializer.Serialize(serializableBodyFrame);
-                this.serverStream.Write(bodyInBinary, 0, bodyInBinary.Length);
-                this.serverStream.Flush();
+                try
+                {
+                    byte[] bodyInBinary = BodyFrameSerializer.Serialize(serializableBodyFrame);
+                    this.serverStream.Write(bodyInBinary, 0, bodyInBinary.Length);
+                    this.serverStream.Flush();
 
-                while (!serverStream.DataAvailable) ;
+                    while (!serverStream.DataAvailable) ;
 
-                byte[] responseRaw = new byte[256];
-                this.serverStream.Read(responseRaw, 0, responseRaw.Length);
-                string response = Encoding.ASCII.GetString(responseRaw, 0, responseRaw.Length);
-                Debug.WriteLine("Kinect Client: Received " + response + " from: " + this.endPoint);
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine("Kinect Client: Exception when transmitting data");
-                Debug.WriteLine(e.Message);
-                Debug.WriteLine(e.StackTrace);
+                    byte[] responseRaw = new byte[256];
+                    this.serverStream.Read(responseRaw, 0, responseRaw.Length);
+                    string response = Encoding.ASCII.GetString(responseRaw, 0, responseRaw.Length);
+                    Debug.WriteLine("Received " + response + " from: " + this.endPoint, "Kinect Client");
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine("Failed to transmit data", "Kinect Client");
+                }
             }
         }
     }
