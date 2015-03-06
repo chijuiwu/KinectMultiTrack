@@ -27,7 +27,6 @@ namespace Tiny
         public uint Id { get; private set; }
         public IPEndPoint IP { get; private set; }
         public bool Calibrated { get; private set; }
-        public bool IsTracking { get; private set; }
         public KinectClient.Specification CameraSpecification { get; private set; }
         private readonly Dictionary<ulong, MovingSkeleton> movingSkeletonsDict;
         private readonly Stack<SBodyFrame> unprocessedBodyFrames;
@@ -62,7 +61,6 @@ namespace Tiny
             this.Id = id;
             this.IP = ip;
             this.Calibrated = false;
-            this.IsTracking = false;
             this.CameraSpecification = new Specification();
             this.CameraSpecification.Height = height;
             this.CameraSpecification.TiltAngle = tiltAngle;
@@ -93,40 +91,6 @@ namespace Tiny
             }
         }
 
-        public void Calibrate()
-        {
-            SBodyFrame[] calibrationFrames = new SBodyFrame[Tracker.MIN_CALIBRATION_FRAMES];
-            // add from back back the 
-            uint calibrationFramesToAdd = Tracker.MIN_CALIBRATION_FRAMES;
-            while (calibrationFramesToAdd > 0)
-            {
-                calibrationFrames[--calibrationFramesToAdd] = this.unprocessedBodyFrames.Pop();
-            }
-            SBodyFrame frame0th = calibrationFrames[0];
-            SBodyFrame frameNth = calibrationFrames[calibrationFrames.Length-1];
-            for (int personIdx = 0; personIdx < frame0th.Bodies.Count; personIdx++)
-            {
-                ulong trackingId = frame0th.Bodies[personIdx].TrackingId;
-                // Use 0th frame to get the initial angle
-                double initAngle = WBody.GetInitialAngle(frame0th.Bodies[personIdx]);
-                // initial position = average of previous positions in frames where that person exists
-                List<SBody> previousPosList = new List<SBody>();
-                for (int frameIdx = 0; frameIdx < calibrationFrames.Length; frameIdx++)
-                {
-                    if (calibrationFrames[frameIdx].Bodies.Count > personIdx)
-                    {
-                        previousPosList.Add(calibrationFrames[frameIdx].Bodies[personIdx]);
-                    }
-                }
-                WCoordinate initPos = WBody.GetInitialPosition(previousPosList);
-                MovingSkeleton skeleton = new MovingSkeleton(trackingId, frameNth.TimeStamp, initAngle, initPos);
-                this.movingSkeletonsDict[trackingId] = skeleton;
-            }
-            this.Calibrated = true;
-            this.CameraSpecification.DepthFrameWidth = frame0th.DepthFrameWidth;
-            this.CameraSpecification.DepthFrameHeight = frame0th.DepthFrameHeight;
-        }
-
         public void StoreFrame(SBodyFrame bodyFrame)
         {
             if (!this.Calibrated)
@@ -137,15 +101,14 @@ namespace Tiny
             {
                 foreach (SBody body in bodyFrame.Bodies)
                 {
-                    if (this.movingSkeletonsDict.ContainsKey(body.TrackingId))
+                    ulong trackingId = body.TrackingId;
+                    if (this.movingSkeletonsDict.ContainsKey(trackingId))
                     {
-                        MovingSkeleton skeleton = this.movingSkeletonsDict[body.TrackingId];
-                        WBody worldBody = WBody.Create(body, skeleton.InitialAngle, skeleton.InitialPosition);
-                        skeleton.UpdatePosition(bodyFrame.TimeStamp, body, worldBody);
+                        this.movingSkeletonsDict[trackingId].UpdatePosition(bodyFrame.TimeStamp, body);
                     }
                     else
                     {
-                         // TODO: Fire unknown skeleton detected
+                        // TODO: Fire unknown skeleton detected
                     }
                 }
             }
@@ -153,6 +116,51 @@ namespace Tiny
             {
                 this.UpdateKinectUI(bodyFrame);
             }
+        }
+
+        public void Calibrate()
+        {
+            SBodyFrame[] calibrationFrames = new SBodyFrame[Tracker.MIN_CALIBRATION_FRAMES];
+            // Add from back to front
+            uint calibrationFramesToAdd = Tracker.MIN_CALIBRATION_FRAMES;
+            while (calibrationFramesToAdd > 0)
+            {
+                calibrationFrames[--calibrationFramesToAdd] = this.unprocessedBodyFrames.Pop();
+            }
+
+            // Use the last frame body as reference
+            int frameNthIdx = calibrationFrames.Length-1;
+            SBodyFrame frameNth = calibrationFrames[frameNthIdx];
+
+            this.CameraSpecification.DepthFrameWidth = frameNth.DepthFrameWidth;
+            this.CameraSpecification.DepthFrameHeight = frameNth.DepthFrameHeight;
+
+            // Coordinate calibration
+            for (int personIdx = 0; personIdx < frameNth.Bodies.Count; personIdx++)
+            {
+                SBody currentBody = calibrationFrames[frameNthIdx].Bodies[personIdx];
+                ulong trackingId = currentBody.TrackingId;
+                long timestamp = frameNth.TimeStamp;
+                
+                // Initial angle
+                double initAngle = WBody.GetInitialAngle(frameNth.Bodies[personIdx]);
+                
+                // initial center position = average of previous positions in frames where that person exists
+                List<SBody> positionsList = new List<SBody>();
+                for (int frameIdx = 0; frameIdx < calibrationFrames.Length; frameIdx++)
+                {
+                    if (calibrationFrames[frameIdx].Bodies.Count > personIdx)
+                    {
+                        positionsList.Add(calibrationFrames[frameIdx].Bodies[personIdx]);
+                    }
+                }
+                WCoordinate initCenterPos = WBody.GetInitialCenterPosition(positionsList);
+
+                MovingSkeleton skeleton = new MovingSkeleton(currentBody, timestamp, initAngle, initCenterPos);
+                this.movingSkeletonsDict[trackingId] = skeleton;
+            }
+
+            this.Calibrated = true;
         }
 
         public static TrackerResult.KinectFOV ExtractFOVInfo(KinectClient kinect)

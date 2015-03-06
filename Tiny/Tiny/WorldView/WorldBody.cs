@@ -40,7 +40,7 @@ namespace Tiny.WorldView
 
         // Return the initial centre position of the user's body
         // Each item in the array is the body at a given time frame during the initial data collection
-        public static WCoordinate GetInitialPosition(List<SBody> initialBodies)
+        public static WCoordinate GetInitialCenterPosition(List<SBody> initialBodies)
         {
             float totalAverageX = 0, totalAverageY = 0, totalAverageZ = 0;
             int bodyCount = 0;

@@ -116,7 +116,7 @@ namespace Tiny
                 {
                     TrackerResult.PotentialSkeleton reference = TrackerResult.GetLocalSkeletonReference(person);
                     double referenceAngle = reference.Skeleton.InitialAngle;
-                    WCoordinate referencePosition = reference.Skeleton.InitialPosition;
+                    WCoordinate referencePosition = reference.Skeleton.InitialCenterPosition;
                     List<Tuple<TrackerResult.PotentialSkeleton, Dictionary<JointType, KinectJoint>>> skeletonCoordinates = new List<Tuple<TrackerResult.PotentialSkeleton, Dictionary<JointType, KinectJoint>>>();
                     foreach (TrackerResult.PotentialSkeleton skeleton in person.Skeletons)
                     {

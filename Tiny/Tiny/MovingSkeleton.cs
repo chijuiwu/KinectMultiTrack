@@ -12,7 +12,7 @@ namespace Tiny
 {
     public class MovingSkeleton
     {
-        // 100 seconds
+        // 50 seconds
         private readonly int MAX_POSITIONS_STORED = 3000;
 
         public class Position
@@ -30,7 +30,7 @@ namespace Tiny
         public ulong TrackingId { get; private set; }
         public long Timestamp { get; private set; }
         public double InitialAngle { get; private set; }
-        public WCoordinate InitialPosition { get; private set; }
+        public WCoordinate InitialCenterPosition { get; private set; }
         public float InitialDistance { get; private set; } // distance(z-value) from the reference Kinect
         public Stack<MovingSkeleton.Position> Positions { get; private set; }
 
@@ -42,24 +42,26 @@ namespace Tiny
             }
         }
 
-        public MovingSkeleton(ulong trackingId, long timestamp, double initAngle, WCoordinate initPos)
+        public MovingSkeleton(SBody body, long timestamp, double initAngle, WCoordinate initCenterPosition)
         {
-            this.TrackingId = trackingId;
+            this.TrackingId = body.TrackingId;
             this.Timestamp = timestamp;
             this.InitialAngle = initAngle;
-            this.InitialPosition = initPos;
-            this.InitialDistance = this.InitialPosition.Z;
+            this.InitialCenterPosition = initCenterPosition;
+            this.InitialDistance = this.InitialCenterPosition.Z;
             this.Positions = new Stack<MovingSkeleton.Position>();
+            // Enable tracking!!
+            this.UpdatePosition(timestamp, body);
         }
 
-        public void UpdatePosition(long timestamp, SBody body, WBody worldviewBody)
+        public void UpdatePosition(long timestamp, SBody body)
         {
             this.Timestamp = timestamp;
-            if (this.Positions.Count() > MAX_POSITIONS_STORED)
-            {
-                this.Positions.Clear();
-            }
-            this.Positions.Push(new MovingSkeleton.Position(body, worldviewBody));
+            //if (this.Positions.Count() > MAX_POSITIONS_STORED)
+            //{
+            //    this.Positions.Clear();
+            //}
+            this.Positions.Push(new MovingSkeleton.Position(body, WBody.Create(body, this.InitialAngle, this.InitialCenterPosition)));
         }
 
         public override string ToString()
@@ -85,12 +87,12 @@ namespace Tiny
                 return false;
             }
 
-            return (this.TrackingId == p.TrackingId) && (this.InitialAngle == p.InitialAngle) && (this.InitialPosition == p.InitialPosition);
+            return (this.TrackingId == p.TrackingId) && (this.InitialAngle == p.InitialAngle) && (this.InitialCenterPosition == p.InitialCenterPosition);
         }
 
         public bool Equals(MovingSkeleton p)
         {
-            return (this.TrackingId == p.TrackingId) && (this.InitialAngle == p.InitialAngle) && (this.InitialPosition == p.InitialPosition);
+            return (this.TrackingId == p.TrackingId) && (this.InitialAngle == p.InitialAngle) && (this.InitialCenterPosition == p.InitialCenterPosition);
         }
 
         public override int GetHashCode()
@@ -100,7 +102,7 @@ namespace Tiny
                 int hash = 17;
                 hash = hash * 23 + this.TrackingId.GetHashCode();
                 hash = hash * 23 + this.InitialAngle.GetHashCode();
-                hash = hash * 23 + this.InitialPosition.GetHashCode();
+                hash = hash * 23 + this.InitialCenterPosition.GetHashCode();
                 return hash;
             }
         }

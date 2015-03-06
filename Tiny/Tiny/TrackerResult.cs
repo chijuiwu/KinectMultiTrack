@@ -81,9 +81,10 @@ namespace Tiny
             public uint Id { get; set; }
             public IEnumerable<PotentialSkeleton> Skeletons { get; private set; }
 
-            public Person(IEnumerable<PotentialSkeleton> skeletons)
+            public Person(params PotentialSkeleton[] skeletons)
                 : this(UInt32.MaxValue, skeletons)
             {
+
             }
 
             public Person(uint id, IEnumerable<PotentialSkeleton> skeletons)

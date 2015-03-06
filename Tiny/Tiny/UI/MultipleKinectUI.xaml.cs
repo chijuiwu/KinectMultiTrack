@@ -43,6 +43,10 @@ namespace Tiny.UI
 
         public void UpdateDisplay(TrackerResult result)
         {
+            if (result.Equals(TrackerResult.Empty))
+            {
+                return;
+            }
             this.Dispatcher.Invoke((Action)(() =>
             {
                 this.DisplayBodyFrames(result);

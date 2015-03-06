@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
@@ -35,7 +37,6 @@ namespace Tiny.UI
         private ViewMode currentViewMode;
         private string trackingStatusText;
 
-        private int displayWidth, displayHeight;
         private DrawingGroup trackingDrawingGroup;
         private DrawingImage trackingViewSource;
 
@@ -67,8 +68,6 @@ namespace Tiny.UI
             
             this.trackingDrawingGroup = new DrawingGroup();
             this.trackingViewSource = new DrawingImage(this.trackingDrawingGroup);
-            this.displayWidth = (int)this.trackingDrawingGroup.Bounds.Width;
-            this.displayHeight = (int)this.trackingDrawingGroup.Bounds.Height;
 
             this.kinectSensor = KinectSensor.GetDefault();
             this.kinectSensor.Open();
@@ -106,10 +105,19 @@ namespace Tiny.UI
 
         public void UpdateDisplay(TrackerResult result)
         {
-            this.Dispatcher.Invoke((Action)(() =>
+            if (result.Equals(TrackerResult.Empty))
             {
-                this.DisplayBodyFrames(result);
-            }));
+                return;
+            }
+            ThreadStart start = delegate()
+            {
+                this.trackingDrawingGroup.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)(() => this.DisplayBodyFrames(result)));
+            };
+            new Thread(start).Start();
+            //Dispatcher.Invoke((Action)(() =>
+            //{
+            //    this.DisplayBodyFrames(result);
+            //}));
         }
 
         private TrackerResult.KinectFOV GetReferenceKinectFOV(IEnumerable<TrackerResult.KinectFOV> fovs)
@@ -127,14 +135,11 @@ namespace Tiny.UI
 
         private void DisplayBodyFrames(TrackerResult result)
         {
+            double displayWidth = this.TrackingUIViewBox.ActualWidth;
+            double displayHeight = this.TrackingUIViewBox.ActualHeight;
             using (DrawingContext dc = this.trackingDrawingGroup.Open())
             {
-                this.DrawBackground(TrackingUI.backgroundBrush, this.displayWidth, this.displayHeight, dc);
-            }
-
-            if (result.Equals(TrackerResult.Empty))
-            {
-                return;
+                this.DrawBackground(TrackingUI.backgroundBrush, displayWidth, displayHeight, dc);
             }
 
             TrackerResult.KinectFOV referenceFOV = this.GetReferenceKinectFOV(result.FOVs);
@@ -155,7 +160,7 @@ namespace Tiny.UI
                         continue;
                     }
                     double referenceAngle = referenceSkeleton.InitialAngle;
-                    WCoordinate referencePosition = referenceSkeleton.InitialPosition;
+                    WCoordinate referencePosition = referenceSkeleton.InitialCenterPosition;
                     // All skeletons
                     List<KinectBody> bodies = new List<KinectBody>();
                     foreach (TrackerResult.PotentialSkeleton matchingSkeleton in person.Skeletons)
@@ -207,9 +212,9 @@ namespace Tiny.UI
             this.DrawBody(drawableJoints, dc, pen);
         }
 
-        private void DrawBackground(Brush color, int frameWidth, int frameHeight, DrawingContext dc)
+        private void DrawBackground(Brush color, double width, double height, DrawingContext dc)
         {
-            dc.DrawRectangle(color, null, new Rect(0.0, 0.0, frameWidth, frameHeight));
+            dc.DrawRectangle(color, null, new Rect(0.0, 0.0, width, height));
         }
 
         private void DrawClipRegion(int frameWidth, int frameHeight, DrawingGroup dg)

@@ -48,7 +48,7 @@
             </Button>
         </StackPanel>
         
-        <Viewbox Grid.Row="1" HorizontalAlignment="Center">
+        <Viewbox x:Name="TrackingUIViewBox" Grid.Row="1" HorizontalAlignment="Center">
             <Image Source="{Binding TrackingViewSource}" Stretch="UniformToFill" />
         </Viewbox>
 

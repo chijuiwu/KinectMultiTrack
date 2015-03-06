@@ -19,8 +19,7 @@ namespace Tiny
         public const uint MIN_CALIBRATION_FRAMES = 120;
 
         private readonly uint KINECTS_COUNT;
-        private bool systemCalibrated = false;
-        private bool systemTracking = false;
+        private bool systemCalibrated;
 
         private readonly ConcurrentDictionary<IPEndPoint, KinectClient> kinectClients;
         private readonly object syncFrameLock = new object();
@@ -30,6 +29,7 @@ namespace Tiny
         public Tracker(uint kinectCount)
         {
             this.KINECTS_COUNT = kinectCount;
+            this.systemCalibrated = false;
             this.kinectClients = new ConcurrentDictionary<IPEndPoint, KinectClient>();
             this.currentResult = TrackerResult.Empty;
         }
@@ -50,15 +50,20 @@ namespace Tiny
                 foreach (KinectClient kinect in this.kinectClients.Values)
                 {
                     // TODO: Remove HACK!!! Instead, show progress bar
-                    if (kinect.UncalibratedFramesCount > Tracker.MIN_CALIBRATION_FRAMES * 3)
+                    if (kinect.UncalibratedFramesCount < Tracker.MIN_CALIBRATION_FRAMES)
                     {
-                        return true;
+                        return false;
                     }
                 }
+                return true;
             }
-            return false;
+            else
+            {
+                return false;
+            }
         }
 
+        // TODO: take the last frame after calibration and start tracking
         private void TryCalibration()
         {
             if (this.systemCalibrated)
@@ -72,23 +77,8 @@ namespace Tiny
                     kinect.Calibrate();
                 }
                 this.systemCalibrated = true;
+                Debug.WriteLine("Calibration done!!", "Tracker");
             }
-        }
-
-        private void UpdateTrackingStatus()
-        {
-            if (this.systemTracking)
-            {
-                return;
-            }
-            foreach (KinectClient kinect in this.kinectClients.Values)
-            {
-                if (!kinect.IsTracking) {
-                    this.systemTracking = false;
-                    break;
-                }
-            }
-            this.systemTracking = true;
         }
 
         public TrackerResult SynchronizeTracking(IPEndPoint source, SBodyFrame frame)
@@ -101,17 +91,19 @@ namespace Tiny
             }
             lock (syncFrameLock)
             {
+                this.kinectClients[source].StoreFrame(frame);
                 if (!this.systemCalibrated)
                 {
                     this.TryCalibration();
+                    if (this.systemCalibrated)
+                    {
+                        Debug.WriteLine("Before initial people detection!!", "Tracker");
+                        this.currentResult = this.PeopleDetection();
+                        Debug.WriteLine("Initial people detection done!!", "Tracker");
+                    }
                 }
-                if (!this.systemTracking)
-                {
-                    this.UpdateTrackingStatus();
-                    // Initial result
-                    this.currentResult = this.PeopleDetection();
-                }
-                if (this.systemCalibrated && this.systemTracking)
+                // Do extra work
+                if (this.systemCalibrated)
                 {
                     this.PeopleTracking(source, frame);
                 }
@@ -133,21 +125,30 @@ namespace Tiny
                 }
             }
 
+            Debug.WriteLine("FOV: " + currentFOVsList.Count, "People Detection");
+            Debug.WriteLine("Skeletons: " + currentSkeletonsList.Count, "People Detection");
+
             List<TrackerResult.Person> trackedPeopleList = new List<TrackerResult.Person>();
             while (true) {
                 TrackerResult.Person person = this.FindPersonWithMultipleSkeletons(ref currentSkeletonsList);
-                if (person == null) {
+                if (person != null) {
+                    // Update person id!!
+                    person.Id = (uint)trackedPeopleList.Count;
+                    trackedPeopleList.Add(person);
+                }
+                else
+                {
                     break;
                 }
-                // Update person id!!
-                person.Id = (uint)trackedPeopleList.Count;
-                trackedPeopleList.Add(person);
             }
+
+            Debug.WriteLine("Tracked people: " + trackedPeopleList.Count, "People Detection");
+
             // Add remaining skeletons as single-skeleton person
             foreach (TrackerResult.PotentialSkeleton potentialSkeleton in currentSkeletonsList) {
                 // Update skeleton id!!
                 potentialSkeleton.Id = 0;
-                TrackerResult.Person person = new TrackerResult.Person(new List<TrackerResult.PotentialSkeleton>(){potentialSkeleton});
+                TrackerResult.Person person = new TrackerResult.Person(potentialSkeleton);
                 // Update person id!!
                 person.Id = (uint)trackedPeopleList.Count;
                 trackedPeopleList.Add(person);
@@ -161,7 +162,7 @@ namespace Tiny
         // TODO: use previous tracking results
         private TrackerResult.Person FindPersonWithMultipleSkeletons(ref List<TrackerResult.PotentialSkeleton> skeletonsList)
         {
-            // Find the best two skeletons
+            // Find the two closest skeletons
             double globalDifference = Double.MaxValue;
             TrackerResult.PotentialSkeleton skeletonMatch1 = null, skeletonMatch2 = null;
             foreach (TrackerResult.PotentialSkeleton thisSkeleton in skeletonsList)
@@ -187,15 +188,17 @@ namespace Tiny
                 }
             }
 
-            if (skeletonMatch1 == null)
+            if (skeletonMatch1 != null && skeletonMatch2 != null)
             {
-                return null;
+                skeletonsList.Remove(skeletonMatch1);
+                skeletonsList.Remove(skeletonMatch2);
+                skeletonMatch1.Id = 0;
+                skeletonMatch2.Id = 1;
+                return new TrackerResult.Person(skeletonMatch1, skeletonMatch2);
             }
             else
             {
-                skeletonMatch1.Id = 0;
-                skeletonMatch2.Id = 1;
-                return new TrackerResult.Person(new List<TrackerResult.PotentialSkeleton> { skeletonMatch1, skeletonMatch2 });
+                return null;
             }
         }
         #endregion
@@ -203,7 +206,6 @@ namespace Tiny
         #region People Tracking
         private void PeopleTracking(IPEndPoint source, SBodyFrame frame)
         {
-            this.kinectClients[source].StoreFrame(frame);
         }
         #endregion
     }
