@@ -90,7 +90,7 @@ namespace Tiny
         {
             this.trackingUI = new TrackingUI();
             this.trackingUI.Show();
-            this.TrackingUIUpdate += this.trackingUI.UpdateDisplay;
+            this.TrackingUIUpdate += this.trackingUI.ProcessTrackerResult;
             this.OnAddedKinectCamera += this.trackingUI.AddKinectCamera;
             this.OnRemovedKinectCamera += this.trackingUI.RemoveKinectCamera;
             Dispatcher.Run();
@@ -159,7 +159,7 @@ namespace Tiny
         private void TrackingUpdateThread(IPEndPoint clientIP, SBodyFrame bodyFrame)
         {
             TrackerResult result = this.tracker.SynchronizeTracking(clientIP, bodyFrame);
-            //this.MultipleKinectUIUpdate(result);
+            this.MultipleKinectUIUpdate(result);
             this.TrackingUIUpdate(result);
             //if (this.writeLogStopwatch.ElapsedMilliseconds > this.writeLogInterval)
             //{

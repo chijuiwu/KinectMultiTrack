@@ -26,12 +26,30 @@ namespace Tiny.UI
         private DrawingGroup multipleKinectDrawingGroup;
         private DrawingImage multipleKinectViewSource;
 
+        // Background
+        private static readonly Brush backgroundBrush = Brushes.Black;
+
+        // Joints
+        private static readonly double jointThickness = 3;
+        private static readonly Brush trackedJointBrush = new SolidColorBrush(Color.FromArgb(255, 68, 192, 68));
+        private static readonly Brush inferredJointBrush = Brushes.Yellow;
+
+        // Bones
+        private static readonly Pen defaultTrackedBonePen = new Pen(Brushes.Blue, 6);
+        private static readonly Pen inferredBonePen = new Pen(Brushes.Gray, 1);
+
         public MultipleKinectUI()
         {
             InitializeComponent();
             this.DataContext = this;
             this.multipleKinectDrawingGroup = new DrawingGroup();
             this.multipleKinectViewSource = new DrawingImage(this.multipleKinectDrawingGroup);
+
+
+            using (DrawingContext dc = this.multipleKinectDrawingGroup.Open())
+            {
+                this.DrawBackground(MultipleKinectUI.backgroundBrush, this.MultiKinectViewBox.ActualWidth, this.MultiKinectViewBox.ActualHeight, dc);
+            }
         }
         public ImageSource MultipleKinectViewSource
         {
@@ -43,10 +61,6 @@ namespace Tiny.UI
 
         public void UpdateDisplay(TrackerResult result)
         {
-            if (result.Equals(TrackerResult.Empty))
-            {
-                return;
-            }
             this.Dispatcher.Invoke((Action)(() =>
             {
                 this.DisplayBodyFrames(result);
@@ -55,17 +69,24 @@ namespace Tiny.UI
 
         private void DisplayBodyFrames(TrackerResult result)
         {
-            if (!result.People.Any())
+            double displayWidth = this.MultiKinectViewBox.ActualWidth;
+            double displayHeight = this.MultiKinectViewBox.ActualHeight;
+            using (DrawingContext dc = this.multipleKinectDrawingGroup.Open())
+            {
+                this.DrawBackground(MultipleKinectUI.backgroundBrush, displayWidth, displayHeight, dc);
+            }
+            if (result.Equals(TrackerResult.Empty))
             {
                 return;
             }
+
             KinectClient.Specification firstFOVDim = result.FOVs.First().Specification;
             int frameWidth = firstFOVDim.DepthFrameWidth;
             int frameHeight = firstFOVDim.DepthFrameHeight;
 
             using (DrawingContext dc = this.multipleKinectDrawingGroup.Open())
             {
-                this.DrawBackground(frameWidth, frameHeight, dc);
+                this.DrawBackground(MultipleKinectUI.backgroundBrush, displayWidth, displayHeight, dc);
                 int personIdx = 0;
                 foreach (TrackerResult.Person person in result.People)
                 {
@@ -87,20 +108,9 @@ namespace Tiny.UI
             this.DrawClipRegion(frameWidth, frameHeight, this.multipleKinectDrawingGroup);
         }
 
-        private static readonly Brush backgroundBrush = Brushes.Black;
-
-        // Joints
-        private static readonly double jointThickness = 3;
-        private static readonly Brush trackedJointBrush = new SolidColorBrush(Color.FromArgb(255, 68, 192, 68));
-        private static readonly Brush inferredJointBrush = Brushes.Yellow;
-
-        // Bones
-        private static readonly Pen defaultTrackedBonePen = new Pen(Brushes.Blue, 6);
-        private static readonly Pen inferredBonePen = new Pen(Brushes.Gray, 1);
-
-        private void DrawBackground(int frameWidth, int frameHeight, DrawingContext dc)
+        private void DrawBackground(Brush color, double width, double height, DrawingContext dc)
         {
-            dc.DrawRectangle(MultipleKinectUI.backgroundBrush, null, new Rect(0.0, 0.0, frameWidth, frameHeight));
+            dc.DrawRectangle(color, null, new Rect(0.0, 0.0, width, height));
         }
 
         private void DrawClipRegion(int frameWidth, int frameHeight, DrawingGroup dg)

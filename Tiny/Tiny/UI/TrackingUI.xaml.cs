@@ -72,6 +72,11 @@ namespace Tiny.UI
             this.kinectSensor = KinectSensor.GetDefault();
             this.kinectSensor.Open();
             this.coordinateMapper = this.kinectSensor.CoordinateMapper;
+
+            //using (DrawingContext dc = this.trackingDrawingGroup.Open())
+            //{
+            //    this.DrawBackground(TrackingUI.backgroundBrush, this.TrackingUIViewBox.ActualWidth, this.TrackingUIViewBox.ActualHeight, dc);
+            //}
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -103,21 +108,9 @@ namespace Tiny.UI
             }
         }
 
-        public void UpdateDisplay(TrackerResult result)
+        public void ProcessTrackerResult(TrackerResult result)
         {
-            if (result.Equals(TrackerResult.Empty))
-            {
-                return;
-            }
-            ThreadStart start = delegate()
-            {
-                this.trackingDrawingGroup.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)(() => this.DisplayBodyFrames(result)));
-            };
-            new Thread(start).Start();
-            //Dispatcher.Invoke((Action)(() =>
-            //{
-            //    this.DisplayBodyFrames(result);
-            //}));
+            this.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)(() => { DisplayBodyFrames(result); }));
         }
 
         private TrackerResult.KinectFOV GetReferenceKinectFOV(IEnumerable<TrackerResult.KinectFOV> fovs)
@@ -142,6 +135,11 @@ namespace Tiny.UI
                 this.DrawBackground(TrackingUI.backgroundBrush, displayWidth, displayHeight, dc);
             }
 
+            if (result.Equals(TrackerResult.Empty))
+            {
+                return;
+            }
+
             TrackerResult.KinectFOV referenceFOV = this.GetReferenceKinectFOV(result.FOVs);
             this.currentReferenceKinectIP = referenceFOV.ClientIP.ToString();
 
@@ -150,6 +148,7 @@ namespace Tiny.UI
 
             using (DrawingContext dc = this.trackingDrawingGroup.Open())
             {
+                this.DrawBackground(TrackingUI.backgroundBrush, displayWidth, displayHeight, dc);
                 int personIdx = 0;
                 foreach (TrackerResult.Person person in result.People)
                 {
@@ -177,7 +176,7 @@ namespace Tiny.UI
                     {
                         // Average
                         KinectBody averageBody = KinectBody.GetAverageBody(bodies);
-                        this.DrawSkeletons(new List<KinectBody>(){averageBody}, dc, TrackingUI.averageBonePen);
+                        this.DrawSkeletons(new List<KinectBody>() { averageBody }, dc, TrackingUI.averageBonePen);
                         if (this.currentViewMode == ViewMode.All)
                         {
                             this.DrawSkeletons(bodies, dc, personPen);
@@ -220,11 +219,6 @@ namespace Tiny.UI
         private void DrawClipRegion(int frameWidth, int frameHeight, DrawingGroup dg)
         {
             dg.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, frameWidth, frameHeight));
-        }
-
-        private void DrawBody(Dictionary<JointType, Tuple<Point, TrackingState>> joints, DrawingContext dc)
-        {
-            this.DrawBody(joints, dc, TrackingUI.defaultTrackedBonePen);
         }
 
         private void DrawBody(Dictionary<JointType, Tuple<Point, TrackingState>> joints, DrawingContext dc, Pen bonePen)

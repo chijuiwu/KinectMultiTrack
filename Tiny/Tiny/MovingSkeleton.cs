@@ -25,6 +25,11 @@ namespace Tiny
                 this.Kinect = kinect;
                 this.Worldview = worldview;
             }
+
+            public static Position Copy(Position position)
+            {
+                return new Position(SBody.Copy(position.Kinect), WBody.Copy(position.Worldview));
+            }
         }
 
         public ulong TrackingId { get; private set; }
@@ -52,6 +57,22 @@ namespace Tiny
             this.Positions = new Stack<MovingSkeleton.Position>();
             // Enable tracking!!
             this.UpdatePosition(timestamp, body);
+        }
+
+        private MovingSkeleton(Position currentPosition, ulong trackingId, long timestamp, double initAngle, WCoordinate initCenterPosition)
+        {
+            this.TrackingId = trackingId;
+            this.Timestamp = timestamp;
+            this.InitialAngle = initAngle;
+            this.InitialCenterPosition = initCenterPosition;
+            this.InitialDistance = this.InitialCenterPosition.Z;
+            this.Positions = new Stack<MovingSkeleton.Position>();
+            this.Positions.Push(currentPosition);
+        }
+
+        public static MovingSkeleton Copy(MovingSkeleton skeleton)
+        {
+            return new MovingSkeleton(Position.Copy(skeleton.CurrentPosition), skeleton.TrackingId, skeleton.Timestamp, skeleton.InitialAngle, skeleton.InitialCenterPosition);
         }
 
         public void UpdatePosition(long timestamp, SBody body)

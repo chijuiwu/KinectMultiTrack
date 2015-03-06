@@ -21,6 +21,20 @@ namespace Tiny
             this.People = people;
         }
 
+        public static TrackerResult Copy(TrackerResult result)
+        {
+            if (result.Equals(TrackerResult.Empty))
+            {
+                return result;
+            }
+            List<Person> peopleCopy = new List<Person>();
+            foreach (Person person in result.People)
+            {
+                peopleCopy.Add(Person.Copy(person));
+            }
+            return new TrackerResult(result.FOVs, peopleCopy);
+        }
+
         public static PotentialSkeleton GetLocalSkeletonReference(Person person)
         {
             foreach (PotentialSkeleton skeleton in person.Skeletons)
@@ -74,6 +88,11 @@ namespace Tiny
                 sb.Append("]");
                 return sb.ToString();
             }
+
+            public static PotentialSkeleton Copy(PotentialSkeleton pSkeleton)
+            {
+                return new PotentialSkeleton(pSkeleton.Id, pSkeleton.FOV, MovingSkeleton.Copy(pSkeleton.Skeleton));
+            }
         }
 
         public class Person
@@ -117,6 +136,16 @@ namespace Tiny
                     sb.Append(match);
                 }
                 return sb.ToString();
+            }
+
+            public static Person Copy(Person person)
+            {
+                List<PotentialSkeleton> skeletonsCopy = new List<PotentialSkeleton>();
+                foreach (PotentialSkeleton skeleton in person.Skeletons)
+                {
+                    skeletonsCopy.Add(PotentialSkeleton.Copy(skeleton));
+                }
+                return new Person(person.Id, skeletonsCopy);
             }
         }
     }

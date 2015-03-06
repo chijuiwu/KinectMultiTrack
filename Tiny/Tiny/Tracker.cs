@@ -50,7 +50,7 @@ namespace Tiny
                 foreach (KinectClient kinect in this.kinectClients.Values)
                 {
                     // TODO: Remove HACK!!! Instead, show progress bar
-                    if (kinect.UncalibratedFramesCount < Tracker.MIN_CALIBRATION_FRAMES)
+                    if (kinect.UncalibratedFramesCount < Tracker.MIN_CALIBRATION_FRAMES*3)
                     {
                         return false;
                     }
@@ -89,7 +89,7 @@ namespace Tiny
                 // Pass in height and tilt angle
                 this.kinectClients[source] = new KinectClient((uint)this.kinectClients.Count, source, 0.0, 0.0);
             }
-            lock (syncFrameLock)
+            lock (this.syncFrameLock)
             {
                 this.kinectClients[source].StoreFrame(frame);
                 if (!this.systemCalibrated)
@@ -107,7 +107,7 @@ namespace Tiny
                 {
                     this.PeopleTracking(source, frame);
                 }
-                return this.currentResult;
+                return TrackerResult.Copy(this.currentResult);
             }
         }
 
