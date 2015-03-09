@@ -15,7 +15,7 @@ using KinectSerializer;
 
 namespace KinectClient
 {
-    class KinectSocket
+    class ClientSocket
     {
         private IPEndPoint endPoint;
         private TcpClient connectionToServer;
@@ -23,7 +23,7 @@ namespace KinectClient
         private NetworkStream serverStream;
 
 
-        public KinectSocket(string host, int port)
+        public ClientSocket(string host, int port)
         {
             this.endPoint = new IPEndPoint(IPAddress.Parse(host), port);
             this.connectionThread = new Thread(new ThreadStart(this.ConnectionWorkerThread));

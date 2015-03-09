@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KinectClient", "KinectClient\KinectClient.csproj", "{EA5CAD03-8C7D-443E-9B22-3D7A0EFB7DC5}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KinectMultiTrack", "Tiny\KinectMultiTrack.csproj", "{B5E5572A-3AF3-4A84-A337-C12DDD899007}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KinectSerializer", "KinectSerializer\KinectSerializer.csproj", "{B5FEF9E7-315A-456F-844F-1B483526B22F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiTrackClient", "MultiTrackClient\MultiTrackClient.csproj", "{EA5CAD03-8C7D-443E-9B22-3D7A0EFB7DC5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiTrackServer", "MultiTrackServer\MultiTrackServer.csproj", "{B5E5572A-3AF3-4A84-A337-C12DDD899007}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,6 +17,14 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B5FEF9E7-315A-456F-844F-1B483526B22F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5FEF9E7-315A-456F-844F-1B483526B22F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5FEF9E7-315A-456F-844F-1B483526B22F}.Debug|x64.ActiveCfg = Debug|x64
+		{B5FEF9E7-315A-456F-844F-1B483526B22F}.Debug|x64.Build.0 = Debug|x64
+		{B5FEF9E7-315A-456F-844F-1B483526B22F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5FEF9E7-315A-456F-844F-1B483526B22F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5FEF9E7-315A-456F-844F-1B483526B22F}.Release|x64.ActiveCfg = Release|x64
+		{B5FEF9E7-315A-456F-844F-1B483526B22F}.Release|x64.Build.0 = Release|x64
 		{EA5CAD03-8C7D-443E-9B22-3D7A0EFB7DC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EA5CAD03-8C7D-443E-9B22-3D7A0EFB7DC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EA5CAD03-8C7D-443E-9B22-3D7A0EFB7DC5}.Debug|x64.ActiveCfg = Debug|x64
@@ -33,14 +41,6 @@ Global
 		{B5E5572A-3AF3-4A84-A337-C12DDD899007}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B5E5572A-3AF3-4A84-A337-C12DDD899007}.Release|x64.ActiveCfg = Release|x64
 		{B5E5572A-3AF3-4A84-A337-C12DDD899007}.Release|x64.Build.0 = Release|x64
-		{B5FEF9E7-315A-456F-844F-1B483526B22F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B5FEF9E7-315A-456F-844F-1B483526B22F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B5FEF9E7-315A-456F-844F-1B483526B22F}.Debug|x64.ActiveCfg = Debug|x64
-		{B5FEF9E7-315A-456F-844F-1B483526B22F}.Debug|x64.Build.0 = Debug|x64
-		{B5FEF9E7-315A-456F-844F-1B483526B22F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B5FEF9E7-315A-456F-844F-1B483526B22F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B5FEF9E7-315A-456F-844F-1B483526B22F}.Release|x64.ActiveCfg = Release|x64
-		{B5FEF9E7-315A-456F-844F-1B483526B22F}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -28,7 +28,7 @@ namespace KinectClient
         private const string kinectServerAddress = "138.251.213.82";
         private const string localhost = "127.0.0.1";
         private const int kinectServerPort = 12345;
-        private KinectSocket kinectSocket;
+        private ClientSocket kinectSocket;
 
         // Kinect position and angle
         private const double kinectAngle = 0;
@@ -56,7 +56,7 @@ namespace KinectClient
         {
             InitializeComponent();
 
-            this.kinectSocket = new KinectSocket(localhost, kinectServerPort);
+            this.kinectSocket = new ClientSocket(localhost, kinectServerPort);
 
             this.DataContext = this;
             this.KinectStatusText = Properties.Resources.KinectUninitialized;
