@@ -6,9 +6,9 @@ using System.Net;
 using System.Diagnostics;
 using System.Globalization;
 using KinectSerializer;
-using Tiny.WorldView;
+using KinectMultiTrack.WorldView;
 
-namespace Tiny
+namespace KinectMultiTrack
 {
     public class MovingSkeleton
     {

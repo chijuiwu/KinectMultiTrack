@@ -9,9 +9,9 @@ using Microsoft.Kinect;
 using KinectSerializer;
 using System.Diagnostics;
 using System.Windows.Threading;
-using Tiny.UI;
+using KinectMultiTrack.UI;
 
-namespace Tiny
+namespace KinectMultiTrack
 {
     public class Server
     {
@@ -67,7 +67,7 @@ namespace Tiny
             this.serverKinectTCPListener.Start();
             this.serverThread.Start();
             this.writeLogStopwatch.Start();
-            Debug.WriteLine(Tiny.Properties.Resources.SERVER_START + this.serverKinectTCPListener.LocalEndpoint);
+            Debug.WriteLine(KinectMultiTrack.Properties.Resources.SERVER_START + this.serverKinectTCPListener.LocalEndpoint);
         }
 
         private void Stop()
@@ -145,7 +145,7 @@ namespace Tiny
             TcpClient client = obj as TcpClient;
             IPEndPoint clientIP = (IPEndPoint)client.Client.RemoteEndPoint;
             NetworkStream clientStream = client.GetStream();
-            Debug.WriteLine(Tiny.Properties.Resources.CONNECTION_START + clientIP);
+            Debug.WriteLine(KinectMultiTrack.Properties.Resources.CONNECTION_START + clientIP);
             
             bool kinectCameraAdded = false;
 
@@ -174,7 +174,7 @@ namespace Tiny
                 }
                 catch (Exception)
                 {
-                    Debug.WriteLine(Tiny.Properties.Resources.SERVER_EXCEPTION);
+                    Debug.WriteLine(KinectMultiTrack.Properties.Resources.SERVER_EXCEPTION);
                     clientStream.Close();
                     client.Close();
                 }

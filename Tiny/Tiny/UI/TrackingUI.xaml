@@ -1,4 +1,4 @@
-﻿<Window x:Class="Tiny.UI.TrackingUI"
+﻿<Window x:Class="KinectMultiTrack.UI.TrackingUI"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Server - Tracking View"

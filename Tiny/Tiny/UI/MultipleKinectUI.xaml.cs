@@ -17,9 +17,9 @@ using Microsoft.Kinect;
 using System.Net;
 using System.Diagnostics;
 using System.Threading;
-using SkeletonVis = Tiny.UI.SkeletonVisualizer;
+using SkeletonVis = KinectMultiTrack.UI.SkeletonVisualizer;
 
-namespace Tiny.UI
+namespace KinectMultiTrack.UI
 {
     public partial class MultipleKinectUI : Window
     {

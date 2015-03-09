@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Windows.Threading;
 using KinectSerializer;
-using Tiny.Properties;
-using Tiny.UI;
-using Tiny.WorldView;
+using KinectMultiTrack.Properties;
+using KinectMultiTrack.UI;
+using KinectMultiTrack.WorldView;
 
-namespace Tiny
+namespace KinectMultiTrack
 {
     public class KinectClient
     {

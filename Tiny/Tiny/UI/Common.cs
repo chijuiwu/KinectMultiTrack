@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
 
-namespace Tiny.UI
+namespace KinectMultiTrack.UI
 {
     internal class Common
     {

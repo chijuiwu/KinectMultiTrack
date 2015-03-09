@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Kinect;
 
-namespace Tiny
+namespace KinectMultiTrack
 {
     public class KinectBody
     {

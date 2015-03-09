@@ -19,11 +19,11 @@ using KinectSerializer;
 using Microsoft.Kinect;
 using System.Diagnostics;
 using System.Net;
-using SkeletonVis = Tiny.UI.SkeletonVisualizer;
-using Tiny.WorldView;
+using SkeletonVis = KinectMultiTrack.UI.SkeletonVisualizer;
+using KinectMultiTrack.WorldView;
 using System.Globalization;
 
-namespace Tiny.UI
+namespace KinectMultiTrack.UI
 {
     public partial class TrackingUI : Window
     {

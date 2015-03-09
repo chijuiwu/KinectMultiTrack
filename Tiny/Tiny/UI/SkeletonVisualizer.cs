@@ -7,10 +7,10 @@ using Microsoft.Kinect;
 using KinectSerializer;
 using System.Windows;
 using System.Windows.Media;
-using SkeletonVis = Tiny.UI.SkeletonVisualizer;
+using SkeletonVis = KinectMultiTrack.UI.SkeletonVisualizer;
 using System.Windows.Threading;
 
-namespace Tiny.UI
+namespace KinectMultiTrack.UI
 {
     public class SkeletonVisualizer
     {

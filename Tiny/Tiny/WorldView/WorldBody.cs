@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using KinectSerializer;
 using Microsoft.Kinect;
-using Tiny.Exceptions;
+using KinectMultiTrack.Exceptions;
 
-namespace Tiny.WorldView
+namespace KinectMultiTrack.WorldView
 {
     public class WBody
     {

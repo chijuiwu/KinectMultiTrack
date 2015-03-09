@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net;
 
-namespace Tiny
+namespace KinectMultiTrack
 {
     public class TrackerResult
     {

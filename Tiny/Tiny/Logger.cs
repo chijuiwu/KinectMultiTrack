@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Kinect;
-using Tiny.WorldView;
+using KinectMultiTrack.WorldView;
 using KinectSerializer;
 using System.Diagnostics;
 using System.Collections.Specialized;
 using System.IO;
 
-namespace Tiny
+namespace KinectMultiTrack
 {
     public class Logger
     {

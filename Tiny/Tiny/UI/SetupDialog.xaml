@@ -1,4 +1,4 @@
-﻿<Window x:Class="Tiny.UI.SetupDialog"
+﻿<Window x:Class="KinectMultiTrack.UI.SetupDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="SetupDialog" Height="500" Width="500">
