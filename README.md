@@ -1,9 +1,9 @@
-Tiny: Tracking People with Multiple Kinects
+KinectMultiTrack: Tracking People with Multiple Kinects
 ======
 
 The current work progress of my, Chi-Jui Wu, Seniour Honours Project in the School of Computer Science, University of St Andrews.
 
-The project is about tracking people and resolving occlusion in realworld environments using multiple Kinects.
+The project is about tracking people in occluded environments with multiple Kinects.
 
 ## Completed
 
@@ -19,6 +19,8 @@ The project is about tracking people and resolving occlusion in realworld enviro
 * Preliminary Skeleton Matching (30th January, 2015)
 * Display Skeletons wrt Different Kienct FOVs (30th January, 2015)
 * Logging (20th February, 2015)
+* Post-processing (23th February, 2015)
+* Preliminary Experiment UI (6th March, 2015)
 
 ## Project Description
 
