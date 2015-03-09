@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Controls;
 
 namespace KinectMultiTrack.UI
 {
@@ -19,9 +20,31 @@ namespace KinectMultiTrack.UI
     /// </summary>
     public partial class SetupDialog : Window
     {
+        List<Control> userSetupControlsList;
+
         public SetupDialog()
         {
             InitializeComponent();
+            this.userSetupControlsList = new List<Control>()
+            {
+                this.User_Study_Id,
+                this.User_Scenario_All,
+            };
+        }
+
+        private void EnableUserSetup(bool enabled)
+        {
+            foreach (Control userSetup in this.userSetupControlsList)
+            {
+                if (enabled)
+                {
+                    userSetup.IsEnabled = true;
+                }
+                else
+                {
+                    userSetup.IsEnabled = false;
+                }
+            }
         }
 
         private void cancelBtn_Click(object sender, RoutedEventArgs e)
@@ -32,6 +55,18 @@ namespace KinectMultiTrack.UI
         private void okBtn_Click(object sender, RoutedEventArgs e)
         {
             this.DialogResult = true;
+        }
+
+        private void User_Study_Click(object sender, RoutedEventArgs e)
+        {
+            if (this.User_Study_OnOff.IsEnabled)
+            {
+                this.EnableUserSetup(true);
+            }
+            else
+            {
+                this.EnableUserSetup(false);
+            }
         }
     }
 }

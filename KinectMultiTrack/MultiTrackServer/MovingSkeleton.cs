@@ -13,7 +13,7 @@ namespace KinectMultiTrack
     public class MovingSkeleton
     {
         // 50 seconds
-        private readonly int MAX_POSITIONS_STORED = 3000;
+        private static readonly int MAX_POSITIONS_STORED = 3000;
 
         public class Position
         {
@@ -78,10 +78,10 @@ namespace KinectMultiTrack
         public void UpdatePosition(long timestamp, SBody body)
         {
             this.Timestamp = timestamp;
-            //if (this.Positions.Count() > MAX_POSITIONS_STORED)
-            //{
-            //    this.Positions.Clear();
-            //}
+            if (this.Positions.Count() > MovingSkeleton.MAX_POSITIONS_STORED)
+            {
+                this.Positions.Clear();
+            }
             this.Positions.Push(new MovingSkeleton.Position(body, WBody.Create(body, this.InitialAngle, this.InitialCenterPosition)));
         }
 

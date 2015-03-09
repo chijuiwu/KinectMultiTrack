@@ -116,7 +116,7 @@ namespace KinectMultiTrack.UI
                 int kinectsCount = Int32.Parse(setup.Kinect_Count.Text);
 
                 // User
-                bool log = Convert.ToBoolean(setup.User_Log.IsChecked);
+                bool log = Convert.ToBoolean(setup.User_Study_OnOff.IsChecked);
                 int studyId = Convert.ToInt32(setup.User_Study_Id.Text);
                 int scenario = Logger.NA;
                 if (Convert.ToBoolean(setup.User_Scenario_All.IsChecked))
@@ -127,7 +127,7 @@ namespace KinectMultiTrack.UI
                 {
                     scenario = Logger.STATIONARY;
                 }
-                else if (Convert.ToBoolean(setup.User_Scenario_Walk.IsChecked))
+                else if (Convert.ToBoolean(setup.User_Scenario_Walk_Wei.IsChecked))
                 {
                     scenario = Logger.WALK;
                 }

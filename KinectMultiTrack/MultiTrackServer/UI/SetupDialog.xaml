@@ -16,26 +16,27 @@
         <StackPanel Margin="10 10 10 10" Grid.Column="0">
             <Label Content="Kinects" HorizontalAlignment="Center" FontSize="22" FontFamily="Microsoft Sans Serif" Margin="0,0,0,20" FontWeight="Bold"/>
 
-            <Label Content="Count" HorizontalAlignment="Left" FontSize="16" FontFamily="Microsoft Sans Serif" Margin="10,0,0,0"></Label>
-            <TextBox x:Name="Kinect_Count" Text="2" HorizontalAlignment="Left" TextWrapping="Wrap" Width="120" Height="20" Margin="10,0,0,0"/>
+            <Label Content="Count" HorizontalAlignment="Left" FontSize="16" FontFamily="Microsoft Sans Serif" Margin="10,0,0,0"/>
+                <TextBox x:Name="Kinect_Count" Text="2" HorizontalAlignment="Left" TextWrapping="Wrap" Width="120" Height="20" Margin="10,0,0,0"/>
 
-            <Button x:Name="okBtn" HorizontalAlignment="Center" Content="OK" IsDefault="True" FontSize="20" FontFamily="Microsoft Sans Serif" Margin="54,260,62,0" Height="50" BorderThickness="1" FontWeight="Bold" Click="okBtn_Click" Width="100"/>
+            <Button x:Name="okBtn" HorizontalAlignment="Center" Content="OK" IsDefault="True" FontSize="20" FontFamily="Microsoft Sans Serif" Margin="0,260,0,0" Height="50" BorderThickness="1" FontWeight="Bold" Click="okBtn_Click" Width="100"/>
         </StackPanel>
         </Border>
         <StackPanel Margin="10 10 10 10" Grid.Column="1">
 
             <Label Content="Users" HorizontalAlignment="Center" FontSize="22" FontFamily="Microsoft Sans Serif" FontWeight="Bold" Margin="0,0,0,20"/>
-            <Label Content="Log" HorizontalAlignment="Left" FontSize="16" FontFamily="Microsoft Sans Serif" Margin="10,0,0,0"/>
-            <CheckBox x:Name="User_Log" Content="" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0"/>
+            <Label Content="Study On/Off" HorizontalAlignment="Left" FontSize="16" FontFamily="Microsoft Sans Serif" Margin="10,0,0,0"/>
+            <CheckBox x:Name="User_Study_OnOff" Content="" Click="User_Study_Click" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0"/>
 
             <Label Content="Study ID" HorizontalAlignment="Left" FontSize="16" FontFamily="Microsoft Sans Serif" Margin="10,20,0,0"></Label>
-            <TextBox x:Name="User_Study_Id" Text="0" HorizontalAlignment="Left" TextWrapping="Wrap" Width="120" Margin="10,0,0,0"/>
+            <TextBox IsEnabled="False" x:Name="User_Study_Id" Text="0" HorizontalAlignment="Left" TextWrapping="Wrap" Width="120" Margin="10,0,0,0"/>
 
             <Label Content="Scenario" HorizontalAlignment="Left" FontSize="16" FontFamily="Microsoft Sans Serif" Margin="10,20,0,0"></Label>
 
-            <RadioButton x:Name="User_Scenario_All" GroupName="ScenarioBtn" Content="All"  IsChecked="True" FontSize="14" FontFamily="Microsoft Sans Serif" Margin="10,0,0,0" />
-            <RadioButton x:Name="User_Scenario_Stationary" Content="Stationary" GroupName="ScenarioBtn" FontSize="14" Margin="10,0,0,0" />
-            <RadioButton x:Name="User_Scenario_Walk" Content="Walk" GroupName="ScenarioBtn" FontSize="14" FontFamily="Microsoft Sans Serif" Margin="10,0,0,0" />
+            <RadioButton IsEnabled="False" x:Name="User_Scenario_All" GroupName="ScenarioBtn" Content="All"  IsChecked="True" FontSize="14" FontFamily="Microsoft Sans Serif" Margin="10,0,0,0" />
+            <RadioButton IsEnabled="False" x:Name="User_Scenario_Stationary" Content="Stationary" GroupName="ScenarioBtn" FontSize="14" Margin="10,0,0,0" />
+            <RadioButton IsEnabled="False" x:Name="User_Scenario_Walk_Wei" Content="Walk (Wei et al)" GroupName="ScenarioBtn" FontSize="14" FontFamily="Microsoft Sans Serif" Margin="10,0,0,0" />
+            <RadioButton IsEnabled="False" x:Name="User_Scenario_Walk_Current" Content="Walk (Current)" GroupName="ScenarioBtn" FontSize="14" FontFamily="Microsoft Sans Serif" Margin="10,0,0,0" />
 
             <Button x:Name="cancelBtn" HorizontalAlignment="Center" Content="Cancel" IsDefault="True" FontSize="20" FontFamily="Microsoft Sans Serif" Margin="0,100,0,0" Width="100" Height="50" IsCancel="True" FontWeight="Bold"/>
 
