@@ -191,7 +191,7 @@ namespace KinectMultiTrack
         private void TrackingUpdateThread(IPEndPoint clientIP, SBodyFrame bodyFrame)
         {
             TrackerResult result = this.tracker.SynchronizeTracking(clientIP, bodyFrame);
-            //this.MultipleKinectUIUpdate(result);
+            this.MultipleKinectUIUpdate(result);
             this.TrackingUIUpdate(result);
             //if (this.loggingOn && this.writeLogStopwatch.ElapsedMilliseconds > this.writeLogInterval)
             //{
