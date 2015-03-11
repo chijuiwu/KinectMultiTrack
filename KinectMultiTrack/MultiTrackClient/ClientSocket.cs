@@ -46,14 +46,13 @@ namespace MultiTrackClient
                 }
                 catch (Exception)
                 {
-                    Debug.WriteLine("Connectio to the server failed. Re-trying...", "KinectClient");
+                    Debug.WriteLine("Connection to the server failed. Re-trying...", "KinectClient");
                 }
             }
         }
 
         public void CloseConnection()
         {
-            Debug.WriteLine("here");
             if (this.connectionThread != null)
             {
                 this.connectionThread.Abort();
@@ -102,11 +101,11 @@ namespace MultiTrackClient
                     byte[] responseRaw = new byte[256];
                     this.serverStream.Read(responseRaw, 0, responseRaw.Length);
                     string response = Encoding.ASCII.GetString(responseRaw, 0, responseRaw.Length);
-                    Debug.WriteLine("OKAY", "Kinect Client");
+                    Debug.WriteLine("Okay", "Kinect Client");
                 }
                 catch (Exception)
                 {
-                    Debug.WriteLine("Failed to transmit data", "Kinect Client");
+                    Debug.WriteLine("Network failure", "Kinect Client");
                 }
             }
         }

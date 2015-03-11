@@ -151,6 +151,7 @@ namespace KinectMultiTrack.UI
         {
             this.Dispatcher.Invoke((Action)(() =>
             {
+                Debug.WriteLine("on calibration started");
                 this.ShowProgressText(TrackingUI.CALIBRATING);
             }));
         }

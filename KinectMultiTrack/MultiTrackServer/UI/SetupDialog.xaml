@@ -38,7 +38,7 @@
             <RadioButton IsEnabled="False" x:Name="User_Scenario_Walk_Wei" Content="Walk (Wei et al)" GroupName="ScenarioBtn" FontSize="14" FontFamily="Microsoft Sans Serif" Margin="10,0,0,0" />
             <RadioButton IsEnabled="False" x:Name="User_Scenario_Walk_Current" Content="Walk (Current)" GroupName="ScenarioBtn" FontSize="14" FontFamily="Microsoft Sans Serif" Margin="10,0,0,0" />
 
-            <Button x:Name="cancelBtn" HorizontalAlignment="Center" Content="Cancel" IsDefault="True" FontSize="20" FontFamily="Microsoft Sans Serif" Margin="0,100,0,0" Width="100" Height="50" IsCancel="True" FontWeight="Bold"/>
+            <Button x:Name="cancelBtn" HorizontalAlignment="Center" Content="Cancel" IsDefault="True" FontSize="20" FontFamily="Microsoft Sans Serif" Margin="0,85,0,0" Width="100" Height="50" IsCancel="True" FontWeight="Bold"/>
 
         </StackPanel>
     </Grid>

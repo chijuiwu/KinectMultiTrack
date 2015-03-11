@@ -60,7 +60,7 @@ namespace KinectMultiTrack.UI
             }
         }
 
-        public void UpdateDisplay(TrackerResult result)
+        public void ProcessTrackerResult(TrackerResult result)
         {
             this.Dispatcher.Invoke((Action)(() =>
             {
