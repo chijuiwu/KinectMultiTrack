@@ -38,18 +38,27 @@ namespace KinectMultiTrack.UI
         private static readonly Pen defaultTrackedBonePen = new Pen(Brushes.Blue, 6);
         private static readonly Pen inferredBonePen = new Pen(Brushes.Gray, 1);
 
-        public MultipleKinectUI()
+        public MultipleKinectUI(Server server)
         {
             InitializeComponent();
             this.DataContext = this;
             this.multipleKinectDrawingGroup = new DrawingGroup();
             this.multipleKinectViewSource = new DrawingImage(this.multipleKinectDrawingGroup);
 
-
             using (DrawingContext dc = this.multipleKinectDrawingGroup.Open())
             {
                 this.DrawBackground(MultipleKinectUI.backgroundBrush, this.MultiKinectViewBox.ActualWidth, this.MultiKinectViewBox.ActualHeight, dc);
             }
+
+            server.MultipleKinectUIUpdate += server_MultipleKinectUIUpdate;
+        }
+
+        private void server_MultipleKinectUIUpdate(TrackerResult result)
+        {
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                this.DisplayBodyFrames(result);
+            }));
         }
 
         public ImageSource MultipleKinectViewSource
@@ -62,10 +71,6 @@ namespace KinectMultiTrack.UI
 
         public void ProcessTrackerResult(TrackerResult result)
         {
-            this.Dispatcher.Invoke((Action)(() =>
-            {
-                this.DisplayBodyFrames(result);
-            }));
         }
 
         private void DisplayBodyFrames(TrackerResult result)

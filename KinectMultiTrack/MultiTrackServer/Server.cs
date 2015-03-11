@@ -37,10 +37,10 @@ namespace KinectMultiTrack
         private event KinectCameraHandler OnAddedKinectCamera;
         private event KinectCameraHandler OnRemovedKinectCamera;
         private delegate void KinectCameraHandler(IPEndPoint kinectClientIP);
-        private event KinectFrameHandler MultipleKinectUIUpdate;
-        private delegate void KinectFrameHandler(TrackerResult result);
-        private event WorldViewHandler TrackingUIUpdate;
-        private delegate void WorldViewHandler(TrackerResult result);
+        public event KinectFrameHandler MultipleKinectUIUpdate;
+        public delegate void KinectFrameHandler(TrackerResult result);
+        public event WorldViewHandler TrackingUIUpdate;
+        public delegate void WorldViewHandler(TrackerResult result);
 
         public Server(int port)
         {
@@ -83,17 +83,15 @@ namespace KinectMultiTrack
 
         private void StartMultipleKinectUIThread()
         {
-            this.multipleKinectUI = new MultipleKinectUI();
+            this.multipleKinectUI = new MultipleKinectUI(this);
             this.multipleKinectUI.Show();
-
-            this.MultipleKinectUIUpdate += this.multipleKinectUI.ProcessTrackerResult;
-
+            //this.MultipleKinectUIUpdate += this.multipleKinectUI.ProcessTrackerResult;
             Dispatcher.Run();
         }
 
         private void StartTrackingUIThread()
         {
-            this.trackingUI = new TrackingUI();
+            this.trackingUI = new TrackingUI(this);
             this.trackingUI.Show();
 
             this.OnAddedKinectCamera += this.trackingUI.AddKinectCamera;
@@ -103,7 +101,7 @@ namespace KinectMultiTrack
             this.trackingUI.OnStartStop += this.StartStopServer;
 
             this.tracker.CalibrationEvent += this.trackingUI.OnCalibratedStarted;
-            this.TrackingUIUpdate += this.trackingUI.ProcessTrackerResult;
+            //this.TrackingUIUpdate += this.trackingUI.ProcessTrackerResult;
 
             Dispatcher.Run();
         }
@@ -165,8 +163,6 @@ namespace KinectMultiTrack
 
                     SBodyFrame bodyFrame = BodyFrameSerializer.Deserialize(clientStream);
                     this.TrackingUpdateThread(clientIP, bodyFrame);
-                    //Thread trackingUpdateThread = new Thread(() => this.TrackingUpdateThread(clientIP, bodyFrame));
-                    //trackingUpdateThread.Start();
 
                     // Response content is trivial
                     byte[] response = Encoding.ASCII.GetBytes(Properties.Resources.SERVER_RESPONSE_OKAY);
@@ -190,9 +186,10 @@ namespace KinectMultiTrack
 
         private void TrackingUpdateThread(IPEndPoint clientIP, SBodyFrame bodyFrame)
         {
-            TrackerResult result = this.tracker.SynchronizeTracking(clientIP, bodyFrame);
-            this.MultipleKinectUIUpdate(result);
-            this.TrackingUIUpdate(result);
+            Tuple<TrackerResult, TrackerResult> result = this.tracker.SynchronizeTracking(clientIP, bodyFrame);
+            //this.TrackingUIUpdate(result.Item1);
+            this.MultipleKinectUIUpdate(result.Item2);
+
             //if (this.loggingOn && this.writeLogStopwatch.ElapsedMilliseconds > this.writeLogInterval)
             //{
             //    Thread writeLogThread = new Thread(() => TLogger.Write(result));

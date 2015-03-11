@@ -26,6 +26,7 @@ namespace MultiTrackClient
     public partial class ClientUI : Window, INotifyPropertyChanged
     {
         private const string kinectServerAddress = "138.251.213.82";
+        private const string myLaptopIPAddress = "138.251.207.136";
         private const string localhost = "127.0.0.1";
         private const int kinectServerPort = 12345;
         private ClientSocket kinectSocket;
@@ -56,7 +57,7 @@ namespace MultiTrackClient
         {
             this.InitializeComponent();
 
-            this.kinectSocket = new ClientSocket(localhost, kinectServerPort);
+            this.kinectSocket = new ClientSocket(ClientUI.localhost, ClientUI.kinectServerPort);
 
             this.DataContext = this;
             this.KinectStatusText = Properties.Resources.KinectUninitialized;

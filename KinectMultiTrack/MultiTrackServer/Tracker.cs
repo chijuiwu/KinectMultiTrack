@@ -90,7 +90,7 @@ namespace KinectMultiTrack
             }
         }
 
-        public TrackerResult SynchronizeTracking(IPEndPoint source, SBodyFrame frame)
+        public Tuple<TrackerResult, TrackerResult> SynchronizeTracking(IPEndPoint source, SBodyFrame frame)
         {
             // Put this code elsewhere
             if (!this.kinectClients.ContainsKey(source))
@@ -116,7 +116,7 @@ namespace KinectMultiTrack
                 {
                     this.PeopleTracking(source, frame);
                 }
-                return TrackerResult.Copy(this.currentResult);
+                return Tuple.Create(TrackerResult.Copy(this.currentResult), TrackerResult.Copy(this.currentResult));
             }
         }
 

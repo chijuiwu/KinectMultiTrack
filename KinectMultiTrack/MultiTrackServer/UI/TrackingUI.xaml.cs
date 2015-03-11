@@ -68,7 +68,7 @@ namespace KinectMultiTrack.UI
         public static readonly string WAITING_KINECT = "Waiting for Kinects";
         public static readonly string CALIBRATING = "Calibrating";
 
-        public TrackingUI()
+        public TrackingUI(Server server)
         {
             InitializeComponent();
             this.DataContext = this;
@@ -85,6 +85,16 @@ namespace KinectMultiTrack.UI
             this.coordinateMapper = this.kinectSensor.CoordinateMapper;
 
             this.Closing += this.TrackingUI_Closing;
+
+            server.TrackingUIUpdate += this.server_TrackingUIUpdate;
+        }
+
+        private void server_TrackingUIUpdate(TrackerResult result)
+        {
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                this.DisplayBodyFrames(result);
+            }));
         }
 
         public ImageSource TrackingViewSource
@@ -151,7 +161,6 @@ namespace KinectMultiTrack.UI
         {
             this.Dispatcher.Invoke((Action)(() =>
             {
-                Debug.WriteLine("on calibration started");
                 this.ShowProgressText(TrackingUI.CALIBRATING);
             }));
         }
@@ -167,10 +176,7 @@ namespace KinectMultiTrack.UI
         public void ProcessTrackerResult(TrackerResult result)
         {
             //    this.trackingDrawingGroup.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)(() => { DisplayBodyFrames(result); }));
-            this.Dispatcher.Invoke((Action)(() =>
-            {
-                this.DisplayBodyFrames(result);
-            }));
+            
         }
 
         private TrackerResult.KinectFOV GetReferenceKinectFOV(IEnumerable<TrackerResult.KinectFOV> fovs)
