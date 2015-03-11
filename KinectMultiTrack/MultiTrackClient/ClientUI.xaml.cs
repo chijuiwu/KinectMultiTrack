@@ -18,12 +18,12 @@ using System.Diagnostics;
 using Microsoft.Kinect;
 using KinectSerializer;
 
-namespace KinectClient
+namespace MultiTrackClient
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class KinectClientUI : Window, INotifyPropertyChanged
+    public partial class ClientUI : Window, INotifyPropertyChanged
     {
         private const string kinectServerAddress = "138.251.213.82";
         private const string localhost = "127.0.0.1";
@@ -52,9 +52,9 @@ namespace KinectClient
         private readonly Brush inferredJointBrush = Brushes.Yellow;
         private readonly Pen inferredBonePen = new Pen(Brushes.Gray, 1);
 
-        public KinectClientUI()
+        public ClientUI()
         {
-            InitializeComponent();
+            this.InitializeComponent();
 
             this.kinectSocket = new ClientSocket(localhost, kinectServerPort);
 

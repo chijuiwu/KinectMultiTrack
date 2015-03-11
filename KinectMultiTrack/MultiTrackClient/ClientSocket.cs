@@ -13,7 +13,7 @@ using System.IO;
 using BodyFrameSerializer = KinectSerializer.BodyFrameSerializer;
 using KinectSerializer;
 
-namespace KinectClient
+namespace MultiTrackClient
 {
     class ClientSocket
     {

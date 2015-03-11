@@ -1,4 +1,4 @@
-﻿<Window x:Class="KinectClient.KinectClientUI"
+﻿<Window x:Class="MultiTrackClient.ClientUI"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Client - Body Stream"
