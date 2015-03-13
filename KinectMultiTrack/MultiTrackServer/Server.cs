@@ -47,10 +47,10 @@ namespace KinectMultiTrack
             
             this.tracker = new Tracker();
 
-            Thread multipleKinectUIThread = new Thread(new ThreadStart(this.StartMultipleKinectUIThread));
-            multipleKinectUIThread.SetApartmentState(ApartmentState.STA);
-            multipleKinectUIThread.IsBackground = true;
-            multipleKinectUIThread.Start();
+            //Thread multipleKinectUIThread = new Thread(new ThreadStart(this.StartMultipleKinectUIThread));
+            //multipleKinectUIThread.SetApartmentState(ApartmentState.STA);
+            //multipleKinectUIThread.IsBackground = true;
+            //multipleKinectUIThread.Start();
 
             Thread trackingUIThread = new Thread(new ThreadStart(this.StartTrackingUIThread));
             trackingUIThread.SetApartmentState(ApartmentState.STA);
@@ -83,10 +83,10 @@ namespace KinectMultiTrack
 
         private void StartMultipleKinectUIThread()
         {
-            this.multipleKinectUI = new MultipleKinectUI(this);
-            this.multipleKinectUI.Show();
+            //this.multipleKinectUI = new MultipleKinectUI(this);
+            //this.multipleKinectUI.Show();
             //this.MultipleKinectUIUpdate += this.multipleKinectUI.ProcessTrackerResult;
-            Dispatcher.Run();
+            //Dispatcher.Run();
         }
 
         private void StartTrackingUIThread()
@@ -97,7 +97,7 @@ namespace KinectMultiTrack
             this.OnAddedKinectCamera += this.trackingUI.AddKinectCamera;
             this.OnRemovedKinectCamera += this.trackingUI.RemoveKinectCamera;
 
-            this.trackingUI.OnTrackerSetup += this.ConfigureServer;
+            this.trackingUI.OnSetup += this.ConfigureServer;
             this.trackingUI.OnStartStop += this.StartStopServer;
 
             this.tracker.CalibrationEvent += this.trackingUI.OnCalibratedStarted;
@@ -106,13 +106,13 @@ namespace KinectMultiTrack
             Dispatcher.Run();
         }
 
-        private void ConfigureServer(TrackerSetup setup)
+        private void ConfigureServer(int kinectCount, bool studyOn, int userStudyId, int userSenario, int kinectConfiguration)
         {
-            this.tracker.Configure(setup);
-
-            this.loggingOn = setup.Logging;
-            Logger.CURRENT_STUDY_ID = setup.StudyId;
-            Logger.CURRENT_USER_SCENARIO = setup.Scenario;
+            this.tracker.Configure(kinectCount);
+            this.loggingOn = studyOn;
+            Logger.CURRENT_STUDY_ID = userStudyId;
+            Logger.CURRENT_KINECT_CONFIGURATION = kinectConfiguration;
+            Logger.CURRENT_USER_SCENARIO = userSenario;
         }
 
         void StartStopServer(bool start)

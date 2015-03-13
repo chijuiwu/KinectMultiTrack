@@ -56,8 +56,9 @@ namespace KinectMultiTrack.UI
         private static readonly Pen inferredBonePen = new Pen(Brushes.Gray, 1);
         private static readonly Pen averageBonePen = new Pen(Brushes.White, 6);
 
-        public event TrackingSetupHandler OnTrackerSetup;
-        public delegate void TrackingSetupHandler(TrackerSetup setup);
+        private bool setupCompleted = false;
+        public event TrackingUISetupHandler OnSetup;
+        public delegate void TrackingUISetupHandler(int kinectCount, bool studyOn, int userStudyId, int userSenario, int kinectConfiguration);
 
         public event TrackingUIHandler OnStartStop;
         public delegate void TrackingUIHandler(bool start);
@@ -121,10 +122,10 @@ namespace KinectMultiTrack.UI
             setup.ShowDialog();
             if (setup.DialogResult.HasValue && setup.DialogResult.Value)
             {
-               
-            }
-            else
-            {
+                this.OnSetup(setup.Kinect_Count, setup.User_Study_On, setup.User_Study_Id, setup.User_Scenario, setup.Kinect_Configuration);
+                this.setupCompleted = true;
+
+                this.StartBtn.IsEnabled = true;
             }
         }
 
@@ -132,6 +133,22 @@ namespace KinectMultiTrack.UI
         {
             this.OnStartStop(true);
             this.ShowProgressText(TrackingUI.WAITING_KINECT);
+
+            this.SetupBtn.IsEnabled = false;
+            this.StopBtn.IsEnabled = true;
+            this.RecalibrateBtn.IsEnabled = true;
+            this.KinectFOVBtn.IsEnabled = true;
+            this.ViewModeBtn.IsEnabled = true;
+        }
+
+        private void StopBtn_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void RecalibrateBtn_Click(object sender, RoutedEventArgs e)
+        {
+
         }
 
         public void OnCalibratedStarted()
@@ -312,7 +329,7 @@ namespace KinectMultiTrack.UI
             dc.DrawLine(pen, from, to);
         }
 
-        private void ReferenceKinectBtn_Click(object sender, RoutedEventArgs e)
+        private void KinectFOVBtn_Click(object sender, RoutedEventArgs e)
         {
             Button referenceKinectBtn = sender as Button;
             referenceKinectBtn.ContextMenu.IsEnabled = true;
@@ -327,8 +344,8 @@ namespace KinectMultiTrack.UI
             {
                 MenuItem kinectIPItem = new MenuItem();
                 kinectIPItem.Header = clientIP.ToString();
-                kinectIPItem.Click += ReferenceKinectItem_Click;
-                this.ReferenceKinectMenu.Items.Add(kinectIPItem);
+                kinectIPItem.Click += KinectFOVItem_Click;
+                this.KinectFOVMenu.Items.Add(kinectIPItem);
                 this.referenceKinectIPs[clientIP.ToString()] = kinectIPItem;
             }));
         }
@@ -337,21 +354,21 @@ namespace KinectMultiTrack.UI
         {
             this.Dispatcher.Invoke((Action)(() =>
             {
-                this.ReferenceKinectMenu.Items.Remove(this.referenceKinectIPs[clientIP.ToString()]);
+                this.KinectFOVMenu.Items.Remove(this.referenceKinectIPs[clientIP.ToString()]);
                 this.referenceKinectIPs.Remove(clientIP.ToString());
                 if (this.currentReferenceKinectIP.Equals(clientIP))
                 {
-                    this.ReferenceKinectBtn.Content = "Reference Kinect";
+                    this.KinectFOVBtn.Content = "Reference Kinect";
                     this.currentReferenceKinectIP = "";
                 }
             }));
         }
 
-        private void ReferenceKinectItem_Click(object sender, RoutedEventArgs e)
+        private void KinectFOVItem_Click(object sender, RoutedEventArgs e)
         {
             string referenceKinectIP = (sender as MenuItem).Header.ToString();
             this.currentReferenceKinectIP = referenceKinectIP;
-            this.ReferenceKinectBtn.Content = referenceKinectIP;
+            this.KinectFOVBtn.Content = referenceKinectIP;
         }
 
         private void ViewModeBtn_Click(object sender, RoutedEventArgs e)
@@ -379,16 +396,6 @@ namespace KinectMultiTrack.UI
         {
             this.currentViewMode = ViewMode.All;
             this.ViewModeBtn.Content = ViewMode.All;
-        }
-
-        private void StopBtn_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void RecalibrateBtn_Click(object sender, RoutedEventArgs e)
-        {
-
         }
     }
 }

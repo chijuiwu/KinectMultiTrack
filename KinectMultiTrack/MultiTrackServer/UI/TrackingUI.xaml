@@ -23,28 +23,28 @@
                 ContextMenuService.IsEnabled="False"
                 Click="SetupBtn_Click" VerticalAlignment="Center" FontFamily="Microsoft Sans Serif" FontSize="14" Margin="40,0,0,0" FontWeight="Bold" Height="40" Width="55"/>
 
-            <Button x:Name="StartBtn" Content="Start" 
+            <Button x:Name="StartBtn" Content="Start" IsEnabled="False"
                 ContextMenuService.IsEnabled="False"
                 Click="StartBtn_Click"  VerticalAlignment="Center" FontFamily="Microsoft Sans Serif" FontSize="14" Margin="0" FontWeight="Bold" Height="40" Width="55"/>
 
-            <Button x:Name="StopBtn" Content="Stop" 
+            <Button x:Name="StopBtn" Content="Stop"  IsEnabled="False"
                 ContextMenuService.IsEnabled="False"
                 Click="StopBtn_Click"  VerticalAlignment="Center" FontFamily="Microsoft Sans Serif" FontSize="14" Margin="0" FontWeight="Bold" Height="40" Width="55"/>
 
-            <Button x:Name="RecalibrateBtn" Content="Recalibrate" 
+            <Button x:Name="RecalibrateBtn" Content="Recalibrate"  IsEnabled="False"
                 ContextMenuService.IsEnabled="False"
                 Click="RecalibrateBtn_Click"  VerticalAlignment="Center" FontFamily="Microsoft Sans Serif" FontSize="14" Margin="0" FontWeight="Bold" Height="40" Width="80"/>
 
-            <Button x:Name="ReferenceKinectBtn" Content="Kinect FOV" 
+            <Button x:Name="KinectFOVBtn" Content="KinectFOV"  IsEnabled="False"
                 ContextMenuService.IsEnabled="False"
-                Click="ReferenceKinectBtn_Click" VerticalAlignment="Center" FontFamily="Microsoft Sans Serif" FontSize="14" Margin="40,0,0,0" FontWeight="Bold" Height="40" Width="98">
+                Click="KinectFOVBtn_Click" VerticalAlignment="Center" FontFamily="Microsoft Sans Serif" FontSize="14" Margin="40,0,0,0" FontWeight="Bold" Height="40" Width="98">
                 <Button.ContextMenu>
-                    <ContextMenu x:Name="ReferenceKinectMenu">
+                    <ContextMenu x:Name="KinectFOVMenu">
                     </ContextMenu>
                 </Button.ContextMenu>
             </Button>
 
-            <Button x:Name="ViewModeBtn" Content="Mode"
+            <Button x:Name="ViewModeBtn" Content="Mode" IsEnabled="False"
                  ContextMenuService.IsEnabled="False"
                  Click="ViewModeBtn_Click" VerticalAlignment="Center" FontFamily="Microsoft Sans Serif" FontSize="14" Margin="0" FontWeight="Bold" Height="40" Width="60"  >
                 <Button.ContextMenu>

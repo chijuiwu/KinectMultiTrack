@@ -34,9 +34,9 @@ namespace KinectMultiTrack
             this.currentResult = TrackerResult.Empty;
         }
 
-        public void Configure(TrackerSetup setup)
+        public void Configure(int kinectCount)
         {
-            this.expectedKinectsCount = setup.KinectsCount;
+            this.expectedKinectsCount = kinectCount;
         }
 
         public void RemoveClient(IPEndPoint clientIP)
