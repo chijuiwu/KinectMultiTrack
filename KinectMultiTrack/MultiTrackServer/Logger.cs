@@ -14,13 +14,25 @@ namespace KinectMultiTrack
 {
     public class Logger
     {
-        public static readonly int NA = -1;
-        public static readonly int ALL = 0;
-        public static readonly int STATIONARY = 1;
-        public static readonly int WALK = 2;
+        public static readonly int NA = -9999;
+
+        public static readonly int SCENARIO_ALL = 0;
+        public static readonly int SCENARIO_STATIONARY = 1;
+        public static readonly int SCENARIO_WALK_WEI = 2;
+        public static readonly int SCENARIO_WALK_CURRENT = 3;
+        public static readonly int SCENARIO_MOVE_1 = 4;
+        public static readonly int SCENARIO_MOVE_2 = 5;
+        public static readonly int SCENARIO_OCCLUSION = 6;
+
+        public static readonly int KINECT_PARALLEL = 0;
+        public static readonly int KINECT_RIGHT_45 = 1;
+        public static readonly int KINECT_RIGHT_90 = 2;
+        public static readonly int KINECT_LEFT_45 = 3;
+        public static readonly int KINECT_LEFT_90 = 4;
 
         private static readonly string STUDY = "Study";
-        private static readonly string SCENARIO = "Scenario";
+        private static readonly string KINECT_CONFIG = "Kinect";
+        private static readonly string USER_SCENARIO = "Scenario";
         private static readonly string TRACKER_TIME = "Tracker_Time";
         private static readonly string PERSON = "Person#";
         private static readonly string SKEL = "Skeleton#";
@@ -34,13 +46,14 @@ namespace KinectMultiTrack
         private static readonly string Y = "Y";
         private static readonly string Z = "Z";
 
-        public static int CURRENT_STUDY = Logger.NA;
-        public static int CURRENT_SCENARIO = Logger.NA;
+        public static int CURRENT_STUDY_ID = Logger.NA;
+        public static int CURRENT_USER_SCENARIO = Logger.NA;
+        public static int CURRENT_KINECT_CONFIGURATION = Logger.NA;
 
-        private static readonly string FILE_DIR = "..\\..\\..\\..\\Logs\\";
-        private static readonly string FILE_NAME_FORMAT = "Raw_Study_{0}_Scenario_{1}.csv";
+        private static readonly string DATA_DIR = "..\\..\\..\\..\\Data\\";
+        private static readonly string DATA_FILENAME_FORMAT = "Study_{0}_Kinect{1}_Scenario_{2}.csv";
         private static readonly List<string> HEADERS_RAW = Logger.GetHeaders();
-        private static readonly StreamWriter WRITER_RAW = Logger.OpenFileWriter(Logger.FILE_DIR, Logger.HEADERS_RAW);
+        private static readonly StreamWriter WRITER_RAW = Logger.OpenFileWriter(Logger.DATA_DIR, Logger.HEADERS_RAW);
 
         private static readonly object WRITE_LOCK = new object();
 
@@ -48,14 +61,15 @@ namespace KinectMultiTrack
         {
             List<string> headers = new List<string>() { 
                 Logger.STUDY,
-                Logger.SCENARIO,
+                Logger.KINECT_CONFIG,
+                Logger.USER_SCENARIO,
                 Logger.TRACKER_TIME, 
                 Logger.PERSON,
                 Logger.SKEL,
                 Logger.SKEL_INIT_ANGLE,
                 Logger.SKEL_INIT_DIST,
                 Logger.SKEL_TIME,
-                Logger.KINECT,
+                Logger.KINECT_CONFIG,
                 Logger.KINECT_TILT_ANGLE,
                 Logger.KINECT_HEIGHT
             };
@@ -78,7 +92,7 @@ namespace KinectMultiTrack
 
         private static StreamWriter OpenFileWriter(string directory, List<string> headers)
         {
-            string filepath = directory + String.Format(Logger.FILE_NAME_FORMAT, Logger.CURRENT_STUDY, Logger.CURRENT_SCENARIO);
+            string filepath = directory + String.Format(Logger.DATA_FILENAME_FORMAT, Logger.CURRENT_STUDY_ID, Logger.CURRENT_KINECT_CONFIGURATION, Logger.CURRENT_USER_SCENARIO);
             Logger.CreateFile(filepath, headers);
             return new StreamWriter(filepath, true);
         }
@@ -132,7 +146,7 @@ namespace KinectMultiTrack
                 TrackerResult.PotentialSkeleton replica = coordinateTuple.Item1;
                 Dictionary<JointType, KinectJoint> joints = coordinateTuple.Item2;
                 // Headers
-                writer.Write(String.Format("{0}, {1}, {2}, {3}, ", Logger.CURRENT_STUDY, Logger.CURRENT_SCENARIO, timestamp, personId));
+                writer.Write(String.Format("{0}, {1}, {2}, {3}, ", Logger.CURRENT_STUDY_ID, Logger.CURRENT_USER_SCENARIO, timestamp, personId));
                 writer.Write(String.Format("{0}, {1}, {2}, {3}, ", replica.Id, replica.Skeleton.InitialAngle, replica.Skeleton.InitialDistance, replica.Skeleton.Timestamp));
                 writer.Write(String.Format("{0}, {1}, {2}", replica.FOV.Id, replica.FOV.Specification.TiltAngle, replica.FOV.Specification.Height));
                 // Joint_X, Joint_Y, Joint_Z

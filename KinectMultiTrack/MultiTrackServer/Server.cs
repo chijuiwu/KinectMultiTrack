@@ -111,8 +111,8 @@ namespace KinectMultiTrack
             this.tracker.Configure(setup);
 
             this.loggingOn = setup.Logging;
-            Logger.CURRENT_STUDY = setup.StudyId;
-            Logger.CURRENT_SCENARIO = setup.Scenario;
+            Logger.CURRENT_STUDY_ID = setup.StudyId;
+            Logger.CURRENT_USER_SCENARIO = setup.Scenario;
         }
 
         void StartStopServer(bool start)

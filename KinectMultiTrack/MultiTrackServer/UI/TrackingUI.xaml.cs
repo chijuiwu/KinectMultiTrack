@@ -121,32 +121,10 @@ namespace KinectMultiTrack.UI
             setup.ShowDialog();
             if (setup.DialogResult.HasValue && setup.DialogResult.Value)
             {
-                // Kinect
-                int kinectsCount = Int32.Parse(setup.Kinect_Count.Text);
-
-                // User
-                bool log = Convert.ToBoolean(setup.User_Study_OnOff.IsChecked);
-                int studyId = Convert.ToInt32(setup.User_Study_Id.Text);
-                int scenario = Logger.NA;
-                if (Convert.ToBoolean(setup.User_Scenario_All.IsChecked))
-                {
-                    scenario = Logger.ALL;
-                }
-                else if (Convert.ToBoolean(setup.User_Scenario_Stationary.IsChecked))
-                {
-                    scenario = Logger.STATIONARY;
-                }
-                else if (Convert.ToBoolean(setup.User_Scenario_Walk_Wei.IsChecked))
-                {
-                    scenario = Logger.WALK;
-                }
-
-                this.OnTrackerSetup(new TrackerSetup(kinectsCount, log, studyId, scenario));
-                this.ShowProgressText(TrackingUI.INITIALIZED);
+               
             }
             else
             {
-                MessageBox.Show("CANCEL");
             }
         }
 
