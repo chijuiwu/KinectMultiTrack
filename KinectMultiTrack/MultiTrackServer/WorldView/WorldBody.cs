@@ -139,10 +139,10 @@ namespace KinectMultiTrack.WorldView
         public static WBody Copy(WBody body)
         {
             WBody copy = new WBody();
-            foreach (JointType jointType in body.Joints.Keys)
+            foreach (JointType jt in body.Joints.Keys)
             {
-                WJoint joint = body.Joints[jointType];
-                copy.Joints[jointType] = new WJoint(WCoordinate.Copy(joint.Coordinate), joint.TrackingState);
+                WJoint joint = body.Joints[jt];
+                copy.Joints[jt] = new WJoint(WCoordinate.Copy(joint.Coordinate), joint.TrackingState);
             }
             return copy;
         }

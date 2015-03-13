@@ -1,0 +1,86 @@
+%%% -*-BibTeX-*-
+%%% Do NOT edit. File created by BibTeX with style
+%%% ACM-Reference-Format-Journals [18-Jan-2012].
+
+\begin{thebibliography}{00}
+
+%%% ====================================================================
+%%% NOTE TO THE USER: you can override these defaults by providing
+%%% customized versions of any of these macros before the \bibliography
+%%% command.  Each of them MUST provide its own final punctuation,
+%%% except for \shownote{}, \showDOI{}, and \showURL{}.  The latter two
+%%% do not use final punctuation, in order to avoid confusing it with
+%%% the Web address.
+%%%
+%%% To suppress output of a particular field, define its macro to expand
+%%% to an empty string, or better, \unskip, like this:
+%%%
+%%% \newcommand{\showDOI}[1]{\unskip}   % LaTeX syntax
+%%%
+%%% \def \showDOI #1{\unskip}           % plain TeX syntax
+%%%
+%%% ====================================================================
+
+\ifx \showCODEN    \undefined \def \showCODEN     #1{\unskip}     \fi
+\ifx \showDOI      \undefined \def \showDOI       #1{{\tt DOI:}\penalty0{#1}\ }
+  \fi
+\ifx \showISBNx    \undefined \def \showISBNx     #1{\unskip}     \fi
+\ifx \showISBNxiii \undefined \def \showISBNxiii  #1{\unskip}     \fi
+\ifx \showISSN     \undefined \def \showISSN      #1{\unskip}     \fi
+\ifx \showLCCN     \undefined \def \showLCCN      #1{\unskip}     \fi
+\ifx \shownote     \undefined \def \shownote      #1{#1}          \fi
+\ifx \showarticletitle \undefined \def \showarticletitle #1{#1}   \fi
+\ifx \showURL      \undefined \def \showURL       #1{#1}          \fi
+
+\bibitem{eggert_four_algorithms}
+{D.W. Eggert}, {A. Lorusso}, {and} {R.B. Fisher}. 1997.
+\newblock \showarticletitle{Estimating 3-D rigid body transformations: a
+  comparison of four major algorithms}.
+\newblock {\em Machine Vision and Applications\/} {9}, 5-6 (1997), 272--290.
+\newblock
+\showISSN{0932-8092}
+\showDOI{%
+\url{http://dx.doi.org/10.1007/s001380050048}}
+
+
+\bibitem{horn_unit_quaternions}
+{B.K. Horn}. 1987.
+\newblock \showarticletitle{Closed-form solution of absolute orientation using
+  unit quaternions}.
+\newblock {\em Journal of the Optical Society of America A\/} {5}, 5 (1987),
+  629--642.
+\newblock
+\showURL{%
+\url{http://dx.doi.org/10.1364/JOSAA.4.000629}}
+
+
+\bibitem{microsoft_kinect_coordinates}
+{Microsoft}. 2015a.
+\newblock Coordinate mapping.
+\newblock   (2015).
+\newblock
+\newblock
+\shownote{\url{https://msdn.microsoft.com/en-us/library/dn785530.aspx}.}
+
+
+\bibitem{microsoft_kinect_namespace}
+{Microsoft}. 2015b.
+\newblock WindowsPreview.Kinect Namespace.
+\newblock   (2015).
+\newblock
+\newblock
+\shownote{url{https://msdn.microsoft.com/en-us/library/jj131033.aspx}.}
+
+
+\bibitem{wei_kinect_calibration}
+{T. Wei}, {Y. Qiao}, {and} {B. Lee}. 2014.
+\newblock \showarticletitle{Kinect Skeleton Coordinate Calibration for Remote
+  Physical Training}. In {\em The Sixth International Conferences on Advances
+  in Multimedia} {\em (MMEDIA '14)}. IARIA, 66--71.
+\newblock
+\showISBNx{978-1-61208-320-9}
+\showURL{%
+\url{http://www.thinkmind.org/index.php?view=article&articleid=mmedia_2014_4_20_50039}}
+
+
+\end{thebibliography}

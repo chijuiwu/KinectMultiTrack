@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
@@ -86,12 +85,12 @@ namespace KinectMultiTrack.UI
 
             this.Closing += this.TrackingUI_Closing;
 
-            server.TrackingUIUpdate += this.server_TrackingUIUpdate;
+            server.TrackerResultUpdate += this.server_TrackingUIUpdate;
         }
 
         private void server_TrackingUIUpdate(TrackerResult result)
         {
-            this.Dispatcher.Invoke((Action)(() =>
+            this.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (Action)(() =>
             {
                 this.DisplayBodyFrames(result);
             }));
@@ -234,19 +233,14 @@ namespace KinectMultiTrack.UI
                     }
 
                     Pen personPen = Common.PersonColors[personIdx++];
-                    if (this.currentViewMode == ViewMode.Skeletons)
+                    if (this.currentViewMode == ViewMode.Skeletons || this.currentViewMode == ViewMode.All)
                     {
                         this.DrawSkeletons(bodies, dc, personPen);
                     }
-                    else
+                    if (this.currentViewMode == ViewMode.Average || this.currentViewMode == ViewMode.All)
                     {
-                        // Average
                         KinectBody averageBody = KinectBody.GetAverageBody(bodies);
                         this.DrawSkeletons(new List<KinectBody>() { averageBody }, dc, TrackingUI.averageBonePen);
-                        if (this.currentViewMode == ViewMode.All)
-                        {
-                            this.DrawSkeletons(bodies, dc, personPen);
-                        }
                     }
                 }
             }

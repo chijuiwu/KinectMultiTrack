@@ -37,9 +37,7 @@ namespace KinectMultiTrack
         private event KinectCameraHandler OnAddedKinectCamera;
         private event KinectCameraHandler OnRemovedKinectCamera;
         private delegate void KinectCameraHandler(IPEndPoint kinectClientIP);
-        public event KinectFrameHandler MultipleKinectUIUpdate;
-        public delegate void KinectFrameHandler(TrackerResult result);
-        public event WorldViewHandler TrackingUIUpdate;
+        public event WorldViewHandler TrackerResultUpdate;
         public delegate void WorldViewHandler(TrackerResult result);
 
         public Server(int port)
@@ -51,10 +49,12 @@ namespace KinectMultiTrack
 
             Thread multipleKinectUIThread = new Thread(new ThreadStart(this.StartMultipleKinectUIThread));
             multipleKinectUIThread.SetApartmentState(ApartmentState.STA);
+            multipleKinectUIThread.IsBackground = true;
             multipleKinectUIThread.Start();
 
             Thread trackingUIThread = new Thread(new ThreadStart(this.StartTrackingUIThread));
             trackingUIThread.SetApartmentState(ApartmentState.STA);
+            trackingUIThread.IsBackground = true;
             trackingUIThread.Start();
 
             this.writeLogStopwatch = new Stopwatch();
@@ -187,9 +187,7 @@ namespace KinectMultiTrack
         private void TrackingUpdateThread(IPEndPoint clientIP, SBodyFrame bodyFrame)
         {
             Tuple<TrackerResult, TrackerResult> result = this.tracker.SynchronizeTracking(clientIP, bodyFrame);
-            //this.TrackingUIUpdate(result.Item1);
-            this.MultipleKinectUIUpdate(result.Item2);
-
+            this.TrackerResultUpdate(result.Item1);
             //if (this.loggingOn && this.writeLogStopwatch.ElapsedMilliseconds > this.writeLogInterval)
             //{
             //    Thread writeLogThread = new Thread(() => TLogger.Write(result));

@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
@@ -16,7 +16,6 @@ using KinectSerializer;
 using Microsoft.Kinect;
 using System.Net;
 using System.Diagnostics;
-using System.Threading;
 using SkeletonVis = KinectMultiTrack.UI.SkeletonVisualizer;
 
 namespace KinectMultiTrack.UI
@@ -50,15 +49,15 @@ namespace KinectMultiTrack.UI
                 this.DrawBackground(MultipleKinectUI.backgroundBrush, this.MultiKinectViewBox.ActualWidth, this.MultiKinectViewBox.ActualHeight, dc);
             }
 
-            server.MultipleKinectUIUpdate += server_MultipleKinectUIUpdate;
+            server.TrackerResultUpdate += server_MultipleKinectUIUpdate;
         }
 
         private void server_MultipleKinectUIUpdate(TrackerResult result)
         {
-            this.Dispatcher.Invoke((Action)(() =>
-            {
-                this.DisplayBodyFrames(result);
-            }));
+            //this.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (Action)(() =>
+            //{
+            //    this.DisplayBodyFrames(result);
+            //}));
         }
 
         public ImageSource MultipleKinectViewSource
@@ -100,12 +99,11 @@ namespace KinectMultiTrack.UI
                     foreach (TrackerResult.PotentialSkeleton pSkeleton in person.Skeletons)
                     {
                         SBody body = pSkeleton.Skeleton.CurrentPosition.Kinect;
-                        Dictionary<JointType, SJoint> joints = body.Joints;
                         Dictionary<JointType, Tuple<Point, TrackingState>> jointPts = new Dictionary<JointType, Tuple<Point, TrackingState>>();
-                        foreach (JointType jt in joints.Keys)
+                        foreach (JointType jt in body.Joints.Keys)
                         {
-                            Point point = new Point(joints[jt].DepthSpacePoint.X, joints[jt].DepthSpacePoint.Y);
-                            jointPts[jt] = Tuple.Create(point, joints[jt].TrackingState);
+                            Point point = new Point(body.Joints[jt].DepthSpacePoint.X, body.Joints[jt].DepthSpacePoint.Y);
+                            jointPts[jt] = Tuple.Create(point, body.Joints[jt].TrackingState);
                         }
                         this.DrawBody(jointPts, dc, pen);
                     }
@@ -175,7 +173,7 @@ namespace KinectMultiTrack.UI
 
         private void DrawBone(Point from, Point to, DrawingContext dc, Pen pen)
         {
-            dc.DrawLine(pen, from, to);
+            //dc.DrawLine(Brushes.Yellow, new Point(0, 0), new Point(0, 0));
         }
     }
 }

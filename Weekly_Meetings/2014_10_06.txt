@@ -1,8 +1,0 @@
-Show David:
-Presentation layout
-
-Questions
-
--Should the Kinects have overlapping FOVs? Should I test for cases where they overlap and cases where they don't?
-	-cameras with overlapping FOVs may be easier to work with
-		-no blind areas between cameras (people's motion are carried over across multiple cameras)

@@ -1,243 +1,262 @@
+\documentclass{sigchi}
 
-\documentclass[paper=a4, fontsize=11pt]{scrartcl}
-\usepackage[T1]{fontenc}
-\usepackage{fourier}
+% Use this command to override the default ACM copyright statement
+% (e.g. for preprints).  Consult the conference website for the
+% camera-ready copyright statement.
 
-\usepackage[english]{babel}															% English language/hyphenation
-\usepackage[protrusion=true,expansion=true]{microtype}	
-\usepackage{amsmath,amsfonts,amsthm} % Math packages
-\usepackage[pdftex]{graphicx}	
-\usepackage{url}
-\usepackage[margin=1in]{geometry}
-\usepackage{float}
-\usepackage{listings}
+
+%% EXAMPLE BEGIN -- HOW TO OVERRIDE THE DEFAULT COPYRIGHT STRIP -- (July 22, 2013 - Paul Baumann)
+\toappear{
+{\emph{University of St Andrews}}, April 3, 2015, United Kingdom. \\
+Copyright \copyright~Chi-Jui Wu. \\
+}
+%% EXAMPLE END -- HOW TO OVERRIDE THE DEFAULT COPYRIGHT STRIP -- (July 22, 2013 - Paul Baumann)
+
+
+% Arabic page numbers for submission.  Remove this line to eliminate
+% page numbers for the camera ready copy
+
+%\pagenumbering{arabic}
+
+% Load basic packages
+\usepackage{balance}  % to better equalize the last page
+\usepackage{graphics} % for EPS, load graphicx instead
+%\usepackage[T1]{fontenc}
+\usepackage{txfonts}
+\usepackage{times}    % comment if you want LaTeX's default font
+\usepackage[pdftex]{hyperref}
+% \usepackage{url}      % llt: nicely formatted URLs
+\usepackage{color}
+\usepackage{textcomp}
+\usepackage{booktabs}
+\usepackage{ccicons}
+\usepackage{todonotes}
 \usepackage{svg}
+\usepackage{amsmath}
 
-\lstset{
-  aboveskip=3mm,
-  belowskip=3mm,
-  frame=single,
-  tabsize=2
+% Set figures directory
+\graphicspath{{./figures/}}
+\setsvg{svgpath = figures/}
+
+% llt: Define a global style for URLs, rather that the default one
+\makeatletter
+\def\url@leostyle{%
+  \@ifundefined{selectfont}{\def\UrlFont{\sf}}{\def\UrlFont{\small\bf\ttfamily}}}
+\makeatother
+\urlstyle{leo}
+
+% To make various LaTeX processors do the right thing with page size.
+\def\pprw{8.5in}
+\def\pprh{11in}
+\special{papersize=\pprw,\pprh}
+\setlength{\paperwidth}{\pprw}
+\setlength{\paperheight}{\pprh}
+\setlength{\pdfpagewidth}{\pprw}
+\setlength{\pdfpageheight}{\pprh}
+
+% Make sure hyperref comes last of your loaded packages, to give it a
+% fighting chance of not being over-written, since its job is to
+% redefine many LaTeX commands.
+\definecolor{linkColor}{RGB}{6,125,233}
+\hypersetup{%
+  pdftitle={SIGCHI Conference Proceedings Format},
+  pdfauthor={LaTeX},
+  pdfkeywords={SIGCHI, proceedings, archival format},
+  bookmarksnumbered,
+  pdfstartview={FitH},
+  colorlinks,
+  citecolor=black,
+  filecolor=black,
+  linkcolor=black,
+  urlcolor=linkColor,
+  breaklinks=true,
 }
 
-%%% Custom sectioning
-\usepackage{sectsty}
-\allsectionsfont{\centering \normalfont\scshape}
+% create a shortcut to typeset table headings
+% \newcommand\tabhead[1]{\small\textbf{#1}}
 
-%%% Custom headers/footers (fancyhdr package)
-\usepackage{fancyhdr}
-\pagestyle{fancyplain}
-\fancyhead{}											% No page header
-\fancyfoot[L]{}											% Empty 
-\fancyfoot[C]{}											% Empty
-\fancyfoot[R]{\thepage}									% Pagenumbering
-\renewcommand{\headrulewidth}{0pt}			% Remove header underlines
-\renewcommand{\footrulewidth}{0pt}				% Remove footer underlines
-\setlength{\headheight}{10pt}
-\setlength{\headsep}{10pt}
-\setlength{\textheight}{700pt}
-\setlength{\footskip}{50pt}
-
-%%% Equation and float numbering
-\numberwithin{equation}{section}		% Equationnumbering: section.eq#
-\numberwithin{figure}{section}			% Figurenumbering: section.fig#
-\numberwithin{table}{section}				% Tablenumbering: section.tab#
-
-
-%%% Maketitle metadata
-\newcommand{\horrule}[1]{\rule{\linewidth}{#1}} 	% Horizontal rule
-
-\title{
-		\vspace{-3ex}
-		\usefont{OT1}{bch}{b}{n}
-		\normalfont \normalsize \textsc{School of Computer Science} \\ [25pt]
-		\horrule{0.5pt} \\[0.4cm]
-		\huge Tiny: Tracking People using Multiple Kinects \\
-		\horrule{2pt} \\[0.5cm]
-		\vspace{-2ex}
-}
-\author{
-		\normalfont 								\normalsize
-        Chi-Jui Wu\\[-3pt]		\normalsize
-        \today
-}
-\date{}
-
+% End of preamble. Here it comes the document.
 \begin{document}
+
+\title{Tracking People with Multiple Kinects}
+
+\numberofauthors{1}
+\author{%
+  \alignauthor{Chi-Jui Wu\\
+    \affaddr{Computer Science, University of St Andrews}\\
+    \affaddr{United Kingdom}\\
+    \email{cjw21@st-andrews.ac.uk}}\\
+}
+
 \maketitle
 
-\section{Project}
-\begin{figure}[htbp]
+\begin{abstract}
+This paper is my undergraduate thesis, completed in School of Computer Science, University of St Andrews, in 2015. The current work is a people tracking system consisted of multiple Kinects. The project aim is to track people in real world environments and resolve the occlusion problem. The final product contains an interactive software for tracking people and an user study on the developed system. The advantages and limitations of the system are discussed.
+\end{abstract}
+
+\keywords{Tracking; Kinect; Calibration; HCI}
+
+\category{H.5.m.}{Information Interfaces and Presentation
+  (e.g. HCI)}{Miscellaneous}{}{}
+
+\section{Introduction}
+
+
+
+\subsection{Problem statement}
+
+The task of detecting and tracking moving targets in real world environment is non-trivial. There are many sources of tracking errors, such as sensor data noise and outliers, illumination levels, changing backgrounds, and occlusion. Real world environments are stochastic. Occlusion occurs when a tracked target is masked by other objects in existing fields of view. The position and movement of an occluded subject are unknown, hence increasing the difficulity of detection and tracking. Occlusions can be static and daynamic, as well as partial and full. Static occlusions refer to situations where stationary objects obstrct the visibility of the target, and dynamic occlusions occur during the interactions of many targets. Partial and full occlusion cases are when the target is partially and fully blocked from the view, respectively. THe current work attempts to resolve all different types of occlusion.
+
+The problem is illustrated in Figure \ref{fig:occlusion_problem}.
+
+\begin{figure}
   \centering
-  \includesvg{image}
-  \caption{svg image}
+  \includegraphics[width=0.9\columnwidth]{occlusion_problem}
+  \caption{The occlusion problem}
+  \label{fig:occlusion_problem}
 \end{figure}
-
-Realtime people detection and tracking are essential aspects of surveillance, medical monitoring, personalized robotics, and interactive systems. The task of detecting and tracking moving targets in real world environment using time-of-flight cameras is non-trivial. There are many sources of tracking errors, including sensor data noise, illumination levels, changing backgrounds, and occlusion. The current project aims to resolve the problem of occlusion in tracking people using multiple Kinects.
-
-Real world environments are complex, unpredictable, and dynamic. Occlusion occurs when a tracked target is masked by other objects in the field of view of one or more cameras. The position and movements of the occluded target are unknown, hence increasing the difficulity of detection and tracking. There are two types of occlusions that are unfavorable to any tracking algorithm. Static occlusion refers to stationary objects that obstruct the visibility of the targets, for instance, a wall blocking the view of a target. Dynamic occlusion arises from the interactions of targets in the environment. An example would be two people walking past each other, where one person temporarily blocks the view of the other person. The proposed algorithm considers both types of occlusions.
 
 \subsection{Contributions}
 
-The goal of the project can be best illustrated in Figure \ref{fig:occlusion_description}. Both targets are occluded by the red obstacle, hence invisible to the Kinect on the other side of the obstacle. However, they are still visible to the other Kinect. The algorithm would use depth sensor information from multiple Kinects to track targets when they are not occluded, partially occluded, and fully occluded. Essentially, the algorithm leverages multiple Kinects, hence a wider field of views, to reconstruct the skeletons of the targets that would otherwise be impossible with a single Kinect. The algorithm makes tracking feasible by merging different field of views from multiple Kinects into a new aritifical coordinate system.
+Replicate current research. Resolve the problem of occlusion using multiple Kinects. 
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.5\textwidth]{occlusion_description}
-	\caption{The problem of occlusion}
-	\label{fig:occlusion_description}
-\end{figure}
+\section{Previous Work}
 
-\section{Background}
+Existing people detection and tracking techniques. Tracking people in surveillance video and in realtime. Tracking using mobile and wearable devices. Motion sensors and wireless. Time-of-flight and structured-light cameras.
 
-Real time detecting and tracking multiple people have been achieved in systems that use RGB-D data\cite{track_rgbd}, shape analysis, stereo and intensity images\cite{w4s}, and appearance-based tracking\cite{track_robust}.
+[Paper: Particle filter to track multiple people for visual surveillance]
+[Paper: Tracking People in Video Sequences by Clustering Feature Motion Paths]
+[Paper: Evaluation of realtime people tracking for indoor environments using ubiquitous motion sensors and limited wireless network infrastructure]
+[Paper: Tracking people under heavy occlusions by layered data association]
+[Paper: Detection and Tracking of Occluded People]
 
-\subsection{Kinect}
+\subsubsection{Coordiante transfomration}
 
-Kinect is a low-cost for body motion capturing and tracking. The sensor produces depth and RGB streams at 30 frames per second \cite{kinect_sensor_specs}. It also provides infrared and audio streans. The current work will use Kinect's underlying technology of skeleton detection and tracking. Different components of the Kinect are cater for different tasks. For isntance, the depth stream is useful for tracking people's positions and performing cluster analysis on various objects in the scene. On the other hand, the color information is useful for matching targets in groups of visually different people.
+\cite{wei_kinect_calibration}
+\cite{eggert_four_algorithms}
+\cite{horn_unit_quaternions}
 
-\subsection{Literature Review}
+\subsubsection{Tracking using RGB-D data}
 
+[Paper: Tracking people within groups using RGB-D data]
+[Paper: Detecting and tracking people in real time with RGB-D camera]
+[Paper: Applications for a people detection and tracking algorithm using a time-of-flight camera]
+\*[Paper: Real-time Human Motion Tracking using Multiple Depth Cameras]
+[Paper: Human Detection Using Depth Information by Kinect]
 
-\section{Setup}
+\section{Kinect}
 
-The current project is written in C\# and uses the Microsoft Kinect SDK (v.2.0.1410.019000). The current Kinect SDK does not support multiple Kinects on a single machine; as a result, two machines are used for running two Kinects. Machine 1 is the server which runs the tracking algorithm. It has a 2.9 GHz CPU and 8.0 GB RAM. Machine 2 has a 2.3 GHz CPU and 8.0 GB RAM. Both machines runs the Microsoft Windows 8 Operating System, and they stream Kinect frames to the server on Machine 1. The server must start first before running the clients.
+The specification and components. Include image Larger field of views. Give examples.
 
-\section{Method}
+\section{Current Approach}
 
-\subsection{Sockets}
+The system topology
 
-TPC soockets are used to transmit serialized Kinect skeleton data from the client to the server.
+\subsection{Multiple Kinects and Sockets}
 
-\subsection{Serialization}
+Clients sends the Kinect body stream to the server
 
-Kinect frames are not serializable by default in the Kinect SDK. A library is written to serialize Kinect data into bytes, which would allow clients to trasnmit them to the server through TPC sockets. The following data are serialized and transmitted:
+\subsubsection{Serialization}
 
-\begin{itemize}
-	\item BodyFrame
-		\begin{enumerate}
-			\item Timestamp
-			\item Depth frame width
-			\item Depth frame height
-		\end{enumerate}
-	\item Body
-		\begin{enumerate}
-			\item Is tracked
-			\item Tracking id
-		\end{enumerate}
-	\item Joint
-	  	\begin{enumerate}
-			\item Tracking state
-			\item Joint type
-			\item Camera space point
-			\item Depth space point
-			\item Orientation
-		\end{enumerate}
-\end{itemize}
+BodyFrame, Body, Joint. The important elements are the tracking state, joint type, amd camera space point.
 
-These data are then deserialized on the server-side. For more information on the data types, visit the Microsoft Kinect documentation [1].
+\cite{microsoft_kinect_namespace}
+\cite{microsoft_kinect_coordinates}
 
 \subsection{Calibration}
 
-The tracking algorithm should calibrate all of the Kinects connected to the server. The process calculates the initial angle and center position of each skeleton with resepct to every Kinect. The initial angle is defined as the angle between the Kinect and the skeleton [INSERT Code Initial Angle]. The center position is defined as the average position of all the joints in the skeleton [INSERT Code Center Position]. These information are essential for converting 3D coordinates in the Kinect camera space to 3D coordinates in the world view coordinate system. This step is the foundation of matching skeletons across different Kinect field of views. Later, the algorithm would match skeletons from different field of views that have the most proximity to each other.
-
-Figure \ref{fig:kinect_camera_space} shows the Kinect camera space. The 3D coordinates (x, y, z) are expressed in meters. The origin of the coordinate system (0, 0, 0) is at the center position of the IR sensor on Kinect \cite{kinect_coordinate_space}. According to the Microsoft specification, the x axis grows to the left of the sensor, the y axis grows upward, and the z axis grows outward from the direction the sensor.
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.5\textwidth]{na}
-	\caption{Kinect 3D coordiinate space}
-	\label{fig:kinect_camera_space}
-\end{figure}
-
-[Describe the worldview coordinate system] \ref{fig:world_view_space}
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.5\textwidth]{na}
-	\caption{World view space}
-	\label{fig:world_view_space}
-\end{figure}
-
-The server synchronizes the calibration process, which is perfomred only once prior to the tracking process. For every Kinect, the algorithm uses the most recent 120 Kinect Body frames, or an equivalent of four seconds, to perform calibration. The server will automatically start the calibration process once it has received sufficient frames from all the clients. The calibration algorithm is taken from [2].
-
-\subsubsection{Initial angle}
-
-\begin{lstlisting}
-Calculating initial angle
-\end{lstlisting}
-
-\subsubsection{Initial center postion}
-
-\begin{lstlisting}
-Calculating initial center position
-\end{lstlisting}
-
-\subsubsection{Coordinates in world view}
-
-\begin{lstlisting}
-Coordinates transformation
-\end{lstlisting}
+Discuss the techniques from Wei et al.
 
 \subsection{Tracking}
 
-\subsubsection{Matching Skeletons}
-
-\begin{lstlisting}
-algorithm pseudocode
-\end{lstlisting}
+Skeletons from different Kinects matched based on spatial information. Filling the gaps of skeletons.
 
 \section{Testing}
 
-The Multiple Kinect UI shows the result of the tracking process (Figure \ref{ui_multiple_Kinects}). The Tracking UI demonstrates (Figure \ref{fig: ui_tracking}) the functionality of converting skeletons into the camera space of any selected Kinect sensor. This shows that the tracking algorithm can accurately match skeletons which follow their respective tracked person, regardless of the reference FOV.
+Interactive application. View the average and individual skeletons from different Kinect fields of views.
 
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.5\textwidth]{na}
-	\caption{The Multiple Kinect UI showing the result of matching skeletons across different FOVs}
-	\label{fig:ui_multiple_Kinects}
+\begin{figure}
+  \centering
+  \includegraphics[width=0.9\columnwidth]{ui}
+  \caption{UI}
+  \label{fig:ui}
 \end{figure}
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.5\textwidth]{na}
-	\caption{The Multiple Kinect UI showing the functionality of the tracking system}
-	\label{fig:ui_tracking}
-\end{figure}
+\subsection{Occlusion}
 
-\subsection{Without occlusion}
-
-Figure \ref{fig:fov1_all} shows the tracking of one person without occlusion using two Kinects. The left image displays the skeletons of the same person from two difference Kinects' perspective. The right image displays the person's position calculated by the tracking algorithm after matching the skeletons belonging to that person. The skeleton in white color represents the average position of the skeletons from different Kinect FOVs. 
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.5\textwidth]{fov1_all}
-	\caption{Tracking of one person with respect to the Kinect FOV of the left skeleton}
-	\label{fig:fov1_all}
-\end{figure}
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.5\textwidth]{fov2_all}
-	\caption{Tracking of one person with respect to the Kinect FOV of the right skeleton}
-	\label{fig:fov2_all}
-\end{figure}
-
-\subsection{With occlusion}
-
+Show persistent tracking in occluded environments. Demonstrate the system works with complex human interactions.
+ 
 \section{Evaluation}
 
-\subsection{Frame rate}
+Discuss results. Compre them with Wei et al.
+
+\subsection{User study}
+
+\begin{figure}
+  \centering
+  \includesvg[width=0.9\columnwidth]{stationary_p0_d7_all}
+  \caption{One person all joints}~\label{fig:one_person_all}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includesvg[width=0.9\columnwidth]{stationary_p0_d7_average}
+  \caption{One person average}~\label{fig:one_person_average}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includesvg[width=0.9\columnwidth]{scenarios}
+  \caption{All scenarios}~\label{fig:scenarios}
+\end{figure}
+
+\subsection{Occlusion}
+
+User study with multiple people and object occlusion.
+
+\section{Extensions}
+
+SECTION
+
+\section{Acknowledgments}
+
+SECTION
 
 
 
-\subsection{Tracking}
+\section{HACK}
 
-The system logs the skeleton coordinates in Kinect camera space for each person with respect to the local Kinect sensor connected to the server machine. The logger writes the coordinates to file every quarter second and flushes the buffer every three seconds. The data are then post-processed to derive each person's average of the skeleton coordinates across different FOVs at every time interval. The differences between the skeleton coordinates from different FOVs and the average are also calculated.
 
-\section{References}
-\bibliographystyle{plain}
-\bibliography{reportbib}
+
+% Balancing columns in a ref list is a bit of a pain because you
+% either use a hack like flushend or balance, or manually insert
+% a column break.  http://www.tex.ac.uk/cgi-bin/texfaq2html?label=balance
+% multicols doesn't work because we're already in two-column mode,
+% and flushend isn't awesome, so I choose balance.  See this
+% for more info: http://cs.brown.edu/system/software/latex/doc/balance.pdf
+%
+% Note that in a perfect world balance wants to be in the first
+% column of the last page.
+%
+% If balance doesn't work for you, you can remove that and
+% hard-code a column break into the bbl file right before you
+% submit:
+%
+% http://stackoverflow.com/questions/2149854/how-to-manually-equalize-columns-
+% in-an-ieee-paper-if-using-bibtex
+%
+% Or, just remove \balance and give up on balancing the last page.
+%
+\balance{}
+
+% REFERENCES FORMAT
+% References must be the same font size as other body text.
+\bibliographystyle{SIGCHI-Reference-Format}
+\bibliography{report_bib}
 
 \end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

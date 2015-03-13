@@ -1,0 +1,27 @@
+What I did last week?
+Read paper(s)
+Histograms of oriented gradients for human detection [5]
+	-human detection from images
+	-HOG (mentioned in many papers) is the local histograms of image gradient orientations
+	-might not be so useful as I know how to use the Kinect to separate a human body from the background as well as body parts that belong to other people
+
+Tracking people within groups with RGB-D data [2]
+
+Ideas
+	-Computational time needed by the algorithm (to process each frame for tracking) in different settings
+
+What I am going to do this week?
+-Read more papers on tracking people using RGB-D data
+-How to capture images while people are moving (or any post-processing to reduce fuzziness)
+
+Questions
+-Description, Objectives, Ethics and Resources due in two weeks (Draft next week)
+-A deadline for the literature review (Week 5)
+
+David mentioned...
+-Depth data calibration
+
+Todo
+-DOER and Ethics draft ready for next Thursday (weekly meeting at 2pm)
+-Literature review presentation in Week 3
+-Written literature review (Background) in Week 5
