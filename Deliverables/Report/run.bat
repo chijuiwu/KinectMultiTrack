@@ -1,7 +1,7 @@
-pdflatex .\report.tex -aux-directory=.\report_aux --shell-escape
+pdflatex .\report.tex -aux-directory=.\Report_aux --shell-escape
 bibtex .\report_aux\report.aux
-pdflatex .\report.tex -aux-directory=.\report_aux --shell-escape
-pdflatex .\report.tex -aux-directory=.\report_aux --shell-escape
+pdflatex .\report.tex -aux-directory=.\Report_aux --shell-escape
+pdflatex .\report.tex -aux-directory=.\Report_aux --shell-escape
 
 @echo off
 echo.
