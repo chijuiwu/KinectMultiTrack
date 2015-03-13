@@ -380,6 +380,16 @@ namespace KinectMultiTrack.UI
             this.currentViewMode = ViewMode.All;
             this.ViewModeBtn.Content = ViewMode.All;
         }
+
+        private void StopBtn_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void RecalibrateBtn_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
 
