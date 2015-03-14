@@ -10,36 +10,18 @@ using KinectMultiTrack.WorldView;
 
 namespace KinectMultiTrack
 {
-    public class MovingSkeleton
+    public class TrackingSkeleton
     {
         // 50 seconds
         private static readonly int MAX_POSITIONS_STORED = 3000;
-
-        public class Position
-        {
-            public SBody Kinect { get; private set; }
-            public WBody Worldview { get; private set; }
-
-            public Position(SBody kinect, WBody worldview)
-            {
-                this.Kinect = kinect;
-                this.Worldview = worldview;
-            }
-
-            public static Position Copy(Position position)
-            {
-                return new Position(SBody.Copy(position.Kinect), WBody.Copy(position.Worldview));
-            }
-        }
-
         public ulong TrackingId { get; private set; }
         public long Timestamp { get; private set; }
         public double InitialAngle { get; private set; }
         public WCoordinate InitialCenterPosition { get; private set; }
         public float InitialDistance { get; private set; } // distance(z-value) from the reference Kinect
-        public Stack<MovingSkeleton.Position> Positions { get; private set; }
+        public Stack<TrackingSkeleton.Position> Positions { get; private set; }
 
-        public MovingSkeleton.Position CurrentPosition
+        public TrackingSkeleton.Position CurrentPosition
         {
             get
             {
@@ -47,42 +29,48 @@ namespace KinectMultiTrack
             }
         }
 
-        public MovingSkeleton(SBody body, long timestamp, double initAngle, WCoordinate initCenterPosition)
+        public TrackingSkeleton(SBody body, long timestamp, double initAngle, WCoordinate initCenterPosition)
         {
             this.TrackingId = body.TrackingId;
             this.Timestamp = timestamp;
             this.InitialAngle = initAngle;
             this.InitialCenterPosition = initCenterPosition;
             this.InitialDistance = this.InitialCenterPosition.Z;
-            this.Positions = new Stack<MovingSkeleton.Position>();
+            this.Positions = new Stack<TrackingSkeleton.Position>();
             // Enable tracking!!
             this.UpdatePosition(timestamp, body);
         }
 
-        private MovingSkeleton(Position currentPosition, ulong trackingId, long timestamp, double initAngle, WCoordinate initCenterPosition)
+        private TrackingSkeleton(Position currentPosition, ulong trackingId, long timestamp, double initAngle, WCoordinate initCenterPosition)
         {
             this.TrackingId = trackingId;
             this.Timestamp = timestamp;
             this.InitialAngle = initAngle;
             this.InitialCenterPosition = initCenterPosition;
             this.InitialDistance = this.InitialCenterPosition.Z;
-            this.Positions = new Stack<MovingSkeleton.Position>();
+            this.Positions = new Stack<TrackingSkeleton.Position>();
             this.Positions.Push(currentPosition);
         }
 
-        public static MovingSkeleton Copy(MovingSkeleton skeleton)
+        public static TrackingSkeleton Copy(TrackingSkeleton skeleton)
         {
-            return new MovingSkeleton(Position.Copy(skeleton.CurrentPosition), skeleton.TrackingId, skeleton.Timestamp, skeleton.InitialAngle, skeleton.InitialCenterPosition);
+            return new TrackingSkeleton(Position.Copy(skeleton.CurrentPosition), skeleton.TrackingId, skeleton.Timestamp, skeleton.InitialAngle, skeleton.InitialCenterPosition);
+        }
+
+        public void UpdatePosition(ulong trackingId, long timestamp, SBody body)
+        {
+            this.TrackingId = trackingId;
+            this.UpdatePosition(timestamp, body);
         }
 
         public void UpdatePosition(long timestamp, SBody body)
         {
             this.Timestamp = timestamp;
-            if (this.Positions.Count() > MovingSkeleton.MAX_POSITIONS_STORED)
+            if (this.Positions.Count() > TrackingSkeleton.MAX_POSITIONS_STORED)
             {
                 this.Positions.Clear();
             }
-            this.Positions.Push(new MovingSkeleton.Position(body, WBody.Create(body, this.InitialAngle, this.InitialCenterPosition)));
+            this.Positions.Push(new TrackingSkeleton.Position(body, WBody.Create(body, this.InitialAngle, this.InitialCenterPosition)));
         }
 
         public override string ToString()
@@ -102,7 +90,7 @@ namespace KinectMultiTrack
                 return false;
             }
             
-            MovingSkeleton p = obj as MovingSkeleton;
+            TrackingSkeleton p = obj as TrackingSkeleton;
             if ((Object)p == null)
             {
                 return false;
@@ -111,7 +99,7 @@ namespace KinectMultiTrack
             return (this.TrackingId == p.TrackingId) && (this.InitialAngle == p.InitialAngle) && (this.InitialCenterPosition == p.InitialCenterPosition);
         }
 
-        public bool Equals(MovingSkeleton p)
+        public bool Equals(TrackingSkeleton p)
         {
             return (this.TrackingId == p.TrackingId) && (this.InitialAngle == p.InitialAngle) && (this.InitialCenterPosition == p.InitialCenterPosition);
         }
@@ -125,6 +113,23 @@ namespace KinectMultiTrack
                 hash = hash * 23 + this.InitialAngle.GetHashCode();
                 hash = hash * 23 + this.InitialCenterPosition.GetHashCode();
                 return hash;
+            }
+        }
+
+        public class Position
+        {
+            public SBody Kinect { get; private set; }
+            public WBody Worldview { get; private set; }
+
+            public Position(SBody kinect, WBody worldview)
+            {
+                this.Kinect = kinect;
+                this.Worldview = worldview;
+            }
+
+            public static Position Copy(Position position)
+            {
+                return new Position(SBody.Copy(position.Kinect), WBody.Copy(position.Worldview));
             }
         }
     }

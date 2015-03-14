@@ -95,7 +95,7 @@
     <Compile Include="UI\TrackingUI.xaml.cs">
       <DependentUpon>TrackingUI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="MovingSkeleton.cs" />
+    <Compile Include="TrackingSkeleton.cs" />
     <Compile Include="WorldView\WorldBody.cs" />
     <Compile Include="Tracker.cs" />
     <Compile Include="WorldView\WorldCoordinate.cs" />
@@ -113,10 +113,6 @@
       <DependentUpon>MultipleKinectUI.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="UI\KinectStreamtUI.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="UI\SetupDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -127,9 +123,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="UI\KinectStreamtUI.xaml.cs">
-      <DependentUpon>KinectStreamtUI.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

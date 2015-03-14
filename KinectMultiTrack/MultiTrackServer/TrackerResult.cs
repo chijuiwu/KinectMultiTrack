@@ -65,14 +65,14 @@ namespace KinectMultiTrack
         {
             public uint Id { get; set; }
             public KinectFOV FOV { get; private set; }
-            public MovingSkeleton Skeleton { get; private set; }
+            public TrackingSkeleton Skeleton { get; private set; }
 
-            public PotentialSkeleton(KinectFOV fov, MovingSkeleton skeleton)
+            public PotentialSkeleton(KinectFOV fov, TrackingSkeleton skeleton)
                 : this(UInt32.MaxValue, fov, skeleton)
             {
             }
 
-            public PotentialSkeleton(uint id, KinectFOV fov, MovingSkeleton skeleton)
+            public PotentialSkeleton(uint id, KinectFOV fov, TrackingSkeleton skeleton)
             {
                 this.Id = id;
                 this.FOV = fov;
@@ -91,7 +91,7 @@ namespace KinectMultiTrack
 
             public static PotentialSkeleton Copy(PotentialSkeleton pSkeleton)
             {
-                return new PotentialSkeleton(pSkeleton.Id, pSkeleton.FOV, MovingSkeleton.Copy(pSkeleton.Skeleton));
+                return new PotentialSkeleton(pSkeleton.Id, pSkeleton.FOV, TrackingSkeleton.Copy(pSkeleton.Skeleton));
             }
         }
 
@@ -112,7 +112,7 @@ namespace KinectMultiTrack
                 this.Skeletons = skeletons;
             }
 
-            public MovingSkeleton FindSkeletonInFOV(KinectFOV fov)
+            public TrackingSkeleton FindSkeletonInFOV(KinectFOV fov)
             {
                 foreach (PotentialSkeleton potentialSkeleton in this.Skeletons)
                 {

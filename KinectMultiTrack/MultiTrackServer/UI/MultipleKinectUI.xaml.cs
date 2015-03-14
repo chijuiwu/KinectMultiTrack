@@ -49,7 +49,7 @@ namespace KinectMultiTrack.UI
                 this.DrawBackground(MultipleKinectUI.backgroundBrush, this.MultiKinectViewBox.ActualWidth, this.MultiKinectViewBox.ActualHeight, dc);
             }
 
-            server.TrackerResultUpdate += server_MultipleKinectUIUpdate;
+            server.OnNewTrackerResult += server_MultipleKinectUIUpdate;
         }
 
         private void server_MultipleKinectUIUpdate(TrackerResult result)

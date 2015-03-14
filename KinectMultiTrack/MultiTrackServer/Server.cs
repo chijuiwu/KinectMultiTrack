@@ -24,20 +24,19 @@ namespace KinectMultiTrack
         private bool loggingOn;
         private const uint WRITE_LOG_INTERVAL = 1 / 4 * SEC_IN_MILLISEC;
         private const uint FLUSH_LOG_INTERVAL = 3 * SEC_IN_MILLISEC;
-        //private static const uint TRACKING_INTERVAL;
         private readonly Stopwatch writeLogStopwatch;
         private readonly Stopwatch flushLogStopwatch;
-        private readonly Stopwatch trackerStopwatch;
 
         private readonly Tracker tracker;
         private MultipleKinectUI multipleKinectUI;
         // main UI
         private TrackingUI trackingUI;
 
-        private event KinectCameraHandler OnAddedKinectCamera;
-        private event KinectCameraHandler OnRemovedKinectCamera;
-        private delegate void KinectCameraHandler(IPEndPoint kinectClientIP);
-        public event WorldViewHandler TrackerResultUpdate;
+        public event KinectCameraHandler OnAddedKinect;
+        public event KinectCameraHandler OnRemovedKinect;
+        public delegate void KinectCameraHandler(IPEndPoint kinectClientIP);
+
+        public event WorldViewHandler OnNewTrackerResult;
         public delegate void WorldViewHandler(TrackerResult result);
 
         public Server(int port)
@@ -47,11 +46,6 @@ namespace KinectMultiTrack
             
             this.tracker = new Tracker();
 
-            //Thread multipleKinectUIThread = new Thread(new ThreadStart(this.StartMultipleKinectUIThread));
-            //multipleKinectUIThread.SetApartmentState(ApartmentState.STA);
-            //multipleKinectUIThread.IsBackground = true;
-            //multipleKinectUIThread.Start();
-
             Thread trackingUIThread = new Thread(new ThreadStart(this.StartTrackingUIThread));
             trackingUIThread.SetApartmentState(ApartmentState.STA);
             trackingUIThread.IsBackground = true;
@@ -59,7 +53,6 @@ namespace KinectMultiTrack
 
             this.writeLogStopwatch = new Stopwatch();
             this.flushLogStopwatch = new Stopwatch();
-            this.trackerStopwatch = new Stopwatch();
         }
 
         private void Run()
@@ -76,32 +69,26 @@ namespace KinectMultiTrack
             this.serverKinectTCPListener.Stop();
             this.writeLogStopwatch.Stop();
             this.flushLogStopwatch.Stop();
-            this.trackerStopwatch.Stop();
             Logger.Flush();
             Logger.Close();
         }
 
-        private void StartMultipleKinectUIThread()
-        {
-            //this.multipleKinectUI = new MultipleKinectUI(this);
-            //this.multipleKinectUI.Show();
-            //this.MultipleKinectUIUpdate += this.multipleKinectUI.ProcessTrackerResult;
-            //Dispatcher.Run();
-        }
-
         private void StartTrackingUIThread()
         {
-            this.trackingUI = new TrackingUI(this);
+            this.trackingUI = new TrackingUI();
             this.trackingUI.Show();
-
-            this.OnAddedKinectCamera += this.trackingUI.AddKinectCamera;
-            this.OnRemovedKinectCamera += this.trackingUI.RemoveKinectCamera;
 
             this.trackingUI.OnSetup += this.ConfigureServer;
             this.trackingUI.OnStartStop += this.StartStopServer;
 
-            this.tracker.CalibrationEvent += this.trackingUI.OnCalibratedStarted;
-            //this.TrackingUIUpdate += this.trackingUI.ProcessTrackerResult;
+            this.OnAddedKinect += this.trackingUI.Server_AddKinectCamera;
+            this.OnRemovedKinect += this.trackingUI.Server_RemoveKinectCamera;
+            
+            this.tracker.OnResult += this.trackingUI.Tracker_OnResult;
+            this.tracker.OnResult += this.SynchronizeLogging;
+            //this.tracker.OnResult += Logger.Tracker_OnResult;
+            this.tracker.OnCalibration += this.trackingUI.Tracker_OnCalibration;
+            this.tracker.OnRecalibration += this.trackingUI.Tracker_OnReCalibration;
 
             Dispatcher.Run();
         }
@@ -115,7 +102,7 @@ namespace KinectMultiTrack
             Logger.CURRENT_USER_SCENARIO = userSenario;
         }
 
-        void StartStopServer(bool start)
+        private void StartStopServer(bool start)
         {
             if (start)
             {
@@ -149,9 +136,9 @@ namespace KinectMultiTrack
 
             while (true)
             {
-                if (!kinectCameraAdded && this.OnAddedKinectCamera != null)
+                if (!kinectCameraAdded && this.OnAddedKinect != null)
                 {
-                    Thread fireOnAddKinectCamera = new Thread(() => this.OnAddedKinectCamera(clientIP));
+                    Thread fireOnAddKinectCamera = new Thread(() => this.OnAddedKinect(clientIP));
                     fireOnAddKinectCamera.Start();
                     kinectCameraAdded = true;
                 }
@@ -162,7 +149,8 @@ namespace KinectMultiTrack
                     while (!clientStream.DataAvailable) ;
 
                     SBodyFrame bodyFrame = BodyFrameSerializer.Deserialize(clientStream);
-                    this.TrackingUpdateThread(clientIP, bodyFrame);
+                    Thread processFrameThread = new Thread(()=>this.tracker.SynchronizeTracking(clientIP, bodyFrame));
+                    processFrameThread.Start();
 
                     // Response content is trivial
                     byte[] response = Encoding.ASCII.GetBytes(Properties.Resources.SERVER_RESPONSE_OKAY);
@@ -177,23 +165,22 @@ namespace KinectMultiTrack
                 }
             }
             this.tracker.RemoveClient(clientIP);
-            Thread fireOnRemoveKinectCamera = new Thread(() => this.OnRemovedKinectCamera(clientIP));
+            Thread fireOnRemoveKinectCamera = new Thread(() => this.OnRemovedKinect(clientIP));
             fireOnRemoveKinectCamera.Start();
             clientStream.Close();
             clientStream.Dispose();
             client.Close();
         }
 
-        private void TrackingUpdateThread(IPEndPoint clientIP, SBodyFrame bodyFrame)
+        private void SynchronizeLogging(TrackerResult result)
         {
-            Tuple<TrackerResult, TrackerResult> result = this.tracker.SynchronizeTracking(clientIP, bodyFrame);
-            this.TrackerResultUpdate(result.Item1);
             //if (this.loggingOn && this.writeLogStopwatch.ElapsedMilliseconds > this.writeLogInterval)
             //{
             //    Thread writeLogThread = new Thread(() => TLogger.Write(result));
             //    writeLogThread.Start();
             //    this.writeLogStopwatch.Restart();
             //}
+            //this.TrackingUIUpdate += this.trackingUI.ProcessTrackerResult;
         }
     }
 }

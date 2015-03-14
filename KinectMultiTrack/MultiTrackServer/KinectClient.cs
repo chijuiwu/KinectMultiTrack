@@ -28,23 +28,14 @@ namespace KinectMultiTrack
         public IPEndPoint IP { get; private set; }
         public bool Calibrated { get; private set; }
         public KinectClient.Specification CameraSpecification { get; private set; }
-        private readonly Dictionary<ulong, MovingSkeleton> movingSkeletonsDict;
-        private readonly Stack<SBodyFrame> unprocessedBodyFrames;
-        
-        private KinectStreamUI kinectUI;
-        public event KinectBodyFrameHandler UpdateKinectUI;
-        public delegate void KinectBodyFrameHandler(SBodyFrame bodyFrame);
-        public event KinectUIHandler DisposeKinectUI;
-        public delegate void KinectUIHandler();
+        private readonly List<TrackingSkeleton> skeletonsList;
+        private readonly Stack<SBodyFrame> uncalibratedFrames;
 
-        public IEnumerable<MovingSkeleton> MovingSkeletons
+        public IEnumerable<TrackingSkeleton> Skeletons
         {
             get
             {
-                foreach (MovingSkeleton skeleton in this.movingSkeletonsDict.Values)
-                {
-                    yield return skeleton;
-                }
+                return this.skeletonsList;
             }
         }
 
@@ -52,7 +43,7 @@ namespace KinectMultiTrack
         {
             get
             {
-                return this.unprocessedBodyFrames.Count;
+                return this.uncalibratedFrames.Count;
             }
         }
 
@@ -64,57 +55,44 @@ namespace KinectMultiTrack
             this.CameraSpecification = new Specification();
             this.CameraSpecification.Height = height;
             this.CameraSpecification.TiltAngle = tiltAngle;
-            this.movingSkeletonsDict = new Dictionary<ulong, MovingSkeleton>();
-            this.unprocessedBodyFrames = new Stack<SBodyFrame>();
-
-            //Commented because multi-threading issues
-            //Thread kinectUIThread = new Thread(new ParameterizedThreadStart(this.StartKinectUIThread));
-            //kinectUIThread.SetApartmentState(ApartmentState.STA);
-            //kinectUIThread.Start(ip);
-        }
-
-        private void StartKinectUIThread(object obj)
-        {
-            this.kinectUI = new KinectStreamUI();
-            this.kinectUI.Show();
-            this.kinectUI.ClientIPLabel.Content = (obj as string);
-            this.UpdateKinectUI += this.kinectUI.UpdateBodyFrame;
-            this.DisposeKinectUI += this.kinectUI.Dispose;
-            Dispatcher.Run();
-        }
-
-        public void DisposeUI()
-        {
-            if (this.kinectUI != null)
-            {
-                this.DisposeKinectUI();
-            }
+            this.skeletonsList = new List<TrackingSkeleton>();
+            this.uncalibratedFrames = new Stack<SBodyFrame>();
         }
 
         public void StoreFrame(SBodyFrame bodyFrame)
         {
             if (!this.Calibrated)
             {
-                this.unprocessedBodyFrames.Push(bodyFrame);
+                this.uncalibratedFrames.Push(bodyFrame);
             }
             else
             {
+                List<ulong> unclaimedTrackedIds = new List<ulong>();
+                List<TrackingSkeleton> unclaimedTrackedSkeletons = new List<TrackingSkeleton>();
                 foreach (SBody body in bodyFrame.Bodies)
                 {
                     ulong trackingId = body.TrackingId;
-                    if (this.movingSkeletonsDict.ContainsKey(trackingId))
+                    TrackingSkeleton skeleton = this.skeletonsList.Find(x => x.TrackingId == trackingId);
+                    if (skeleton != null)
                     {
-                        this.movingSkeletonsDict[trackingId].UpdatePosition(bodyFrame.TimeStamp, body);
+                        skeleton.UpdatePosition(bodyFrame.TimeStamp, body);
                     }
                     else
                     {
-                        // TODO: Fire unknown skeleton detected
+                        unclaimedTrackedIds.Add(trackingId);
+                        unclaimedTrackedSkeletons.Add(skeleton);
                     }
                 }
-            }
-            if (this.UpdateKinectUI != null)
-            {
-                this.UpdateKinectUI(bodyFrame);
+                foreach (TrackingSkeleton skeleton in unclaimedTrackedSkeletons)
+                {
+                    if (unclaimedTrackedIds.Count > 0)
+                    {
+                        ulong unclaimedId = unclaimedTrackedIds.First();
+                        SBody unclaimedBody = bodyFrame.Bodies.Find(x => x.TrackingId == unclaimedId);
+                        unclaimedTrackedIds.Remove(unclaimedId);
+                        skeleton.UpdatePosition(bodyFrame.TimeStamp, unclaimedBody);
+                    }
+                }
             }
         }
 
@@ -125,7 +103,7 @@ namespace KinectMultiTrack
             uint calibrationFramesToAdd = Tracker.MIN_CALIBRATION_FRAMES;
             while (calibrationFramesToAdd > 0)
             {
-                calibrationFrames[--calibrationFramesToAdd] = this.unprocessedBodyFrames.Pop();
+                calibrationFrames[--calibrationFramesToAdd] = this.uncalibratedFrames.Pop();
             }
 
             // Use the last frame body as reference
@@ -156,11 +134,16 @@ namespace KinectMultiTrack
                 }
                 WCoordinate initCenterPos = WBody.GetInitialCenterPosition(positionsList);
 
-                MovingSkeleton skeleton = new MovingSkeleton(currentBody, timestamp, initAngle, initCenterPos);
-                this.movingSkeletonsDict[trackingId] = skeleton;
+                this.skeletonsList.Add(new TrackingSkeleton(currentBody, timestamp, initAngle, initCenterPos));
             }
-
             this.Calibrated = true;
+        }
+
+        public void PrepareRecalibration()
+        {
+            this.uncalibratedFrames.Clear();
+            this.skeletonsList.Clear();
+            this.Calibrated = false;
         }
 
         public static TrackerResult.KinectFOV ExtractFOVInfo(KinectClient kinect)

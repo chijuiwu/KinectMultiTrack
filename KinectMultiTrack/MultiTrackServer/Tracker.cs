@@ -22,10 +22,13 @@ namespace KinectMultiTrack
         private bool systemCalibrated;
 
         private readonly ConcurrentDictionary<IPEndPoint, KinectClient> kinectClients;
+
         private TrackerResult currentResult;
 
-        public event TrackerEventHandler CalibrationEvent;
+        public event TrackerEventHandler OnCalibration, OnRecalibration;
         public delegate void TrackerEventHandler();
+        public event TrackerResultHandler OnResult;
+        public delegate void TrackerResultHandler(TrackerResult result);
 
         public Tracker()
         {
@@ -42,10 +45,7 @@ namespace KinectMultiTrack
         public void RemoveClient(IPEndPoint clientIP)
         {
             KinectClient kinect;
-            if (this.kinectClients.TryRemove(clientIP, out kinect))
-            {
-                kinect.DisposeUI();
-            }
+            this.kinectClients.TryRemove(clientIP, out kinect);
         }
 
         private bool KinectsMeetCalibrationRequirement()
@@ -75,22 +75,26 @@ namespace KinectMultiTrack
             {
                 return;
             }
-            if (this.kinectClients.Count == this.expectedKinectsCount)
-            {
-                this.CalibrationEvent();
-            }
             if (this.KinectsMeetCalibrationRequirement())
             {
-                foreach (KinectClient kinect in this.kinectClients.Values)
-                {
-                    kinect.Calibrate();
-                }
+                this.OnCalibration();
+                this.kinectClients.Values.ToList<KinectClient>().ForEach(kinect => kinect.Calibrate());
                 this.systemCalibrated = true;
                 Debug.WriteLine("Calibration done!!", "Tracker");
             }
         }
 
-        public Tuple<TrackerResult, TrackerResult> SynchronizeTracking(IPEndPoint source, SBodyFrame frame)
+        private void ReCalibration()
+        {
+            this.systemCalibrated = false;
+            foreach (KinectClient kinect in this.kinectClients.Values)
+            {
+                kinect.PrepareRecalibration();
+            }
+            this.OnRecalibration();
+        }
+
+        public TrackerResult SynchronizeTracking(IPEndPoint source, SBodyFrame frame)
         {
             // Put this code elsewhere
             if (!this.kinectClients.ContainsKey(source))
@@ -100,24 +104,34 @@ namespace KinectMultiTrack
             }
             lock (this.syncFrameLock)
             {
-                this.kinectClients[source].StoreFrame(frame);
                 if (!this.systemCalibrated)
                 {
                     this.TryCalibration();
                     if (this.systemCalibrated)
                     {
-                        Debug.WriteLine("Before initial people detection!!", "Tracker");
                         this.currentResult = this.PeopleDetection();
-                        Debug.WriteLine("Initial people detection done!!", "Tracker");
                     }
                 }
-                // Do extra work
                 if (this.systemCalibrated)
                 {
-                    this.PeopleTracking(source, frame);
+                    if (this.ContainsSamePeople(source, frame))
+                    {
+                        this.kinectClients[source].StoreFrame(frame);
+                    }
+                    else
+                    {
+                        this.ReCalibration();
+                        this.currentResult = TrackerResult.Empty;
+                    }
                 }
-                return Tuple.Create(TrackerResult.Copy(this.currentResult), TrackerResult.Copy(this.currentResult));
+                return this.currentResult;
             }
+        }
+
+        // Assume same number equals same people
+        private bool ContainsSamePeople(IPEndPoint source, SBodyFrame frame)
+        {
+            return frame.Bodies.Count() == this.kinectClients[source].Skeletons.Count();
         }
 
         # region People Detection
@@ -129,8 +143,8 @@ namespace KinectMultiTrack
             {
                 TrackerResult.KinectFOV fov = KinectClient.ExtractFOVInfo(kinect);
                 currentFOVsList.Add(fov);
-                foreach (MovingSkeleton movingSkeleton in kinect.MovingSkeletons) {
-                    currentSkeletonsList.Add(new TrackerResult.PotentialSkeleton(fov, movingSkeleton));
+                foreach (TrackingSkeleton skeleton in kinect.Skeletons) {
+                    currentSkeletonsList.Add(new TrackerResult.PotentialSkeleton(fov, skeleton));
                 }
             }
 
@@ -168,7 +182,6 @@ namespace KinectMultiTrack
 
         // Create person based on different FOVs and proximity in worldview positions
         // TODO: extend for multiple FOVs (now: 2)
-        // TODO: use previous tracking results
         private TrackerResult.Person FindPersonWithMultipleSkeletons(ref List<TrackerResult.PotentialSkeleton> skeletonsList)
         {
             // Find the two closest skeletons
@@ -177,11 +190,11 @@ namespace KinectMultiTrack
             foreach (TrackerResult.PotentialSkeleton thisSkeleton in skeletonsList)
             {
                 TrackerResult.KinectFOV fov1 = thisSkeleton.FOV;
-                MovingSkeleton skeleton1 = thisSkeleton.Skeleton;
+                TrackingSkeleton skeleton1 = thisSkeleton.Skeleton;
                 foreach (TrackerResult.PotentialSkeleton thatSkeleton in skeletonsList)
                 {
                     TrackerResult.KinectFOV fov2 = thatSkeleton.FOV;
-                    MovingSkeleton skeleton2 = thatSkeleton.Skeleton;
+                    TrackingSkeleton skeleton2 = thatSkeleton.Skeleton;
                     if (!fov1.Equals(fov2))
                     {
                         WBody pos1 = skeleton1.CurrentPosition.Worldview;
@@ -211,12 +224,5 @@ namespace KinectMultiTrack
             }
         }
         #endregion
-
-        #region People Tracking
-        private void PeopleTracking(IPEndPoint source, SBodyFrame frame)
-        {
-        }
-        #endregion
-
     }
 }

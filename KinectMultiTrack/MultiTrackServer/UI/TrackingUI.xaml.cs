@@ -59,16 +59,16 @@ namespace KinectMultiTrack.UI
         private bool setupCompleted = false;
         public event TrackingUISetupHandler OnSetup;
         public delegate void TrackingUISetupHandler(int kinectCount, bool studyOn, int userStudyId, int userSenario, int kinectConfiguration);
-
         public event TrackingUIHandler OnStartStop;
         public delegate void TrackingUIHandler(bool start);
 
-        public static readonly string UNINITIALIZED = "Uninitialized";
-        public static readonly string INITIALIZED = "Initialized";
-        public static readonly string WAITING_KINECT = "Waiting for Kinects";
-        public static readonly string CALIBRATING = "Calibrating";
+        private static readonly string UNINITIALIZED = "Uninitialized";
+        private static readonly string INITIALIZED = "Initialized";
+        private static readonly string WAITING_KINECT = "Waiting for Kinects";
+        private static readonly string CALIBRATING = "Calibrating";
+        private static readonly string RECALIBRATING = "Recalibrating";
 
-        public TrackingUI(Server server)
+        public TrackingUI()
         {
             InitializeComponent();
             this.DataContext = this;
@@ -85,17 +85,59 @@ namespace KinectMultiTrack.UI
             this.coordinateMapper = this.kinectSensor.CoordinateMapper;
 
             this.Closing += this.TrackingUI_Closing;
-
-            server.TrackerResultUpdate += this.server_TrackingUIUpdate;
         }
 
-        private void server_TrackingUIUpdate(TrackerResult result)
+
+        public void Server_AddKinectCamera(IPEndPoint clientIP)
         {
-            this.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (Action)(() =>
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                MenuItem kinectIPItem = new MenuItem();
+                kinectIPItem.Header = clientIP.ToString();
+                kinectIPItem.Click += KinectFOVItem_Click;
+                this.KinectFOVMenu.Items.Add(kinectIPItem);
+                this.referenceKinectIPs[clientIP.ToString()] = kinectIPItem;
+            }));
+        }
+
+        public void Server_RemoveKinectCamera(IPEndPoint clientIP)
+        {
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                this.KinectFOVMenu.Items.Remove(this.referenceKinectIPs[clientIP.ToString()]);
+                this.referenceKinectIPs.Remove(clientIP.ToString());
+                if (this.currentReferenceKinectIP.Equals(clientIP))
+                {
+                    this.KinectFOVBtn.Content = "Reference Kinect";
+                    this.currentReferenceKinectIP = "";
+                }
+            }));
+        }
+
+        public void Tracker_OnResult(TrackerResult result)
+        {
+            this.Dispatcher.Invoke((Action)(() =>
             {
                 this.DisplayBodyFrames(result);
             }));
         }
+
+        public void Tracker_OnCalibration()
+        {
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                this.ShowProgressText(TrackingUI.CALIBRATING);
+            }));
+        }
+
+        public void Tracker_OnReCalibration()
+        {
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                this.ShowProgressText(TrackingUI.RECALIBRATING);
+            }));
+        }
+
 
         public ImageSource TrackingViewSource
         {
@@ -150,15 +192,6 @@ namespace KinectMultiTrack.UI
         {
 
         }
-
-        public void OnCalibratedStarted()
-        {
-            this.Dispatcher.Invoke((Action)(() =>
-            {
-                this.ShowProgressText(TrackingUI.CALIBRATING);
-            }));
-        }
-
         private void ShowProgressText(string text)
         {
             using (DrawingContext dc = this.trackingDrawingGroup.Open())
@@ -212,7 +245,7 @@ namespace KinectMultiTrack.UI
                 int personIdx = 0;
                 foreach (TrackerResult.Person person in result.People)
                 {
-                    MovingSkeleton referenceSkeleton = person.FindSkeletonInFOV(referenceFOV);
+                    TrackingSkeleton referenceSkeleton = person.FindSkeletonInFOV(referenceFOV);
                     // HACK
                     if (referenceSkeleton == null)
                     {
@@ -338,31 +371,6 @@ namespace KinectMultiTrack.UI
             referenceKinectBtn.ContextMenu.IsOpen = true;
         }
 
-        internal void AddKinectCamera(IPEndPoint clientIP)
-        {
-            this.Dispatcher.Invoke((Action)(() =>
-            {
-                MenuItem kinectIPItem = new MenuItem();
-                kinectIPItem.Header = clientIP.ToString();
-                kinectIPItem.Click += KinectFOVItem_Click;
-                this.KinectFOVMenu.Items.Add(kinectIPItem);
-                this.referenceKinectIPs[clientIP.ToString()] = kinectIPItem;
-            }));
-        }
-
-        internal void RemoveKinectCamera(IPEndPoint clientIP)
-        {
-            this.Dispatcher.Invoke((Action)(() =>
-            {
-                this.KinectFOVMenu.Items.Remove(this.referenceKinectIPs[clientIP.ToString()]);
-                this.referenceKinectIPs.Remove(clientIP.ToString());
-                if (this.currentReferenceKinectIP.Equals(clientIP))
-                {
-                    this.KinectFOVBtn.Content = "Reference Kinect";
-                    this.currentReferenceKinectIP = "";
-                }
-            }));
-        }
 
         private void KinectFOVItem_Click(object sender, RoutedEventArgs e)
         {
