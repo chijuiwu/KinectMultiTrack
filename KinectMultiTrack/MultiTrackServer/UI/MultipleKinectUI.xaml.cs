@@ -93,8 +93,8 @@ namespace KinectMultiTrack.UI
                 int personIdx = 0;
                 foreach (TrackerResult.Person person in result.People)
                 {
-                    Pen pen = Common.PersonColors[personIdx++];
-                    foreach (TrackerResult.PotentialSkeleton pSkeleton in person.Skeletons)
+                    Pen pen = Colors.SKELETON[personIdx++];
+                    foreach (TrackerResult.PotentialSkeleton pSkeleton in person.PotentialSkeletons)
                     {
                         SBody body = pSkeleton.Skeleton.CurrentPosition.Kinect;
                         Dictionary<JointType, Tuple<Point, TrackingState>> jointPts = new Dictionary<JointType, Tuple<Point, TrackingState>>();

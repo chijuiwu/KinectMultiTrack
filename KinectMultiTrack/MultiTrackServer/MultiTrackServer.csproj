@@ -87,7 +87,8 @@
     <Compile Include="KinectJoint.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="TrackerResult.cs" />
-    <Compile Include="UI\Common.cs" />
+    <Compile Include="UI\Colors.cs" />
+    <Compile Include="UI\DrawableJoint.cs" />
     <Compile Include="UI\SetupDialog.xaml.cs">
       <DependentUpon>SetupDialog.xaml</DependentUpon>
     </Compile>

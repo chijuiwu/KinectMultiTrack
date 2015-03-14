@@ -128,7 +128,7 @@ namespace KinectMultiTrack
                     double referenceAngle = reference.Skeleton.InitialAngle;
                     WCoordinate referencePosition = reference.Skeleton.InitialCenterPosition;
                     List<Tuple<TrackerResult.PotentialSkeleton, Dictionary<JointType, KinectJoint>>> skeletonCoordinates = new List<Tuple<TrackerResult.PotentialSkeleton, Dictionary<JointType, KinectJoint>>>();
-                    foreach (TrackerResult.PotentialSkeleton skeleton in person.Skeletons)
+                    foreach (TrackerResult.PotentialSkeleton skeleton in person.PotentialSkeletons)
                     {
                         KinectBody body = WBody.TransformWorldToKinectBody(skeleton.Skeleton.CurrentPosition.Worldview, referenceAngle, referencePosition);
                         skeletonCoordinates.Add(Tuple.Create(skeleton, body.Joints));

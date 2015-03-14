@@ -14,6 +14,35 @@ namespace KinectMultiTrack
         public IEnumerable<Person> People { get; private set; }
         public static TrackerResult Empty = new TrackerResult(Enumerable.Empty<KinectFOV>(), Enumerable.Empty<TrackerResult.Person>());
 
+        public int DepthFrameWidth
+        {
+            get
+            {
+                if (this == TrackerResult.Empty)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return this.FOVs.First().Specification.DepthFrameWidth;
+                }
+            }
+        }
+        public int DepthFrameHeight
+        {
+            get
+            {
+                if (this == TrackerResult.Empty)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return this.FOVs.First().Specification.DepthFrameHeight;
+                }
+            }
+        }
+
         public TrackerResult(IEnumerable<KinectFOV> fovs, IEnumerable<Person> people)
         {
             this.Timestamp = DateTime.UtcNow.Ticks / TimeSpan.TicksPerMillisecond;
@@ -37,14 +66,14 @@ namespace KinectMultiTrack
 
         public static PotentialSkeleton GetLocalSkeletonReference(Person person)
         {
-            foreach (PotentialSkeleton skeleton in person.Skeletons)
+            foreach (PotentialSkeleton skeleton in person.PotentialSkeletons)
             {
                 if (skeleton.FOV.ClientIP.Address.ToString().Equals("127.0.0.1"))
                 {
                     return skeleton;
                 }
             }
-            return person.Skeletons.First();
+            return person.PotentialSkeletons.First();
         }
 
         public class KinectFOV
@@ -98,7 +127,7 @@ namespace KinectMultiTrack
         public class Person
         {
             public uint Id { get; set; }
-            public IEnumerable<PotentialSkeleton> Skeletons { get; private set; }
+            public IEnumerable<PotentialSkeleton> PotentialSkeletons { get; private set; }
 
             public Person(params PotentialSkeleton[] skeletons)
                 : this(UInt32.MaxValue, skeletons)
@@ -109,16 +138,16 @@ namespace KinectMultiTrack
             public Person(uint id, IEnumerable<PotentialSkeleton> skeletons)
             {
                 this.Id = id;
-                this.Skeletons = skeletons;
+                this.PotentialSkeletons = skeletons;
             }
 
-            public TrackingSkeleton FindSkeletonInFOV(KinectFOV fov)
+            public TrackingSkeleton GetSkeletonInFOV(KinectFOV fov)
             {
-                foreach (PotentialSkeleton potentialSkeleton in this.Skeletons)
+                foreach (PotentialSkeleton pSkeleton in this.PotentialSkeletons)
                 {
-                    if (potentialSkeleton.FOV.Equals(fov))
+                    if (pSkeleton.FOV.Equals(fov))
                     {
-                        return potentialSkeleton.Skeleton;
+                        return pSkeleton.Skeleton;
                     }
                 }
                 return null;
@@ -127,9 +156,9 @@ namespace KinectMultiTrack
             public override string ToString()
             {
                 StringBuilder sb = new StringBuilder();
-                sb.Append("[Skeletons: ").Append(this.Skeletons.Count()).Append("]: ");
+                sb.Append("[Skeletons: ").Append(this.PotentialSkeletons.Count()).Append("]: ");
                 String prefix = "";
-                foreach (PotentialSkeleton match in this.Skeletons)
+                foreach (PotentialSkeleton match in this.PotentialSkeletons)
                 {
                     sb.Append(prefix);
                     prefix = ",";
@@ -141,7 +170,7 @@ namespace KinectMultiTrack
             public static Person Copy(Person person)
             {
                 List<PotentialSkeleton> skeletonsCopy = new List<PotentialSkeleton>();
-                foreach (PotentialSkeleton skeleton in person.Skeletons)
+                foreach (PotentialSkeleton skeleton in person.PotentialSkeletons)
                 {
                     skeletonsCopy.Add(PotentialSkeleton.Copy(skeleton));
                 }

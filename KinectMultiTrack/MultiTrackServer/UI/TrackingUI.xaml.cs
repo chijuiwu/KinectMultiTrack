@@ -40,23 +40,9 @@ namespace KinectMultiTrack.UI
         private DrawingImage trackingUIViewSource;
         private DrawingGroup multipleUIDrawingGroup;
         private DrawingImage multipleUIViewSource;
-        private double displayWidth, displayHeight;
 
         private KinectSensor kinectSensor;
         private CoordinateMapper coordinateMapper;
-
-        // Background
-        private static readonly Brush backgroundBrush = Brushes.Black;
-
-        // Joints
-        private static readonly double jointThickness = 3;
-        private static readonly Brush trackedJointBrush = new SolidColorBrush(Color.FromArgb(255, 68, 192, 68));
-        private static readonly Brush inferredJointBrush = Brushes.Yellow;
-
-        // Bones
-        private static readonly Pen defaultTrackedBonePen = new Pen(Brushes.Blue, 6);
-        private static readonly Pen inferredBonePen = new Pen(Brushes.Gray, 1);
-        private static readonly Pen averageBonePen = new Pen(Brushes.White, 6);
 
         public event TrackingUISetupHandler OnSetup;
         public delegate void TrackingUISetupHandler(int kinectCount, bool studyOn, int userStudyId, int userSenario, int kinectConfiguration);
@@ -210,7 +196,7 @@ namespace KinectMultiTrack.UI
         }
         #endregion
 
-        private TrackerResult.KinectFOV GetReferenceKinectFOV(IEnumerable<TrackerResult.KinectFOV> fovs)
+        private TrackerResult.KinectFOV UpdateReferenceKinectFOV(IEnumerable<TrackerResult.KinectFOV> fovs)
         {
             TrackerResult.KinectFOV referenceFOV = fovs.First();
             foreach (TrackerResult.KinectFOV fov in fovs)
@@ -218,8 +204,10 @@ namespace KinectMultiTrack.UI
                 if (fov.ClientIP.ToString().Equals(this.currentReferenceKinectIP))
                 {
                     referenceFOV = fov;
+                    break;
                 }
             }
+            this.currentReferenceKinectIP = referenceFOV.ClientIP.ToString();
             return referenceFOV;
         }
 
@@ -229,73 +217,78 @@ namespace KinectMultiTrack.UI
             {
                 return;
             }
+            this.RefreshTrackingUI(result);
+            //this.RefreshMultipleUI(result);
+        }
 
-            this.displayWidth = this.TrackingUI_Viewbox.ActualWidth;
-            this.displayHeight = this.TrackingUI_Viewbox.ActualHeight;
-            using (DrawingContext dc = this.trackingUIDrawingGroup.Open())
-            {
-                this.DrawBackground(TrackingUI.backgroundBrush, displayWidth, displayHeight, dc);
-            }
+        private void RefreshTrackingUI(TrackerResult result)
+        {
+            double trackingUIWidth = this.TrackingUI_Viewbox.ActualWidth;
+            double trackingUIHeight = this.TrackingUI_Viewbox.ActualHeight;
 
-            TrackerResult.KinectFOV referenceFOV = this.GetReferenceKinectFOV(result.FOVs);
-            this.currentReferenceKinectIP = referenceFOV.ClientIP.ToString();
-
+            TrackerResult.KinectFOV referenceFOV = this.UpdateReferenceKinectFOV(result.FOVs);
             int frameWidth = referenceFOV.Specification.DepthFrameWidth;
             int frameHeight = referenceFOV.Specification.DepthFrameHeight;
 
             using (DrawingContext dc = this.trackingUIDrawingGroup.Open())
             {
-                this.DrawBackground(TrackingUI.backgroundBrush, displayWidth, displayHeight, dc);
+                this.DrawBackground(Colors.BACKGROUND_BRUSH, trackingUIWidth, trackingUIHeight, dc);
+
                 int personIdx = 0;
                 foreach (TrackerResult.Person person in result.People)
                 {
-                    TrackingSkeleton referenceSkeleton = person.FindSkeletonInFOV(referenceFOV);
-                    // HACK
-                    if (referenceSkeleton == null)
-                    {
-                        continue;
-                    }
-                    double referenceAngle = referenceSkeleton.InitialAngle;
-                    WCoordinate referencePosition = referenceSkeleton.InitialCenterPosition;
-                    // All skeletons
+                    TrackingSkeleton refSkeleton = person.GetSkeletonInFOV(referenceFOV);
+
                     List<KinectBody> bodies = new List<KinectBody>();
-                    foreach (TrackerResult.PotentialSkeleton pSkeleton in person.Skeletons)
+                    foreach (TrackerResult.PotentialSkeleton pSkeleton in person.PotentialSkeletons)
                     {
-                        bodies.Add(WBody.TransformWorldToKinectBody(pSkeleton.Skeleton.CurrentPosition.Worldview, referenceAngle, referencePosition));
+                        bodies.Add(WBody.TransformWorldToKinectBody(pSkeleton.Skeleton.CurrentPosition.Worldview, refSkeleton.InitialAngle, refSkeleton.InitialCenterPosition));
                     }
 
-                    Pen personPen = Common.PersonColors[personIdx++];
+                    Pen skeletonColor = Colors.SKELETON[personIdx++];
                     if (this.currentViewMode == ViewMode.Skeletons || this.currentViewMode == ViewMode.All)
                     {
-                        this.DrawSkeletons(bodies, dc, personPen);
+                        this.DrawSkeletons(bodies, dc, skeletonColor);
                     }
                     if (this.currentViewMode == ViewMode.Average || this.currentViewMode == ViewMode.All)
                     {
-                        KinectBody averageBody = KinectBody.GetAverageBody(bodies);
-                        this.DrawSkeletons(new List<KinectBody>() { averageBody }, dc, TrackingUI.averageBonePen);
+                        this.DrawSkeletons(new List<KinectBody>() { KinectBody.GetAverageBody(bodies) }, dc, Colors.AVG_BONE_PEN);
                     }
                 }
             }
-            this.DrawClipRegion(frameWidth, frameHeight, this.trackingUIDrawingGroup);
+            //this.DrawClipRegion(frameWidth, frameHeight, this.trackingUIDrawingGroup);
         }
 
-        private void DrawSkeletons(IEnumerable<KinectBody> bodies, DrawingContext dc, Pen trackedBonePen)
+        private void RefreshMultipleUI(TrackerResult result)
         {
-            foreach (KinectBody body in bodies)
+            double multipleUIWidth = this.MultipleUI_Viewbox.ActualWidth;
+            double multipleUIHeight = this.MultipleUI_Viewbox.ActualHeight;
+
+            int frameWidth = result.DepthFrameWidth;
+            int frameHeight = result.DepthFrameHeight;
+
+            using (DrawingContext dc = this.multipleUIDrawingGroup.Open())
             {
-                Dictionary<JointType, Tuple<Point, TrackingState>> drawableJoints = new Dictionary<JointType, Tuple<Point, TrackingState>>();
-                foreach (JointType jt in body.Joints.Keys)
+                this.DrawBackground(Colors.BACKGROUND_BRUSH, multipleUIWidth, multipleUIHeight, dc);
+
+                int personIdx = 0;
+                foreach (TrackerResult.Person person in result.People)
                 {
-                    CameraSpacePoint position = body.Joints[jt].Position;
-                    if (position.Z < 0)
+                    Pen skeletonColor = Colors.SKELETON[personIdx++];
+                    foreach (TrackerResult.PotentialSkeleton pSkeleton in person.PotentialSkeletons)
                     {
-                        position.Z = 0.1f;
+                        SBody body = pSkeleton.Skeleton.CurrentPosition.Kinect;
+                        Dictionary<JointType, DrawableJoint> jointPts = new Dictionary<JointType, DrawableJoint>();
+                        foreach (JointType jt in body.Joints.Keys)
+                        {
+                            Point point = new Point(body.Joints[jt].DepthSpacePoint.X, body.Joints[jt].DepthSpacePoint.Y);
+                            jointPts[jt] = new DrawableJoint(point, body.Joints[jt].TrackingState);
+                        }
+                        this.DrawBody(jointPts, dc, skeletonColor);
                     }
-                    DepthSpacePoint joint2DPt = this.coordinateMapper.MapCameraPointToDepthSpace(position);
-                    drawableJoints[jt] = Tuple.Create(new Point(joint2DPt.X, joint2DPt.Y), body.Joints[jt].TrackingState);
                 }
-                this.DrawBody(drawableJoints, dc, trackedBonePen);
             }
+            //this.DrawClipRegion(frameWidth, frameHeight, this.multipleUIDrawingGroup);
         }
 
         private void DrawBackground(Brush color, double width, double height, DrawingContext dc)
@@ -308,50 +301,63 @@ namespace KinectMultiTrack.UI
             dg.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, frameWidth, frameHeight));
         }
 
-        private void DrawBody(Dictionary<JointType, Tuple<Point, TrackingState>> joints, DrawingContext dc, Pen bonePen)
+        private void DrawSkeletons(IEnumerable<KinectBody> bodies, DrawingContext dc, Pen skeletonColor)
+        {
+            foreach (KinectBody body in bodies)
+            {
+                Dictionary<JointType, DrawableJoint> jointPts = new Dictionary<JointType, DrawableJoint>();
+                foreach (JointType jt in body.Joints.Keys)
+                {
+                    CameraSpacePoint position = body.Joints[jt].Position;
+                    if (position.Z < 0)
+                    {
+                        position.Z = 0.1f;
+                    }
+                    DepthSpacePoint jointPt2D = this.coordinateMapper.MapCameraPointToDepthSpace(position);
+                    jointPts[jt] = new DrawableJoint(new Point(jointPt2D.X, jointPt2D.Y), body.Joints[jt].TrackingState);
+                }
+                this.DrawBody(jointPts, dc, skeletonColor);
+            }
+        }
+
+        private void DrawBody(Dictionary<JointType, DrawableJoint> joints, DrawingContext dc, Pen skeletonColor)
         {
             // Draw bones
             foreach (var bone in SkeletonStructure.Bones)
             {
-                JointType jt0 = bone.Item1;
-                JointType jt1 = bone.Item2;
-                if (!joints.ContainsKey(jt0) || !joints.ContainsKey(jt1))
+                JointType jt1st = bone.Item1;
+                JointType jt2nd = bone.Item2;
+                if (!joints.ContainsKey(jt1st) || !joints.ContainsKey(jt2nd))
                 {
                     continue;
                 }
-                Point jointPt0 = joints[jt0].Item1;
-                Point jointPt1 = joints[jt1].Item1;
-                TrackingState joint0TS = joints[jt0].Item2;
-                TrackingState joint1TS = joints[jt1].Item2;
-                if (joint0TS == TrackingState.NotTracked || joint1TS == TrackingState.NotTracked)
+                if (joints[jt1st].TrackingState == TrackingState.NotTracked || joints[jt2nd].TrackingState == TrackingState.NotTracked)
                 {
                     continue;
                 }
-                else if (joint0TS == TrackingState.Tracked && joint1TS == TrackingState.Tracked)
+                else if (joints[jt1st].TrackingState == TrackingState.Tracked && joints[jt2nd].TrackingState == TrackingState.Tracked)
                 {
-                    this.DrawBone(jointPt0, jointPt1, dc, bonePen);
+                    this.DrawBone(joints[jt1st].Point, joints[jt2nd].Point, dc, skeletonColor);
                 }
                 else
                 {
-                    this.DrawBone(jointPt0, jointPt1, dc, TrackingUI.inferredBonePen);
+                    this.DrawBone(joints[jt1st].Point, joints[jt2nd].Point, dc, Colors.INFERRED_BONE_PEN);
                 }
             }
             // Draw joints
-            foreach (Tuple<Point, TrackingState> joint in joints.Values)
+            foreach (DrawableJoint joint in joints.Values)
             {
-                Point coordinate = joint.Item1;
-                TrackingState trackingState = joint.Item2;
-                if (trackingState == TrackingState.NotTracked)
+                if (joint.TrackingState == TrackingState.NotTracked)
                 {
                     continue;
                 }
-                else if (trackingState == TrackingState.Tracked)
+                else if (joint.TrackingState == TrackingState.Tracked)
                 {
-                    this.DrawJoint(coordinate, dc, TrackingUI.trackedJointBrush, TrackingUI.jointThickness);
+                    this.DrawJoint(joint.Point, dc, Colors.TRACKED_JOINT_BRUSH, Colors.JOINT_THICKNESS);
                 }
-                else if (trackingState == TrackingState.Inferred)
+                else if (joint.TrackingState == TrackingState.Inferred)
                 {
-                    this.DrawJoint(coordinate, dc, TrackingUI.inferredJointBrush, TrackingUI.jointThickness);
+                    this.DrawJoint(joint.Point, dc, Colors.INFERRED_JOINT_BRUSH, Colors.JOINT_THICKNESS);
                 }
             }
         }
