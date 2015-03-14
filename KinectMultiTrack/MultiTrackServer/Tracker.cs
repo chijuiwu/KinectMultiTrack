@@ -77,6 +77,7 @@ namespace KinectMultiTrack
             }
             if (this.KinectsMeetCalibrationRequirement())
             {
+                Debug.WriteLine("Before calibration", "Tracker");
                 this.OnCalibration();
                 this.kinectClients.Values.ToList<KinectClient>().ForEach(kinect => kinect.Calibrate());
                 this.systemCalibrated = true;
@@ -94,7 +95,7 @@ namespace KinectMultiTrack
             this.OnRecalibration();
         }
 
-        public TrackerResult SynchronizeTracking(IPEndPoint source, SBodyFrame frame)
+        public void SynchronizeTracking(IPEndPoint source, SBodyFrame frame)
         {
             // Put this code elsewhere
             if (!this.kinectClients.ContainsKey(source))
@@ -116,7 +117,7 @@ namespace KinectMultiTrack
                 {
                     if (this.ContainsSamePeople(source, frame))
                     {
-                        this.kinectClients[source].StoreFrame(frame);
+                        this.kinectClients[source].UpdateFrame(frame);
                     }
                     else
                     {
@@ -124,7 +125,11 @@ namespace KinectMultiTrack
                         this.currentResult = TrackerResult.Empty;
                     }
                 }
-                return this.currentResult;
+                else
+                {
+                    this.kinectClients[source].AddCalibrationFrame(frame);
+                }
+                this.OnResult(this.currentResult);
             }
         }
 

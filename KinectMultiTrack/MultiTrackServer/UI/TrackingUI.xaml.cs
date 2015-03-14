@@ -56,7 +56,6 @@ namespace KinectMultiTrack.UI
         private static readonly Pen inferredBonePen = new Pen(Brushes.Gray, 1);
         private static readonly Pen averageBonePen = new Pen(Brushes.White, 6);
 
-        private bool setupCompleted = false;
         public event TrackingUISetupHandler OnSetup;
         public delegate void TrackingUISetupHandler(int kinectCount, bool studyOn, int userStudyId, int userSenario, int kinectConfiguration);
         public event TrackingUIHandler OnStartStop;
@@ -66,7 +65,7 @@ namespace KinectMultiTrack.UI
         private static readonly string INITIALIZED = "Initialized";
         private static readonly string WAITING_KINECT = "Waiting for Kinects";
         private static readonly string CALIBRATING = "Calibrating";
-        private static readonly string RECALIBRATING = "Recalibrating";
+        private static readonly string RECALIBRATING = "Confused!! Recalibrating";
 
         public TrackingUI()
         {
@@ -138,15 +137,6 @@ namespace KinectMultiTrack.UI
             }));
         }
 
-
-        public ImageSource TrackingViewSource
-        {
-            get
-            {
-                return this.trackingViewSource;
-            }
-        }
-
         private void TrackingUI_Loaded(object sender, RoutedEventArgs e)
         {
             this.ShowProgressText(TrackingUI.UNINITIALIZED);
@@ -157,6 +147,14 @@ namespace KinectMultiTrack.UI
             this.OnStartStop(false);
         }
 
+        public ImageSource TrackingViewSource
+        {
+            get
+            {
+                return this.trackingViewSource;
+            }
+        }
+
         private void SetupBtn_Click(object sender, RoutedEventArgs e)
         {
             SetupDialog setup = new SetupDialog();
@@ -165,22 +163,20 @@ namespace KinectMultiTrack.UI
             if (setup.DialogResult.HasValue && setup.DialogResult.Value)
             {
                 this.OnSetup(setup.Kinect_Count, setup.User_Study_On, setup.User_Study_Id, setup.User_Scenario, setup.Kinect_Configuration);
-                this.setupCompleted = true;
-
                 this.StartBtn.IsEnabled = true;
+                this.ShowProgressText(TrackingUI.INITIALIZED);
             }
         }
 
         private void StartBtn_Click(object sender, RoutedEventArgs e)
         {
             this.OnStartStop(true);
-            this.ShowProgressText(TrackingUI.WAITING_KINECT);
-
             this.SetupBtn.IsEnabled = false;
             this.StopBtn.IsEnabled = true;
             this.RecalibrateBtn.IsEnabled = true;
             this.KinectFOVBtn.IsEnabled = true;
             this.ViewModeBtn.IsEnabled = true;
+            this.ShowProgressText(TrackingUI.WAITING_KINECT);
         }
 
         private void StopBtn_Click(object sender, RoutedEventArgs e)

@@ -29,7 +29,7 @@ namespace KinectMultiTrack
         public bool Calibrated { get; private set; }
         public KinectClient.Specification CameraSpecification { get; private set; }
         private readonly List<TrackingSkeleton> skeletonsList;
-        private readonly Stack<SBodyFrame> uncalibratedFrames;
+        private readonly Stack<SBodyFrame> calibrationFrames;
 
         public IEnumerable<TrackingSkeleton> Skeletons
         {
@@ -43,7 +43,7 @@ namespace KinectMultiTrack
         {
             get
             {
-                return this.uncalibratedFrames.Count;
+                return this.calibrationFrames.Count;
             }
         }
 
@@ -56,59 +56,59 @@ namespace KinectMultiTrack
             this.CameraSpecification.Height = height;
             this.CameraSpecification.TiltAngle = tiltAngle;
             this.skeletonsList = new List<TrackingSkeleton>();
-            this.uncalibratedFrames = new Stack<SBodyFrame>();
+            this.calibrationFrames = new Stack<SBodyFrame>();
         }
 
-        public void StoreFrame(SBodyFrame bodyFrame)
+        public void AddCalibrationFrame(SBodyFrame frame)
         {
-            if (!this.Calibrated)
+            this.calibrationFrames.Push(frame);
+        }
+
+        public void UpdateFrame(SBodyFrame frame)
+        {
+            List<ulong> unclaimedTrackedIds = new List<ulong>();
+            List<TrackingSkeleton> unclaimedTrackedSkeletons = new List<TrackingSkeleton>();
+            foreach (SBody body in frame.Bodies)
             {
-                this.uncalibratedFrames.Push(bodyFrame);
-            }
-            else
-            {
-                List<ulong> unclaimedTrackedIds = new List<ulong>();
-                List<TrackingSkeleton> unclaimedTrackedSkeletons = new List<TrackingSkeleton>();
-                foreach (SBody body in bodyFrame.Bodies)
+                ulong trackingId = body.TrackingId;
+                TrackingSkeleton skeleton = this.skeletonsList.Find(x => x.TrackingId == trackingId);
+                if (skeleton != null)
                 {
-                    ulong trackingId = body.TrackingId;
-                    TrackingSkeleton skeleton = this.skeletonsList.Find(x => x.TrackingId == trackingId);
-                    if (skeleton != null)
-                    {
-                        skeleton.UpdatePosition(bodyFrame.TimeStamp, body);
-                    }
-                    else
-                    {
-                        unclaimedTrackedIds.Add(trackingId);
-                        unclaimedTrackedSkeletons.Add(skeleton);
-                    }
+                    skeleton.UpdatePosition(frame.TimeStamp, body);
                 }
-                foreach (TrackingSkeleton skeleton in unclaimedTrackedSkeletons)
+                else
                 {
-                    if (unclaimedTrackedIds.Count > 0)
-                    {
-                        ulong unclaimedId = unclaimedTrackedIds.First();
-                        SBody unclaimedBody = bodyFrame.Bodies.Find(x => x.TrackingId == unclaimedId);
-                        unclaimedTrackedIds.Remove(unclaimedId);
-                        skeleton.UpdatePosition(bodyFrame.TimeStamp, unclaimedBody);
-                    }
+                    unclaimedTrackedIds.Add(trackingId);
+                    unclaimedTrackedSkeletons.Add(skeleton);
+                }
+            }
+
+            // TODO: make it better
+            foreach (TrackingSkeleton skeleton in unclaimedTrackedSkeletons)
+            {
+                if (unclaimedTrackedIds.Count > 0)
+                {
+                    ulong unclaimedId = unclaimedTrackedIds.First();
+                    SBody unclaimedBody = frame.Bodies.Find(x => x.TrackingId == unclaimedId);
+                    unclaimedTrackedIds.Remove(unclaimedId);
+                    skeleton.UpdatePosition(frame.TimeStamp, unclaimedBody);
                 }
             }
         }
 
         public void Calibrate()
         {
-            SBodyFrame[] calibrationFrames = new SBodyFrame[Tracker.MIN_CALIBRATION_FRAMES];
+            SBodyFrame[] selectedFrames = new SBodyFrame[Tracker.MIN_CALIBRATION_FRAMES];
             // Add from back to front
             uint calibrationFramesToAdd = Tracker.MIN_CALIBRATION_FRAMES;
             while (calibrationFramesToAdd > 0)
             {
-                calibrationFrames[--calibrationFramesToAdd] = this.uncalibratedFrames.Pop();
+                selectedFrames[--calibrationFramesToAdd] = this.calibrationFrames.Pop();
             }
 
             // Use the last frame body as reference
-            int frameNthIdx = calibrationFrames.Length-1;
-            SBodyFrame frameNth = calibrationFrames[frameNthIdx];
+            int frameNthIdx = selectedFrames.Length-1;
+            SBodyFrame frameNth = selectedFrames[frameNthIdx];
 
             this.CameraSpecification.DepthFrameWidth = frameNth.DepthFrameWidth;
             this.CameraSpecification.DepthFrameHeight = frameNth.DepthFrameHeight;
@@ -116,7 +116,7 @@ namespace KinectMultiTrack
             // Coordinate calibration
             for (int personIdx = 0; personIdx < frameNth.Bodies.Count; personIdx++)
             {
-                SBody currentBody = calibrationFrames[frameNthIdx].Bodies[personIdx];
+                SBody currentBody = selectedFrames[frameNthIdx].Bodies[personIdx];
                 ulong trackingId = currentBody.TrackingId;
                 long timestamp = frameNth.TimeStamp;
                 
@@ -125,11 +125,11 @@ namespace KinectMultiTrack
                 
                 // initial center position = average of previous positions in frames where that person exists
                 List<SBody> positionsList = new List<SBody>();
-                for (int frameIdx = 0; frameIdx < calibrationFrames.Length; frameIdx++)
+                for (int frameIdx = 0; frameIdx < selectedFrames.Length; frameIdx++)
                 {
-                    if (calibrationFrames[frameIdx].Bodies.Count > personIdx)
+                    if (selectedFrames[frameIdx].Bodies.Count > personIdx)
                     {
-                        positionsList.Add(calibrationFrames[frameIdx].Bodies[personIdx]);
+                        positionsList.Add(selectedFrames[frameIdx].Bodies[personIdx]);
                     }
                 }
                 WCoordinate initCenterPos = WBody.GetInitialCenterPosition(positionsList);
@@ -141,7 +141,7 @@ namespace KinectMultiTrack
 
         public void PrepareRecalibration()
         {
-            this.uncalibratedFrames.Clear();
+            this.calibrationFrames.Clear();
             this.skeletonsList.Clear();
             this.Calibrated = false;
         }

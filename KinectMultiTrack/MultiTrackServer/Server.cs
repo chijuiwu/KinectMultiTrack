@@ -28,16 +28,11 @@ namespace KinectMultiTrack
         private readonly Stopwatch flushLogStopwatch;
 
         private readonly Tracker tracker;
-        private MultipleKinectUI multipleKinectUI;
-        // main UI
         private TrackingUI trackingUI;
 
         public event KinectCameraHandler OnAddedKinect;
         public event KinectCameraHandler OnRemovedKinect;
         public delegate void KinectCameraHandler(IPEndPoint kinectClientIP);
-
-        public event WorldViewHandler OnNewTrackerResult;
-        public delegate void WorldViewHandler(TrackerResult result);
 
         public Server(int port)
         {
@@ -65,8 +60,8 @@ namespace KinectMultiTrack
 
         private void Stop()
         {
-            this.serverThread.Abort();
             this.serverKinectTCPListener.Stop();
+            this.serverThread.Abort();
             this.writeLogStopwatch.Stop();
             this.flushLogStopwatch.Stop();
             Logger.Flush();
