@@ -64,13 +64,13 @@
             </Grid.ColumnDefinitions>
 
             <Border Background="Black" >
-                <Viewbox x:Name="TrackingUIViewBox" Grid.Column="0" HorizontalAlignment="Center">
-                    <Image Source="{Binding TrackingViewSource}" Stretch="UniformToFill" />
+                <Viewbox x:Name="TrackingUI_Viewbox" Grid.Column="0" HorizontalAlignment="Center">
+                    <Image Source="{Binding TrackingUI_Viewsource}" Stretch="UniformToFill" />
                 </Viewbox>
 
             </Border>
-            <Viewbox x:Name="TrackingUIViewBox2" Grid.Column="1" HorizontalAlignment="Center">
-                <Image Source="{Binding TrackingViewSource}" Stretch="UniformToFill" />
+            <Viewbox x:Name="MultipleUI_Viewbox" Grid.Column="1" HorizontalAlignment="Center">
+                <Image Source="{Binding MultipleUI_Viewsource}" Stretch="UniformToFill" />
             </Viewbox>
         </Grid>
     </Grid>

@@ -30,14 +30,16 @@ namespace KinectMultiTrack.UI
         private string currentReferenceKinectIP;
         private enum ViewMode
         {
-            Skeletons,
+            All,
             Average,
-            All
+            Skeletons,
         };
         private ViewMode currentViewMode;
 
-        private DrawingGroup trackingDrawingGroup;
-        private DrawingImage trackingViewSource;
+        private DrawingGroup trackingUIDrawingGroup;
+        private DrawingImage trackingUIViewSource;
+        private DrawingGroup multipleUIDrawingGroup;
+        private DrawingImage multipleUIViewSource;
         private double displayWidth, displayHeight;
 
         private KinectSensor kinectSensor;
@@ -69,15 +71,17 @@ namespace KinectMultiTrack.UI
 
         public TrackingUI()
         {
-            InitializeComponent();
+            this.InitializeComponent();
             this.DataContext = this;
 
             this.referenceKinectIPs = new Dictionary<string, MenuItem>();
             this.currentReferenceKinectIP = "";
             this.currentViewMode = ViewMode.All;
             
-            this.trackingDrawingGroup = new DrawingGroup();
-            this.trackingViewSource = new DrawingImage(this.trackingDrawingGroup);
+            this.trackingUIDrawingGroup = new DrawingGroup();
+            this.trackingUIViewSource = new DrawingImage(this.trackingUIDrawingGroup);
+            this.multipleUIDrawingGroup = new DrawingGroup();
+            this.multipleUIViewSource = new DrawingImage(this.multipleUIDrawingGroup);
 
             this.kinectSensor = KinectSensor.GetDefault();
             this.kinectSensor.Open();
@@ -147,14 +151,6 @@ namespace KinectMultiTrack.UI
             this.OnStartStop(false);
         }
 
-        public ImageSource TrackingViewSource
-        {
-            get
-            {
-                return this.trackingViewSource;
-            }
-        }
-
         private void SetupBtn_Click(object sender, RoutedEventArgs e)
         {
             SetupDialog setup = new SetupDialog();
@@ -190,17 +186,29 @@ namespace KinectMultiTrack.UI
         }
         private void ShowProgressText(string text)
         {
-            using (DrawingContext dc = this.trackingDrawingGroup.Open())
+            using (DrawingContext dc = this.trackingUIDrawingGroup.Open())
             {
                 dc.DrawText(new FormattedText(text, CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Verdana"), 20, Brushes.White), new Point(0, 0));
             }
         }
 
-        public void ProcessTrackerResult(TrackerResult result)
+        #region UI viewing bindings Important!!!
+        public ImageSource TrackingUI_Viewsource
         {
-            //    this.trackingDrawingGroup.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)(() => { DisplayBodyFrames(result); }));
-            
+            get
+            {
+                return this.trackingUIViewSource;
+            }
         }
+
+        public ImageSource MultipleUI_Viewsource
+        {
+            get
+            {
+                return this.multipleUIViewSource;
+            }
+        }
+        #endregion
 
         private TrackerResult.KinectFOV GetReferenceKinectFOV(IEnumerable<TrackerResult.KinectFOV> fovs)
         {
@@ -222,9 +230,9 @@ namespace KinectMultiTrack.UI
                 return;
             }
 
-            this.displayWidth = this.TrackingUIViewBox.ActualWidth;
-            this.displayHeight = this.TrackingUIViewBox.ActualHeight;
-            using (DrawingContext dc = this.trackingDrawingGroup.Open())
+            this.displayWidth = this.TrackingUI_Viewbox.ActualWidth;
+            this.displayHeight = this.TrackingUI_Viewbox.ActualHeight;
+            using (DrawingContext dc = this.trackingUIDrawingGroup.Open())
             {
                 this.DrawBackground(TrackingUI.backgroundBrush, displayWidth, displayHeight, dc);
             }
@@ -235,7 +243,7 @@ namespace KinectMultiTrack.UI
             int frameWidth = referenceFOV.Specification.DepthFrameWidth;
             int frameHeight = referenceFOV.Specification.DepthFrameHeight;
 
-            using (DrawingContext dc = this.trackingDrawingGroup.Open())
+            using (DrawingContext dc = this.trackingUIDrawingGroup.Open())
             {
                 this.DrawBackground(TrackingUI.backgroundBrush, displayWidth, displayHeight, dc);
                 int personIdx = 0;
@@ -268,7 +276,7 @@ namespace KinectMultiTrack.UI
                     }
                 }
             }
-            this.DrawClipRegion(frameWidth, frameHeight, this.trackingDrawingGroup);
+            this.DrawClipRegion(frameWidth, frameHeight, this.trackingUIDrawingGroup);
         }
 
         private void DrawSkeletons(IEnumerable<KinectBody> bodies, DrawingContext dc, Pen trackedBonePen)
