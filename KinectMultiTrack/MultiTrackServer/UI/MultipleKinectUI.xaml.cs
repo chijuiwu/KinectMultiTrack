@@ -16,7 +16,6 @@ using KinectSerializer;
 using Microsoft.Kinect;
 using System.Net;
 using System.Diagnostics;
-using SkeletonVis = KinectMultiTrack.UI.SkeletonVisualizer;
 
 namespace KinectMultiTrack.UI
 {

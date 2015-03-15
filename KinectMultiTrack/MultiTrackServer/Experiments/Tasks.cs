@@ -24,13 +24,15 @@ namespace KinectMultiTrack.Experiments
         // Occlusion
         public static string GO_AROUND_OCCLUSION = "Go Around the Occlusion Object";
 
-        // Done
+        // Instruction
+        public static string READY = "Ready";
         public static string DONE = "Done!!!";
 
         public const int STATIONARY_DURATION_SEC = 5;
 
         public static readonly List<string> WALK_WEI = new List<string>()
         {
+            Tasks.READY,
             Tasks.FORWARD,
             Tasks.LEFT,
             Tasks.RIGHT,
@@ -44,6 +46,7 @@ namespace KinectMultiTrack.Experiments
 
         public static readonly List<string> WALK_CURRENT = new List<string>()
         {
+            Tasks.READY,
             Tasks.START_POSITION,
             Tasks.CIRCLE,
             Tasks.DONE
@@ -51,18 +54,21 @@ namespace KinectMultiTrack.Experiments
 
         public static readonly List<string> INTERACTION_1 = new List<string>()
         {
+            Tasks.READY,
             Tasks.PERSON_1_WALK,
             Tasks.DONE
         };
 
         public static readonly List<string> INTERACTION_2 = new List<string>()
         {
+            Tasks.READY,
             Tasks.PERSONS_WALK,
             Tasks.DONE
         };
 
         public static readonly List<string> OCCLUSION_1 = new List<string>()
         {
+            Tasks.READY,
             Tasks.GO_AROUND_OCCLUSION,
             Tasks.DONE
         };

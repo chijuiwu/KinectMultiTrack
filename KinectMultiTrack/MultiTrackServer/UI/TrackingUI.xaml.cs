@@ -18,7 +18,6 @@ using KinectSerializer;
 using Microsoft.Kinect;
 using System.Diagnostics;
 using System.Net;
-using SkeletonVis = KinectMultiTrack.UI.SkeletonVisualizer;
 using KinectMultiTrack.WorldView;
 using System.Globalization;
 
@@ -53,6 +52,7 @@ namespace KinectMultiTrack.UI
 
         private bool studyOn;
         private int userScenario;
+        private List<string> userTasks;
 
         private static readonly string UNINITIALIZED = "Uninitialized";
         private static readonly string INITIALIZED = "Initialized";
@@ -231,17 +231,17 @@ namespace KinectMultiTrack.UI
             if (this.studyOn)
             {
                 this.RefreshCurrentTask();
+                this.OnDisplayResult(this.userScenario, result);
             }
             else
             {
                 this.RefreshMultipleUI(result);
             }
-            this.OnDisplayResult(this.userScenario, result);
         }
 
         private void RefreshCurrentTask()
         {
-            throw new NotImplementedException();
+            //if (this.userScenario ==)
         }
 
         private TrackerResult.KinectFOV UpdateReferenceKinectFOV(IEnumerable<TrackerResult.KinectFOV> fovs)

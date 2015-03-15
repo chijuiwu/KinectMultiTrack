@@ -92,7 +92,6 @@
     <Compile Include="UI\SetupDialog.xaml.cs">
       <DependentUpon>SetupDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\SkeletonVisualizer.cs" />
     <Compile Include="UI\TrackingUI.xaml.cs">
       <DependentUpon>TrackingUI.xaml</DependentUpon>
     </Compile>
