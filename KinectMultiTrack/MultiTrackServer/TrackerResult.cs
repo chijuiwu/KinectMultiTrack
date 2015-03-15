@@ -28,6 +28,7 @@ namespace KinectMultiTrack
                 }
             }
         }
+
         public int DepthFrameHeight
         {
             get

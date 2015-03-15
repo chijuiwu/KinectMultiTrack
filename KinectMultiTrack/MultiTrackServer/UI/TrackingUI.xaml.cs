@@ -49,9 +49,12 @@ namespace KinectMultiTrack.UI
         public event TrackingUIHandler OnStartStop;
         public delegate void TrackingUIHandler(bool start);
 
+        private bool studyOn;
+
         private static readonly string UNINITIALIZED = "Uninitialized";
         private static readonly string INITIALIZED = "Initialized";
         private static readonly string WAITING_KINECT = "Waiting for Kinects";
+        private static readonly string CALIBRATION_FORMAT = "{0}\n{1} frames remaining";
         private static readonly string CALIBRATING = "Calibrating";
         private static readonly string RECALIBRATING = "Confused!! Recalibrating";
 
@@ -72,6 +75,8 @@ namespace KinectMultiTrack.UI
             this.kinectSensor = KinectSensor.GetDefault();
             this.kinectSensor.Open();
             this.coordinateMapper = this.kinectSensor.CoordinateMapper;
+
+            this.studyOn = false;
 
             this.Closing += this.TrackingUI_Closing;
         }
@@ -111,15 +116,15 @@ namespace KinectMultiTrack.UI
             }));
         }
 
-        public void Tracker_OnCalibration()
+        public void Tracker_OnCalibration(int framesRemaining)
         {
             this.Dispatcher.Invoke((Action)(() =>
             {
-                this.ShowProgressText(TrackingUI.CALIBRATING);
+                this.ShowProgressText(TrackingUI.CALIBRATION_FORMATTrackingUI.CALIBRATING);
             }));
         }
 
-        public void Tracker_OnReCalibration()
+        public void Tracker_OnReCalibration(int framesRemaining)
         {
             this.Dispatcher.Invoke((Action)(() =>
             {
@@ -144,20 +149,21 @@ namespace KinectMultiTrack.UI
             setup.ShowDialog();
             if (setup.DialogResult.HasValue && setup.DialogResult.Value)
             {
-                this.OnSetup(setup.Kinect_Count, setup.User_Study_On, setup.User_Study_Id, setup.User_Scenario, setup.Kinect_Configuration);
+                this.studyOn = setup.User_Study_On;
                 this.StartBtn.IsEnabled = true;
+                this.OnSetup(setup.Kinect_Count, setup.User_Study_On, setup.User_Study_Id, setup.User_Scenario, setup.Kinect_Configuration);
                 this.ShowProgressText(TrackingUI.INITIALIZED);
             }
         }
 
         private void StartBtn_Click(object sender, RoutedEventArgs e)
         {
-            this.OnStartStop(true);
             this.SetupBtn.IsEnabled = false;
             this.StopBtn.IsEnabled = true;
             this.RecalibrateBtn.IsEnabled = true;
             this.KinectFOVBtn.IsEnabled = true;
             this.ViewModeBtn.IsEnabled = true;
+            this.OnStartStop(true);
             this.ShowProgressText(TrackingUI.WAITING_KINECT);
         }
 
@@ -218,7 +224,13 @@ namespace KinectMultiTrack.UI
                 return;
             }
             this.RefreshTrackingUI(result);
-            //this.RefreshMultipleUI(result);
+            if (this.studyOn)
+            {
+            }
+            else
+            {
+                this.RefreshMultipleUI(result);
+            }
         }
 
         private void RefreshTrackingUI(TrackerResult result)
@@ -226,13 +238,14 @@ namespace KinectMultiTrack.UI
             double trackingUIWidth = this.TrackingUI_Viewbox.ActualWidth;
             double trackingUIHeight = this.TrackingUI_Viewbox.ActualHeight;
 
+            int frameWidth = result.DepthFrameWidth;
+            int frameHeight = result.DepthFrameHeight;
+
             TrackerResult.KinectFOV referenceFOV = this.UpdateReferenceKinectFOV(result.FOVs);
-            int frameWidth = referenceFOV.Specification.DepthFrameWidth;
-            int frameHeight = referenceFOV.Specification.DepthFrameHeight;
 
             using (DrawingContext dc = this.trackingUIDrawingGroup.Open())
             {
-                this.DrawBackground(Colors.BACKGROUND_BRUSH, trackingUIWidth, trackingUIHeight, dc);
+                this.DrawBackground(Colors.BACKGROUND_TRACKING, trackingUIWidth, trackingUIHeight, dc);
 
                 int personIdx = 0;
                 foreach (TrackerResult.Person person in result.People)
@@ -242,6 +255,7 @@ namespace KinectMultiTrack.UI
                     List<KinectBody> bodies = new List<KinectBody>();
                     foreach (TrackerResult.PotentialSkeleton pSkeleton in person.PotentialSkeletons)
                     {
+                        this.DrawClippedEdges(pSkeleton.Skeleton.CurrentPosition.Kinect, frameWidth, frameHeight, dc);
                         bodies.Add(WBody.TransformWorldToKinectBody(pSkeleton.Skeleton.CurrentPosition.Worldview, refSkeleton.InitialAngle, refSkeleton.InitialCenterPosition));
                     }
 
@@ -252,11 +266,11 @@ namespace KinectMultiTrack.UI
                     }
                     if (this.currentViewMode == ViewMode.Average || this.currentViewMode == ViewMode.All)
                     {
-                        this.DrawSkeletons(new List<KinectBody>() { KinectBody.GetAverageBody(bodies) }, dc, Colors.AVG_BONE_PEN);
+                        this.DrawSkeletons(new List<KinectBody>() { KinectBody.GetAverageBody(bodies) }, dc, Colors.AVG_BONE);
                     }
                 }
+                this.DrawClipRegion(frameWidth, frameHeight, this.trackingUIDrawingGroup);
             }
-            //this.DrawClipRegion(frameWidth, frameHeight, this.trackingUIDrawingGroup);
         }
 
         private void RefreshMultipleUI(TrackerResult result)
@@ -269,7 +283,7 @@ namespace KinectMultiTrack.UI
 
             using (DrawingContext dc = this.multipleUIDrawingGroup.Open())
             {
-                this.DrawBackground(Colors.BACKGROUND_BRUSH, multipleUIWidth, multipleUIHeight, dc);
+                this.DrawBackground(Colors.BACKGROUND_MULTIPLE, multipleUIWidth, multipleUIHeight, dc);
 
                 int personIdx = 0;
                 foreach (TrackerResult.Person person in result.People)
@@ -287,8 +301,8 @@ namespace KinectMultiTrack.UI
                         this.DrawBody(jointPts, dc, skeletonColor);
                     }
                 }
+                this.DrawClipRegion(frameWidth, frameHeight, this.multipleUIDrawingGroup);
             }
-            //this.DrawClipRegion(frameWidth, frameHeight, this.multipleUIDrawingGroup);
         }
 
         private void DrawBackground(Brush color, double width, double height, DrawingContext dc)
@@ -299,6 +313,43 @@ namespace KinectMultiTrack.UI
         private void DrawClipRegion(int frameWidth, int frameHeight, DrawingGroup dg)
         {
             dg.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, frameWidth, frameHeight));
+        }
+
+        private void DrawClippedEdges(SBody body, int frameWidth, int frameHeight, DrawingContext dc)
+        {
+            FrameEdges clippedEdges = body.ClippedEdges;
+
+            if (clippedEdges.HasFlag(FrameEdges.Bottom))
+            {
+                dc.DrawRectangle(
+                    Brushes.Red,
+                    null,
+                    new Rect(0, frameHeight - Colors.CLIP_BOUNDS_THICKNESS, frameWidth, Colors.CLIP_BOUNDS_THICKNESS));
+            }
+
+            if (clippedEdges.HasFlag(FrameEdges.Top))
+            {
+                dc.DrawRectangle(
+                    Brushes.Red,
+                    null,
+                    new Rect(0, 0, frameWidth, Colors.CLIP_BOUNDS_THICKNESS));
+            }
+
+            if (clippedEdges.HasFlag(FrameEdges.Left))
+            {
+                dc.DrawRectangle(
+                    Brushes.Red,
+                    null,
+                    new Rect(0, 0, Colors.CLIP_BOUNDS_THICKNESS, frameHeight));
+            }
+
+            if (clippedEdges.HasFlag(FrameEdges.Right))
+            {
+                dc.DrawRectangle(
+                    Brushes.Red,
+                    null,
+                    new Rect(frameWidth - Colors.CLIP_BOUNDS_THICKNESS, 0, Colors.CLIP_BOUNDS_THICKNESS, frameHeight));
+            }
         }
 
         private void DrawSkeletons(IEnumerable<KinectBody> bodies, DrawingContext dc, Pen skeletonColor)
@@ -341,7 +392,7 @@ namespace KinectMultiTrack.UI
                 }
                 else
                 {
-                    this.DrawBone(joints[jt1st].Point, joints[jt2nd].Point, dc, Colors.INFERRED_BONE_PEN);
+                    this.DrawBone(joints[jt1st].Point, joints[jt2nd].Point, dc, Colors.INFERRED_BONE);
                 }
             }
             // Draw joints
@@ -353,11 +404,11 @@ namespace KinectMultiTrack.UI
                 }
                 else if (joint.TrackingState == TrackingState.Tracked)
                 {
-                    this.DrawJoint(joint.Point, dc, Colors.TRACKED_JOINT_BRUSH, Colors.JOINT_THICKNESS);
+                    this.DrawJoint(joint.Point, dc, Colors.TRACKED_JOINT, Colors.JOINT_THICKNESS);
                 }
                 else if (joint.TrackingState == TrackingState.Inferred)
                 {
-                    this.DrawJoint(joint.Point, dc, Colors.INFERRED_JOINT_BRUSH, Colors.JOINT_THICKNESS);
+                    this.DrawJoint(joint.Point, dc, Colors.INFERRED_JOINT, Colors.JOINT_THICKNESS);
                 }
             }
         }

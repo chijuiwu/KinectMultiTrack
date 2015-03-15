@@ -26,7 +26,7 @@ namespace KinectMultiTrack
         private TrackerResult currentResult;
 
         public event TrackerEventHandler OnCalibration, OnRecalibration;
-        public delegate void TrackerEventHandler();
+        public delegate void TrackerEventHandler(int framesRemaining);
         public event TrackerResultHandler OnResult;
         public delegate void TrackerResultHandler(TrackerResult result);
 
@@ -68,20 +68,27 @@ namespace KinectMultiTrack
             }
         }
 
-        // TODO: take the last frame after calibration and start tracking
+        private int GetCalibrationFramesRemaining()
+        {
+            throw new NotImplementedException();
+        }
+
+        // TODO: Handle unexpected behaviour during calibration
         private void TryCalibration()
         {
             if (this.systemCalibrated)
             {
                 return;
             }
+            if (this.kinectClients.Count == this.expectedKinectsCount)
+            {
+                int numberOfFramesRemaining = this.GetCalibrationFramesRemaining();
+                this.OnCalibration(numberOfFramesRemaining);
+            }
             if (this.KinectsMeetCalibrationRequirement())
             {
-                Debug.WriteLine("Before calibration", "Tracker");
-                this.OnCalibration();
                 this.kinectClients.Values.ToList<KinectClient>().ForEach(kinect => kinect.Calibrate());
                 this.systemCalibrated = true;
-                Debug.WriteLine("Calibration done!!", "Tracker");
             }
         }
 

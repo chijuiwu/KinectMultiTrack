@@ -21,16 +21,19 @@ namespace KinectMultiTrack.UI
         };
 
         // Background
-        public static readonly Brush BACKGROUND_BRUSH = Brushes.Black;
+        public static readonly Brush BACKGROUND_TRACKING = Brushes.Black;
+        public static readonly Brush BACKGROUND_MULTIPLE = Brushes.DarkGray;
+
+        // ClippedEdges
+        public const double CLIP_BOUNDS_THICKNESS = 5;
 
         // Joints
         public const double JOINT_THICKNESS = 3;
-        public static readonly Brush TRACKED_JOINT_BRUSH = new SolidColorBrush(Color.FromArgb(255, 68, 192, 68));
-        public static readonly Brush INFERRED_JOINT_BRUSH = Brushes.Yellow;
+        public static readonly Brush TRACKED_JOINT = new SolidColorBrush(Color.FromArgb(255, 68, 192, 68));
+        public static readonly Brush INFERRED_JOINT = Brushes.Yellow;
 
         // Bones
-        public static readonly Pen TRACKED_BONE_PEN = new Pen(Brushes.Blue, 6);
-        public static readonly Pen INFERRED_BONE_PEN = new Pen(Brushes.Gray, 1);
-        public static readonly Pen AVG_BONE_PEN = new Pen(Brushes.White, 6);
+        public static readonly Pen INFERRED_BONE = new Pen(Brushes.LightBlue, 1);
+        public static readonly Pen AVG_BONE = new Pen(Brushes.White, 6);
     }
 }

@@ -170,7 +170,7 @@ namespace MultiTrackClient
                         if (body.IsTracked)
                         {
                             // serialize KinectBody
-                            SBody serializableBody = new SBody(true, body.TrackingId);
+                            SBody serializableBody = new SBody(true, body.TrackingId, body.ClippedEdges);
 
                             this.DrawClippedEdges(body, dc);
 
