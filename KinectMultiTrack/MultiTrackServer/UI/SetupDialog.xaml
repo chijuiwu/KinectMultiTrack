@@ -63,12 +63,12 @@
 
                 <StackPanel x:Name="User_Scenario_Panel" Margin="10,10,10,11" Grid.Column="1" >
                     <Label Content="Scenario" HorizontalAlignment="Left" FontSize="16" FontFamily="Microsoft Sans Serif" Margin="10,10,0,0"></Label>
-                    <RadioButton IsEnabled="False" x:Name="User_Scenario_All" Content="All"  GroupName="User_Scenario" IsChecked="True" FontSize="14" FontFamily="Microsoft Sans Serif" Margin="10,0,0,0" />
+                    <RadioButton IsEnabled="False" x:Name="User_Scenario_First_3" Content="First 3"  GroupName="User_Scenario" IsChecked="True" FontSize="14" FontFamily="Microsoft Sans Serif" Margin="10,0,0,0" />
                     <RadioButton IsEnabled="False" x:Name="User_Scenario_Stationary" Content="Stationary" GroupName="User_Scenario" FontSize="14" FontFamily="Microsoft Sans Serif" Margin="10,0,0,0" />
                     <RadioButton IsEnabled="False" x:Name="User_Scenario_Walk_Wei" Content="Walk (Wei et al)" GroupName="User_Scenario" FontSize="14" FontFamily="Microsoft Sans Serif" Margin="10,0,0,0" />
                     <RadioButton IsEnabled="False" x:Name="User_Scenario_Walk_Current" Content="Walk (Current)" GroupName="User_Scenario" FontSize="14" FontFamily="Microsoft Sans Serif" Margin="10,0,0,0" />
-                    <RadioButton IsEnabled="False" x:Name="User_Scenario_Move_1" Content="Move 1" GroupName="User_Scenario" FontSize="14" FontFamily="Microsoft Sans Serif" Margin="10,0,0,0" />
-                    <RadioButton IsEnabled="False" x:Name="User_Scenario_Move_2" Content="Move 2" GroupName="User_Scenario" FontSize="14" FontFamily="Microsoft Sans Serif" Margin="10,0,0,0" />
+                    <RadioButton IsEnabled="False" x:Name="User_Scenario_Interaction_1" Content="Interaction 1" GroupName="User_Scenario" FontSize="14" FontFamily="Microsoft Sans Serif" Margin="10,0,0,0" />
+                    <RadioButton IsEnabled="False" x:Name="User_Scenario_Interaction_2" Content="Interaction 2" GroupName="User_Scenario" FontSize="14" FontFamily="Microsoft Sans Serif" Margin="10,0,0,0" />
                     <RadioButton IsEnabled="False" x:Name="User_Scenario_Occlusion_1" Content="Occlusion 1" GroupName="User_Scenario" FontSize="14" FontFamily="Microsoft Sans Serif" Margin="10,0,0,0" />
                     <Button x:Name="cancelBtn" HorizontalAlignment="Left" Content="Cancel" IsDefault="True" FontSize="20" FontFamily="Microsoft Sans Serif" Margin="10,70,0,0" Width="100" Height="50" IsCancel="True" FontWeight="Bold" VerticalAlignment="Center"/>
                 </StackPanel>

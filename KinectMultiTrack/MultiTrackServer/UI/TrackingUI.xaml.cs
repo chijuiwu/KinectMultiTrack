@@ -48,8 +48,11 @@ namespace KinectMultiTrack.UI
         public delegate void TrackingUISetupHandler(int kinectCount, bool studyOn, int userStudyId, int userSenario, int kinectConfiguration);
         public event TrackingUIHandler OnStartStop;
         public delegate void TrackingUIHandler(bool start);
+        public event TrackingUIUpdateHandler OnDisplayResult;
+        public delegate void TrackingUIUpdateHandler(int userScenario, TrackerResult result);
 
         private bool studyOn;
+        private int userScenario;
 
         private static readonly string UNINITIALIZED = "Uninitialized";
         private static readonly string INITIALIZED = "Initialized";
@@ -157,6 +160,7 @@ namespace KinectMultiTrack.UI
             if (setup.DialogResult.HasValue && setup.DialogResult.Value)
             {
                 this.studyOn = setup.User_Study_On;
+                this.userScenario = setup.User_Scenario;
                 this.StartBtn.IsEnabled = true;
                 this.OnSetup(setup.Kinect_Count, setup.User_Study_On, setup.User_Study_Id, setup.User_Scenario, setup.Kinect_Configuration);
                 this.ShowProgressText(TrackingUI.INITIALIZED);
@@ -217,6 +221,29 @@ namespace KinectMultiTrack.UI
         }
         #endregion
 
+        private void DisplayBodyFrames(TrackerResult result)
+        {
+            if (result.Equals(TrackerResult.Empty))
+            {
+                return;
+            }
+            this.RefreshTrackingUI(result);
+            if (this.studyOn)
+            {
+                this.RefreshCurrentTask();
+            }
+            else
+            {
+                this.RefreshMultipleUI(result);
+            }
+            this.OnDisplayResult(this.userScenario, result);
+        }
+
+        private void RefreshCurrentTask()
+        {
+            throw new NotImplementedException();
+        }
+
         private TrackerResult.KinectFOV UpdateReferenceKinectFOV(IEnumerable<TrackerResult.KinectFOV> fovs)
         {
             TrackerResult.KinectFOV referenceFOV = fovs.First();
@@ -230,22 +257,6 @@ namespace KinectMultiTrack.UI
             }
             this.currentReferenceKinectIP = referenceFOV.ClientIP.ToString();
             return referenceFOV;
-        }
-
-        private void DisplayBodyFrames(TrackerResult result)
-        {
-            if (result.Equals(TrackerResult.Empty))
-            {
-                return;
-            }
-            this.RefreshTrackingUI(result);
-            if (this.studyOn)
-            {
-            }
-            else
-            {
-                this.RefreshMultipleUI(result);
-            }
         }
 
         private void RefreshTrackingUI(TrackerResult result)

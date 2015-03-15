@@ -20,7 +20,7 @@ namespace KinectMultiTrack
         // 4 Seconds
         public const uint MIN_CALIBRATION_FRAMES = 120;
         public const uint MIN_CALIBRATION_FRAMES_STORED = MIN_CALIBRATION_FRAMES * 3;
-        private readonly object syncFrameLock = new object();
+        private readonly object syncTrackLock = new object();
         private bool systemCalibrated;
 
         private readonly ConcurrentDictionary<IPEndPoint, KinectClient> kinectClients;
@@ -123,7 +123,7 @@ namespace KinectMultiTrack
                 // Pass in height and tilt angle
                 this.kinectClients[source] = new KinectClient((uint)this.kinectClients.Count, source, 0.0, 0.0);
             }
-            lock (this.syncFrameLock)
+            lock (this.syncTrackLock)
             {
                 if (!this.systemCalibrated)
                 {

@@ -16,13 +16,13 @@ namespace KinectMultiTrack
     {
         public static readonly int NA = -9999;
 
-        public static readonly int SCENARIO_ALL = 0;
+        public static readonly int SCENARIO_FIRST_3 = 0; // Placeholder
         public static readonly int SCENARIO_STATIONARY = 1;
         public static readonly int SCENARIO_WALK_WEI = 2;
         public static readonly int SCENARIO_WALK_CURRENT = 3;
-        public static readonly int SCENARIO_MOVE_1 = 4;
-        public static readonly int SCENARIO_MOVE_2 = 5;
-        public static readonly int SCENARIO_OCCLUSION = 6;
+        public static readonly int SCENARIO_INTERACTION_1 = 4;
+        public static readonly int SCENARIO_INTERACTION_2 = 5;
+        public static readonly int SCENARIO_OCCLUSION_1 = 6;
 
         public static readonly int KINECT_PARALLEL = 0;
         public static readonly int KINECT_RIGHT_45 = 1;
@@ -52,10 +52,10 @@ namespace KinectMultiTrack
 
         private static readonly string DATA_DIR = "..\\..\\..\\..\\Data\\";
         private static readonly string DATA_FILENAME_FORMAT = "Study_{0}_Kinect{1}_Scenario_{2}.csv";
-        private static readonly List<string> HEADERS_RAW = Logger.GetHeaders();
-        private static readonly StreamWriter WRITER_RAW = Logger.OpenFileWriter(Logger.DATA_DIR, Logger.HEADERS_RAW);
+        private static readonly List<string> HEADERS = Logger.GetHeaders();
+        private static readonly StreamWriter WRITER = Logger.OpenFileWriter(Logger.DATA_DIR, Logger.HEADERS);
 
-        private static readonly object WRITE_LOCK = new object();
+        private static readonly object syncLogLock = new object();
 
         private static List<string> GetHeaders()
         {
@@ -118,10 +118,11 @@ namespace KinectMultiTrack
             }
         }
 
-        public static void Write(TrackerResult result)
+        public static void SynchronizeLogging(int userScenario, TrackerResult result)
         {
-            lock (WRITE_LOCK)
-            {   
+            lock (Logger.syncLogLock)
+            {
+                Logger.CURRENT_USER_SCENARIO = userScenario;
                 foreach (TrackerResult.Person person in result.People)
                 {
                     TrackerResult.PotentialSkeleton reference = TrackerResult.GetLocalSkeletonReference(person);
@@ -133,9 +134,9 @@ namespace KinectMultiTrack
                         KinectBody body = WBody.TransformWorldToKinectBody(skeleton.Skeleton.CurrentPosition.Worldview, referenceAngle, referencePosition);
                         skeletonCoordinates.Add(Tuple.Create(skeleton, body.Joints));
                     }
-                    // Raw
-                    Logger.WriteData(Logger.WRITER_RAW, result.Timestamp, person.Id, skeletonCoordinates);
+                    Logger.WriteData(Logger.WRITER, result.Timestamp, person.Id, skeletonCoordinates);
                 }
+                Logger.Flush();
             }
         }
 
@@ -176,12 +177,12 @@ namespace KinectMultiTrack
 
         public static void Flush()
         {
-            Logger.WRITER_RAW.Flush();
+            Logger.WRITER.Flush();
         }
 
         public static void Close()
         {
-            Logger.WRITER_RAW.Close();
+            Logger.WRITER.Close();
         }
     }
 }

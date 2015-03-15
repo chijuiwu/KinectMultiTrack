@@ -75,6 +75,7 @@ namespace KinectMultiTrack
 
             this.trackingUI.OnSetup += this.ConfigureServer;
             this.trackingUI.OnStartStop += this.StartStopServer;
+            this.trackingUI.OnDisplayResult += this.Log;
 
             this.OnAddedKinect += this.trackingUI.Server_AddKinectCamera;
             this.OnRemovedKinect += this.trackingUI.Server_RemoveKinectCamera;
@@ -82,7 +83,6 @@ namespace KinectMultiTrack
             this.tracker.OnCalibration += this.trackingUI.Tracker_OnCalibration;
             this.tracker.OnRecalibration += this.trackingUI.Tracker_OnReCalibration;
             this.tracker.OnResult += this.trackingUI.Tracker_OnResult;
-            this.tracker.OnResult += this.SynchronizeLogging;
 
             Dispatcher.Run();
         }
@@ -93,7 +93,6 @@ namespace KinectMultiTrack
             this.loggingOn = studyOn;
             Logger.CURRENT_STUDY_ID = userStudyId;
             Logger.CURRENT_KINECT_CONFIGURATION = kinectConfiguration;
-            Logger.CURRENT_USER_SCENARIO = userSenario;
         }
 
         private void StartStopServer(bool start)
@@ -143,8 +142,7 @@ namespace KinectMultiTrack
                     while (!clientStream.DataAvailable) ;
 
                     SBodyFrame bodyFrame = BodyFrameSerializer.Deserialize(clientStream);
-                    Thread processFrameThread = new Thread(()=>this.tracker.SynchronizeTracking(clientIP, bodyFrame));
-                    processFrameThread.Start();
+                    this.Track(clientIP, bodyFrame);
 
                     // Response content is trivial
                     byte[] response = Encoding.ASCII.GetBytes(Properties.Resources.SERVER_RESPONSE_OKAY);
@@ -166,15 +164,16 @@ namespace KinectMultiTrack
             client.Close();
         }
 
-        private void SynchronizeLogging(TrackerResult result)
+        private void Track(IPEndPoint clientIP, SBodyFrame bodyFrame)
         {
-            //if (this.loggingOn && this.writeLogStopwatch.ElapsedMilliseconds > this.writeLogInterval)
-            //{
-            //    Thread writeLogThread = new Thread(() => TLogger.Write(result));
-            //    writeLogThread.Start();
-            //    this.writeLogStopwatch.Restart();
-            //}
-            //this.TrackingUIUpdate += this.trackingUI.ProcessTrackerResult;
+            Thread track = new Thread(() => this.tracker.SynchronizeTracking(clientIP, bodyFrame));
+            track.Start();
+        }
+
+        private void Log(int userScenario, TrackerResult result)
+        {
+            Thread log = new Thread(() => Logger.SynchronizeLogging(userScenario, result));
+            log.Start();
         }
     }
 }

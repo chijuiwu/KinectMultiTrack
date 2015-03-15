@@ -31,18 +31,18 @@ namespace KinectMultiTrack.UI
 
         public SetupDialog()
         {
-            InitializeComponent();
+            this.InitializeComponent();
 
             // Set up user scenarios with ids from the Logger
             this.userScenariosDict = new Dictionary<RadioButton, int>()
             {
-                {this.User_Scenario_All, Logger.SCENARIO_ALL},
+                {this.User_Scenario_First_3, Logger.SCENARIO_FIRST_3},
                 {this.User_Scenario_Stationary, Logger.SCENARIO_STATIONARY},
                 {this.User_Scenario_Walk_Wei, Logger.SCENARIO_WALK_WEI},
                 {this.User_Scenario_Walk_Current, Logger.SCENARIO_WALK_CURRENT},
-                {this.User_Scenario_Move_1, Logger.SCENARIO_MOVE_1},
-                {this.User_Scenario_Move_2, Logger.SCENARIO_MOVE_2},
-                {this.User_Scenario_Occlusion_1, Logger.SCENARIO_OCCLUSION}
+                {this.User_Scenario_Interaction_1, Logger.SCENARIO_INTERACTION_1},
+                {this.User_Scenario_Interaction_2, Logger.SCENARIO_INTERACTION_2},
+                {this.User_Scenario_Occlusion_1, Logger.SCENARIO_OCCLUSION_1}
             };
 
             // Set up Kinect configurations with ids from the Logger
