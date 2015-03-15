@@ -216,6 +216,7 @@ namespace KinectMultiTrack.UI
         {
             using (DrawingContext dc = this.trackingUIDrawingGroup.Open())
             {
+                TextBlock textBlock = new TextBlock();
                 FormattedText txt = new FormattedText(text, CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Verdana"), 20, Brushes.White);
                 txt.TextAlignment = TextAlignment.Center;
                 dc.DrawText(txt, new Point(0, 0));
@@ -249,6 +250,7 @@ namespace KinectMultiTrack.UI
             }
             if (e.Key == Key.Down)
             {
+                Debug.WriteLine("key down");
                 this.ShowNextTask();
             }
         }
@@ -256,17 +258,16 @@ namespace KinectMultiTrack.UI
         private void ShowNextTask()
         {
             string nextTask = this.userScenario.Tasks.ElementAt(this.currentTaskIdx);
-            using (DrawingContext dc = this.multipleUIDrawingGroup.Open())
-            {
-                FormattedText txt = new FormattedText(nextTask, CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Verdana"), 20, Brushes.Black);
-                //txt.TextAlignment = TextAlignment.Center;
-                dc.DrawText(txt, new Point(0, 0));
-            }
-            if (this.currentTaskIdx == (this.userScenario.Tasks.Count() - 1))
-            {
-                this.currentTaskIdx = 0;
-            }
-            else
+            Grid textGrid = new Grid();
+            textGrid.Width = 100;
+            TextBlock textBlock = new TextBlock();
+            textBlock.Text = nextTask;
+            textBlock.TextAlignment = TextAlignment.Center;
+            textBlock.HorizontalAlignment = HorizontalAlignment.Center;
+            textBlock.VerticalAlignment = VerticalAlignment.Center;
+            textGrid.Children.Add(textBlock);
+            this.MultipleUI_Viewbox.Child = textGrid;
+            if (this.currentTaskIdx < (this.userScenario.Tasks.Count() - 1))
             {
                 this.currentTaskIdx++;
             }

@@ -100,19 +100,11 @@
     <Compile Include="Tracker.cs" />
     <Compile Include="WorldView\WorldCoordinate.cs" />
     <Compile Include="WorldView\WorldJoint.cs" />
-    <Page Include="UI\MultipleKinectUI.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Server.cs" />
-    <Compile Include="UI\MultipleKinectUI.xaml.cs">
-      <DependentUpon>MultipleKinectUI.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
     <Page Include="UI\SetupDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
