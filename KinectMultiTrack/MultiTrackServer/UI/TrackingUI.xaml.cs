@@ -53,10 +53,9 @@ namespace KinectMultiTrack.UI
 
         private static readonly string UNINITIALIZED = "Uninitialized";
         private static readonly string INITIALIZED = "Initialized";
-        private static readonly string WAITING_KINECT = "Waiting for Kinects";
-        private static readonly string CALIBRATION_FORMAT = "{0}\n{1} frames remaining";
-        private static readonly string CALIBRATING = "Calibrating";
-        private static readonly string RECALIBRATING = "Confused!! Recalibrating";
+        private static readonly string KINECT_FORMAT = "Waiting for Kinects...{0}";
+        private static readonly string CALIBRATION_FORMAT = "Calibrating...\n{0} frames remaining";
+        private static readonly string RE_CALIBRATION_FORMAT = "Confused!!! Recalibrating...\n{0}";
 
         public TrackingUI()
         {
@@ -108,27 +107,35 @@ namespace KinectMultiTrack.UI
             }));
         }
 
+        public void Tracker_OnWaitingKinects(int kinects)
+        {
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                this.ShowProgressText(String.Format(TrackingUI.KINECT_FORMAT, kinects));
+            }));
+        }
+
+        public void Tracker_OnCalibration(uint framesRemaining)
+        {
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                this.ShowProgressText(String.Format(TrackingUI.CALIBRATION_FORMAT, framesRemaining));
+            }));
+        }
+
+        public void Tracker_OnReCalibration(string msg)
+        {
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                this.ShowProgressText(String.Format(TrackingUI.RE_CALIBRATION_FORMAT, msg));
+            }));
+        }
+
         public void Tracker_OnResult(TrackerResult result)
         {
             this.Dispatcher.Invoke((Action)(() =>
             {
                 this.DisplayBodyFrames(result);
-            }));
-        }
-
-        public void Tracker_OnCalibration(int framesRemaining)
-        {
-            this.Dispatcher.Invoke((Action)(() =>
-            {
-                this.ShowProgressText(TrackingUI.CALIBRATION_FORMATTrackingUI.CALIBRATING);
-            }));
-        }
-
-        public void Tracker_OnReCalibration(int framesRemaining)
-        {
-            this.Dispatcher.Invoke((Action)(() =>
-            {
-                this.ShowProgressText(TrackingUI.RECALIBRATING);
             }));
         }
 
@@ -164,23 +171,31 @@ namespace KinectMultiTrack.UI
             this.KinectFOVBtn.IsEnabled = true;
             this.ViewModeBtn.IsEnabled = true;
             this.OnStartStop(true);
-            this.ShowProgressText(TrackingUI.WAITING_KINECT);
         }
 
         private void StopBtn_Click(object sender, RoutedEventArgs e)
         {
-
+            this.SetupBtn.IsEnabled = true;
+            this.StartBtn.IsEnabled = true;
+            this.StopBtn.IsEnabled = false;
+            this.RecalibrateBtn.IsEnabled = false;
+            this.KinectFOVBtn.IsEnabled = false;
+            this.ViewModeBtn.IsEnabled = false;
+            this.OnStartStop(false);
         }
 
         private void RecalibrateBtn_Click(object sender, RoutedEventArgs e)
         {
 
         }
+
         private void ShowProgressText(string text)
         {
             using (DrawingContext dc = this.trackingUIDrawingGroup.Open())
             {
-                dc.DrawText(new FormattedText(text, CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Verdana"), 20, Brushes.White), new Point(0, 0));
+                FormattedText txt = new FormattedText(text, CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Verdana"), 20, Brushes.White);
+                txt.TextAlignment = TextAlignment.Center;
+                dc.DrawText(txt, new Point(0, 0));
             }
         }
 

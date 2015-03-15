@@ -78,12 +78,11 @@ namespace KinectMultiTrack
 
             this.OnAddedKinect += this.trackingUI.Server_AddKinectCamera;
             this.OnRemovedKinect += this.trackingUI.Server_RemoveKinectCamera;
-            
-            this.tracker.OnResult += this.trackingUI.Tracker_OnResult;
-            this.tracker.OnResult += this.SynchronizeLogging;
-            //this.tracker.OnResult += Logger.Tracker_OnResult;
+            this.tracker.OnWaitingKinects += this.trackingUI.Tracker_OnWaitingKinects;
             this.tracker.OnCalibration += this.trackingUI.Tracker_OnCalibration;
             this.tracker.OnRecalibration += this.trackingUI.Tracker_OnReCalibration;
+            this.tracker.OnResult += this.trackingUI.Tracker_OnResult;
+            this.tracker.OnResult += this.SynchronizeLogging;
 
             Dispatcher.Run();
         }

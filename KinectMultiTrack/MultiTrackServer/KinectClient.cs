@@ -28,22 +28,22 @@ namespace KinectMultiTrack
         public IPEndPoint IP { get; private set; }
         public bool Calibrated { get; private set; }
         public KinectClient.Specification CameraSpecification { get; private set; }
-        private readonly List<TrackingSkeleton> skeletonsList;
-        private readonly Stack<SBodyFrame> calibrationFrames;
+        public readonly List<TrackingSkeleton> skeletonsList { get; private set; }
+        public readonly Stack<SBodyFrame> CalibrationFrames { get; private set; }
+        public readonly SBodyFrame FirstCalibrationFrame { get; private set; }
 
-        public IEnumerable<TrackingSkeleton> Skeletons
+        public int CurrentSkeletonCount
         {
             get
             {
-                return this.skeletonsList;
-            }
-        }
-
-        public int UncalibratedFramesCount
-        {
-            get
-            {
-                return this.calibrationFrames.Count;
+                if (this.Calibrated)
+                {
+                    return this.skeletonsList.Count;
+                }
+                else
+                {
+                    return this.CalibrationFrames.Count > 0 ? this.CalibrationFrames.Peek().Bodies.Count : 0;
+                }
             }
         }
 
@@ -56,16 +56,20 @@ namespace KinectMultiTrack
             this.CameraSpecification.Height = height;
             this.CameraSpecification.TiltAngle = tiltAngle;
             this.skeletonsList = new List<TrackingSkeleton>();
-            this.calibrationFrames = new Stack<SBodyFrame>();
-        }
-
-        public void AddCalibrationFrame(SBodyFrame frame)
-        {
-            this.calibrationFrames.Push(frame);
+            this.CalibrationFrames = new Stack<SBodyFrame>();
         }
 
         public void UpdateFrame(SBodyFrame frame)
         {
+            if (!this.Calibrated)
+            {
+                if (frame.Bodies.Count > 0)
+                {
+                    this.CalibrationFrames.Push(frame);
+                }
+                return;
+            }
+
             List<ulong> unclaimedTrackedIds = new List<ulong>();
             List<TrackingSkeleton> unclaimedTrackedSkeletons = new List<TrackingSkeleton>();
             foreach (SBody body in frame.Bodies)
@@ -103,7 +107,7 @@ namespace KinectMultiTrack
             uint calibrationFramesToAdd = Tracker.MIN_CALIBRATION_FRAMES;
             while (calibrationFramesToAdd > 0)
             {
-                selectedFrames[--calibrationFramesToAdd] = this.calibrationFrames.Pop();
+                selectedFrames[--calibrationFramesToAdd] = this.CalibrationFrames.Pop();
             }
 
             // Use the last frame body as reference
@@ -141,7 +145,7 @@ namespace KinectMultiTrack
 
         public void PrepareRecalibration()
         {
-            this.calibrationFrames.Clear();
+            this.CalibrationFrames.Clear();
             this.skeletonsList.Clear();
             this.Calibrated = false;
         }

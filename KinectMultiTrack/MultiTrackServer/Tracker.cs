@@ -15,9 +15,11 @@ namespace KinectMultiTrack
 {
     public class Tracker
     {
+        // TODO: allow dynamically adding new kinects
         private int expectedKinectsCount;
         // 4 Seconds
         public const uint MIN_CALIBRATION_FRAMES = 120;
+        public const uint MIN_CALIBRATION_FRAMES_STORED = MIN_CALIBRATION_FRAMES * 3;
         private readonly object syncFrameLock = new object();
         private bool systemCalibrated;
 
@@ -25,8 +27,12 @@ namespace KinectMultiTrack
 
         private TrackerResult currentResult;
 
-        public event TrackerEventHandler OnCalibration, OnRecalibration;
-        public delegate void TrackerEventHandler(int framesRemaining);
+        public event TrackerKinectHandler OnWaitingKinects;
+        public delegate void TrackerKinectHandler(int kinects);
+        public event TrackerCalibrationHandler OnCalibration;
+        public delegate void TrackerCalibrationHandler(uint framesRemaining);
+        public event TrackerRecalibrationHandler OnRecalibration;
+        public delegate void TrackerRecalibrationHandler(string msg);
         public event TrackerResultHandler OnResult;
         public delegate void TrackerResultHandler(TrackerResult result);
 
@@ -48,32 +54,37 @@ namespace KinectMultiTrack
             this.kinectClients.TryRemove(clientIP, out kinect);
         }
 
+        private uint GetCalibrationFramesRemaining()
+        {
+            uint mostFramesRequired = UInt32.MinValue;
+            foreach (KinectClient kinect in this.kinectClients.Values)
+            {
+                uint kinectRemainingFrames = Tracker.MIN_CALIBRATION_FRAMES_STORED - kinect.UncalibratedFramesCount;
+                if (kinectRemainingFrames > mostFramesRequired)
+                {
+                    mostFramesRequired = kinectRemainingFrames;
+                }
+            }
+            return mostFramesRequired;
+        }
+
+        private int GetKinectsRemaining()
+        {
+            return this.expectedKinectsCount - this.kinectClients.Count;
+        }
+
         private bool KinectsMeetCalibrationRequirement()
         {
-            if (this.kinectClients.Count == this.expectedKinectsCount)
+            foreach (KinectClient kinect in this.kinectClients.Values)
             {
-                foreach (KinectClient kinect in this.kinectClients.Values)
+                if (kinect.UncalibratedFramesCount < Tracker.MIN_CALIBRATION_FRAMES_STORED)
                 {
-                    // TODO: Remove HACK!!! Instead, show progress bar
-                    if (kinect.UncalibratedFramesCount < Tracker.MIN_CALIBRATION_FRAMES*3)
-                    {
-                        return false;
-                    }
+                    return false;
                 }
-                return true;
             }
-            else
-            {
-                return false;
-            }
+            return true;
         }
 
-        private int GetCalibrationFramesRemaining()
-        {
-            throw new NotImplementedException();
-        }
-
-        // TODO: Handle unexpected behaviour during calibration
         private void TryCalibration()
         {
             if (this.systemCalibrated)
@@ -82,13 +93,16 @@ namespace KinectMultiTrack
             }
             if (this.kinectClients.Count == this.expectedKinectsCount)
             {
-                int numberOfFramesRemaining = this.GetCalibrationFramesRemaining();
-                this.OnCalibration(numberOfFramesRemaining);
+                this.OnCalibration(this.GetCalibrationFramesRemaining());
+                if (this.KinectsMeetCalibrationRequirement())
+                {
+                    this.kinectClients.Values.ToList<KinectClient>().ForEach(kinect => kinect.Calibrate());
+                    this.systemCalibrated = true;
+                }
             }
-            if (this.KinectsMeetCalibrationRequirement())
+            else
             {
-                this.kinectClients.Values.ToList<KinectClient>().ForEach(kinect => kinect.Calibrate());
-                this.systemCalibrated = true;
+                this.OnWaitingKinects(this.GetKinectsRemaining());
             }
         }
 
@@ -99,12 +113,11 @@ namespace KinectMultiTrack
             {
                 kinect.PrepareRecalibration();
             }
-            this.OnRecalibration();
+            this.OnRecalibration("");
         }
 
         public void SynchronizeTracking(IPEndPoint source, SBodyFrame frame)
         {
-            // Put this code elsewhere
             if (!this.kinectClients.ContainsKey(source))
             {
                 // Pass in height and tilt angle
@@ -120,30 +133,37 @@ namespace KinectMultiTrack
                         this.currentResult = this.PeopleDetection();
                     }
                 }
-                if (this.systemCalibrated)
+                if (this.ContainsExpectedMovements(source, frame))
                 {
-                    if (this.ContainsSamePeople(source, frame))
-                    {
-                        this.kinectClients[source].UpdateFrame(frame);
-                    }
-                    else
-                    {
-                        this.ReCalibration();
-                        this.currentResult = TrackerResult.Empty;
-                    }
+                    this.kinectClients[source].UpdateFrame(frame);
                 }
                 else
                 {
-                    this.kinectClients[source].AddCalibrationFrame(frame);
+                    this.ReCalibration();
+                    this.currentResult = TrackerResult.Empty;
                 }
-                this.OnResult(this.currentResult);
+                this.OnResult(TrackerResult.Copy(this.currentResult));
             }
         }
 
         // Assume same number equals same people
-        private bool ContainsSamePeople(IPEndPoint source, SBodyFrame frame)
+        // TODO: Handle unexpected behaviour during calibration
+        private bool ContainsExpectedMovements(IPEndPoint source, SBodyFrame frame)
         {
-            return frame.Bodies.Count() == this.kinectClients[source].Skeletons.Count();
+            if (this.kinectClients[source].CurrentSkeletonCount > 0)
+            {
+                bool sameBodies = frame.Bodies.Count() == this.kinectClients[source].CurrentSkeletonCount;
+                bool stationaryCalibration = true;
+                if (!this.systemCalibrated)
+                {
+                    //
+                }
+                return sameBodies && stationaryCalibration;
+            }
+            else
+            {
+                return true;
+            }
         }
 
         # region People Detection
