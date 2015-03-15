@@ -59,7 +59,7 @@ namespace KinectMultiTrack
             uint mostFramesRequired = UInt32.MinValue;
             foreach (KinectClient kinect in this.kinectClients.Values)
             {
-                uint kinectRemainingFrames = Tracker.MIN_CALIBRATION_FRAMES_STORED - kinect.UncalibratedFramesCount;
+                uint kinectRemainingFrames = (uint)(Tracker.MIN_CALIBRATION_FRAMES_STORED - kinect.CalibrationFrames.Count);
                 if (kinectRemainingFrames > mostFramesRequired)
                 {
                     mostFramesRequired = kinectRemainingFrames;
@@ -77,7 +77,7 @@ namespace KinectMultiTrack
         {
             foreach (KinectClient kinect in this.kinectClients.Values)
             {
-                if (kinect.UncalibratedFramesCount < Tracker.MIN_CALIBRATION_FRAMES_STORED)
+                if (kinect.CalibrationFrames.Count < Tracker.MIN_CALIBRATION_FRAMES_STORED)
                 {
                     return false;
                 }
@@ -146,8 +146,7 @@ namespace KinectMultiTrack
             }
         }
 
-        // Assume same number equals same people
-        // TODO: Handle unexpected behaviour during calibration
+        // TODO: Handle unexpected behaviour during calibration more elegantly
         private bool ContainsExpectedMovements(IPEndPoint source, SBodyFrame frame)
         {
             if (this.kinectClients[source].CurrentSkeletonCount > 0)
@@ -156,7 +155,19 @@ namespace KinectMultiTrack
                 bool stationaryCalibration = true;
                 if (!this.systemCalibrated)
                 {
-                    //
+                    SBodyFrame firstFrame = this.kinectClients[source].FirstCalibrationFrame;
+                    foreach (SBody body in firstFrame.Bodies)
+                    {
+                        SBody currentBody = frame.Bodies.Find(x => x.TrackingId == body.TrackingId);
+                        CameraSpacePoint firstHeadPt = body.Joints[JointType.Head].CameraSpacePoint;
+                        CameraSpacePoint currentHeadPt = body.Joints[JointType.Head].CameraSpacePoint;
+                        double difference = Math.Sqrt(Math.Pow(firstHeadPt.X - currentHeadPt.X, 2) + Math.Pow(firstHeadPt.Y - currentHeadPt.Y, 2) + Math.Pow(firstHeadPt.Z - currentHeadPt.Z, 2));
+                        if (difference > 0.1)
+                        {
+                            stationaryCalibration = false;
+                            break;
+                        }
+                    }
                 }
                 return sameBodies && stationaryCalibration;
             }
@@ -175,7 +186,8 @@ namespace KinectMultiTrack
             {
                 TrackerResult.KinectFOV fov = KinectClient.ExtractFOVInfo(kinect);
                 currentFOVsList.Add(fov);
-                foreach (TrackingSkeleton skeleton in kinect.Skeletons) {
+                foreach (TrackingSkeleton skeleton in kinect.skeletonsList)
+                {
                     currentSkeletonsList.Add(new TrackerResult.PotentialSkeleton(fov, skeleton));
                 }
             }
@@ -184,9 +196,11 @@ namespace KinectMultiTrack
             Debug.WriteLine("Skeletons: " + currentSkeletonsList.Count, "People Detection");
 
             List<TrackerResult.Person> trackedPeopleList = new List<TrackerResult.Person>();
-            while (true) {
+            while (true)
+            {
                 TrackerResult.Person person = this.FindPersonWithMultipleSkeletons(ref currentSkeletonsList);
-                if (person != null) {
+                if (person != null)
+                {
                     // Update person id!!
                     person.Id = (uint)trackedPeopleList.Count;
                     trackedPeopleList.Add(person);
@@ -200,7 +214,8 @@ namespace KinectMultiTrack
             Debug.WriteLine("Tracked people: " + trackedPeopleList.Count, "People Detection");
 
             // Add remaining skeletons as single-skeleton person
-            foreach (TrackerResult.PotentialSkeleton potentialSkeleton in currentSkeletonsList) {
+            foreach (TrackerResult.PotentialSkeleton potentialSkeleton in currentSkeletonsList)
+            {
                 // Update skeleton id!!
                 potentialSkeleton.Id = 0;
                 TrackerResult.Person person = new TrackerResult.Person(potentialSkeleton);

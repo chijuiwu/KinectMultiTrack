@@ -28,9 +28,9 @@ namespace KinectMultiTrack
         public IPEndPoint IP { get; private set; }
         public bool Calibrated { get; private set; }
         public KinectClient.Specification CameraSpecification { get; private set; }
-        public readonly List<TrackingSkeleton> skeletonsList { get; private set; }
-        public readonly Stack<SBodyFrame> CalibrationFrames { get; private set; }
-        public readonly SBodyFrame FirstCalibrationFrame { get; private set; }
+        public List<TrackingSkeleton> skeletonsList { get; private set; }
+        public Stack<SBodyFrame> CalibrationFrames { get; private set; }
+        public SBodyFrame FirstCalibrationFrame { get; private set; }
 
         public int CurrentSkeletonCount
         {
@@ -65,6 +65,10 @@ namespace KinectMultiTrack
             {
                 if (frame.Bodies.Count > 0)
                 {
+                    if (this.CalibrationFrames.Count == 0)
+                    {
+                        this.FirstCalibrationFrame = frame;
+                    }
                     this.CalibrationFrames.Push(frame);
                 }
                 return;
@@ -146,6 +150,7 @@ namespace KinectMultiTrack
         public void PrepareRecalibration()
         {
             this.CalibrationFrames.Clear();
+            this.FirstCalibrationFrame = null;
             this.skeletonsList.Clear();
             this.Calibrated = false;
         }
