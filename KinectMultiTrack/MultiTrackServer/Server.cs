@@ -21,7 +21,6 @@ namespace KinectMultiTrack
         private const uint SEC_IN_MILLISEC = 1000;
         private const uint FRAME_IN_SEC = 60;
 
-        private bool loggingOn;
         private const uint WRITE_LOG_INTERVAL = 1 / 4 * SEC_IN_MILLISEC;
         private const uint FLUSH_LOG_INTERVAL = 3 * SEC_IN_MILLISEC;
         private readonly Stopwatch writeLogStopwatch;
@@ -87,12 +86,9 @@ namespace KinectMultiTrack
             Dispatcher.Run();
         }
 
-        private void ConfigureServer(int kinectCount, bool studyOn, int userStudyId, int userSenario, int kinectConfiguration)
+        private void ConfigureServer(int kinectCount)
         {
             this.tracker.Configure(kinectCount);
-            this.loggingOn = studyOn;
-            Logger.CURRENT_STUDY_ID = userStudyId;
-            Logger.CURRENT_KINECT_CONFIGURATION = kinectConfiguration;
         }
 
         private void StartStopServer(bool start)

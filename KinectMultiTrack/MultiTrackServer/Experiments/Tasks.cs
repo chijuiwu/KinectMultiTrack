@@ -9,20 +9,23 @@ namespace KinectMultiTrack.Experiments
 
     public class Tasks {
 
+        // Stand
+        public static string STAND_STILL = "Stand still";
+
         // Walk
         public static string LEFT = "Move Left";
         public static string RIGHT = "Move Right";
         public static string BACKWARD = "Move Backward";
         public static string FORWARD = "Move Forward";
-        public static string START_POSITION = "Move to Starting Position";
-        public static string CIRCLE = "Go Around the Circle(Clockwise)";
+        public static string START_POSITION = "Move to the\nStarting Position";
+        public static string CIRCLE = "Go Around the\nCircle (Clockwise)";
 
         // Interaction
-        public static string PERSON_1_WALK = "Person 1 Walk Past Person 2";
-        public static string PERSONS_WALK = "Two People Walk Past Each Other";
+        public static string PERSON_1_WALK = "Person 1\nWalk Past Person2";
+        public static string PERSONS_WALK = "Two People\nWalk Past Each Other";
 
         // Occlusion
-        public static string GO_AROUND_OCCLUSION = "Go Around the Occlusion Object";
+        public static string GO_AROUND_OCCLUSION = "Go Around the\nOcclusion Object";
 
         // Instruction
         public static string READY = "Ready";
@@ -30,7 +33,16 @@ namespace KinectMultiTrack.Experiments
 
         public const int STATIONARY_DURATION_SEC = 5;
 
-        public static readonly List<string> WALK_WEI = new List<string>()
+        public static readonly IEnumerable<string> EMPTY = new List<string>();
+
+        public static readonly IEnumerable<string> STATIONARY = new List<string>()
+        {
+            Tasks.READY,
+            Tasks.STAND_STILL,
+            Tasks.DONE
+        };
+
+        public static readonly IEnumerable<string> WALK_WEI = new List<string>()
         {
             Tasks.READY,
             Tasks.FORWARD,
@@ -44,7 +56,7 @@ namespace KinectMultiTrack.Experiments
             Tasks.DONE
         };
 
-        public static readonly List<string> WALK_CURRENT = new List<string>()
+        public static readonly IEnumerable<string> WALK_CURRENT = new List<string>()
         {
             Tasks.READY,
             Tasks.START_POSITION,
@@ -52,21 +64,23 @@ namespace KinectMultiTrack.Experiments
             Tasks.DONE
         };
 
-        public static readonly List<string> INTERACTION_1 = new List<string>()
+        public static readonly IEnumerable<string> FIRST_3 = Tasks.STATIONARY.Union(Tasks.WALK_WEI).Union(Tasks.WALK_CURRENT);
+
+        public static readonly IEnumerable<string> INTERACTION_1 = new List<string>()
         {
             Tasks.READY,
             Tasks.PERSON_1_WALK,
             Tasks.DONE
         };
 
-        public static readonly List<string> INTERACTION_2 = new List<string>()
+        public static readonly IEnumerable<string> INTERACTION_2 = new List<string>()
         {
             Tasks.READY,
             Tasks.PERSONS_WALK,
             Tasks.DONE
         };
 
-        public static readonly List<string> OCCLUSION_1 = new List<string>()
+        public static readonly IEnumerable<string> OCCLUSION_1 = new List<string>()
         {
             Tasks.READY,
             Tasks.GO_AROUND_OCCLUSION,

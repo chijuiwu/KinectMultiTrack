@@ -45,15 +45,16 @@ namespace KinectMultiTrack.UI
         private CoordinateMapper coordinateMapper;
 
         public event TrackingUISetupHandler OnSetup;
-        public delegate void TrackingUISetupHandler(int kinectCount, bool studyOn, int userStudyId, int userSenario, int kinectConfiguration);
+        public delegate void TrackingUISetupHandler(int kinectCount);
         public event TrackingUIHandler OnStartStop;
         public delegate void TrackingUIHandler(bool start);
         public event TrackingUIUpdateHandler OnDisplayResult;
         public delegate void TrackingUIUpdateHandler(int userScenario, TrackerResult result);
 
         private bool studyOn;
-        private int userScenario;
-        private List<string> userTasks;
+        private SetupDialog.UserScenario userScenario;
+        private int currentScenarioId;
+        private int currentTaskIdx;
 
         private static readonly string UNINITIALIZED = "Uninitialized";
         private static readonly string INITIALIZED = "Initialized";
@@ -70,7 +71,7 @@ namespace KinectMultiTrack.UI
             this.referenceKinectIPs = new Dictionary<string, MenuItem>();
             this.currentReferenceKinectIP = "";
             this.currentViewMode = ViewMode.All;
-            
+
             this.trackingUIDrawingGroup = new DrawingGroup();
             this.trackingUIViewSource = new DrawingImage(this.trackingUIDrawingGroup);
             this.multipleUIDrawingGroup = new DrawingGroup();
@@ -163,9 +164,21 @@ namespace KinectMultiTrack.UI
             {
                 this.studyOn = setup.User_Study_On;
                 this.userScenario = setup.User_Scenario;
+                // Just a hack
+                if (this.userScenario.ScenarioId == Logger.SCENARIO_FIRST_3)
+                {
+                    this.currentScenarioId = Logger.SCENARIO_STATIONARY;
+                }
+                else
+                {
+                    this.currentScenarioId = this.userScenario.ScenarioId;
+                }
+                this.currentTaskIdx = 0;
                 this.StartBtn.IsEnabled = true;
-                this.OnSetup(setup.Kinect_Count, setup.User_Study_On, setup.User_Study_Id, setup.User_Scenario, setup.Kinect_Configuration);
+                this.OnSetup(setup.Kinect_Count);
                 this.ShowProgressText(TrackingUI.INITIALIZED);
+                Logger.CURRENT_STUDY_ID = setup.User_Study_Id;
+                Logger.CURRENT_KINECT_CONFIGURATION = setup.Kinect_Configuration;
             }
         }
 
@@ -227,15 +240,33 @@ namespace KinectMultiTrack.UI
         #region keyup
         private void TrackingUI_OnKeyUp(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter)
+            if (!this.studyOn)
             {
-                Debug.WriteLine("enter");
+                return;
+            }
+            if (e.Key == Key.Down)
+            {
+                this.ShowNextTask();
             }
         }
 
-        private void RefreshCurrentTask()
+        private void ShowNextTask()
         {
-            //if (this.userScenario ==)
+            string nextTask = this.userScenario.Tasks.ElementAt(this.currentTaskIdx);
+            using (DrawingContext dc = this.multipleUIDrawingGroup.Open())
+            {
+                FormattedText txt = new FormattedText(nextTask, CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Verdana"), 20, Brushes.Black);
+                //txt.TextAlignment = TextAlignment.Center;
+                dc.DrawText(txt, new Point(0, 0));
+            }
+            if (this.currentTaskIdx == (this.userScenario.Tasks.Count() - 1))
+            {
+                this.currentTaskIdx = 0;
+            }
+            else
+            {
+                this.currentTaskIdx++;
+            }
         }
         #endregion
 
@@ -248,7 +279,7 @@ namespace KinectMultiTrack.UI
             this.RefreshTrackingUI(result);
             if (this.studyOn)
             {
-                this.OnDisplayResult(this.userScenario, result);
+                this.OnDisplayResult(this.currentScenarioId, result);
             }
             else
             {
@@ -359,34 +390,22 @@ namespace KinectMultiTrack.UI
 
             if (clippedEdges.HasFlag(FrameEdges.Bottom))
             {
-                dc.DrawRectangle(
-                    Brushes.Red,
-                    null,
-                    new Rect(0, frameHeight - Colors.CLIP_BOUNDS_THICKNESS, frameWidth, Colors.CLIP_BOUNDS_THICKNESS));
+                dc.DrawRectangle(Colors.CLIPPED_EDGES, null, new Rect(0, frameHeight - Colors.CLIP_BOUNDS_THICKNESS, frameWidth, Colors.CLIP_BOUNDS_THICKNESS));
             }
 
             if (clippedEdges.HasFlag(FrameEdges.Top))
             {
-                dc.DrawRectangle(
-                    Brushes.Red,
-                    null,
-                    new Rect(0, 0, frameWidth, Colors.CLIP_BOUNDS_THICKNESS));
+                dc.DrawRectangle(Colors.CLIPPED_EDGES, null, new Rect(0, 0, frameWidth, Colors.CLIP_BOUNDS_THICKNESS));
             }
 
             if (clippedEdges.HasFlag(FrameEdges.Left))
             {
-                dc.DrawRectangle(
-                    Brushes.Red,
-                    null,
-                    new Rect(0, 0, Colors.CLIP_BOUNDS_THICKNESS, frameHeight));
+                dc.DrawRectangle(Colors.CLIPPED_EDGES, null, new Rect(0, 0, Colors.CLIP_BOUNDS_THICKNESS, frameHeight));
             }
 
             if (clippedEdges.HasFlag(FrameEdges.Right))
             {
-                dc.DrawRectangle(
-                    Brushes.Red,
-                    null,
-                    new Rect(frameWidth - Colors.CLIP_BOUNDS_THICKNESS, 0, Colors.CLIP_BOUNDS_THICKNESS, frameHeight));
+                dc.DrawRectangle(Colors.CLIPPED_EDGES, null, new Rect(frameWidth - Colors.CLIP_BOUNDS_THICKNESS, 0, Colors.CLIP_BOUNDS_THICKNESS, frameHeight));
             }
         }
 

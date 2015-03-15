@@ -26,6 +26,7 @@ namespace KinectMultiTrack.UI
 
         // ClippedEdges
         public const double CLIP_BOUNDS_THICKNESS = 5;
+        public static readonly Brush CLIPPED_EDGES = Brushes.Red;
 
         // Joints
         public const double JOINT_THICKNESS = 3;
