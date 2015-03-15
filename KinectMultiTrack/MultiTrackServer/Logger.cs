@@ -23,7 +23,8 @@ namespace KinectMultiTrack
         public static readonly int SCENARIO_INTERACTION_1 = 4;
         public static readonly int SCENARIO_INTERACTION_2 = 5;
         public static readonly int SCENARIO_OCCLUSION_1 = 6;
-
+        public static readonly int SCENARIO_FREE = 7;
+        
         public static readonly int KINECT_PARALLEL = 0;
         public static readonly int KINECT_RIGHT_45 = 1;
         public static readonly int KINECT_RIGHT_90 = 2;

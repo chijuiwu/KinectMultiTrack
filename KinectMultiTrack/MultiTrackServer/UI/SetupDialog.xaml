@@ -71,7 +71,7 @@
                     <RadioButton IsEnabled="False" x:Name="User_Scenario_Interaction_2" Content="Interaction 2" GroupName="User_Scenario" FontSize="14" FontFamily="Microsoft Sans Serif" Margin="10,0,0,0" />
                     <RadioButton IsEnabled="False" x:Name="User_Scenario_Occlusion_1" Content="Occlusion 1" GroupName="User_Scenario" FontSize="14" FontFamily="Microsoft Sans Serif" Margin="10,0,0,0" />
                     <RadioButton IsEnabled="False" x:Name="User_Scenario_Free" Content="Free" GroupName="User_Scenario" FontSize="14" FontFamily="Microsoft Sans Serif" Margin="10,0,0,0" />
-                    <Button x:Name="cancelBtn" HorizontalAlignment="Left" Content="Cancel" IsDefault="True" FontSize="20" FontFamily="Microsoft Sans Serif" Margin="10,70,0,0" Width="100" Height="50" IsCancel="True" FontWeight="Bold" VerticalAlignment="Center"/>
+                    <Button x:Name="cancelBtn" HorizontalAlignment="Left" Content="Cancel" IsDefault="True" FontSize="20" FontFamily="Microsoft Sans Serif" Margin="10,55,0,0" Width="100" Height="50" IsCancel="True" FontWeight="Bold" VerticalAlignment="Center"/>
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>

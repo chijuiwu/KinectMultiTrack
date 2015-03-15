@@ -42,7 +42,8 @@ namespace KinectMultiTrack.UI
                 {this.User_Scenario_Walk_Current, Logger.SCENARIO_WALK_CURRENT},
                 {this.User_Scenario_Interaction_1, Logger.SCENARIO_INTERACTION_1},
                 {this.User_Scenario_Interaction_2, Logger.SCENARIO_INTERACTION_2},
-                {this.User_Scenario_Occlusion_1, Logger.SCENARIO_OCCLUSION_1}
+                {this.User_Scenario_Occlusion_1, Logger.SCENARIO_OCCLUSION_1},
+                {this.User_Scenario_Free, Logger.SCENARIO_FREE}
             };
 
             // Set up Kinect configurations with ids from the Logger

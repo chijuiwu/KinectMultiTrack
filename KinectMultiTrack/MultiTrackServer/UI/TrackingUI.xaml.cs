@@ -20,6 +20,7 @@ using System.Diagnostics;
 using System.Net;
 using KinectMultiTrack.WorldView;
 using System.Globalization;
+using System.Threading;
 
 namespace KinectMultiTrack.UI
 {
@@ -56,6 +57,7 @@ namespace KinectMultiTrack.UI
 
         private static readonly string UNINITIALIZED = "Uninitialized";
         private static readonly string INITIALIZED = "Initialized";
+        private static readonly string RUNNING = "Server Running...";
         private static readonly string KINECT_FORMAT = "Waiting for Kinects...{0}";
         private static readonly string CALIBRATION_FORMAT = "Calibrating...\n{0} frames remaining";
         private static readonly string RE_CALIBRATION_FORMAT = "Confused!!! Recalibrating...\n{0}";
@@ -175,6 +177,7 @@ namespace KinectMultiTrack.UI
             this.KinectFOVBtn.IsEnabled = true;
             this.ViewModeBtn.IsEnabled = true;
             this.OnStartStop(true);
+            this.ShowProgressText(TrackingUI.RUNNING);
         }
 
         private void StopBtn_Click(object sender, RoutedEventArgs e)
@@ -221,6 +224,21 @@ namespace KinectMultiTrack.UI
         }
         #endregion
 
+        #region keyup
+        private void TrackingUI_OnKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                Debug.WriteLine("enter");
+            }
+        }
+
+        private void RefreshCurrentTask()
+        {
+            //if (this.userScenario ==)
+        }
+        #endregion
+
         private void DisplayBodyFrames(TrackerResult result)
         {
             if (result.Equals(TrackerResult.Empty))
@@ -230,18 +248,12 @@ namespace KinectMultiTrack.UI
             this.RefreshTrackingUI(result);
             if (this.studyOn)
             {
-                this.RefreshCurrentTask();
                 this.OnDisplayResult(this.userScenario, result);
             }
             else
             {
                 this.RefreshMultipleUI(result);
             }
-        }
-
-        private void RefreshCurrentTask()
-        {
-            //if (this.userScenario ==)
         }
 
         private TrackerResult.KinectFOV UpdateReferenceKinectFOV(IEnumerable<TrackerResult.KinectFOV> fovs)
