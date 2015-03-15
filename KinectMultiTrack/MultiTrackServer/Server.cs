@@ -37,7 +37,7 @@ namespace KinectMultiTrack
         {
             this.serverKinectTCPListener = new TcpListener(IPAddress.Any, port);
             this.serverThread = new Thread(new ThreadStart(this.ServerWorkerThread));
-            
+
             this.tracker = new Tracker();
 
             Thread trackingUIThread = new Thread(new ThreadStart(this.StartTrackingUIThread));
@@ -47,6 +47,18 @@ namespace KinectMultiTrack
 
             this.writeLogStopwatch = new Stopwatch();
             this.flushLogStopwatch = new Stopwatch();
+        }
+
+        private void StartStopServer(bool start)
+        {
+            if (start)
+            {
+                this.Run();
+            }
+            else
+            {
+                this.Stop();
+            }
         }
 
         private void Run()
@@ -59,12 +71,8 @@ namespace KinectMultiTrack
 
         private void Stop()
         {
-            this.serverKinectTCPListener.Stop();
-            this.serverThread.Abort();
             this.writeLogStopwatch.Stop();
             this.flushLogStopwatch.Stop();
-            Logger.Flush();
-            Logger.Close();
         }
 
         private void StartTrackingUIThread()
@@ -89,18 +97,6 @@ namespace KinectMultiTrack
         private void ConfigureServer(int kinectCount)
         {
             this.tracker.Configure(kinectCount);
-        }
-
-        private void StartStopServer(bool start)
-        {
-            if (start)
-            {
-                this.Run();
-            }
-            else
-            {
-                this.Stop();
-            }
         }
 
         // Accepts connections and for each thread spaw a new connection
@@ -152,9 +148,12 @@ namespace KinectMultiTrack
                     client.Close();
                 }
             }
-            this.tracker.RemoveClient(clientIP);
-            Thread fireOnRemoveKinectCamera = new Thread(() => this.OnRemovedKinect(clientIP));
-            fireOnRemoveKinectCamera.Start();
+            if (kinectCameraAdded)
+            {
+                this.tracker.RemoveClient(clientIP);
+                Thread fireOnRemoveKinectCamera = new Thread(() => this.OnRemovedKinect(clientIP));
+                fireOnRemoveKinectCamera.Start();
+            }
             clientStream.Close();
             clientStream.Dispose();
             client.Close();

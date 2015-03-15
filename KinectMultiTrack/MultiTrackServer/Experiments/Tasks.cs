@@ -64,7 +64,7 @@ namespace KinectMultiTrack.Experiments
             Tasks.DONE
         };
 
-        public static readonly IEnumerable<string> FIRST_3 = Tasks.STATIONARY.Union(Tasks.WALK_WEI).Union(Tasks.WALK_CURRENT);
+        public static readonly IEnumerable<string> FIRST_3 = Tasks.STATIONARY.Concat(Tasks.WALK_WEI).Concat(Tasks.WALK_CURRENT);
 
         public static readonly IEnumerable<string> INTERACTION_1 = new List<string>()
         {

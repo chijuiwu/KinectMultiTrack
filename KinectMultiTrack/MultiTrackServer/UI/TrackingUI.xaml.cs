@@ -59,6 +59,7 @@ namespace KinectMultiTrack.UI
         private static readonly string UNINITIALIZED = "Uninitialized";
         private static readonly string INITIALIZED = "Initialized";
         private static readonly string RUNNING = "Server Running...";
+        private static readonly string STOPPED = "Server Stopped";
         private static readonly string KINECT_FORMAT = "Waiting for Kinects...{0}";
         private static readonly string CALIBRATION_FORMAT = "Calibrating...\n{0} frames remaining";
         private static readonly string RE_CALIBRATION_FORMAT = "Confused!!! Recalibrating...\n{0}";
@@ -185,7 +186,8 @@ namespace KinectMultiTrack.UI
         private void StartBtn_Click(object sender, RoutedEventArgs e)
         {
             this.SetupBtn.IsEnabled = false;
-            this.StopBtn.IsEnabled = true;
+            // TODO: Fix stopping server
+            //this.StopBtn.IsEnabled = true;
             this.RecalibrateBtn.IsEnabled = true;
             this.KinectFOVBtn.IsEnabled = true;
             this.ViewModeBtn.IsEnabled = true;
@@ -202,6 +204,7 @@ namespace KinectMultiTrack.UI
             this.KinectFOVBtn.IsEnabled = false;
             this.ViewModeBtn.IsEnabled = false;
             this.OnStartStop(false);
+            this.ShowProgressText(TrackingUI.STOPPED);
         }
 
         private void RecalibrateBtn_Click(object sender, RoutedEventArgs e)
