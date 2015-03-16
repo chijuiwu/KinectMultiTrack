@@ -19,13 +19,11 @@ namespace KinectMultiTrack
         private readonly Thread serverThread;
 
         private const uint SEC_IN_MILLISEC = 1000;
-        private const uint FRAME_IN_SEC = 60;
-
-        private const uint WRITE_LOG_INTERVAL = 1 / 4 * SEC_IN_MILLISEC;
-        private const uint FLUSH_LOG_INTERVAL = 3 * SEC_IN_MILLISEC;
-        private readonly Stopwatch writeLogStopwatch;
-        private readonly Stopwatch flushLogStopwatch;
-
+        //private const uint WRITE_LOG_INTERVAL = 1/4 * SEC_IN_MILLISEC;
+        //private readonly Stopwatch writeLogStopwatch;
+        private const int WRITE_FRAME_INTERVAL = 2;
+        private int currentFrameCount = 1;
+        
         private readonly Tracker tracker;
         private TrackingUI trackingUI;
 
@@ -45,8 +43,7 @@ namespace KinectMultiTrack
             trackingUIThread.IsBackground = true;
             trackingUIThread.Start();
 
-            this.writeLogStopwatch = new Stopwatch();
-            this.flushLogStopwatch = new Stopwatch();
+            //this.writeLogStopwatch = new Stopwatch();
         }
 
         private void StartStopServer(bool start)
@@ -65,14 +62,13 @@ namespace KinectMultiTrack
         {
             this.serverKinectTCPListener.Start();
             this.serverThread.Start();
-            this.writeLogStopwatch.Start();
+            //this.writeLogStopwatch.Start();
             Debug.WriteLine(KinectMultiTrack.Properties.Resources.SERVER_START + this.serverKinectTCPListener.LocalEndpoint);
         }
 
         private void Stop()
         {
-            this.writeLogStopwatch.Stop();
-            this.flushLogStopwatch.Stop();
+            //this.writeLogStopwatch.Stop();
         }
 
         private void StartTrackingUIThread()
@@ -138,7 +134,7 @@ namespace KinectMultiTrack
                     while (!clientStream.DataAvailable) ;
 
                     SBodyFrame bodyFrame = BodyFrameSerializer.Deserialize(clientStream);
-                    this.Track(clientIP, bodyFrame);
+                    this.Track(clientIP, bodyFrame, this.trackingUI.GetCurrentScenarioId());
 
                     // Response content is trivial
                     byte[] response = Encoding.ASCII.GetBytes(Properties.Resources.SERVER_RESPONSE_OKAY);
@@ -163,16 +159,24 @@ namespace KinectMultiTrack
             client.Close();
         }
 
-        private void Track(IPEndPoint clientIP, SBodyFrame bodyFrame)
+        private void Track(IPEndPoint clientIP, SBodyFrame bodyFrame, int scenarioId)
         {
-            Thread track = new Thread(() => this.tracker.SynchronizeTracking(clientIP, bodyFrame));
+            Thread track = new Thread(() => this.tracker.SynchronizeTracking(clientIP, bodyFrame, scenarioId));
             track.Start();
         }
 
-        private void Log(int userScenario, TrackerResult result)
+        private void Log(TrackerResult result, int userScenario)
         {
-            Thread log = new Thread(() => Logger.SynchronizeLogging(userScenario, result));
-            log.Start();
+            if (this.currentFrameCount == Server.WRITE_FRAME_INTERVAL)
+            {
+                Thread log = new Thread(() => Logger.SynchronizeLogging(result, userScenario));
+                log.Start();
+                this.currentFrameCount = 1;
+            }
+            else
+            {
+                this.currentFrameCount++;
+            }
         }
     }
 }

@@ -47,14 +47,14 @@ namespace KinectMultiTrack
             }
         }
 
-        public KinectClient(uint id, IPEndPoint ip, double height, double tiltAngle)
+        public KinectClient(uint id, IPEndPoint ip, double tiltAngle, double height)
         {
             this.Id = id;
             this.IP = ip;
             this.Calibrated = false;
             this.CameraSpecification = new Specification();
-            this.CameraSpecification.Height = height;
             this.CameraSpecification.TiltAngle = tiltAngle;
+            this.CameraSpecification.Height = height;
             this.skeletonsList = new List<TrackingSkeleton>();
             this.CalibrationFrames = new Stack<SBodyFrame>();
         }

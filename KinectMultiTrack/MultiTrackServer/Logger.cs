@@ -52,7 +52,7 @@ namespace KinectMultiTrack
         public static int CURRENT_KINECT_CONFIGURATION = Logger.NA;
 
         private static readonly string DATA_DIR = "..\\..\\..\\..\\Data\\";
-        private static readonly string DATA_FILENAME_FORMAT = "Study_{0}_Kinect{1}_Time_{2}.csv";
+        private static readonly string DATA_FILENAME_FORMAT = "Study_{0}_Kinect_{1}_Time_{2}.csv";
         private static readonly List<string> HEADERS = Logger.GetHeaders();
         private static StreamWriter WRITER;
 
@@ -130,7 +130,7 @@ namespace KinectMultiTrack
             }
         }
 
-        public static void SynchronizeLogging(int userScenario, TrackerResult result)
+        public static void SynchronizeLogging(TrackerResult result, int userScenario)
         {
             lock (Logger.syncLogLock)
             {
@@ -143,8 +143,11 @@ namespace KinectMultiTrack
                     List<Tuple<TrackerResult.PotentialSkeleton, Dictionary<JointType, KinectJoint>>> skeletonCoordinates = new List<Tuple<TrackerResult.PotentialSkeleton, Dictionary<JointType, KinectJoint>>>();
                     foreach (TrackerResult.PotentialSkeleton skeleton in person.PotentialSkeletons)
                     {
-                        KinectBody body = WBody.TransformWorldToKinectBody(skeleton.Skeleton.CurrentPosition.Worldview, referenceAngle, referencePosition);
-                        skeletonCoordinates.Add(Tuple.Create(skeleton, body.Joints));
+                        if (skeleton.Skeleton.CurrentPosition != null)
+                        {
+                            KinectBody body = WBody.TransformWorldToKinectBody(skeleton.Skeleton.CurrentPosition.Worldview, referenceAngle, referencePosition);
+                            skeletonCoordinates.Add(Tuple.Create(skeleton, body.Joints));
+                        }
                     }
                     Logger.WriteData(Logger.WRITER, result.Timestamp, person.Id, skeletonCoordinates);
                 }

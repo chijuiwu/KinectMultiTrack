@@ -52,7 +52,7 @@ namespace KinectMultiTrack.UI
         public event TrackingUIHandler OnStartStop;
         public delegate void TrackingUIHandler(bool start);
         public event TrackingUIUpdateHandler OnDisplayResult;
-        public delegate void TrackingUIUpdateHandler(int userScenario, TrackerResult result);
+        public delegate void TrackingUIUpdateHandler(TrackerResult result, int userScenario);
 
         private bool studyOn;
         private IEnumerable<UserTask> userTasks;
@@ -68,8 +68,9 @@ namespace KinectMultiTrack.UI
         private static readonly string RE_CALIBRATION_FORMAT = "Confused!!!\n{0}";
 
         private const uint SEC_IN_MILLISEC = 1000;
-        private const uint REFRESH_MULTIPLE_UI_INTERVAL = 1 * SEC_IN_MILLISEC;
-        private readonly Stopwatch refreshMultipleUIStopwatch;
+        //private const uint REFRESH_MULTIPLE_UI_INTERVAL = 1/25 * SEC_IN_MILLISEC;
+        //private const int DISPLAY_FRAME_INTERVAL = ;
+        //private readonly Stopwatch refreshMultipleUIStopwatch;
 
         public TrackingUI()
         {
@@ -95,7 +96,7 @@ namespace KinectMultiTrack.UI
 
             this.Closing += this.TrackingUI_Closing;
 
-            this.refreshMultipleUIStopwatch = new Stopwatch();
+            //this.refreshMultipleUIStopwatch = new Stopwatch();
         }
 
 
@@ -155,11 +156,11 @@ namespace KinectMultiTrack.UI
             }));
         }
 
-        public void Tracker_OnResult(TrackerResult result)
+        public void Tracker_OnResult(TrackerResult result, int scenario)
         {
             this.Dispatcher.Invoke((Action)(() =>
             {
-                this.DisplayBodyFrames(result);
+                this.DisplayBodyFrames(result, scenario);
             }));
         }
 
@@ -190,9 +191,9 @@ namespace KinectMultiTrack.UI
                 {
                     this.MultipleUI_Viewbox.Child = this.multipleUIViewCopy;
                 }
-                if (!this.studyOn || this.userTasks.Equals(UserTask.TASK_FREE))
+                if (this.studyOn || this.userTasks.Equals(UserTask.TASK_FREE))
                 {
-                    this.refreshMultipleUIStopwatch.Start();
+                    //this.refreshMultipleUIStopwatch.Start();
                 }
             }
         }
@@ -289,27 +290,39 @@ namespace KinectMultiTrack.UI
         }
         #endregion
 
-        private void DisplayBodyFrames(TrackerResult result)
+        public int GetCurrentScenarioId()
+        {
+            return this.userTasks.ElementAt(this.currentTaskIdx).ScenarioId;
+        }
+
+        private void DisplayBodyFrames(TrackerResult result, int scenarioId)
         {
             if (result.Equals(TrackerResult.Empty))
             {
                 return;
             }
-            this.TrackingUI_Viewbox.Child = this.trackingUIViewCopy;
-            this.RefreshTrackingUI(result);
+            //if (this.refreshMultipleUIStopwatch.ElapsedMilliseconds > TrackingUI.REFRESH_MULTIPLE_UI_INTERVAL)
+            //{
+                this.TrackingUI_Viewbox.Child = this.trackingUIViewCopy;
+                this.RefreshTrackingUI(result);
+                //this.refreshMultipleUIStopwatch.Restart();
+            //}
             if (this.studyOn)
             {
-                // For writing to log file
-                this.OnDisplayResult(this.userTasks.ElementAt(this.currentTaskIdx).ScenarioId, result);
+                if (scenarioId != Logger.NA)
+                {
+                    // For writing to log file
+                    this.OnDisplayResult(result, scenarioId);
+                }
             }
             else if (!this.studyOn || this.userTasks.Equals(UserTask.TASK_FREE))
             {
-                if (this.refreshMultipleUIStopwatch.ElapsedMilliseconds > TrackingUI.REFRESH_MULTIPLE_UI_INTERVAL)
-                {
-                    this.MultipleUI_Viewbox.Child = this.multipleUIViewCopy;
-                    this.RefreshMultipleUI(result);
-                    this.refreshMultipleUIStopwatch.Restart();
-                }
+                //if (this.refreshMultipleUIStopwatch.ElapsedMilliseconds > TrackingUI.REFRESH_MULTIPLE_UI_INTERVAL)
+                //{
+                //    this.MultipleUI_Viewbox.Child = this.multipleUIViewCopy;
+                //    this.RefreshMultipleUI(result);
+                //    this.refreshMultipleUIStopwatch.Restart();
+                //}
             }
         }
 

@@ -36,7 +36,7 @@ namespace KinectMultiTrack
         public event TrackerRecalibrationHandler OnRecalibration;
         public delegate void TrackerRecalibrationHandler(string msg);
         public event TrackerResultHandler OnResult;
-        public delegate void TrackerResultHandler(TrackerResult result);
+        public delegate void TrackerResultHandler(TrackerResult result, int scenarioId);
 
         public Tracker()
         {
@@ -123,12 +123,12 @@ namespace KinectMultiTrack
             this.OnRecalibration(msg);
         }
 
-        public void SynchronizeTracking(IPEndPoint source, SBodyFrame frame)
+        public void SynchronizeTracking(IPEndPoint source, SBodyFrame frame, int scenarioId)
         {
             if (!this.kinectClients.ContainsKey(source))
             {
                 // Pass in height and tilt angle
-                this.kinectClients[source] = new KinectClient((uint)this.kinectClients.Count, source, 0.0, 0.0);
+                this.kinectClients[source] = new KinectClient((uint)this.kinectClients.Count, source, 0.0, 100.0);
             }
             lock (this.syncTrackLock)
             {
@@ -154,7 +154,7 @@ namespace KinectMultiTrack
                     this.initialPeopleTracked = 0;
                     this.recentlyRecalibrated = true;
                 }
-                this.OnResult(this.currentResult);
+                this.OnResult(TrackerResult.Copy(this.currentResult), scenarioId);
             }
         }
 
