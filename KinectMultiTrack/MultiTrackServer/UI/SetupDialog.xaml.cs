@@ -12,7 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Diagnostics;
-using KinectMultiTrack.Experiments;
+using KinectMultiTrack.Studies;
 
 namespace KinectMultiTrack.UI
 {
@@ -21,25 +21,14 @@ namespace KinectMultiTrack.UI
     /// </summary>
     public partial class SetupDialog : Window
     {
-        public class UserScenario
-        {
-            public int ScenarioId { get; private set; }
-            public IEnumerable<string> Tasks { get; private set; }
 
-            public UserScenario(int loggingId, IEnumerable<string> tasks)
-            {
-                this.ScenarioId = loggingId;
-                this.Tasks = tasks;
-            }
-        }
-
-        private Dictionary<RadioButton, UserScenario> userScenariosDict;
+        private Dictionary<RadioButton, IEnumerable<UserTask>> userTasksDict;
         private Dictionary<RadioButton, int> kinectConfigurationsDict;
 
         public int Kinect_Count { get; private set; }
         public bool User_Study_On { get; private set; }
         public int User_Study_Id { get; private set; }
-        public UserScenario User_Scenario { get; private set; }
+        public IEnumerable<UserTask> User_Task { get; private set; }
         public int Kinect_Configuration { get; private set; }
 
         public SetupDialog()
@@ -47,16 +36,16 @@ namespace KinectMultiTrack.UI
             this.InitializeComponent();
 
             // Set up user scenarios with ids from the Logger
-            this.userScenariosDict = new Dictionary<RadioButton, UserScenario>()
+            this.userTasksDict = new Dictionary<RadioButton, IEnumerable<UserTask>>()
             {
-                {this.User_Scenario_First_3, new UserScenario(Logger.SCENARIO_FIRST_3, Tasks.FIRST_3)},
-                {this.User_Scenario_Stationary, new UserScenario(Logger.SCENARIO_STATIONARY, Tasks.STATIONARY)},
-                {this.User_Scenario_Walk_Wei, new UserScenario(Logger.SCENARIO_WALK_WEI, Tasks.WALK_WEI)},
-                {this.User_Scenario_Walk_Current, new UserScenario(Logger.SCENARIO_WALK_CURRENT, Tasks.WALK_CURRENT)},
-                {this.User_Scenario_Interaction_1, new UserScenario(Logger.SCENARIO_INTERACTION_1, Tasks.INTERACTION_1)},
-                {this.User_Scenario_Interaction_2, new UserScenario(Logger.SCENARIO_INTERACTION_2, Tasks.INTERACTION_2)},
-                {this.User_Scenario_Occlusion_1, new UserScenario(Logger.SCENARIO_OCCLUSION_1, Tasks.OCCLUSION_1)},
-                {this.User_Scenario_Free, new UserScenario(Logger.SCENARIO_FREE, Tasks.EMPTY)}
+                {this.User_Scenario_First_3, UserTask.TASK_FIRST_3},
+                {this.User_Scenario_Stationary, UserTask.TASK_STATIONARY},
+                {this.User_Scenario_Walk_Wei, UserTask.TASK_WALK_WEI},
+                {this.User_Scenario_Walk_Current, UserTask.TASK_WALK_CURRENT},
+                {this.User_Scenario_Interaction_1, UserTask.TASK_INTERACTION_1},
+                {this.User_Scenario_Interaction_2, UserTask.TASK_INTERACTION_2},
+                {this.User_Scenario_Occlusion_1, UserTask.TASK_OCCLUSION_1},
+                {this.User_Scenario_Free, UserTask.TASK_FREE}
             };
 
             // Set up Kinect configurations with ids from the Logger
@@ -73,7 +62,7 @@ namespace KinectMultiTrack.UI
         private void EnableUserSetup(bool enabled)
         {
             this.User_Study_Id_Entry.IsEnabled = enabled;
-            foreach (RadioButton scenario in this.userScenariosDict.Keys)
+            foreach (RadioButton scenario in this.userTasksDict.Keys)
             {
                 scenario.IsEnabled = enabled;
             }
@@ -119,16 +108,16 @@ namespace KinectMultiTrack.UI
             }
         }
 
-        private UserScenario GetUserScenario()
+        private IEnumerable<UserTask> GetUserTask()
         {
-            foreach (RadioButton setting in this.userScenariosDict.Keys)
+            foreach (RadioButton setting in this.userTasksDict.Keys)
             {
                 if (setting.IsChecked.HasValue && setting.IsChecked.Value)
                 {
-                    return this.userScenariosDict[setting];
+                    return this.userTasksDict[setting];
                 }
             }
-            return new UserScenario(Logger.NA, Tasks.EMPTY);
+            return UserTask.TASK_EMPTY;
         }
 
         private int GetKinectConfiguration()
@@ -148,7 +137,7 @@ namespace KinectMultiTrack.UI
             this.Kinect_Count = this.GetKinectCount();
             this.User_Study_On = this.GetStudyOn();
             this.User_Study_Id = this.GetStudyId();
-            this.User_Scenario = this.GetUserScenario();
+            this.User_Task = this.GetUserTask();
             this.Kinect_Configuration = this.GetKinectConfiguration();
             this.DialogResult = true;
         }

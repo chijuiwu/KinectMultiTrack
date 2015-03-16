@@ -71,9 +71,7 @@
 
             <Border Background="DarkGray" Grid.Column="1">
                 <Viewbox x:Name="MultipleUI_Viewbox" Grid.Column="1" HorizontalAlignment="Center">
-                    <Grid Width="100">
-                        <TextBlock Text="XXX" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    </Grid>
+                    <Image Source="{Binding MultipleUI_Viewsource}" Stretch="UniformToFill" />
                 </Viewbox>
             </Border>
         </Grid>

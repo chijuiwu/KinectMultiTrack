@@ -81,7 +81,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Exceptions\UntrackedJointException.cs" />
-    <Compile Include="Experiments\Tasks.cs" />
+    <Compile Include="Studies\UserTask.cs" />
     <Compile Include="KinectBody.cs" />
     <Compile Include="KinectClient.cs" />
     <Compile Include="KinectJoint.cs" />

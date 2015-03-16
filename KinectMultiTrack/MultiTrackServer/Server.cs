@@ -165,9 +165,9 @@ namespace KinectMultiTrack
             track.Start();
         }
 
-        private void Log(int userScenario, TrackerResult result)
+        private void Log(int studyId, int kinectConfiguration, int userScenario, TrackerResult result)
         {
-            Thread log = new Thread(() => Logger.SynchronizeLogging(userScenario, result));
+            Thread log = new Thread(() => Logger.SynchronizeLogging(studyId, kinectConfiguration, userScenario, result));
             log.Start();
         }
     }

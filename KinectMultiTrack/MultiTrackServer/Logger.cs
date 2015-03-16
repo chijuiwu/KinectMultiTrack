@@ -16,7 +16,7 @@ namespace KinectMultiTrack
     {
         public static readonly int NA = -9999;
 
-        public static readonly int SCENARIO_FIRST_3 = 0; // Placeholder
+        public static readonly int SCENARIO_NA = -9999; // Placeholder
         public static readonly int SCENARIO_STATIONARY = 1;
         public static readonly int SCENARIO_WALK_WEI = 2;
         public static readonly int SCENARIO_WALK_CURRENT = 3;
@@ -119,10 +119,12 @@ namespace KinectMultiTrack
             }
         }
 
-        public static void SynchronizeLogging(int userScenario, TrackerResult result)
+        public static void SynchronizeLogging(int studyId, int kinectConfiguration, int userScenario, TrackerResult result)
         {
             lock (Logger.syncLogLock)
             {
+                Logger.CURRENT_STUDY_ID = studyId;
+                Logger.CURRENT_KINECT_CONFIGURATION = kinectConfiguration;
                 Logger.CURRENT_USER_SCENARIO = userScenario;
                 foreach (TrackerResult.Person person in result.People)
                 {

@@ -21,6 +21,7 @@ using System.Net;
 using KinectMultiTrack.WorldView;
 using System.Globalization;
 using System.Threading;
+using KinectMultiTrack.Studies;
 
 namespace KinectMultiTrack.UI
 {
@@ -40,6 +41,7 @@ namespace KinectMultiTrack.UI
         private DrawingImage trackingUIViewSource;
         private DrawingGroup multipleUIDrawingGroup;
         private DrawingImage multipleUIViewSource;
+        private UIElement multipleUIViewCopy;
 
         private KinectSensor kinectSensor;
         private CoordinateMapper coordinateMapper;
@@ -49,11 +51,12 @@ namespace KinectMultiTrack.UI
         public event TrackingUIHandler OnStartStop;
         public delegate void TrackingUIHandler(bool start);
         public event TrackingUIUpdateHandler OnDisplayResult;
-        public delegate void TrackingUIUpdateHandler(int userScenario, TrackerResult result);
+        public delegate void TrackingUIUpdateHandler(int studyId, int kinectConfiguration, int userScenario, TrackerResult result);
 
         private bool studyOn;
-        private SetupDialog.UserScenario userScenario;
-        private int currentScenarioId;
+        private IEnumerable<UserTask> userTasks;
+        private int currentStudyId;
+        private int currentKinectConfiguration;
         private int currentTaskIdx;
 
         private static readonly string UNINITIALIZED = "Uninitialized";
@@ -77,6 +80,7 @@ namespace KinectMultiTrack.UI
             this.trackingUIViewSource = new DrawingImage(this.trackingUIDrawingGroup);
             this.multipleUIDrawingGroup = new DrawingGroup();
             this.multipleUIViewSource = new DrawingImage(this.multipleUIDrawingGroup);
+            this.multipleUIViewCopy = this.MultipleUI_Viewbox.Child;
 
             this.kinectSensor = KinectSensor.GetDefault();
             this.kinectSensor.Open();
@@ -164,22 +168,17 @@ namespace KinectMultiTrack.UI
             if (setup.DialogResult.HasValue && setup.DialogResult.Value)
             {
                 this.studyOn = setup.User_Study_On;
-                this.userScenario = setup.User_Scenario;
-                // Just a hack
-                if (this.userScenario.ScenarioId == Logger.SCENARIO_FIRST_3)
-                {
-                    this.currentScenarioId = Logger.SCENARIO_STATIONARY;
-                }
-                else
-                {
-                    this.currentScenarioId = this.userScenario.ScenarioId;
-                }
+                this.currentStudyId = setup.User_Study_Id;
+                this.currentKinectConfiguration = setup.Kinect_Configuration;
+                this.userTasks = setup.User_Task;
                 this.currentTaskIdx = 0;
                 this.StartBtn.IsEnabled = true;
                 this.OnSetup(setup.Kinect_Count);
                 this.ShowProgressText(TrackingUI.INITIALIZED);
-                Logger.CURRENT_STUDY_ID = setup.User_Study_Id;
-                Logger.CURRENT_KINECT_CONFIGURATION = setup.Kinect_Configuration;
+                if (this.userTasks.Equals(UserTask.TASK_FREE))
+                {
+                    this.MultipleUI_Viewbox.Child = this.multipleUIViewCopy;
+                }
             }
         }
 
@@ -244,7 +243,7 @@ namespace KinectMultiTrack.UI
         #region keyup
         private void TrackingUI_OnKeyUp(object sender, KeyEventArgs e)
         {
-            if (!this.studyOn)
+            if (!this.studyOn || this.userTasks.Equals(UserTask.TASK_FREE))
             {
                 return;
             }
@@ -257,17 +256,16 @@ namespace KinectMultiTrack.UI
 
         private void ShowNextTask()
         {
-            string nextTask = this.userScenario.Tasks.ElementAt(this.currentTaskIdx);
             Grid textGrid = new Grid();
             textGrid.Width = 100;
             TextBlock textBlock = new TextBlock();
-            textBlock.Text = nextTask;
+            textBlock.Text = this.userTasks.ElementAt(this.currentTaskIdx).Description;
             textBlock.TextAlignment = TextAlignment.Center;
             textBlock.HorizontalAlignment = HorizontalAlignment.Center;
             textBlock.VerticalAlignment = VerticalAlignment.Center;
             textGrid.Children.Add(textBlock);
             this.MultipleUI_Viewbox.Child = textGrid;
-            if (this.currentTaskIdx < (this.userScenario.Tasks.Count() - 1))
+            if (this.currentTaskIdx < (this.userTasks.Count() - 1))
             {
                 this.currentTaskIdx++;
             }
@@ -283,9 +281,9 @@ namespace KinectMultiTrack.UI
             this.RefreshTrackingUI(result);
             if (this.studyOn)
             {
-                this.OnDisplayResult(this.currentScenarioId, result);
+                this.OnDisplayResult(this.currentStudyId, this.currentKinectConfiguration, this.userTasks.ElementAt(this.currentTaskIdx).ScenarioId, result);
             }
-            else
+            else if (!this.studyOn || this.userTasks.Equals(UserTask.TASK_FREE))
             {
                 this.RefreshMultipleUI(result);
             }
