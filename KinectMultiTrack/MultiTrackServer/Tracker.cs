@@ -18,8 +18,8 @@ namespace KinectMultiTrack
         // TODO: allow dynamically adding new kinects
         private int expectedKinectsCount;
         // 4 Seconds
-        public const uint MIN_CALIBRATION_FRAMES = 120;
-        public const uint MIN_CALIBRATION_FRAMES_STORED = MIN_CALIBRATION_FRAMES * 3;
+        public const int MIN_CALIBRATION_FRAMES = 120;
+        public const int MIN_CALIBRATION_FRAMES_STORED = MIN_CALIBRATION_FRAMES * 2;
         private readonly object syncTrackLock = new object();
         private bool systemCalibrated;
 
@@ -30,7 +30,7 @@ namespace KinectMultiTrack
         public event TrackerKinectHandler OnWaitingKinects;
         public delegate void TrackerKinectHandler(int kinects);
         public event TrackerCalibrationHandler OnCalibration;
-        public delegate void TrackerCalibrationHandler(uint framesRemaining);
+        public delegate void TrackerCalibrationHandler(int framesRemaining);
         public event TrackerRecalibrationHandler OnRecalibration;
         public delegate void TrackerRecalibrationHandler(string msg);
         public event TrackerResultHandler OnResult;
@@ -54,18 +54,18 @@ namespace KinectMultiTrack
             this.kinectClients.TryRemove(clientIP, out kinect);
         }
 
-        private uint GetCalibrationFramesRemaining()
+        private int GetCalibrationFramesRemaining()
         {
-            uint mostFramesRequired = UInt32.MinValue;
+            int mostFramesRequired = Int32.MinValue;
             foreach (KinectClient kinect in this.kinectClients.Values)
             {
-                uint kinectRemainingFrames = (uint)(Tracker.MIN_CALIBRATION_FRAMES_STORED - kinect.CalibrationFrames.Count);
+                int kinectRemainingFrames = Tracker.MIN_CALIBRATION_FRAMES_STORED - kinect.CalibrationFrames.Count;
                 if (kinectRemainingFrames > mostFramesRequired)
                 {
                     mostFramesRequired = kinectRemainingFrames;
                 }
             }
-            return mostFramesRequired;
+            return mostFramesRequired == Int32.MinValue ? 0 : mostFramesRequired;
         }
 
         private int GetKinectsRemaining()
@@ -106,14 +106,14 @@ namespace KinectMultiTrack
             }
         }
 
-        private void ReCalibration()
+        private void ReCalibration(string msg)
         {
             this.systemCalibrated = false;
             foreach (KinectClient kinect in this.kinectClients.Values)
             {
                 kinect.PrepareRecalibration();
             }
-            this.OnRecalibration("");
+            this.OnRecalibration(msg);
         }
 
         public void SynchronizeTracking(IPEndPoint source, SBodyFrame frame)
@@ -133,48 +133,51 @@ namespace KinectMultiTrack
                         this.currentResult = this.PeopleDetection();
                     }
                 }
-                if (this.ContainsExpectedMovements(source, frame))
+                string unexpectedBehavior = "";
+                if (this.ContainsExpectedMovements(source, frame, ref unexpectedBehavior))
                 {
                     this.kinectClients[source].UpdateFrame(frame);
                 }
                 else
                 {
-                    this.ReCalibration();
+                    this.ReCalibration(unexpectedBehavior);
                     this.currentResult = TrackerResult.Empty;
                 }
                 this.OnResult(TrackerResult.Copy(this.currentResult));
             }
         }
 
-        // TODO: Handle unexpected behaviour during calibration more elegantly
-        private bool ContainsExpectedMovements(IPEndPoint source, SBodyFrame frame)
+        private bool ContainsExpectedMovements(IPEndPoint source, SBodyFrame frame, ref string msg)
         {
             if (this.kinectClients[source].CurrentSkeletonCount > 0)
             {
-                bool sameBodies = frame.Bodies.Count() == this.kinectClients[source].CurrentSkeletonCount;
-                bool stationaryCalibration = true;
+                if (frame.Bodies.Count() != this.kinectClients[source].CurrentSkeletonCount)
+                {
+                    msg = "Intruder? Out of boundary?";
+                    return false;
+                }
                 if (!this.systemCalibrated)
                 {
-                    SBodyFrame firstFrame = this.kinectClients[source].FirstCalibrationFrame;
-                    foreach (SBody body in firstFrame.Bodies)
+                    foreach (SBody body in this.kinectClients[source].FirstCalibrationFrame.Bodies)
                     {
                         SBody currentBody = frame.Bodies.Find(x => x.TrackingId == body.TrackingId);
-                        CameraSpacePoint firstHeadPt = body.Joints[JointType.Head].CameraSpacePoint;
-                        CameraSpacePoint currentHeadPt = body.Joints[JointType.Head].CameraSpacePoint;
-                        double difference = Math.Sqrt(Math.Pow(firstHeadPt.X - currentHeadPt.X, 2) + Math.Pow(firstHeadPt.Y - currentHeadPt.Y, 2) + Math.Pow(firstHeadPt.Z - currentHeadPt.Z, 2));
-                        if (difference > 0.1)
+                        if (!body.Joints.ContainsKey(JointType.Head) || !currentBody.Joints.ContainsKey(JointType.Head))
                         {
-                            stationaryCalibration = false;
-                            break;
+                            msg = "Missing head";
+                            return false;
+                        }
+                        CameraSpacePoint firstHeadPt = body.Joints[JointType.Head].CameraSpacePoint;
+                        CameraSpacePoint currentHeadPt = currentBody.Joints[JointType.Head].CameraSpacePoint;
+                        double difference = Math.Sqrt(Math.Pow(firstHeadPt.X - currentHeadPt.X, 2) + Math.Pow(firstHeadPt.Y - currentHeadPt.Y, 2) + Math.Pow(firstHeadPt.Z - currentHeadPt.Z, 2));
+                        if (difference > 0.05)
+                        {
+                            msg = "Head movement?";
+                            return false;
                         }
                     }
                 }
-                return sameBodies && stationaryCalibration;
             }
-            else
-            {
-                return true;
-            }
+            return true;
         }
 
         # region People Detection

@@ -41,6 +41,7 @@ namespace KinectMultiTrack.UI
         private DrawingImage trackingUIViewSource;
         private DrawingGroup multipleUIDrawingGroup;
         private DrawingImage multipleUIViewSource;
+        private UIElement trackingUIViewCopy;
         private UIElement multipleUIViewCopy;
 
         private KinectSensor kinectSensor;
@@ -58,6 +59,7 @@ namespace KinectMultiTrack.UI
         private int currentStudyId;
         private int currentKinectConfiguration;
         private int currentTaskIdx;
+        private bool toRecalibrate;
 
         private static readonly string UNINITIALIZED = "Uninitialized";
         private static readonly string INITIALIZED = "Initialized";
@@ -65,7 +67,7 @@ namespace KinectMultiTrack.UI
         private static readonly string STOPPED = "Server Stopped";
         private static readonly string KINECT_FORMAT = "Waiting for Kinects...{0}";
         private static readonly string CALIBRATION_FORMAT = "Calibrating...\n{0} frames remaining";
-        private static readonly string RE_CALIBRATION_FORMAT = "Confused!!! Recalibrating...\n{0}";
+        private static readonly string RE_CALIBRATION_FORMAT = "Confused!!!\n{0}";
 
         public TrackingUI()
         {
@@ -80,6 +82,7 @@ namespace KinectMultiTrack.UI
             this.trackingUIViewSource = new DrawingImage(this.trackingUIDrawingGroup);
             this.multipleUIDrawingGroup = new DrawingGroup();
             this.multipleUIViewSource = new DrawingImage(this.multipleUIDrawingGroup);
+            this.trackingUIViewCopy = this.TrackingUI_Viewbox.Child;
             this.multipleUIViewCopy = this.MultipleUI_Viewbox.Child;
 
             this.kinectSensor = KinectSensor.GetDefault();
@@ -126,8 +129,13 @@ namespace KinectMultiTrack.UI
             }));
         }
 
-        public void Tracker_OnCalibration(uint framesRemaining)
+        public void Tracker_OnCalibration(int framesRemaining)
         {
+            if (framesRemaining == Tracker.MIN_CALIBRATION_FRAMES_STORED && toRecalibrate)
+            {
+                return;
+            }
+            this.toRecalibrate = false;
             this.Dispatcher.Invoke((Action)(() =>
             {
                 this.ShowProgressText(String.Format(TrackingUI.CALIBRATION_FORMAT, framesRemaining));
@@ -136,6 +144,7 @@ namespace KinectMultiTrack.UI
 
         public void Tracker_OnReCalibration(string msg)
         {
+            this.toRecalibrate = true;
             this.Dispatcher.Invoke((Action)(() =>
             {
                 this.ShowProgressText(String.Format(TrackingUI.RE_CALIBRATION_FORMAT, msg));
@@ -213,13 +222,16 @@ namespace KinectMultiTrack.UI
 
         private void ShowProgressText(string text)
         {
-            using (DrawingContext dc = this.trackingUIDrawingGroup.Open())
-            {
-                TextBlock textBlock = new TextBlock();
-                FormattedText txt = new FormattedText(text, CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Verdana"), 20, Brushes.White);
-                txt.TextAlignment = TextAlignment.Center;
-                dc.DrawText(txt, new Point(0, 0));
-            }
+            Grid textGrid = new Grid();
+            textGrid.Width = 150;
+            TextBlock textBlock = new TextBlock();
+            textBlock.Text = text;
+            textBlock.Foreground = Brushes.White;
+            textBlock.TextAlignment = TextAlignment.Center;
+            textBlock.HorizontalAlignment = HorizontalAlignment.Center;
+            textBlock.VerticalAlignment = VerticalAlignment.Center;
+            textGrid.Children.Add(textBlock);
+            this.TrackingUI_Viewbox.Child = textGrid;
         }
 
         #region UI viewing bindings Important!!!
@@ -249,7 +261,6 @@ namespace KinectMultiTrack.UI
             }
             if (e.Key == Key.Down)
             {
-                Debug.WriteLine("key down");
                 this.ShowNextTask();
             }
         }
@@ -257,7 +268,7 @@ namespace KinectMultiTrack.UI
         private void ShowNextTask()
         {
             Grid textGrid = new Grid();
-            textGrid.Width = 100;
+            textGrid.Width = 150;
             TextBlock textBlock = new TextBlock();
             textBlock.Text = this.userTasks.ElementAt(this.currentTaskIdx).Description;
             textBlock.TextAlignment = TextAlignment.Center;
@@ -278,13 +289,16 @@ namespace KinectMultiTrack.UI
             {
                 return;
             }
+            this.TrackingUI_Viewbox.Child = this.trackingUIViewCopy;
             this.RefreshTrackingUI(result);
             if (this.studyOn)
             {
+                // For writing to log file
                 this.OnDisplayResult(this.currentStudyId, this.currentKinectConfiguration, this.userTasks.ElementAt(this.currentTaskIdx).ScenarioId, result);
             }
             else if (!this.studyOn || this.userTasks.Equals(UserTask.TASK_FREE))
             {
+                this.MultipleUI_Viewbox.Child = this.multipleUIViewCopy;
                 this.RefreshMultipleUI(result);
             }
         }
