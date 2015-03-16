@@ -76,22 +76,21 @@ namespace KinectMultiTrack
 
             List<ulong> unclaimedTrackedIds = new List<ulong>();
             List<TrackingSkeleton> unclaimedTrackedSkeletons = new List<TrackingSkeleton>();
+            this.skeletonsList.ForEach(x => unclaimedTrackedSkeletons.Add(x));
+
             foreach (SBody body in frame.Bodies)
             {
                 ulong trackingId = body.TrackingId;
-                TrackingSkeleton skeleton = this.skeletonsList.Find(x => x.TrackingId == trackingId);
+                unclaimedTrackedIds.Add(trackingId);
+                TrackingSkeleton skeleton = unclaimedTrackedSkeletons.Find(x => x.TrackingId == trackingId);
                 if (skeleton != null)
                 {
                     skeleton.UpdatePosition(frame.TimeStamp, body);
-                }
-                else
-                {
-                    unclaimedTrackedIds.Add(trackingId);
-                    unclaimedTrackedSkeletons.Add(skeleton);
+                    unclaimedTrackedIds.Remove(trackingId);
+                    unclaimedTrackedSkeletons.Remove(skeleton);
                 }
             }
 
-            // TODO: make it better
             foreach (TrackingSkeleton skeleton in unclaimedTrackedSkeletons)
             {
                 if (unclaimedTrackedIds.Count > 0)
@@ -99,7 +98,11 @@ namespace KinectMultiTrack
                     ulong unclaimedId = unclaimedTrackedIds.First();
                     SBody unclaimedBody = frame.Bodies.Find(x => x.TrackingId == unclaimedId);
                     unclaimedTrackedIds.Remove(unclaimedId);
-                    skeleton.UpdatePosition(frame.TimeStamp, unclaimedBody);
+                    skeleton.UpdatePosition(unclaimedId, frame.TimeStamp, unclaimedBody);
+                }
+                else
+                {
+                    skeleton.UpdatePosition(frame.TimeStamp, null);
                 }
             }
         }

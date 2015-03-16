@@ -67,6 +67,10 @@ namespace KinectMultiTrack.UI
         private static readonly string CALIBRATION_FORMAT = "Calibrating...\n{0} frames remaining";
         private static readonly string RE_CALIBRATION_FORMAT = "Confused!!!\n{0}";
 
+        private const uint SEC_IN_MILLISEC = 1000;
+        private const uint REFRESH_MULTIPLE_UI_INTERVAL = 1 * SEC_IN_MILLISEC;
+        private readonly Stopwatch refreshMultipleUIStopwatch;
+
         public TrackingUI()
         {
             this.InitializeComponent();
@@ -90,6 +94,8 @@ namespace KinectMultiTrack.UI
             this.studyOn = false;
 
             this.Closing += this.TrackingUI_Closing;
+
+            this.refreshMultipleUIStopwatch = new Stopwatch();
         }
 
 
@@ -183,6 +189,10 @@ namespace KinectMultiTrack.UI
                 if (this.userTasks.Equals(UserTask.TASK_FREE))
                 {
                     this.MultipleUI_Viewbox.Child = this.multipleUIViewCopy;
+                }
+                if (!this.studyOn || this.userTasks.Equals(UserTask.TASK_FREE))
+                {
+                    this.refreshMultipleUIStopwatch.Start();
                 }
             }
         }
@@ -294,8 +304,12 @@ namespace KinectMultiTrack.UI
             }
             else if (!this.studyOn || this.userTasks.Equals(UserTask.TASK_FREE))
             {
-                this.MultipleUI_Viewbox.Child = this.multipleUIViewCopy;
-                this.RefreshMultipleUI(result);
+                if (this.refreshMultipleUIStopwatch.ElapsedMilliseconds > TrackingUI.REFRESH_MULTIPLE_UI_INTERVAL)
+                {
+                    this.MultipleUI_Viewbox.Child = this.multipleUIViewCopy;
+                    this.RefreshMultipleUI(result);
+                    this.refreshMultipleUIStopwatch.Restart();
+                }
             }
         }
 
@@ -332,12 +346,19 @@ namespace KinectMultiTrack.UI
                 foreach (TrackerResult.Person person in result.People)
                 {
                     TrackingSkeleton refSkeleton = person.GetSkeletonInFOV(referenceFOV);
+                    if (refSkeleton == null)
+                    {
+                        continue;
+                    }
 
                     List<KinectBody> bodies = new List<KinectBody>();
                     foreach (TrackerResult.PotentialSkeleton pSkeleton in person.PotentialSkeletons)
                     {
-                        this.DrawClippedEdges(pSkeleton.Skeleton.CurrentPosition.Kinect, frameWidth, frameHeight, dc);
-                        bodies.Add(WBody.TransformWorldToKinectBody(pSkeleton.Skeleton.CurrentPosition.Worldview, refSkeleton.InitialAngle, refSkeleton.InitialCenterPosition));
+                        if (pSkeleton.Skeleton.CurrentPosition != null)
+                        {
+                            this.DrawClippedEdges(pSkeleton.Skeleton.CurrentPosition.Kinect, frameWidth, frameHeight, dc);
+                            bodies.Add(WBody.TransformWorldToKinectBody(pSkeleton.Skeleton.CurrentPosition.Worldview, refSkeleton.InitialAngle, refSkeleton.InitialCenterPosition));
+                        }
                     }
 
                     Pen skeletonColor = Colors.SKELETON[personIdx++];
@@ -372,14 +393,17 @@ namespace KinectMultiTrack.UI
                     Pen skeletonColor = Colors.SKELETON[personIdx++];
                     foreach (TrackerResult.PotentialSkeleton pSkeleton in person.PotentialSkeletons)
                     {
-                        SBody body = pSkeleton.Skeleton.CurrentPosition.Kinect;
-                        Dictionary<JointType, DrawableJoint> jointPts = new Dictionary<JointType, DrawableJoint>();
-                        foreach (JointType jt in body.Joints.Keys)
+                        if (pSkeleton.Skeleton.CurrentPosition != null)
                         {
-                            Point point = new Point(body.Joints[jt].DepthSpacePoint.X, body.Joints[jt].DepthSpacePoint.Y);
-                            jointPts[jt] = new DrawableJoint(point, body.Joints[jt].TrackingState);
+                            SBody body = pSkeleton.Skeleton.CurrentPosition.Kinect;
+                            Dictionary<JointType, DrawableJoint> jointPts = new Dictionary<JointType, DrawableJoint>();
+                            foreach (JointType jt in body.Joints.Keys)
+                            {
+                                Point point = new Point(body.Joints[jt].DepthSpacePoint.X, body.Joints[jt].DepthSpacePoint.Y);
+                                jointPts[jt] = new DrawableJoint(point, body.Joints[jt].TrackingState);
+                            }
+                            this.DrawBody(jointPts, dc, skeletonColor);
                         }
-                        this.DrawBody(jointPts, dc, skeletonColor);
                     }
                 }
                 this.DrawClipRegion(frameWidth, frameHeight, this.multipleUIDrawingGroup);

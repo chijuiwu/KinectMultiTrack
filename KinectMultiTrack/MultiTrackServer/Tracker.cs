@@ -19,13 +19,15 @@ namespace KinectMultiTrack
         private int expectedKinectsCount;
         // 4 Seconds
         public const int MIN_CALIBRATION_FRAMES = 120;
-        public const int MIN_CALIBRATION_FRAMES_STORED = MIN_CALIBRATION_FRAMES * 2;
+        public const int MIN_CALIBRATION_FRAMES_STORED = MIN_CALIBRATION_FRAMES;
         private readonly object syncTrackLock = new object();
         private bool systemCalibrated;
+        private bool recentlyRecalibrated;
 
         private readonly ConcurrentDictionary<IPEndPoint, KinectClient> kinectClients;
 
         private TrackerResult currentResult;
+        private int initialPeopleTracked;
 
         public event TrackerKinectHandler OnWaitingKinects;
         public delegate void TrackerKinectHandler(int kinects);
@@ -93,6 +95,11 @@ namespace KinectMultiTrack
             }
             if (this.kinectClients.Count == this.expectedKinectsCount)
             {
+                if (this.recentlyRecalibrated)
+                {
+                    this.recentlyRecalibrated = false;
+                    return;
+                }
                 this.OnCalibration(this.GetCalibrationFramesRemaining());
                 if (this.KinectsMeetCalibrationRequirement())
                 {
@@ -131,6 +138,8 @@ namespace KinectMultiTrack
                     if (this.systemCalibrated)
                     {
                         this.currentResult = this.PeopleDetection();
+                        this.initialPeopleTracked = this.currentResult.People.Count();
+                        Debug.WriteLine("initial people: " + this.initialPeopleTracked);
                     }
                 }
                 string unexpectedBehavior = "";
@@ -142,39 +151,83 @@ namespace KinectMultiTrack
                 {
                     this.ReCalibration(unexpectedBehavior);
                     this.currentResult = TrackerResult.Empty;
+                    this.initialPeopleTracked = 0;
+                    this.recentlyRecalibrated = true;
                 }
-                this.OnResult(TrackerResult.Copy(this.currentResult));
+                this.OnResult(this.currentResult);
             }
         }
 
+        private bool RemainStationary(JointType jt, SBody currentBody, SBody previousBody, ref string msg)
+        {
+            if (currentBody == null || !previousBody.Joints.ContainsKey(jt) || !currentBody.Joints.ContainsKey(jt))
+            {
+                msg = "Missing"+jt;
+                return false;
+            }
+            CameraSpacePoint currentHeadPt = currentBody.Joints[jt].CameraSpacePoint;
+            CameraSpacePoint previousHeadPt = previousBody.Joints[jt].CameraSpacePoint;
+            double difference = Math.Sqrt(Math.Pow(previousHeadPt.X - currentHeadPt.X, 2) + Math.Pow(previousHeadPt.Y - currentHeadPt.Y, 2) + Math.Pow(previousHeadPt.Z - currentHeadPt.Z, 2));
+            if (difference > 0.1)
+            {
+                msg = ""+jt+" remain stationary";
+                return false;
+            }
+            return true;
+        }
+
+        // Use more than the brain
         private bool ContainsExpectedMovements(IPEndPoint source, SBodyFrame frame, ref string msg)
         {
-            if (this.kinectClients[source].CurrentSkeletonCount > 0)
+            if (!this.systemCalibrated)
             {
-                if (frame.Bodies.Count() != this.kinectClients[source].CurrentSkeletonCount)
+                if (this.kinectClients[source].FirstCalibrationFrame != null)
                 {
-                    msg = "Intruder? Out of boundary?";
-                    return false;
-                }
-                if (!this.systemCalibrated)
-                {
-                    foreach (SBody body in this.kinectClients[source].FirstCalibrationFrame.Bodies)
+                    foreach (SBody previousBody in this.kinectClients[source].FirstCalibrationFrame.Bodies)
                     {
-                        SBody currentBody = frame.Bodies.Find(x => x.TrackingId == body.TrackingId);
-                        if (!body.Joints.ContainsKey(JointType.Head) || !currentBody.Joints.ContainsKey(JointType.Head))
+                        SBody currentBody = frame.Bodies.Find(x => x.TrackingId == previousBody.TrackingId);
+                        // Head
+                        if (!this.RemainStationary(JointType.Head, currentBody, previousBody, ref msg))
                         {
-                            msg = "Missing head";
                             return false;
                         }
-                        CameraSpacePoint firstHeadPt = body.Joints[JointType.Head].CameraSpacePoint;
-                        CameraSpacePoint currentHeadPt = currentBody.Joints[JointType.Head].CameraSpacePoint;
-                        double difference = Math.Sqrt(Math.Pow(firstHeadPt.X - currentHeadPt.X, 2) + Math.Pow(firstHeadPt.Y - currentHeadPt.Y, 2) + Math.Pow(firstHeadPt.Z - currentHeadPt.Z, 2));
-                        if (difference > 0.05)
+                        // Left hand
+                        if (!this.RemainStationary(JointType.HandLeft, currentBody, previousBody, ref msg))
                         {
-                            msg = "Head movement?";
+                            return false;
+                        }
+                        // Right right
+                        if (!this.RemainStationary(JointType.HandRight, currentBody, previousBody, ref msg))
+                        {
                             return false;
                         }
                     }
+                }
+            }
+            else
+            {
+                bool allMissing = true;
+                foreach (TrackerResult.Person person in this.currentResult.People)
+                {
+                    bool personMissing = true;
+                    foreach (TrackerResult.PotentialSkeleton potentialSkeletons in person.PotentialSkeletons)
+                    {
+                        if (potentialSkeletons.Skeleton.CurrentPosition != null)
+                        {
+                            personMissing = false;
+                            break;
+                        }
+                    }
+                    if (!personMissing)
+                    {
+                        allMissing = false;
+                        break;
+                    }
+                }
+                if (allMissing)
+                {
+                    msg = "Out of Bounds?";
+                    return false;
                 }
             }
             return true;
@@ -214,20 +267,32 @@ namespace KinectMultiTrack
                 }
             }
 
-            Debug.WriteLine("Tracked people: " + trackedPeopleList.Count, "People Detection");
+            Debug.WriteLine("Tracked people after matching: " + trackedPeopleList.Count, "People Detection");
 
             // Add remaining skeletons as single-skeleton person
             foreach (TrackerResult.PotentialSkeleton potentialSkeleton in currentSkeletonsList)
             {
-                // Update skeleton id!!
-                potentialSkeleton.Id = 0;
-                TrackerResult.Person person = new TrackerResult.Person(potentialSkeleton);
-                // Update person id!!
-                person.Id = (uint)trackedPeopleList.Count;
-                trackedPeopleList.Add(person);
+                if (potentialSkeleton.Skeleton.CurrentPosition != null)
+                {
+                    // Update skeleton id!!
+                    potentialSkeleton.Id = 0;
+                    TrackerResult.Person person = new TrackerResult.Person(potentialSkeleton);
+                    // Update person id!!
+                    person.Id = (uint)trackedPeopleList.Count;
+                    trackedPeopleList.Add(person);
+                }
             }
 
-            return new TrackerResult(currentFOVsList, trackedPeopleList);
+            Debug.WriteLine("Tracked people total: " + trackedPeopleList.Count, "People Detection");
+
+            if (trackedPeopleList.Count == 0)
+            {
+                return TrackerResult.Empty;
+            }
+            else
+            {
+                return new TrackerResult(currentFOVsList, trackedPeopleList);
+            }
         }
 
         // Create person based on different FOVs and proximity in worldview positions

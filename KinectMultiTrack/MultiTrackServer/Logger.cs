@@ -32,7 +32,7 @@ namespace KinectMultiTrack
         public static readonly int KINECT_LEFT_90 = 4;
 
         private static readonly string STUDY = "Study";
-        private static readonly string KINECT_CONFIG = "Kinect";
+        private static readonly string KINECT_CONFIG = "KinectConfig";
         private static readonly string USER_SCENARIO = "Scenario";
         private static readonly string TRACKER_TIME = "Tracker_Time";
         private static readonly string PERSON = "Person#";
@@ -67,10 +67,10 @@ namespace KinectMultiTrack
                 Logger.TRACKER_TIME, 
                 Logger.PERSON,
                 Logger.SKEL,
+                Logger.SKEL_TIME,
                 Logger.SKEL_INIT_ANGLE,
                 Logger.SKEL_INIT_DIST,
-                Logger.SKEL_TIME,
-                Logger.KINECT_CONFIG,
+                Logger.KINECT,
                 Logger.KINECT_TILT_ANGLE,
                 Logger.KINECT_HEIGHT
             };
@@ -156,12 +156,12 @@ namespace KinectMultiTrack
         {
             foreach (Tuple<TrackerResult.PotentialSkeleton, Dictionary<JointType, KinectJoint>> coordinateTuple in coordinates)
             {
-                TrackerResult.PotentialSkeleton replica = coordinateTuple.Item1;
+                TrackerResult.PotentialSkeleton pSkeleton = coordinateTuple.Item1;
                 Dictionary<JointType, KinectJoint> joints = coordinateTuple.Item2;
                 // Headers
-                writer.Write(String.Format("{0}, {1}, {2}, {3}, ", Logger.CURRENT_STUDY_ID, Logger.CURRENT_USER_SCENARIO, timestamp, personId));
-                writer.Write(String.Format("{0}, {1}, {2}, {3}, ", replica.Id, replica.Skeleton.InitialAngle, replica.Skeleton.InitialDistance, replica.Skeleton.Timestamp));
-                writer.Write(String.Format("{0}, {1}, {2}", replica.FOV.Id, replica.FOV.Specification.TiltAngle, replica.FOV.Specification.Height));
+                writer.Write(String.Format("{0}, {1}, {2}, {3}, {4}, ", Logger.CURRENT_STUDY_ID, Logger.CURRENT_KINECT_CONFIGURATION, Logger.CURRENT_USER_SCENARIO, timestamp, personId));
+                writer.Write(String.Format("{0}, {1}, {2}, {3}, ", pSkeleton.Id, pSkeleton.Skeleton.Timestamp, pSkeleton.Skeleton.InitialAngle, pSkeleton.Skeleton.InitialDistance));
+                writer.Write(String.Format("{0}, {1}, {2}", pSkeleton.FOV.ClientIP.Address, pSkeleton.FOV.Specification.TiltAngle, pSkeleton.FOV.Specification.Height));
                 // Joint_X, Joint_Y, Joint_Z
                 Logger.WriteJointsData(writer, joints);
             }

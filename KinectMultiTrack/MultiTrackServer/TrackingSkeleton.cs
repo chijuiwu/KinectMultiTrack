@@ -70,7 +70,14 @@ namespace KinectMultiTrack
             {
                 this.Positions.Clear();
             }
-            this.Positions.Push(new TrackingSkeleton.Position(body, WBody.Create(body, this.InitialAngle, this.InitialCenterPosition)));
+            if (body != null)
+            {
+                this.Positions.Push(new TrackingSkeleton.Position(body, WBody.Create(body, this.InitialAngle, this.InitialCenterPosition)));
+            }
+            else
+            {
+                this.Positions.Push(null);
+            }
         }
 
         public override string ToString()
@@ -129,7 +136,14 @@ namespace KinectMultiTrack
 
             public static Position Copy(Position position)
             {
-                return new Position(SBody.Copy(position.Kinect), WBody.Copy(position.Worldview));
+                if (position != null)
+                {
+                    return new Position(SBody.Copy(position.Kinect), WBody.Copy(position.Worldview));
+                }
+                else
+                {
+                    return null;
+                }
             }
         }
     }
