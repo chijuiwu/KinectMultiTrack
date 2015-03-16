@@ -48,16 +48,14 @@ namespace KinectMultiTrack.UI
         private CoordinateMapper coordinateMapper;
 
         public event TrackingUISetupHandler OnSetup;
-        public delegate void TrackingUISetupHandler(int kinectCount);
+        public delegate void TrackingUISetupHandler(int kinectCount, int studyId, int kinectConfiguration);
         public event TrackingUIHandler OnStartStop;
         public delegate void TrackingUIHandler(bool start);
         public event TrackingUIUpdateHandler OnDisplayResult;
-        public delegate void TrackingUIUpdateHandler(int studyId, int kinectConfiguration, int userScenario, TrackerResult result);
+        public delegate void TrackingUIUpdateHandler(int userScenario, TrackerResult result);
 
         private bool studyOn;
         private IEnumerable<UserTask> userTasks;
-        private int currentStudyId;
-        private int currentKinectConfiguration;
         private int currentTaskIdx;
         private bool toRecalibrate;
 
@@ -177,12 +175,10 @@ namespace KinectMultiTrack.UI
             if (setup.DialogResult.HasValue && setup.DialogResult.Value)
             {
                 this.studyOn = setup.User_Study_On;
-                this.currentStudyId = setup.User_Study_Id;
-                this.currentKinectConfiguration = setup.Kinect_Configuration;
                 this.userTasks = setup.User_Task;
                 this.currentTaskIdx = 0;
                 this.StartBtn.IsEnabled = true;
-                this.OnSetup(setup.Kinect_Count);
+                this.OnSetup(setup.Kinect_Count, setup.User_Study_Id, setup.Kinect_Configuration);
                 this.ShowProgressText(TrackingUI.INITIALIZED);
                 if (this.userTasks.Equals(UserTask.TASK_FREE))
                 {
@@ -294,7 +290,7 @@ namespace KinectMultiTrack.UI
             if (this.studyOn)
             {
                 // For writing to log file
-                this.OnDisplayResult(this.currentStudyId, this.currentKinectConfiguration, this.userTasks.ElementAt(this.currentTaskIdx).ScenarioId, result);
+                this.OnDisplayResult(this.userTasks.ElementAt(this.currentTaskIdx).ScenarioId, result);
             }
             else if (!this.studyOn || this.userTasks.Equals(UserTask.TASK_FREE))
             {

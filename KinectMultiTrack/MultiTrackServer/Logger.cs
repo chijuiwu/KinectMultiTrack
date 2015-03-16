@@ -52,9 +52,9 @@ namespace KinectMultiTrack
         public static int CURRENT_KINECT_CONFIGURATION = Logger.NA;
 
         private static readonly string DATA_DIR = "..\\..\\..\\..\\Data\\";
-        private static readonly string DATA_FILENAME_FORMAT = "Study_{0}_Kinect{1}_Scenario_{2}.csv";
+        private static readonly string DATA_FILENAME_FORMAT = "Study_{0}_Kinect{1}_Time_{2}.csv";
         private static readonly List<string> HEADERS = Logger.GetHeaders();
-        private static readonly StreamWriter WRITER = Logger.OpenFileWriter(Logger.DATA_DIR, Logger.HEADERS);
+        private static StreamWriter WRITER;
 
         private static readonly object syncLogLock = new object();
 
@@ -91,14 +91,25 @@ namespace KinectMultiTrack
             }
         }
 
-        private static StreamWriter OpenFileWriter(string directory, List<string> headers)
+        public static void OpenFile(int studyId, int kinectConfiguration)
         {
-            string filepath = directory + String.Format(Logger.DATA_FILENAME_FORMAT, Logger.CURRENT_STUDY_ID, Logger.CURRENT_KINECT_CONFIGURATION, Logger.CURRENT_USER_SCENARIO);
-            Logger.CreateFile(filepath, headers);
+            if (Logger.WRITER != null)
+            {
+                Logger.WRITER.Close();
+            }
+            Logger.CURRENT_STUDY_ID = studyId;
+            Logger.CURRENT_KINECT_CONFIGURATION = kinectConfiguration;
+            string filepath = Logger.DATA_DIR + String.Format(Logger.DATA_FILENAME_FORMAT, Logger.CURRENT_STUDY_ID, Logger.CURRENT_KINECT_CONFIGURATION, DateTime.Now.ToString("h_mm_ss_tt"));
+            Logger.WRITER = Logger.OpenFileWriter(filepath);
+        }
+
+        private static StreamWriter OpenFileWriter(string filepath)
+        {
+            Logger.CreateFileIfNotExists(filepath, Logger.HEADERS);
             return new StreamWriter(filepath, true);
         }
 
-        private static void CreateFile(string filepath, List<string> headers)
+        private static void CreateFileIfNotExists(string filepath, List<string> headers)
         {
             using (StreamReader r = new StreamReader(File.Open(filepath, FileMode.OpenOrCreate, FileAccess.Read, FileShare.ReadWrite)))
             {
@@ -119,12 +130,10 @@ namespace KinectMultiTrack
             }
         }
 
-        public static void SynchronizeLogging(int studyId, int kinectConfiguration, int userScenario, TrackerResult result)
+        public static void SynchronizeLogging(int userScenario, TrackerResult result)
         {
             lock (Logger.syncLogLock)
             {
-                Logger.CURRENT_STUDY_ID = studyId;
-                Logger.CURRENT_KINECT_CONFIGURATION = kinectConfiguration;
                 Logger.CURRENT_USER_SCENARIO = userScenario;
                 foreach (TrackerResult.Person person in result.People)
                 {

@@ -94,9 +94,13 @@ namespace KinectMultiTrack
             Dispatcher.Run();
         }
 
-        private void ConfigureServer(int kinectCount)
+        private void ConfigureServer(int kinectCount, int studyId, int kinectConfiguration)
         {
             this.tracker.Configure(kinectCount);
+            if (studyId != Logger.NA)
+            {
+                Logger.OpenFile(studyId, kinectConfiguration);
+            }
         }
 
         // Accepts connections and for each thread spaw a new connection
@@ -165,9 +169,9 @@ namespace KinectMultiTrack
             track.Start();
         }
 
-        private void Log(int studyId, int kinectConfiguration, int userScenario, TrackerResult result)
+        private void Log(int userScenario, TrackerResult result)
         {
-            Thread log = new Thread(() => Logger.SynchronizeLogging(studyId, kinectConfiguration, userScenario, result));
+            Thread log = new Thread(() => Logger.SynchronizeLogging(userScenario, result));
             log.Start();
         }
     }

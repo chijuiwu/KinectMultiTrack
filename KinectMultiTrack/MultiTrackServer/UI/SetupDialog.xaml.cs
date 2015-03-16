@@ -136,7 +136,7 @@ namespace KinectMultiTrack.UI
         {
             this.Kinect_Count = this.GetKinectCount();
             this.User_Study_On = this.GetStudyOn();
-            this.User_Study_Id = this.GetStudyId();
+            this.User_Study_Id = this.User_Study_On ? this.GetStudyId() : Logger.NA;
             this.User_Task = this.GetUserTask();
             this.Kinect_Configuration = this.GetKinectConfiguration();
             this.DialogResult = true;
