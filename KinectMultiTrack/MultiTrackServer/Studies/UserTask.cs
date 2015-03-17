@@ -17,14 +17,18 @@ namespace KinectMultiTrack.Studies
         public static string BACKWARD = "Move Backward";
         public static string FORWARD = "Move Forward";
         public static string START_POSITION = "Move to the\nStarting Position";
-        public static string CIRCLE = "Go Around the\nCircle (Clockwise)";
+        public static string SQUARE = "Go Around the\nSquare (Clockwise)";
+        public static string TOP_RIGHT = "Go to Top Right";
+        public static string BOT_LEFT = "Go to Bottom Left";
+        public static string TOP_LEFT = "Go to Top Left";
+        public static string BOT_RIGHT = "Go to Bottom Right";
 
         // Interaction
         public static string PERSON_1_WALK = "Person 1\nWalks Past\nPerson2";
         public static string PERSONS_WALK = "Two People\nWalk Past\nEach Other";
 
         // Occlusion
-        public static string GO_AROUND_OCCLUSION = "Go Around the\nOcclusion Object";
+        public static string GO_AROUND_OCCLUSION = "Go Around the\nObstacle";
 
         // Instruction
         public static string READY = "Ready";
@@ -68,7 +72,11 @@ namespace KinectMultiTrack.Studies
         {
             new UserTask(UserTask.READY, Logger.SCENARIO_NA),
             new UserTask(UserTask.START_POSITION, Logger.SCENARIO_WALK_CURRENT),
-            new UserTask(UserTask.CIRCLE, Logger.SCENARIO_WALK_CURRENT),
+            new UserTask(UserTask.SQUARE, Logger.SCENARIO_WALK_CURRENT),
+            new UserTask(UserTask.TOP_RIGHT, Logger.SCENARIO_WALK_CURRENT),
+            new UserTask(UserTask.BOT_LEFT, Logger.SCENARIO_WALK_CURRENT),
+            new UserTask(UserTask.TOP_LEFT, Logger.SCENARIO_WALK_CURRENT),
+            new UserTask(UserTask.BOT_RIGHT, Logger.SCENARIO_WALK_CURRENT),
             new UserTask(UserTask.DONE, Logger.SCENARIO_NA)
         };
 

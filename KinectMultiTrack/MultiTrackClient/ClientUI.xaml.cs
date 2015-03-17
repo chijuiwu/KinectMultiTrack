@@ -57,7 +57,7 @@ namespace MultiTrackClient
         {
             this.InitializeComponent();
 
-            this.kinectSocket = new ClientSocket(ClientUI.localhost, ClientUI.kinectServerPort);
+            this.kinectSocket = new ClientSocket(ClientUI.kinectServerAddress, ClientUI.kinectServerPort);
 
             this.DataContext = this;
             this.KinectStatusText = Properties.Resources.KinectUninitialized;
