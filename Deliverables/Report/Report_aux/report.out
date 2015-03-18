@@ -2,20 +2,34 @@
 \BOOKMARK [2][-]{section*.6}{Problem statement}{section*.5}% 2
 \BOOKMARK [2][-]{section*.8}{Contributions}{section*.5}% 3
 \BOOKMARK [1][-]{section*.9}{Previous Work}{}% 4
-\BOOKMARK [2][-]{section*.10}{Coordiante transfomration}{section*.9}% 5
-\BOOKMARK [3][-]{section*.11}{Tracking using RGB-D data}{section*.10}% 6
-\BOOKMARK [1][-]{section*.12}{Kinect}{}% 7
-\BOOKMARK [1][-]{section*.13}{Current Approach}{}% 8
-\BOOKMARK [2][-]{section*.14}{Multiple Kinects and Sockets}{section*.13}% 9
-\BOOKMARK [3][-]{section*.15}{Serialization}{section*.14}% 10
-\BOOKMARK [2][-]{section*.16}{Calibration}{section*.13}% 11
-\BOOKMARK [2][-]{section*.17}{Tracking}{section*.13}% 12
-\BOOKMARK [1][-]{section*.18}{Testing}{}% 13
-\BOOKMARK [2][-]{section*.20}{Occlusion}{section*.18}% 14
-\BOOKMARK [1][-]{section*.21}{Evaluation}{}% 15
-\BOOKMARK [2][-]{section*.22}{User study}{section*.21}% 16
-\BOOKMARK [2][-]{section*.26}{Occlusion}{section*.21}% 17
-\BOOKMARK [1][-]{section*.27}{Extensions}{}% 18
-\BOOKMARK [1][-]{section*.28}{Acknowledgments}{}% 19
-\BOOKMARK [1][-]{section*.29}{HACK}{}% 20
-\BOOKMARK [1][-]{section*.30}{REFERENCES }{}% 21
+\BOOKMARK [2][-]{section*.10}{Tracking people}{section*.9}% 5
+\BOOKMARK [2][-]{section*.11}{Coordiante transfomration}{section*.9}% 6
+\BOOKMARK [2][-]{section*.12}{Tracking using depth data}{section*.9}% 7
+\BOOKMARK [2][-]{section*.13}{Tracking using color data}{section*.9}% 8
+\BOOKMARK [1][-]{section*.14}{Kinect}{}% 9
+\BOOKMARK [1][-]{section*.15}{Current Approach}{}% 10
+\BOOKMARK [2][-]{section*.16}{Overview}{section*.15}% 11
+\BOOKMARK [2][-]{section*.17}{Computer Specification}{section*.15}% 12
+\BOOKMARK [2][-]{section*.18}{Kinect Body Stream}{section*.15}% 13
+\BOOKMARK [2][-]{section*.19}{Clients and Servers}{section*.15}% 14
+\BOOKMARK [3][-]{section*.20}{Communication Protocol}{section*.19}% 15
+\BOOKMARK [3][-]{section*.21}{Serialization}{section*.19}% 16
+\BOOKMARK [2][-]{section*.22}{Calibration}{section*.15}% 17
+\BOOKMARK [2][-]{section*.23}{Tracking by detection}{section*.15}% 18
+\BOOKMARK [2][-]{section*.24}{Handling occlusion}{section*.15}% 19
+\BOOKMARK [2][-]{section*.25}{Handling new skeletons}{section*.15}% 20
+\BOOKMARK [2][-]{section*.26}{Advantages}{section*.15}% 21
+\BOOKMARK [2][-]{section*.27}{Disadvantages}{section*.15}% 22
+\BOOKMARK [1][-]{section*.28}{Testing}{}% 23
+\BOOKMARK [2][-]{section*.30}{Occlusion}{section*.28}% 24
+\BOOKMARK [1][-]{section*.31}{Evaluation}{}% 25
+\BOOKMARK [2][-]{section*.32}{User study}{section*.31}% 26
+\BOOKMARK [2][-]{section*.36}{Occlusion}{section*.31}% 27
+\BOOKMARK [1][-]{section*.37}{Application}{}% 28
+\BOOKMARK [1][-]{section*.38}{Future Work}{}% 29
+\BOOKMARK [2][-]{section*.39}{User studies}{section*.38}% 30
+\BOOKMARK [2][-]{section*.40}{Application}{section*.38}% 31
+\BOOKMARK [1][-]{section*.41}{SH Project Reflection}{}% 32
+\BOOKMARK [2][-]{section*.42}{Requirement Specifications}{section*.41}% 33
+\BOOKMARK [1][-]{section*.43}{Acknowledgments}{}% 34
+\BOOKMARK [1][-]{section*.44}{REFERENCES }{}% 35

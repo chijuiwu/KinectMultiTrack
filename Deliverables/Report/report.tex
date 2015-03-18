@@ -94,7 +94,7 @@ Copyright \copyright~Chi-Jui Wu. \\
 This paper is my undergraduate thesis, completed in School of Computer Science, University of St Andrews, in 2015. The current work is a people tracking system consisted of multiple Kinects. The project aim is to track people in real world environments and resolve the occlusion problem. The final product contains an interactive software for tracking people and an user study on the developed system. The advantages and limitations of the system are discussed.
 \end{abstract}
 
-\keywords{Tracking; Kinect; Calibration; HCI}
+\keywords{Tracking; Occlusion; Kinect; Calibration; HCI}
 
 \category{H.5.m.}{Information Interfaces and Presentation
   (e.g. HCI)}{Miscellaneous}{}{}
@@ -120,6 +120,12 @@ The problem is illustrated in Figure \ref{fig:occlusion_problem}.
 
 Replicate current research. Resolve the problem of occlusion using multiple Kinects. 
 
+\begin{enumerate}
+  \item The first item
+  \item The second item
+  \item The third etc
+\end{enumerate}
+
 \section{Previous Work}
 
 Existing people detection and tracking techniques. Tracking people in surveillance video and in realtime. Tracking using mobile and wearable devices. Motion sensors and wireless. Time-of-flight and structured-light cameras.
@@ -130,13 +136,17 @@ Existing people detection and tracking techniques. Tracking people in surveillan
 [Paper: Tracking people under heavy occlusions by layered data association]
 [Paper: Detection and Tracking of Occluded People]
 
-\subsubsection{Coordiante transfomration}
+\subsection{Tracking people}
+
+\subsection{Coordiante transfomration}
 
 \cite{wei_kinect_calibration}
 \cite{eggert_four_algorithms}
 \cite{horn_unit_quaternions}
 
-\subsubsection{Tracking using RGB-D data}
+\subsection{Tracking using depth data}
+
+\subsection{Tracking using color data}
 
 [Paper: Tracking people within groups using RGB-D data]
 [Paper: Detecting and tracking people in real time with RGB-D camera]
@@ -150,15 +160,21 @@ The specification and components. Include image Larger field of views. Give exam
 
 \section{Current Approach}
 
+\subsection{Overview}
+
 The current system consists of two Kinects and two machines. Each machine is a client running one Kinect, and one machine 
 
 \subsection{Computer Specification}
 
 The server machine is running Microsoft Windows 8 on. The other client machine is running 
 
-\subsection{Sockets}
+\subsection{Kinect Body Stream}
+
+\subsection{Clients and Servers}
 
 Clients sends the Kinect body stream to the server
+
+\subsubsection{Communication Protocol}
 
 \subsubsection{Serialization}
 
@@ -171,9 +187,17 @@ BodyFrame, Body, Joint. The important elements are the tracking state, joint typ
 
 Discuss the techniques from Wei et al.
 
-\subsection{Tracking}
+\subsection{Tracking by detection}
 
 Skeletons from different Kinects matched based on spatial information. Filling the gaps of skeletons.
+
+\subsection{Handling occlusion}
+
+\subsection{Handling new skeletons}
+
+\subsection{Advantages}
+
+\subsection{Disadvantages}
 
 \section{Testing}
 
@@ -216,7 +240,7 @@ Discuss results. Compre them with Wei et al.
 
 \subsection{Occlusion}
 
-User study with multiple people and object occlusion.
+User study with multiple people and obstacles.
 
 \section{Application}
 
@@ -224,11 +248,15 @@ SECTION
 
 \section{Future Work}
 
-SECTION
+\subsection{User studies}
+
+\subsection{Application}
 
 \section{SH Project Reflection}
 
 SECTION
+
+\subsection{Requirement Specifications}
 
 \section{Acknowledgments}
 
