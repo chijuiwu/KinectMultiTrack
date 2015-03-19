@@ -25,7 +25,9 @@ namespace KinectMultiTrack.Studies
 
         // Interaction
         public static string PERSON_1_WALK = "Person 1\nWalks Past\nPerson 2";
+        public static string PERSON_1_AROUND = "Person 1\nGoes Around\nPerson 2";
         public static string PERSON_2_WALK = "Person 2\nWalks Past\nPerson 1";
+        public static string PERSON_2_AROUND = "Person 2\nGoes Around\nPerson 1";
         public static string PERSONS_EXCHANGE = "Exchange Positions";
 
         // Occlusion
@@ -87,8 +89,10 @@ namespace KinectMultiTrack.Studies
         {
             new UserTask(UserTask.READY, Logger.SCENARIO_NA),
             new UserTask(UserTask.PERSON_1_WALK, Logger.SCENARIO_INTERACTION_1_P1),
+            new UserTask(UserTask.PERSON_1_AROUND, Logger.SCENARIO_INTERACTION_1_P1),
             new UserTask(UserTask.READY, Logger.SCENARIO_NA),
             new UserTask(UserTask.PERSON_2_WALK, Logger.SCENARIO_INTERACTION_1_P2),
+            new UserTask(UserTask.PERSON_2_AROUND, Logger.SCENARIO_INTERACTION_1_P1),
             new UserTask(UserTask.DONE, Logger.SCENARIO_NA)
         };
 
