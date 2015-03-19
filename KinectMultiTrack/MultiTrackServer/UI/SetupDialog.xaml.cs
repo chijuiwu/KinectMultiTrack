@@ -42,6 +42,7 @@ namespace KinectMultiTrack.UI
                 {this.User_Scenario_Stationary, UserTask.TASK_STATIONARY},
                 {this.User_Scenario_Walk_Wei, UserTask.TASK_WALK_WEI},
                 {this.User_Scenario_Walk_Current, UserTask.TASK_WALK_CURRENT},
+                {this.User_Scenario_Interactions, UserTask.TASK_INTERACTIONS},
                 {this.User_Scenario_Interaction_1, UserTask.TASK_INTERACTION_1},
                 {this.User_Scenario_Interaction_2, UserTask.TASK_INTERACTION_2},
                 {this.User_Scenario_Occlusion_1, UserTask.TASK_OCCLUSION_1},

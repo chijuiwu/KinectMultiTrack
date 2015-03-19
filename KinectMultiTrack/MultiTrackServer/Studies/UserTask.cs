@@ -24,8 +24,9 @@ namespace KinectMultiTrack.Studies
         public static string BOT_RIGHT = "Go to Bottom Right";
 
         // Interaction
-        public static string PERSON_1_WALK = "Person 1\nWalks Past\nPerson2";
-        public static string PERSONS_WALK = "Two People\nWalk Past\nEach Other";
+        public static string PERSON_1_WALK = "Person 1\nWalks Past\nPerson 2";
+        public static string PERSON_2_WALK = "Person 2\nWalks Past\nPerson 1";
+        public static string PERSONS_EXCHANGE = "Exchange Positions";
 
         // Occlusion
         public static string GO_AROUND_OCCLUSION = "Go Around the\nObstacle";
@@ -85,16 +86,20 @@ namespace KinectMultiTrack.Studies
         public static readonly IEnumerable<UserTask> TASK_INTERACTION_1 = new List<UserTask>()
         {
             new UserTask(UserTask.READY, Logger.SCENARIO_NA),
-            new UserTask(UserTask.PERSON_1_WALK, Logger.SCENARIO_INTERACTION_1),
+            new UserTask(UserTask.PERSON_1_WALK, Logger.SCENARIO_INTERACTION_1_P1),
+            new UserTask(UserTask.READY, Logger.SCENARIO_NA),
+            new UserTask(UserTask.PERSON_2_WALK, Logger.SCENARIO_INTERACTION_1_P2),
             new UserTask(UserTask.DONE, Logger.SCENARIO_NA)
         };
 
         public static readonly IEnumerable<UserTask> TASK_INTERACTION_2 = new List<UserTask>()
         {
             new UserTask(UserTask.READY, Logger.SCENARIO_NA),
-            new UserTask(UserTask.PERSONS_WALK, Logger.SCENARIO_INTERACTION_2),
+            new UserTask(UserTask.PERSONS_EXCHANGE, Logger.SCENARIO_INTERACTION_2),
             new UserTask(UserTask.DONE, Logger.SCENARIO_NA)
         };
+
+        public static readonly IEnumerable<UserTask> TASK_INTERACTIONS = UserTask.TASK_INTERACTION_1.Concat(UserTask.TASK_INTERACTION_2);
 
         public static readonly IEnumerable<UserTask> TASK_OCCLUSION_1 = new List<UserTask>()
         {

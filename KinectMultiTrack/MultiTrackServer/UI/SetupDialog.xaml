@@ -67,6 +67,7 @@
                     <RadioButton IsEnabled="False" x:Name="User_Scenario_Stationary" Content="Stationary" GroupName="User_Scenario" FontSize="14" FontFamily="Microsoft Sans Serif" Margin="10,0,0,0" />
                     <RadioButton IsEnabled="False" x:Name="User_Scenario_Walk_Wei" Content="Walk (Wei et al)" GroupName="User_Scenario" FontSize="14" FontFamily="Microsoft Sans Serif" Margin="10,0,0,0" />
                     <RadioButton IsEnabled="False" x:Name="User_Scenario_Walk_Current" Content="Walk (Current)" GroupName="User_Scenario" FontSize="14" FontFamily="Microsoft Sans Serif" Margin="10,0,0,0" />
+                    <RadioButton IsEnabled="False" x:Name="User_Scenario_Interactions" Content="Interactions (2)" GroupName="User_Scenario" FontSize="14" FontFamily="Microsoft Sans Serif" Margin="10,0,0,0" />
                     <RadioButton IsEnabled="False" x:Name="User_Scenario_Interaction_1" Content="Interaction 1" GroupName="User_Scenario" FontSize="14" FontFamily="Microsoft Sans Serif" Margin="10,0,0,0" />
                     <RadioButton IsEnabled="False" x:Name="User_Scenario_Interaction_2" Content="Interaction 2" GroupName="User_Scenario" FontSize="14" FontFamily="Microsoft Sans Serif" Margin="10,0,0,0" />
                     <RadioButton IsEnabled="False" x:Name="User_Scenario_Occlusion_1" Content="Occlusion 1" GroupName="User_Scenario" FontSize="14" FontFamily="Microsoft Sans Serif" Margin="10,0,0,0" />
