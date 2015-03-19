@@ -7,7 +7,7 @@
 
 %% EXAMPLE BEGIN -- HOW TO OVERRIDE THE DEFAULT COPYRIGHT STRIP -- (July 22, 2013 - Paul Baumann)
 \toappear{
-{\emph{University of St Andrews}}, April 3, 2015, United Kingdom. \\
+{\emph{University of St Andrews}}, April 10th, 2015, United Kingdom. \\
 Copyright \copyright~Chi-Jui Wu. \\
 }
 %% EXAMPLE END -- HOW TO OVERRIDE THE DEFAULT COPYRIGHT STRIP -- (July 22, 2013 - Paul Baumann)
@@ -305,7 +305,7 @@ Participants are multinational university students and staff. There are particip
 
 \subsection{Setting}
 
-The studies take place in a semi-controlled environment (See Figure \ref{fig:studies_setting}). The two Kinects are placed at either three pre-defined locations, where they are approximately parallel, 45 and 90 degrees apart. One Kinect is always placed at the front position; it is the Kinect on the left in the image. (\textbf{(todo: measure the exact angles and distances between them - they are marked by duct tapes so shouldn't be too hard)}) Duct tapes are used to mark the precise locations of the Kinects. The boundary within which the participants will be moving is also marked with duct tapes. The sides of the block are found empirically to be near the minimum distance of the Kinect viewing range of the full body skeleton. The dimension of the boundary is x by x meters (\textbf{(todo: find the dimensions in meters)}). Each potential step is marked with duct tapes colored in a hue (either black or red) different from the color on the duct tapes in the previous step. The starting position has a distinct color (green) from all other steps.
+The studies take place in a semi-controlled environment (See Figure \ref{fig:studies_setting}). The two Kinects are placed at either three pre-defined locations, where they are approximately parallel, 45 and 90 degrees apart. One Kinect is always placed at the front position; it is the Kinect on the left in the image. (\textbf{(todo: measure the exact angles and distances between them - they are marked by duct tapes so shouldn't be too hard)}) Duct tapes are used to mark the precise locations of the Kinects. The boundary within which the participants will be moving is also marked with duct tapes. The sides of the block are found empirically to be near the minimum distance of the Kinect viewing range of the full body skeleton. The dimension of the boundary is x by x meters (\textbf{(todo: find the dimensions in meters)}). Each potential step is marked with duct tapes colored in a hue (either black or red) different from that on the duct tapes in the previous step. The starting position has a distinct color (green) from all other steps.
 
 \begin{figure}[!h]
   \centering
@@ -325,27 +325,35 @@ Firstly, participants are introduced to the project aims and objectives. They ar
 
 \subsection{Ethics}
 
-There are no legitimate ethics concerns about participating in the studies. The skeleton data are annoymized and will be stored up to a maximum of three years.
+There are no legitimate ethical concerns about participating in the studies. The skeleton data are annoymized and will be stored up to a maximum of three years. Any participant who feels uncomfortable with the guideline is welcome to speak to the researcher and his supervisor.
 
 \subsection{Study 1: Stationary}
 
-In the first study, participants are required to remain stationary for ten seconds in the center of the block.
+In the first study, participants are required to remain stationary for ten seconds in the center of the block. The study is done with all three Kinect configurations.
 
 \subsection{Study 2: Basic Movements}
 
-The second study requires the participants to move in the same way as explained in the Wei et al study. The specific movements are forward,
+The second study requires the participants to move in the same way as explained in the Wei et al study. These are basic movements such as moving forward, backward, left, and right. The study is done with all three Kinect configurations.
 
 \subsection{Study 3: Continuous Movements}
 
-The third study requires the participants to walk around the perimeter of the block and walk diagonally to each of the corners.
+The third study requires the participants to walk around the perimeter of the block and walk diagonally to each of four corners. Like the previous two studies, study 3 is done with all three Kinect configurations. Studies 1, 2, 3 are conducted in succession for every participant.
 
-\subsection{Study 4: Interaction 1?}
+\subsection{Study 4: Two people Cross-over}
+
+The fourth study involves two people. They stand next to each other. The person on the left will walk to the front of the other person, then back to his initial position. Then he will walk around the person, from the front to the back, then return to his starting position. The other person does the same. In the end, both people exchange positions.
 
 \subsection{Study 5: Interaction 2?}
 
 \subsection{Study 6: Occlusion}
 
-Participants are asked to walk around a large obstacle (a poster).
+Participants are asked to walk around a large obstacle, which is a large poster in the current study. The obstacle divides the field of view of two Kinects at 90 degrees apart (See Figure \ref{fig:studies_obstacle}). The participant starts on the right hand side of the obstacle, where he is visible to both Kinects. As the participant walks around the obstacle, from the back, then to the left side of the obstacle, the Kinect that was looking at the side of the participant will slowly lose the sight of the person. When the participant is on the other side of the obstacle, only the front-facing Kinect will have sight of the person. The study should demonstrate that the system would still be able to track the person despite that one of the Kinect loses the person's sight temporarily. The study is only done with Kinects placed 90 degrees apart.
+
+\begin{figure}[!h]
+  \centering
+  \includesvg[width=0.9\columnwidth]{studies_obstacle}
+  \caption{The obstacle in the actual experiment}~\label{fig:studies_obstacle}
+\end{figure}
 
 \section{Evaluation}
 
@@ -371,6 +379,8 @@ Discuss results. Compre them with Wei et al.
 
 \section{Application}
 
+The system application is for demonstrating that the system works as intended. The main componenets of the application consist of a server, a tracker, a user interface, and a logger. The server passes on the Kinect BodyFrames to the tracker. The tracker then processes the data, and the tracking result is shown on the user interface as a visualization of people's skeletons. The logger writes the tracking result to files if requested by the end user.
+
 \begin{figure}[!h]
   \centering
   \includegraphics[width=0.9\columnwidth]{ui}
@@ -380,7 +390,13 @@ Discuss results. Compre them with Wei et al.
 
 \subsection{Design}
 
+The application should be intuitive and easy to use. It should display the skeletons before and after applying coordinate transformation and skeleton matching. The skeleton visualization should also be rendered at the same speed as that of Kinect BodyFrames arriving. The application provides with user essential functionalities to start and stop the server, recalibrate, can send the average skeleton stream to other applications. \textbf{(todo: implement the last two)}  
+
+The user interface is created using the .NET WPF framework, because all official .
+
 \subsection{Implementation}
+
+
 
 \subsubsection{Tracking View}
 
@@ -404,33 +420,11 @@ SECTION
 
 \section{Acknowledgments}
 
-The skeleton visualization is modified based on the Microsoft Kinect Developer examples.
+I declare that, unless otherwise stated, the work is completed by myself, Chi-Jui Wu, under the supervision of Dr. David Harris-Birtill. The code for skeleton visualization is written based on the official Microsoft Kinect Developer example.
+In addition, all infographics, excluding real-life images, are created by Ching Su. I retain the copyright of this work.
 
-All pictorial illustrations excluding screenshots are not done by myself
-.
-% Balancing columns in a ref list is a bit of a pain because you
-% either use a hack like flushend or balance, or manually insert
-% a column break.  http://www.tex.ac.uk/cgi-bin/texfaq2html?label=balance
-% multicols doesn't work because we're already in two-column mode,
-% and flushend isn't awesome, so I choose balance.  See this
-% for more info: http://cs.brown.edu/system/software/latex/doc/balance.pdf
-%
-% Note that in a perfect world balance wants to be in the first
-% column of the last page.
-%
-% If balance doesn't work for you, you can remove that and
-% hard-code a column break into the bbl file right before you
-% submit:
-%
-% http://stackoverflow.com/questions/2149854/how-to-manually-equalize-columns-
-% in-an-ieee-paper-if-using-bibtex
-%
-% Or, just remove \balance and give up on balancing the last page.
-%
 \balance{}
 
-% REFERENCES FORMAT
-% References must be the same font size as other body text.
 \bibliographystyle{SIGCHI-Reference-Format}
 \bibliography{report_bib}
 
@@ -453,8 +447,3 @@ BodyFrame, Body, Joint. The important elements are the tracking state, joint typ
 \end{appendices}
 
 \end{document}
-
-%%% Local Variables:
-%%% mode: latex
-%%% TeX-master: t
-%%% End:
