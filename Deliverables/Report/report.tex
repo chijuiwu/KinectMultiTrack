@@ -34,6 +34,7 @@ Copyright \copyright~Chi-Jui Wu. \\
 \usepackage{svg}
 \usepackage{amsmath}
 \usepackage[toc,page]{appendix}
+\usepackage{nameref}
 
 % Set figures directory
 \graphicspath{{./figures/}}
@@ -103,12 +104,13 @@ Word count:
   (e.g. HCI)}{Miscellaneous}{}{}
 
 \section{Introduction}
-
+\label{sec:introduction}
 
 
 \section{Problem statement}
+\label{sec:problem_statement}
 
-The task of detecting and tracking moving targets in real world environment is non-trivial. There are many sources of tracking errors, such as sensor data noise and outliers, illumination levels, changing backgrounds, and occlusion. Real world environments are stochastic. Occlusion occurs when a tracked target is masked by other objects in existing fields of view. The position and movement of an occluded subject are unknown, hence increasing the difficulity of detection and tracking. Occlusions can be static and daynamic, as well as partial and full. Static occlusions refer to situations where stationary objects obstrct the visibility of the target, and dynamic occlusions occur during the interactions of many targets. Partial and full occlusion cases are when the target is partially and fully blocked from the view, respectively. THe current work attempts to resolve all different types of occlusion.
+The task of detecting and tracking moving targets in real world environment is non-trivial. There are many sources of tracking errors, such as sensor data noise and outliers, illumination levels, changing backgrounds, and occlusion. Real world environments are stochastic. Occlusion occurs when a tracked target is masked by other objects in existing fields of view. The position and movement of an occluded subject are unknown, hence increasing the difficulty of detection and tracking. Occlusions can be static and dynamic, as well as partial and full. Static occlusions refer to situations where stationary objects obstruct the visibility of the target, and dynamic occlusions occur during the interactions of many targets. Partial and full occlusion cases are when the target is partially and fully blocked from the view, respectively. THe current work attempts to resolve all different types of occlusion.
 
 The problem is illustrated in Figure \ref{fig:occlusion_problem}.
 
@@ -122,6 +124,7 @@ The problem is illustrated in Figure \ref{fig:occlusion_problem}.
 \subsection{Aims and Objectives}
 
 \section{Contributions}
+\label{sec:contributions}
 
 Replicate current research, discuss limitations, (in)validate results. Resolve the problem of occlusion using multiple Kinects. 
 
@@ -132,18 +135,19 @@ Replicate current research, discuss limitations, (in)validate results. Resolve t
 \end{enumerate}
 
 \section{Previous Work}
+\label{sec:previous_work}
 
-Existing people detection and tracking techniques. Tracking people in surveillance video and in realtime. Tracking using mobile and wearable devices. Motion sensors and wireless. Time-of-flight and structured-light cameras.
+Existing people detection and tracking techniques. Tracking people in surveillance video and in real time. Tracking using mobile and wearable devices. Motion sensors and wireless. Time-of-flight and structured-light cameras.
 
 [Paper: Particle filter to track multiple people for visual surveillance]
 [Paper: Tracking People in Video Sequences by Clustering Feature Motion Paths]
-[Paper: Evaluation of realtime people tracking for indoor environments using ubiquitous motion sensors and limited wireless network infrastructure]
+[Paper: Evaluation of real time people tracking for indoor environments using ubiquitous motion sensors and limited wireless network infrastructure]
 [Paper: Tracking people under heavy occlusions by layered data association]
 [Paper: Detection and Tracking of Occluded People]
 
 \subsection{Tracking people}
 
-\subsection{Coordiante transfomration}
+\subsection{Coordinate transformation}
 
 \cite{wei_kinect_calibration}
 \cite{eggert_four_algorithms}
@@ -160,6 +164,7 @@ Existing people detection and tracking techniques. Tracking people in surveillan
 [Paper: Human Detection Using Depth Information by Kinect]
 
 \section{Kinect}
+\label{sec:kinect}
 
 The specification and components. Include image Larger field of views. Give examples.
 
@@ -174,16 +179,17 @@ Kinect Camera Space. The coordinates are 3D points (x, y, z), expressed in meter
 \subsection{Multiple Kinects}
 
 \section{Current Approach}
+\label{sec:current_approach}
 
-The current work is an extension on the Wei et al study \textbf{(add reference)}. It applies the same algorithms for doing calibration and coordinate trasnformation on the skeleton joints from different Kinects. After calibration, the system would match skeletons from multiple Kinects to form models of the tracked people. Wei et al designed and tested the system for a single user. The current system extends it to handle six people, which is the maximum number of skeletons one Kinect can recongize in its Body stream. After the calibration phase, for every new frame the system receives from the Kinects, the system would update the spatial positions of the skeletons in the corresponding models.
+The current work is an extension on the Wei et al study \textbf{(add reference)}. It applies the same algorithms for doing calibration and coordinate transformation on the skeleton joints from different Kinects. After calibration, the system would match skeletons from multiple Kinects to form models of the tracked people. Wei et al designed and tested the system for a single user. The current system extends it to handle six people, which is the maximum number of skeletons one Kinect can recognize in its Body stream. After the calibration phase, for every new frame the system receives from the Kinects, the system would update the spatial positions of the skeletons in the corresponding models.
 
 The system would also visualize the skeletons before and after applying coordinate transformation. The transformed skeletons are color-coded for the ease of distinguishing skeletons belonging to different people. The transformation process would inherently produce some errors, therefore, the system attempts to minimize the skeleton joint differences by constructing an average skeleton for every person.
 
-The system is a standalone application written in C# (.NET Framework 4.5), but it can also integrate with other applications, such as a heart rate estimation application using Kinect color data.
+The system is a standalone application written in C\# (.NET Framework 4.5), but it can also integrate with other applications, such as a heart rate estimation application using Kinect color data. More details on the design and implementation of the application will be discussed in section ``\nameref{sec:application}".
 
 \subsection{System architecture}
 
-The system topology consists of one or more machines in a client-server model. The latest Kinect v2 SDK at the time of writing (version 2.0.1410.19000) still does not support running multiple Kinects on a single machine, as a result, the system leverages the TCP/IP protocol for communicating between multiple Kinects. In the current system architecture, each client is running one Kinect (Figure \ref{fig:}). There is only one server, and any client machine can also run the server. All clients send Kinect Body frames to the server. The server is the workhorse of the system. It serves incoming client connections, establishes network streams with the clients, runs the user interface and exchanges infomration with the tracker (whom in runs the tracking algorithm), and lastly, informs the logger to write tracking data to files.
+The system topology consists of one or more machines in a client-server model. The latest Kinect v2 SDK at the time of writing (version 2.0.1410.19000) still does not support running multiple Kinects on a single machine, as a result, the system leverages the TCP/IP protocol for communicating between multiple Kinects. In the current system architecture, each client is running one Kinect (Figure \ref{fig:}). There is only one server, and any client machine can also run the server. All clients send Kinect Body frames to the server. The server is the workhorse of the system. It serves incoming client connections, establishes network streams with the clients, runs the user interface and exchanges information with the tracker (whom in runs the tracking algorithm), and lastly, informs the logger to write tracking data to files.
 
 \begin{figure}[!h]
   \centering
@@ -203,21 +209,21 @@ There is no initial handshaking between the client and the server. In other word
 
 \subsection{Kinect BodyFrame}
 
-The Kinect BodyFrame contains information about the people that are tracked by the Kinect sensor in realtime. It was called the SkeletonFrame in the Kinect v1 SDK. Each frame contains at most six Kinect Body data, where each Kinect Body represents an actively tracked or inferred skeleton. A Kinect Body stores the joints coordinates and their metadata. These information are computed by the Kinect sensor from its depth data. The current system uses the preprocessed information for tracking indivduals.
+The Kinect BodyFrame contains information about the people that are tracked by the Kinect sensor in real time. It was called the SkeletonFrame in the Kinect v1 SDK. Each frame contains at most six Kinect Body data, where each Kinect Body represents an actively tracked or inferred skeleton. A Kinect Body stores the joints coordinates and their metadata. These information are computed by the Kinect sensor from its depth data. The current system uses the preprocessed information for tracking individuals.
 
 \subsubsection{Serialization}
 
-The Kinect v2 SDK does not support serialization of the Kinect BodyFrame. The current work builds a Kinect BodyFrame serialization library for transmitting this data across the network. See the appendix for a complete list of serialized properties. Among all the serialized data, the most important pieces of information are the skeleton joints, the tracking state of each joint. The Microsoft Kinect
+The Kinect v2 SDK does not support serialization of the Kinect BodyFrame. The current work builds a Kinect BodyFrame serialization library for transmitting this data across the network. See the appendix for a complete list of serialized properties. Among all the serialized data, the most important pieces of information are the skeleton joints, their position in the Kinect Camera Space, the type and the tracking state of each joint.
 
 \subsection{Calibration}
 
-The server passes on the Kinect BodyFrames to the tracker, whom initiates the calibration process. The system performs calibration to ensure that people's initial position and angle are taken correctly. The initial position is defined as the average coordinate of all visible joints coordinates from the skeleton. The initial angle is defined as the the angle between the Kinect and the skeleton. The mathematical formulae can be found in \textbf{(todo: insert pseudocode)}. Subsequently, they can be used as reference points during coordinate transformation. The tracker will initiate the calibration process once it has received sufficient frames from all connected clients, or Kinects.
+The server passes on the Kinect BodyFrames to the tracker, who initiates the calibration process. The system performs calibration to ensure that people's initial position and angle are taken correctly. The initial position is defined as the average coordinate of all visible joints coordinates from the skeleton. The initial angle is defined as the the angle between the Kinect and the skeleton. The mathematical formulae can be found in \textbf{(todo: insert pseudocode)}. Subsequently, they can be used as reference points during coordinate transformation. The tracker will initiate the calibration process once it has received sufficient frames from all connected clients, or Kinects.
 
-The initial angle \theta has three different cases. It is zero when the center of the skeleton is perpendicular to the sensor. It is positive when the skeleton is facing right, or left of the sesnor. Lastly, it is negative when the skeleton is facing left, or right of the sensor.
+The initial angle $\theta$ has three different cases. It is zero when the center of the skeleton is perpendicular to the sensor. It is positive when the skeleton is facing right, or left of the sensor. Lastly, it is negative when the skeleton is facing left, or right of the sensor.
 
 \subsubsection{Procedure}
 
-The calibration procedure is replicated from the method proposed by Wei et al, with minor adjustments. The system uses 120 Kinect BodyFrames, or an equivalent of four seconds. If there were more frames available from any connected Kinect, the tracker would use the most recent frames. All calculations performed during calibration are done using the Kinect Camera Space.
+The calibration procedure is replicated from the method proposed by Wei et al, with minor adjustments. The system uses 120 Kinect BodyFrames for calibration, which takes four seconds, because Kinect sends the BodyFrame at 30 frames per second. If there were more frames available from any connected Kinect, the tracker would use the most recent frames. All calculations performed during calibration are done using the Kinect Camera Space.
 
 \subsubsection{Detecting interference}
 
@@ -225,19 +231,19 @@ The tracker will automatically initiate recalibration if people move their joint
 
 \subsection{Coordinate transformation}
 
-After the tracker completes calibrating the Kinect coordinate system, it can transform any joint of a skeleton to a world coordinate. Joints in the world coordinate system can be transformed back to any Kinect field of view. Tracker uses the joint coordinates in world view to find skeletons belonging ot the same person in different Kinect fields of view. When tracker finds all skeletons of the same person, it can transform all correponding joints in world view to a single Kinect's camera space, showing combined depth sensor information for the tracked person. The transfomration process is the very first step in filling the missing joints, hence the whole body, in the average skeleton during occlusion. Unsurprisingly, the effectiveness of the system depends heavily on how accurate the transformation is done.
+After the tracker completes calibrating the Kinect coordinate system, it can transform any joint of a skeleton to a world coordinate. Joints in the world coordinate system can be transformed back to any Kinect field of view. Tracker uses the joint coordinates in world view to find skeletons belonging to the same person in different Kinect fields of view. When tracker finds all skeletons of the same person, it can transform all corresponding joints in world view to a single Kinect's camera space, showing combined depth sensor information for the tracked person. The transformation process is the very first step in filling the missing joints, hence the whole body, in the average skeleton during occlusion. Unsurprisingly, the effectiveness of the system depends heavily on how accurate the transformation is done.
 
 \subsection{Tracking by detection}
 
-After calibration, all the tracker sees is a collection of skeletons with their initial position and angle. As aforementioned, the tracker can represent these skeletons in both the Kinect Camera Space and the world coordinate system. This information is not useful on its own, and the more poeple there are in the views of the Kinects, the larger this collection of skeletons would be. The tracking system should know which skeletons belong to which person, thus knowing about people's absolute position relative to any Kinect field of view.
+After calibration, all the tracker sees is a collection of skeletons with their initial position and angle. As aforementioned, the tracker can represent these skeletons in both the Kinect Camera Space and the world coordinate system. This information is not useful on its own, and the more people there are in the views of the Kinects, the larger this collection of skeletons would be. The tracking system should know which skeletons belong to which person, thus knowing about people's absolute position relative to any Kinect field of view.
 
-The tracker contrsuct models of tracked people by finding skeletons in different fields of view that have high proximity in the world coordinate system. The tracker performs the detection algorithm using joints in the world coordinate system, because using these coordiantes would allow the tracker to compare skeletons' spatial positions regardless of perspectives. It assumes that skeletons from different Kinects field of view that have the highest proximity must belong to the same person. The tracker continues this process until it can no longer put skeletons in pair. The pseudocode is shown below \textbf{(todo: insert pseudocode)}.
+The tracker construct models of tracked people by finding skeletons in different fields of view that have high proximity in the world coordinate system. The tracker performs the detection algorithm using joints in the world coordinate system, because using these coordinates would allow the tracker to compare skeletons' spatial positions regardless of perspectives. It assumes that skeletons from different Kinects field of view that have the highest proximity must belong to the same person. The tracker continues this process until it can no longer put skeletons in pair. The pseudocode is shown below \textbf{(todo: insert pseudocode)}.
 
 The current implementation assumes that every person is visible to all Kinects. The system works fine when there is only one person who is occluded from all Kinects, because the person would only have one skeleton, leaving it to the last to be matched. The system would not detect people correctly in scenarios where several people are occluded from all Kinects in the calibration phase, because it would try to match skeletons from different Kinect fields of view even though they are far apart from each other. \textbf{(todo: add illustrations of a working scenario and a non-working scenario)}.
 
 Every calibration process follows a people detection result. It entails models of currently tracked people, where each model consists a number of potential skeletons, all from different Kinect perspectives. A potential skeleton represents one replica of a person from a Kinect field of view. The average skeleton of a person is the average body across all potential skeletons in the person's model. The average skeleton of a person can be seen as the system's view of that person. The result is permanent until the system recalibrates. That is, the same skeletons are always associated with the same person whom they were initially identified with. 
 
-The system performs tracking by updating every potential skeleton in the current result, propogating the changes to the skeleton visualization.
+The system performs tracking by updating every potential skeleton in the current result, propagating the changes to the skeleton visualization.
 
 \subsection{Detecting occlusion}
 
@@ -245,9 +251,9 @@ When a person obstructs another person causing a Kinect sensor to partially or c
 
 \subsection{Detecting new and missing people}
 
-The system makes the assumption that people during calibration will be the only people in the scene throughout the lifetime of the system. This is because the system does not have any information about the new people entering the scene that would otherwise be obtained during calibration, such as their precise initial position and angle, which are needed to perform coordinate transformation. When the system detects intruders or zero people in the scene, it would automatically reinitiate calibration. \textbf{(todo: finish coding)} Scenarios where a number of skeletons, but not all, is missing from the system's available Kinects are unimportant, because the people possessing those skeletons may only be temporarily occluded.
+The system makes the assumption that people during calibration will be the only people in the scene throughout the lifetime of the system. This is because the system does not have any information about the new people entering the scene that would otherwise be obtained during calibration, such as their precise initial position and angle, which are needed to perform coordinate transformation. When the system detects intruders or zero people in the scene, it would automatically initiate calibration. \textbf{(todo: finish coding)} Scenarios where a number of skeletons, but not all, is missing from the system's available Kinects are unimportant, because the people possessing those skeletons may only be temporarily occluded.
 
-Since the positions of all potentail skeletons are updated every frame, the system would know when the skeletons are missing. The scene is empty if and only if every potential skeleton in the scene is empty.
+Since the positions of all potential skeletons are updated every frame, the system would know when the skeletons are missing. The scene is empty if and only if every potential skeleton in the scene is empty.
 
 \subsection{Strengths}
 
@@ -255,17 +261,165 @@ Since the positions of all potentail skeletons are updated every frame, the syst
 
 \subsection{Improvements}
 
-\section{Testing}
+\section{Application}
+\label{sec:application}
 
-Interactive application. View the average and individual skeletons from different Kinect fields of views.
+The final application demonstrates that the system works as intended. The main components of the application consist of a server, a tracker, a user interface, and a logger. The server passes on the Kinect BodyFrames received from the clients to the tracker. The tracker then processes the data and signals the user interface when the latest result is available. The user interface displays the tracking result on the skeleton visualization. When required by the end user, the logger would write tracking result to files.
+
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=0.9\columnwidth]{ui}
+  \caption{UI}
+  \label{fig:ui}
+\end{figure}
+
+\subsection{Running the application}
+
+\subsection{Design}
+
+The application should be intuitive and easy to use. Since it is a prototype demonstrating the capability of the tracking system, it puts large emphasis on the skeleton visualization, showing that the combined skeletons match the expected outcome of the tracking process. The application displays the skeletons before and apply applying coordinate transformation and skeleton matching. The combined skeletons should render at the same speed as the server receives BodyFrames from multiple sources. 
+
+The application provides the end users essential functionalities for running the application, including start and stop the server, recalibrate, view tracked skeletons from different views, and send the average skeleton stream to other applications. The user interface will fire a ``OnDisplayResult'' event when the rendering of the skeleton visualization is completed. This lets the server know when to signal the logger.
+
+The overall control flow of the application is now clear. The server handles data from the clients. The tracker processes the data. The user interface visaulizaes the data and provides additional control for the user. If required, the server then tells the logger to store the tracking done after the visualization is shown.
+
+\textbf{(todo: implement recalibration and stop button and the last feature)}
+
+The application does not take the following elements into design decision:
+
+\begin{itemize}
+  \item The security of the application.
+  \item The privacy of users' tracking information
+  \item The scalability and robustness of the server.
+\end{itemize}
+
+\subsection{Client Implementation}
+
+\subsection{Server Implementation}
+
+The application is written in C# with the .NET 4.5 framework, and the user interface is created using the .NET WPF framework, because the official Microsoft Kinect SDK is written in C# and the latest examples use the WPF framework. 
+
+The application leverages the C# events and delegates model. The application components subscribe to the event queues of other components. When new data is available from the subscribing component, the subscribed component consumes the data, does something with it, and fires events to all of its subscribed components. The components on the receiving end do the same, and so on. The server aseembles the overall communication via events.
+
+The application is started with one parameter, the server port number. It then creates a server to be run at that port number. The server will only start running when it receives such command from the user. After the server is created, it creates the user interface thread as a Single Threaded Apartment running in the background. The user interface will appear now.
+
+\subsubsection{Events}
+
+The server will receive the following events from the user interface:
+
+\begin{itemize}
+  \item Setup parameters for the server
+  \item Start the server
+  \item Stop the server
+  \item When the user interface has displayed the tracking result (then the server will notify the logger)
+\end{itemize}
+
+The user will have control over the server, hence the system.
+
+The server will pass the following events to the user interface:
+
+\begin{itemize}
+  \item Clients (Kinects) have been connected to the server
+  \item Clients (Kinects) have been removed from the server
+\end{itemize}
+
+The user interface can know which Kinects are connected to the server, giving the user feedback and later allowing him to choose from which Kinect perspective to view tracked people's skeletons.
+
+The server will bind the following events from the tracker to the user interface:
+
+\begin{itemize}
+  \item The tracker is waiting for Kinects to be connected
+  \item The tracker is calibrating (and how many frames remaining)
+  \item The tracker needs recalibration (and for what reason)
+  \item The tracker has synchronized the latest BodyFrame with the tracking result 
+\end{itemize}
+
+The user interface would show more feedback, including the latest result, from the tracker.
+
+\subsubsection{Server}
+
+The application listens for TCP client connections. This work is done in a separate thread, called the ServerWorkerThread. When the TCP socket listener receives a new connection, the server will handle it in a new, separate thread. In the socket thread, the server will create a network stream between the client and the server. After the connection is established, the server will fire a ``OnKinectConnected'' event to the user interface. Later on, the server will receive Kinect BodyFrames from the client through the network stream it had created. Upon receiving some data, the server would deserialize it into a BodyFrame object, then it would fire another event called ``Track'' to the tracker with information about the sender and the BodyFrame itself. Lastly, the server will send a response (a string) back to the client. The response is trivial; it is used to tell the client that the data has been received. The client is also implemented so that it In the current implementation, the server returns ``Okay''. The server will continue to process additional BodyFrames received on its end of the netwrok stream, and the above procedure repeats.
+
+\textbf{(todo: fix the server so that it can stop and report the additions)}
+
+\subsection{User Interface Implementation}
+
+The application has one window. It has a number of small buttons as controls on the top of the interface. Below the controls the window is split into halves. The left hand side shows the visualization for merged skeletons after applying coordinate transformation, and the right hand side shows the visualization of skeletons in their original fields of view. Displaying the two different views at once demonstrates the system's tracking algorithm.
+
+The design decisions on the look of the user interface are not discussed, because aesthetic features were not taken into consideration when the user interface was developed.
+
+\subsubsection{Controls}
+
+Available user controls are shown as buttons. The user interface responds to click events on each button. Buttons representing functionalities are that not meant to be used are disabled. For instance, when the start button is pressed, signaling the server to start running, the setup button, which parameterizes the server, should be disabled. A full set of constraints on the availability of the buttons are specified below:
+
+\textbf{(todo: should I put this down?)}
+
+\subsubsection{Events}
+
+When the user interface receives events from the server about new and old connections with clients, the user interface adds and remvoes option to transform the kinect Bodies into the particular Kinect's field of view, respectively. The user interface would also display texts, centered on the left hand side visualization, about the progress of calibration or any interrupted action causing calibration to fail. How the user interface displays the BodyFrames is discussed in the next subsections  ``\nameref{subsec:tracking_view}'' and ``\nameref{subsec:disjoined_view}''.
+
+\subsubsection{Tracking View}
+\label{subsec:tracking_view}
+
+The Tracking View shows the skeleton visualization of the tracking result. The merged skeletons are drawn from the perspective of the selected Kinect, specified by the user or is defaulted to the local client's Kinect (The local client is the client that is also running on the server machine). The average skeleton is calculated at this stage. The potential skeletons of a person share the same color, and the average skeleton is always colored white. There are six avaialble colors, because the system sets the cap of number of tracked people to six.
+
+The skeleton visaulization in both Tracking View and Disjoined View has the same implementation. The bones of the skeletons are drawn first, then the joints. The simplified list of human bones using the Kinect joints are taken from the Microsfot Kinect Developer examples. The inferred bones are displayed thinner than the tracked bones.
+
+\textbf{(todo: default to local Kinect)}
+
+\begin{figure}[!h]
+  \centering
+  \includesvg[width=0.9\columnwidth]{tracking_view}
+  \caption{The Tracking View}~\label{fig:tracking_view}
+\end{figure}
+
+\subsubsection{Disjoined View}
+\label{subsec:disjoined_view}
+
+The Disjoined View shows the skeleton visualization of the tracked skeletons in their original Kinect coordinate system. The skeletons are colored with respect to their Kinect origin. In other words, skeletons coming from the same Kinect would share the same color. The number of available colors is also limited to six.
+
+\begin{figure}[!h]
+  \centering
+  \includesvg[width=0.9\columnwidth]{disjoined_view}
+  \caption{The Disjoined View}~\label{fig:disjoined_view}
+\end{figure}
+
+\subsection{Tracker Implementation}
+
+The tracker runs the tracking algorithm on the Kinect BodyFrames from multiple Kinects. It is the brain of the application and the system, hence the most complex. There are no generic data structures in the whole application except the tracker. 
+
+\subsection{Logger Implementation}
+
+
+
+\textbf{``Disjoined'' or called something else}
+
+\subsection{Integration with Heart Rate Monitoring}
+
+\section{Testing}
+\label{sec:testing}
+
+The system running multiple Kinects is verified by looking at the skeleton visualization on the user interface for a number of different users and in various interaction scenarios. The researcher is interested in whether the application has accomplished the following tasks:
+
+\begin{enumerate}
+  \item The skeletons from different Kinect fields of view are matched correctly to the corresponding persons in the scene.
+  \item The transformed skeletons of the same person are close together, showing minimal differences in the joint coordinates.
+  \item The skeletons can be transformed to different Kinects' Camera Space (3D coordinate system) for viewing
+  \item All of the above statements hold when the users move freely.
+\end{enumerate}
+
+It is worth noting that the best tracking results, which minimize overall differences in joint coordinates, are when the Kinects are placed parallel to the ground floor with near 0 degree tilting angle. The researcher then investigates the performance of the tracking algorithm with the aforementioned contraints in various artificial scenarios. See the sections on User Studies for more details and the section on Future Work for improving the current system.
 
 \subsection{Occlusion}
 
-Show persistent tracking in occluded environments. Demonstrate the system works with complex human interactions.
+The main goal of the project is to show persistent tracking results in occluded environments and scenarios where complex human interactions are in play. The researcher has verified this requirement by partially and fully obstructing users in the scene. In the simplest case, a person may be self-occluded if he stands in a position such that one Kinect cannot fully see all the joints but two Kinects combined can have a complete view of the person. \textbf{(todo: show an illustration)} The research stands back-facing the main Kinect, while showing his right arm only to the second Kinect. The system would form the average skeleton using the actively tracked information from both Kinects; the average skeleton would contain joint coordinates that both Kinects are most sure about.
+
+\textbf{todo: show different cases where the system is working properly, with images}
 
 \section{User studies}
+\label{sec:user_studies}
 
-A series of user studies are designed to evaluate the system's accuracy at tracking people in different scenarios. The accuracy of the tracking algorithm, or essentially the coordinate transformation algorithm, is measured by the differences in the joint coordinate between multiple potential skeletons of the same person. The studies will require participants to move around in front of multiple Kinects alone and with other participants. The software will log participants' positions from tracking, and these data will provide a quantitative feedback on the accuracty of the algorithm in different Kinect configurations and user scenarios.
+A series of user studies are designed to evaluate the system's accuracy at tracking people in different scenarios. The accuracy of the tracking algorithm, or essentially the coordinate transformation algorithm, is measured by the differences in the joint coordinate between multiple potential skeletons of the same person. The studies will require participants to move around in front of multiple Kinects alone and with other participants. The software will log participants' positions from tracking, and these data will provide a quantitative feedback on the accuracy of the algorithm in different Kinect configurations and user scenarios.
 
 To reiterate, a potential skeleton is a skeleton from a single Kinect field of view. One person may have multiple potential skeletons when they are visible to many Kinects. The application is most useful for its ability to transform any potential skeleton into any Kinect's camera space. The potential skeleton in the current Kinect field of view would be unaffected, but the other potential skeletons that were in other Kinects fields of view would have slight deviations in their joint coordinates. The user studies attempt to capture such deviations in all possible cases.
 
@@ -283,7 +437,7 @@ The null hypotheses are as follows:
 
 \begin{enumerate}
   \item The differences in each joint coordinate among all potential skeletons of a person are consistent across time and are within five centimeters
-  \item The differences in each joint coordiante among all potential skeletons of a person are consistent with different Kinect configurations
+  \item The differences in each joint coordinate among all potential skeletons of a person are consistent with different Kinect configurations
   \item The application would fill in the missing joint coordinates of a person from information about all potential skeletons
 \end{enumerate}
 
@@ -293,7 +447,7 @@ The current studies use two machines and two Kinects. Each machine is connected 
 
 \subsubsection{Computer Specification}
 
-The server machine is running Microsoft Windows 8 on a i5 processor and 8 Gb RAM \textbf{(add details)}. The other client machine is also running Microsoft Windows 8, on a i7-3610QM CPU at 2.30 GHz and 8 GB RAM.
+The server machine is running Microsoft Windows 8 on a i5 processor and 8 Gb RAM \textbf{(todo: add details)}. The other client machine is also running Microsoft Windows 8, on a i7-3610QM CPU at 2.30 GHz and 8 GB RAM.
 
 \subsubsection{Kinect Specification}
 
@@ -301,7 +455,7 @@ The sensors are the v2 Kinects for Xbox One. The SDK running those Kinects is ve
 
 \subsection{Participants}
 
-Participants are multinational university students and staff. There are participants in both genders and with varying heights and weights. They are compensated with chocolates for participation.
+Participants are multinational university students and staff. There are participants in both genders and with a wide range of heights and weights. They are compensated with chocolates for participation.
 
 \subsection{Setting}
 
@@ -315,7 +469,7 @@ The studies take place in a semi-controlled environment (See Figure \ref{fig:stu
 
 \subsection{Method}
 
-Firstly, participants are introduced to the project aims and objectives. They are given sufficient time to ask questions and decide whether to participate in the experiment before signing the consent form. Participants are free to withdraw from the studies at any time without any explanation. Secondly, participants are told beforehand what instructions they would expect during the experiments. This is because the studies are designed to measure how well the system tracks people, not how participants react to some situations. In user studies mode, the application would show instructions on the right hand side of the screen, telling the participants where to put their feet next. For instance, it would tell the participant to move forward (See Figure \ref{fig:studies_instruction}). The application will try to log as least amount of stationary movements as possible for tasks where they require participants to be moving. Not only because testing for differences in joint coordinates when the participant remains stationary is a standalone study, but also the researcher is interested in how the tracking algorithm performs when tracked people are constantly moving. To achieve this goal, the application introduces pasues between tasks. The researcher has control over the starting time of the next task. During the pauses, the researcher would give additional details about the studies to the participants.
+Firstly, participants are introduced to the project aims and objectives. They are given sufficient time to ask questions and decide whether to participate in the experiment before signing the consent form. Participants are free to withdraw from the studies at any time without any explanation. Secondly, participants are told beforehand what instructions they would expect during the experiments. This is because the studies are designed to measure how well the system tracks people, not how participants react to some situations. In user studies mode, the application would show instructions on the right hand side of the screen, telling the participants where to put their feet next. For instance, it would tell the participant to move forward (See Figure \ref{fig:studies_instruction}). The application will try to log as least amount of stationary movements as possible for tasks where they require participants to be moving. Not only because testing for differences in joint coordinates when the participant remains stationary is a standalone study, but also the researcher is interested in how the tracking algorithm performs when tracked people are constantly moving. To achieve this goal, the application introduces pauses between tasks. The researcher has control over the starting time of the next task. During the pauses, the researcher would give additional details about the studies to the participants.
 
 \begin{figure}[!h]
   \centering
@@ -325,7 +479,7 @@ Firstly, participants are introduced to the project aims and objectives. They ar
 
 \subsection{Ethics}
 
-There are no legitimate ethical concerns about participating in the studies. The skeleton data are annoymized and will be stored up to a maximum of three years. Any participant who feels uncomfortable with the guideline is welcome to speak to the researcher and his supervisor.
+There are no legitimate ethical concerns about participating in the studies. The skeleton data are anonymized and will be stored up to a maximum of three years. Any participant who feels uncomfortable with the guideline is welcome to speak to the researcher and his supervisor.
 
 \subsection{Study 1: Stationary}
 
@@ -356,8 +510,9 @@ Participants are asked to walk around a large obstacle, which is a large poster 
 \end{figure}
 
 \section{Evaluation}
+\label{sec:evaluation}
 
-Discuss results. Compre them with Wei et al.
+Discuss results. Compare them with Wei et al.
 
 \begin{figure}[!h]
   \centering
@@ -377,36 +532,8 @@ Discuss results. Compre them with Wei et al.
   \caption{All scenarios}~\label{fig:scenarios}
 \end{figure}
 
-\section{Application}
-
-The system application is for demonstrating that the system works as intended. The main componenets of the application consist of a server, a tracker, a user interface, and a logger. The server passes on the Kinect BodyFrames to the tracker. The tracker then processes the data, and the tracking result is shown on the user interface as a visualization of people's skeletons. The logger writes the tracking result to files if requested by the end user.
-
-\begin{figure}[!h]
-  \centering
-  \includegraphics[width=0.9\columnwidth]{ui}
-  \caption{UI}
-  \label{fig:ui}
-\end{figure}
-
-\subsection{Design}
-
-The application should be intuitive and easy to use. It should display the skeletons before and after applying coordinate transformation and skeleton matching. The skeleton visualization should also be rendered at the same speed as that of Kinect BodyFrames arriving. The application provides with user essential functionalities to start and stop the server, recalibrate, can send the average skeleton stream to other applications. \textbf{(todo: implement the last two)}  
-
-The user interface is created using the .NET WPF framework, because all official .
-
-\subsection{Implementation}
-
-
-
-\subsubsection{Tracking View}
-
-\subsubsection{Disjoined View}
-
-\textbf{``Disjoined'' or called something else}
-
-\subsection{Integration with Heart Rate Monitoring}
-
 \section{Future Work}
+\label{sec:future_work}
 
 \subsection{User studies}
 
@@ -416,9 +543,10 @@ The user interface is created using the .NET WPF framework, because all official
 
 SECTION
 
-\subsection{Requirements Specification}
+\subsection{Requirements}
 
-\section{Acknowledgments}
+\section{Acknowledgements}
+\label{sec:acknowledge}
 
 I declare that, unless otherwise stated, the work is completed by myself, Chi-Jui Wu, under the supervision of Dr. David Harris-Birtill. The code for skeleton visualization is written based on the official Microsoft Kinect Developer example.
 In addition, all infographics, excluding real-life images, are created by Ching Su. I retain the copyright of this work.

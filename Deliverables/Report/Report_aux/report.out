@@ -1,50 +1,70 @@
 \BOOKMARK [1][-]{section*.5}{Introduction}{}% 1
-\BOOKMARK [2][-]{section*.6}{Problem statement}{section*.5}% 2
-\BOOKMARK [2][-]{section*.8}{Contributions}{section*.5}% 3
-\BOOKMARK [1][-]{section*.9}{Previous Work}{}% 4
-\BOOKMARK [2][-]{section*.10}{Tracking people}{section*.9}% 5
-\BOOKMARK [2][-]{section*.11}{Coordiante transfomration}{section*.9}% 6
-\BOOKMARK [2][-]{section*.12}{Tracking using depth data}{section*.9}% 7
-\BOOKMARK [2][-]{section*.13}{Tracking using color data}{section*.9}% 8
-\BOOKMARK [1][-]{section*.14}{Kinect}{}% 9
-\BOOKMARK [2][-]{section*.15}{Features}{section*.14}% 10
-\BOOKMARK [2][-]{section*.16}{Multiple Kinects}{section*.14}% 11
-\BOOKMARK [1][-]{section*.17}{Current Approach}{}% 12
-\BOOKMARK [2][-]{section*.18}{Overview}{section*.17}% 13
-\BOOKMARK [2][-]{section*.19}{Computer Specification}{section*.17}% 14
-\BOOKMARK [2][-]{section*.20}{Kinect Specification}{section*.17}% 15
-\BOOKMARK [2][-]{section*.21}{Kinect Body Stream}{section*.17}% 16
-\BOOKMARK [2][-]{section*.22}{Clients and Servers}{section*.17}% 17
-\BOOKMARK [3][-]{section*.23}{Communication Protocol}{section*.22}% 18
-\BOOKMARK [3][-]{section*.24}{Serialization}{section*.22}% 19
-\BOOKMARK [2][-]{section*.25}{Calibration}{section*.17}% 20
-\BOOKMARK [3][-]{section*.26}{Technique}{section*.25}% 21
-\BOOKMARK [3][-]{section*.27}{Detecting interference}{section*.25}% 22
-\BOOKMARK [2][-]{section*.28}{Tracking by detection}{section*.17}% 23
-\BOOKMARK [2][-]{section*.29}{Detecting occlusion}{section*.17}% 24
-\BOOKMARK [2][-]{section*.30}{Detecting new skeletons}{section*.17}% 25
-\BOOKMARK [2][-]{section*.31}{Strength}{section*.17}% 26
-\BOOKMARK [2][-]{section*.32}{Limitations}{section*.17}% 27
-\BOOKMARK [2][-]{section*.33}{Improvements}{section*.17}% 28
-\BOOKMARK [1][-]{section*.34}{Testing}{}% 29
-\BOOKMARK [2][-]{section*.36}{Occlusion}{section*.34}% 30
-\BOOKMARK [1][-]{section*.37}{Evaluation}{}% 31
-\BOOKMARK [2][-]{section*.38}{User study}{section*.37}% 32
-\BOOKMARK [2][-]{section*.42}{Study 1}{section*.37}% 33
-\BOOKMARK [2][-]{section*.43}{Study 2}{section*.37}% 34
-\BOOKMARK [2][-]{section*.44}{Study 3}{section*.37}% 35
-\BOOKMARK [2][-]{section*.45}{Study 4}{section*.37}% 36
-\BOOKMARK [2][-]{section*.46}{Study 5}{section*.37}% 37
-\BOOKMARK [2][-]{section*.47}{Study 6}{section*.37}% 38
-\BOOKMARK [2][-]{section*.48}{Occlusion}{section*.37}% 39
-\BOOKMARK [1][-]{section*.49}{Application}{}% 40
-\BOOKMARK [2][-]{section*.50}{Tracking UI}{section*.49}% 41
-\BOOKMARK [2][-]{section*.51}{Disjoined UI}{section*.49}% 42
-\BOOKMARK [2][-]{section*.52}{Integration with Heart Rate Monitoring}{section*.49}% 43
-\BOOKMARK [1][-]{section*.53}{Future Work}{}% 44
-\BOOKMARK [2][-]{section*.54}{User studies}{section*.53}% 45
-\BOOKMARK [2][-]{section*.55}{Application}{section*.53}% 46
-\BOOKMARK [1][-]{section*.56}{SH Project Reflection}{}% 47
-\BOOKMARK [2][-]{section*.57}{Requirements Specification}{section*.56}% 48
-\BOOKMARK [1][-]{section*.58}{Acknowledgments}{}% 49
-\BOOKMARK [1][-]{section*.59}{REFERENCES }{}% 50
+\BOOKMARK [1][-]{section*.6}{Problem statement}{}% 2
+\BOOKMARK [2][-]{section*.8}{Aims and Objectives}{section*.6}% 3
+\BOOKMARK [1][-]{section*.9}{Contributions}{}% 4
+\BOOKMARK [1][-]{section*.10}{Previous Work}{}% 5
+\BOOKMARK [2][-]{section*.11}{Tracking people}{section*.10}% 6
+\BOOKMARK [2][-]{section*.12}{Coordinate transformation}{section*.10}% 7
+\BOOKMARK [2][-]{section*.13}{Tracking using depth data}{section*.10}% 8
+\BOOKMARK [2][-]{section*.14}{Tracking using color data}{section*.10}% 9
+\BOOKMARK [1][-]{section*.15}{Kinect}{}% 10
+\BOOKMARK [2][-]{section*.16}{Features}{section*.15}% 11
+\BOOKMARK [2][-]{section*.17}{Coordinate System}{section*.15}% 12
+\BOOKMARK [2][-]{section*.18}{Multiple Kinects}{section*.15}% 13
+\BOOKMARK [1][-]{section*.19}{Current Approach}{}% 14
+\BOOKMARK [2][-]{section*.20}{System architecture}{section*.19}% 15
+\BOOKMARK [2][-]{section*.22}{Clients and Servers}{section*.19}% 16
+\BOOKMARK [3][-]{section*.23}{Communication Protocol}{section*.22}% 17
+\BOOKMARK [2][-]{section*.24}{Kinect BodyFrame}{section*.19}% 18
+\BOOKMARK [3][-]{section*.25}{Serialization}{section*.24}% 19
+\BOOKMARK [2][-]{section*.26}{Calibration}{section*.19}% 20
+\BOOKMARK [3][-]{section*.27}{Procedure}{section*.26}% 21
+\BOOKMARK [3][-]{section*.28}{Detecting interference}{section*.26}% 22
+\BOOKMARK [2][-]{section*.29}{Coordinate transformation}{section*.19}% 23
+\BOOKMARK [2][-]{section*.30}{Tracking by detection}{section*.19}% 24
+\BOOKMARK [2][-]{section*.31}{Detecting occlusion}{section*.19}% 25
+\BOOKMARK [2][-]{section*.32}{Detecting new and missing people}{section*.19}% 26
+\BOOKMARK [2][-]{section*.33}{Strengths}{section*.19}% 27
+\BOOKMARK [2][-]{section*.34}{Limitations}{section*.19}% 28
+\BOOKMARK [2][-]{section*.35}{Improvements}{section*.19}% 29
+\BOOKMARK [1][-]{section*.36}{Application}{}% 30
+\BOOKMARK [2][-]{section*.38}{Running the application}{section*.36}% 31
+\BOOKMARK [2][-]{section*.39}{Design}{section*.36}% 32
+\BOOKMARK [2][-]{section*.40}{Client Implementation}{section*.36}% 33
+\BOOKMARK [2][-]{section*.41}{Server Implementation}{section*.36}% 34
+\BOOKMARK [3][-]{section*.42}{Events}{section*.41}% 35
+\BOOKMARK [3][-]{section*.43}{Server}{section*.41}% 36
+\BOOKMARK [2][-]{section*.44}{User Interface Implementation}{section*.36}% 37
+\BOOKMARK [3][-]{section*.45}{Controls}{section*.44}% 38
+\BOOKMARK [3][-]{section*.46}{Events}{section*.44}% 39
+\BOOKMARK [3][-]{section*.47}{Tracking View}{section*.44}% 40
+\BOOKMARK [3][-]{section*.49}{Disjoined View}{section*.44}% 41
+\BOOKMARK [2][-]{section*.51}{Tracker Implementation}{section*.36}% 42
+\BOOKMARK [2][-]{section*.52}{Logger Implementation}{section*.36}% 43
+\BOOKMARK [2][-]{section*.53}{Integration with Heart Rate Monitoring}{section*.36}% 44
+\BOOKMARK [1][-]{section*.54}{Testing}{}% 45
+\BOOKMARK [2][-]{section*.55}{Occlusion}{section*.54}% 46
+\BOOKMARK [1][-]{section*.56}{User studies}{}% 47
+\BOOKMARK [2][-]{section*.58}{Hypotheses}{section*.56}% 48
+\BOOKMARK [2][-]{section*.59}{Apparatus}{section*.56}% 49
+\BOOKMARK [3][-]{section*.60}{Computer Specification}{section*.59}% 50
+\BOOKMARK [3][-]{section*.61}{Kinect Specification}{section*.59}% 51
+\BOOKMARK [2][-]{section*.62}{Participants}{section*.56}% 52
+\BOOKMARK [2][-]{section*.63}{Setting}{section*.56}% 53
+\BOOKMARK [2][-]{section*.65}{Method}{section*.56}% 54
+\BOOKMARK [2][-]{section*.67}{Ethics}{section*.56}% 55
+\BOOKMARK [2][-]{section*.68}{Study 1: Stationary}{section*.56}% 56
+\BOOKMARK [2][-]{section*.69}{Study 2: Basic Movements}{section*.56}% 57
+\BOOKMARK [2][-]{section*.70}{Study 3: Continuous Movements}{section*.56}% 58
+\BOOKMARK [2][-]{section*.71}{Study 4: Two people Cross-over}{section*.56}% 59
+\BOOKMARK [2][-]{section*.72}{Study 5: Interaction 2?}{section*.56}% 60
+\BOOKMARK [2][-]{section*.73}{Study 6: Occlusion}{section*.56}% 61
+\BOOKMARK [1][-]{section*.75}{Evaluation}{}% 62
+\BOOKMARK [1][-]{section*.79}{Future Work}{}% 63
+\BOOKMARK [2][-]{section*.80}{User studies}{section*.79}% 64
+\BOOKMARK [2][-]{section*.81}{Application}{section*.79}% 65
+\BOOKMARK [1][-]{section*.82}{SH Project Reflection}{}% 66
+\BOOKMARK [2][-]{section*.83}{Requirements}{section*.82}% 67
+\BOOKMARK [1][-]{section*.84}{Acknowledgements}{}% 68
+\BOOKMARK [1][-]{section*.85}{REFERENCES }{}% 69
+\BOOKMARK [1][-]{section*.86}{Appendices}{}% 70
