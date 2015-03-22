@@ -181,31 +181,9 @@ Kinect Camera Space. The coordinates are 3D points (x, y, z), expressed in meter
 \section{Current Approach}
 \label{sec:current_approach}
 
-The current work is an extension on the Wei et al study \textbf{(add reference)}. It applies the same algorithms for doing calibration and coordinate transformation on the skeleton joints from different Kinects. After calibration, the system would match skeletons from multiple Kinects to form models of the tracked people. Wei et al designed and tested the system for a single user. The current system extends it to handle six people, which is the maximum number of skeletons one Kinect can recognize in its Body stream. After the calibration phase, for every new frame the system receives from the Kinects, the system would update the spatial positions of the skeletons in the corresponding models.
+This section describes the tracking algorithm behind the system.
 
-The system would also visualize the skeletons before and after applying coordinate transformation. The transformed skeletons are color-coded for the ease of distinguishing skeletons belonging to different people. The transformation process would inherently produce some errors, therefore, the system attempts to minimize the skeleton joint differences by constructing an average skeleton for every person.
-
-The system is a standalone application written in C\# (.NET Framework 4.5), but it can also integrate with other applications, such as a heart rate estimation application using Kinect color data. More details on the design and implementation of the application will be discussed in section ``\nameref{sec:application}".
-
-\subsection{System architecture}
-
-The system topology consists of one or more machines in a client-server model. The latest Kinect v2 SDK at the time of writing (version 2.0.1410.19000) still does not support running multiple Kinects on a single machine, as a result, the system leverages the TCP/IP protocol for communicating between multiple Kinects. In the current system architecture, each client is running one Kinect (Figure \ref{fig:}). There is only one server, and any client machine can also run the server. All clients send Kinect Body frames to the server. The server is the workhorse of the system. It serves incoming client connections, establishes network streams with the clients, runs the user interface and exchanges information with the tracker (whom in runs the tracking algorithm), and lastly, informs the logger to write tracking data to files.
-
-\begin{figure}[!h]
-  \centering
-  \includesvg[width=0.9\columnwidth]{system_diagram}
-  \caption{An overview of the system topology}~\label{fig:system_diagram}
-\end{figure}
-
-\subsection{Clients and Servers}
-
-The clients and servers communicate through TCP connections. The server opens the a port on the TPC network, and clients request connections to the server via sockets. When a client starts running, it will also start the Kinect \textbf{(change code: only start the Kinect after it's connected to the server)}. The client will continuously make connection requests until the server responds. If a connection is terminated by the server before the client stops running, the client will keep trying to reconnect to the server.
-
-After the client establishes a connection with the server, it will start sending Kinect Body frames to the server. The low level networking is handled by the Microsoft .Net framework. The client serializes this data before transmitting it to the server, and the server will deserialize it. The server will then passes on the data to the tracker.
-
-\subsubsection{Communication Protocol}
-
-There is no initial handshaking between the client and the server. In other words, the server will accept any connection request. The server will send a confirmation message to the client after it has received the data, but the client will ignore and proceed to send the next available frame. There is minimal amount of networking
+The current work is an extension on the Wei et al study \textbf{(add reference)}. It applies the same algorithms for doing calibration and coordinate transformation on the skeleton joints from different Kinects. After calibration, the system would match skeletons from multiple Kinects to form models of the tracked people. Wei et al designed and tested the system for a single user. The current system extends it to handle six people, which is the maximum number of skeletons one Kinect can recognize in its Body stream. After the calibration phase, for every new frame the system receives from the Kinects, the system would update the spatial positions of the skeletons in the corresponding models. The transformation process would inherently produce some errors, therefore, the system attempts to minimize the skeleton joint differences by constructing an average skeleton for every person.
 
 \subsection{Kinect BodyFrame}
 
@@ -261,17 +239,12 @@ Since the positions of all potential skeletons are updated every frame, the syst
 
 \subsection{Improvements}
 
-\section{Application}
-\label{sec:application}
+\section{System}
+\label{sec:system}
 
-The final application demonstrates that the system works as intended. The main components of the application consist of a server, a tracker, a user interface, and a logger. The server passes on the Kinect BodyFrames received from the clients to the tracker. The tracker then processes the data and signals the user interface when the latest result is available. The user interface displays the tracking result on the skeleton visualization. When required by the end user, the logger would write tracking result to files.
+The final application demonstrates that the system works as intended. The main components of the system consist of a server, a tracker, a user interface, and a logger. The server passes on the Kinect BodyFrames received from the clients to the tracker. The tracker then processes the data and signals the user interface when the latest result is available. The user interface displays the tracking result on the skeleton visualization. When required by the end user, the logger would write tracking result to files.
 
-\begin{figure}[!h]
-  \centering
-  \includegraphics[width=0.9\columnwidth]{ui}
-  \caption{UI}
-  \label{fig:ui}
-\end{figure}
+The system is a standalone application written in C\# (.NET Framework 4.5), but it can also integrate with other applications, such as a heart rate estimation application using Kinect color data. More details on the design and implementation of the application will be discussed in section ``\nameref{sec:application}".
 
 \subsection{Running the application}
 
@@ -290,10 +263,25 @@ The application does not take the following elements into design decision:
 \begin{itemize}
   \item The security of the application.
   \item The privacy of users' tracking information
-  \item The scalability and robustness of the server.
+  \item The scalability and robustness of the client and server.
 \end{itemize}
 
+
+\subsection{System architecture}
+
+The system topology consists of one or more machines in a client-server model. The latest Kinect v2 SDK at the time of writing (version 2.0.1410.19000) still does not support running multiple Kinects on a single machine, as a result, the system leverages the TCP/IP protocol for communicating between multiple Kinects. In the current system architecture, each client is running one Kinect (Figure \ref{fig:}). There is only one server, and any client machine can also run the server. All clients send Kinect Body frames to the server. The server is the workhorse of the system. It serves incoming client connections, establishes network streams with the clients, runs the user interface and exchanges information with the tracker (whom in runs the tracking algorithm), and lastly, informs the logger to write tracking data to files.
+
+\begin{figure}[!h]
+  \centering
+  \includesvg[width=0.9\columnwidth]{system_diagram}
+  \caption{An overview of the system topology}~\label{fig:system_diagram}
+\end{figure}
+
 \subsection{Client Implementation}
+
+The clients and servers communicate through TCP connections. The server opens the a port on the TPC network, and clients request connections to the server via sockets. When a client starts running, it will also start the Kinect \textbf{(change code: only start the Kinect after it's connected to the server)}. The client will continuously make connection requests until the server responds. If a connection is terminated by the server before the client stops running, the client will keep trying to reconnect to the server.
+
+After the client establishes a connection with the server, it will start sending Kinect Body frames to the server. The low level networking is handled by the Microsoft .Net framework. The client serializes this data before transmitting it to the server, and the server will deserialize it. The server will then passes on the data to the tracker.
 
 \subsection{Server Implementation}
 
@@ -302,8 +290,6 @@ The application is written in C# with the .NET 4.5 framework, and the user inter
 The application leverages the C# events and delegates model. The application components subscribe to the event queues of other components. When new data is available from the subscribing component, the subscribed component consumes the data, does something with it, and fires events to all of its subscribed components. The components on the receiving end do the same, and so on. The server aseembles the overall communication via events.
 
 The application is started with one parameter, the server port number. It then creates a server to be run at that port number. The server will only start running when it receives such command from the user. After the server is created, it creates the user interface thread as a Single Threaded Apartment running in the background. The user interface will appear now.
-
-\subsubsection{Events}
 
 The server will receive the following events from the user interface:
 
@@ -336,7 +322,7 @@ The server will bind the following events from the tracker to the user interface
 
 The user interface would show more feedback, including the latest result, from the tracker.
 
-\subsubsection{Server}
+\subsubsection{Communication Protocol}
 
 The application listens for TCP client connections. This work is done in a separate thread, called the ServerWorkerThread. When the TCP socket listener receives a new connection, the server will handle it in a new, separate thread. In the socket thread, the server will create a network stream between the client and the server. After the connection is established, the server will fire a ``OnKinectConnected'' event to the user interface. Later on, the server will receive Kinect BodyFrames from the client through the network stream it had created. Upon receiving some data, the server would deserialize it into a BodyFrame object, then it would fire another event called ``Track'' to the tracker with information about the sender and the BodyFrame itself. Lastly, the server will send a response (a string) back to the client. The response is trivial; it is used to tell the client that the data has been received. The client is also implemented so that it In the current implementation, the server returns ``Okay''. The server will continue to process additional BodyFrames received on its end of the netwrok stream, and the above procedure repeats.
 
@@ -347,6 +333,13 @@ The application listens for TCP client connections. This work is done in a separ
 The application has one window. It has a number of small buttons as controls on the top of the interface. Below the controls the window is split into halves. The left hand side shows the visualization for merged skeletons after applying coordinate transformation, and the right hand side shows the visualization of skeletons in their original fields of view. Displaying the two different views at once demonstrates the system's tracking algorithm.
 
 The design decisions on the look of the user interface are not discussed, because aesthetic features were not taken into consideration when the user interface was developed.
+
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=0.9\columnwidth]{ui}
+  \caption{UI}
+  \label{fig:ui}
+\end{figure}
 
 \subsubsection{Controls}
 
