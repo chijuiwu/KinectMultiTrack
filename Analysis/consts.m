@@ -35,18 +35,20 @@ scenario_count = length(scenario_types);
 %
 % Log
 %
-log_c_scenario = 1;
-log_c_tracking_time = 2;
-log_c_person = 3;
-log_c_skeleton = 4;
-log_c_skeleton_angle = 5;
-log_c_skeleton_dist = 6;
+log_c_study_id = 1;
+log_c_kinect_config = 2;
+log_c_scenario = 3;
+log_c_tracking_time = 4;
+log_c_person = 5;
+log_c_skeleton = 6;
 log_c_skeleton_time = 7;
-log_c_kinect = 8;
-log_c_kinect_angle = 9;
-log_c_kinect_height = 10;
-log_c_headers = log_c_scenario:log_c_kinect_height;
-log_c_joint = 11;
+log_c_skeleton_angle = 8;
+log_c_skeleton_dist = 9;
+log_c_kinect = 10;
+log_c_kinect_angle = 11;
+log_c_kinect_height = 12;
+log_c_headers = log_c_study_id:log_c_kinect_height;
+log_c_joint = 13;
 log_data_per_joint = 3;
 log_c_x = log_c_joint;
 log_c_y = log_c_joint+1;
