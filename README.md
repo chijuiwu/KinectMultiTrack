@@ -21,6 +21,8 @@ The project is about tracking people in occluded environments with multiple Kine
 * Logging (20th February, 2015)
 * Post-processing (23th February, 2015)
 * Preliminary Experiment UI (6th March, 2015)
+* Starting Experiments (17th March, 2015)
+* Starting the Final Report (18th March, 2015)
 
 ## Project Description
 
