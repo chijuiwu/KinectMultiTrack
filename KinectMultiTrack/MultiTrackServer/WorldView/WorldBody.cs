@@ -49,7 +49,7 @@ namespace KinectMultiTrack.WorldView
                 bodyCount++;
                 float sumXs = 0, sumYs = 0, sumZs = 0;
                 int countXs = 0, countYs = 0, countZs = 0;
-                // HACK: Assume all joints are present
+                // Assume all joints are present
                 foreach (JointType jt in SkeletonStructure.Joints)
                 {
                     if (!body.Joints.ContainsKey(jt) || body.Joints[jt].TrackingState == TrackingState.NotTracked)
