@@ -29,4 +29,3 @@ The project is about tracking people in occluded environments with multiple Kine
 #### Problem
 
 ![occlusion_problem](Deliverables/Report/Figures/occlusion_problem.JPG)
-
