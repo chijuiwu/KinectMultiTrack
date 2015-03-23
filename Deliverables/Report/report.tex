@@ -111,7 +111,7 @@ The current project proposes an algorithm for tracking people with multiple Kine
 
 \subsubsection{Word Count}
 
-\textbf{XX,XXX}
+\textbf{5,385}
 
 \section{Problem statement}
 \label{sec:problem_statement}
@@ -154,11 +154,13 @@ The contributions of the current work are:
 
 Existing people detection and tracking techniques. Tracking people in surveillance video and in real time. Tracking using mobile and wearable devices. Motion sensors and wireless. Time-of-flight and structured-light cameras.
 
-[Paper: Particle filter to track multiple people for visual surveillance]
-[Paper: Tracking People in Video Sequences by Clustering Feature Motion Paths]
-[Paper: Evaluation of real time people tracking for indoor environments using ubiquitous motion sensors and limited wireless network infrastructure]
-[Paper: Tracking people under heavy occlusions by layered data association]
-[Paper: Detection and Tracking of Occluded People]
+\begin{enumerate}
+  \item Particle filter to track multiple people for visual surveillance
+  \item Tracking People in Video Sequences by Clustering Feature Motion Paths
+  \item Evaluation of real time people tracking for indoor environments using ubiquitous motion sensors and limited wireless network infrastructure
+  \item Tracking people under heavy occlusions by layered data association
+  \item Detection and Tracking of Occluded People
+\end{enumerate}
 
 \subsection{Tracking people}
 
@@ -179,11 +181,13 @@ Existing people detection and tracking techniques. Tracking people in surveillan
 
 \textbf{TODO}
 
-[Paper: Tracking people within groups using RGB-D data]
-[Paper: Detecting and tracking people in real time with RGB-D camera]
-[Paper: Applications for a people detection and tracking algorithm using a time-of-flight camera]
-[Paper: Real-time Human Motion Tracking using Multiple Depth Cameras]
-[Paper: Human Detection Using Depth Information by Kinect]
+\begin{enumerate}
+  \item Tracking people within groups using RGB-D data
+  \item Detecting and tracking people in real time with RGB-D camera
+  \item Applications for a people detection and tracking algorithm using a time-of-flight camera
+  \item Real-time Human Motion Tracking using Multiple Depth Cameras
+  \item Human Detection Using Depth Information by Kinect
+\end{enumerate}
 
 \section{Kinect}
 \label{sec:kinect}
@@ -196,6 +200,8 @@ The complete API reference for Kinect v2 is accessible at {\url{https://msdn.mic
 
 \subsection{Features}
 
+\textbf{TODO}
+
 \subsection{Coordinate System}
 
 Kinect Camera Space. The coordinates are 3D points (x, y, z), expressed in meters. The origin of the coordinate system at (0, 0, 0) is at the center of the Kinect's IR sensor. The x axis grows to the left of the Kinect, the y axis grows upward, and the z axis grows outward from the direction of the sensor.
@@ -203,6 +209,8 @@ Kinect Camera Space. The coordinates are 3D points (x, y, z), expressed in meter
 \cite{microsoft_kinect_coordinates}
 
 \subsection{Multiple Kinects}
+
+\textbf{TODO}
 
 \section{Current Approach}
 \label{sec:current_approach}
@@ -296,23 +304,14 @@ After the system completes calibration, it can transform any calibrated skeleton
 Given the initial center position $C(X_C, Y_C, Z_C)$, initial angle $\theta$, and the number of joints per skeleton, a skeletal joint in the World coordinate system can be expressed as follows:
 
 \begin{equation}
-\label{eq:transformed_j}
-T_j (X_Tj, Y_Tj, Z_Tj) = (X_j - X_C, Y_j - Y_C, Z_j - Z_C)
+\label{eq:joint_translated}
+J_t (X_{Jt}, Y_{Jt}, Z_{Jt}) = (X_j - X_C, Y_j - Y_C, Z_j - Z_C)
 \end{equation}
 
 \begin{equation}
-\label{eq:worldview_j}
-W_j (X_Wj, Y_Wj, Z_Wj) = (X_Tj * \cos \theta, - X_C, Y_j - Y_C, Z_j - Z_C)
+\label{eq:joint_worldview}
+J_w (X_{Jw}, Y_{Jw}, Z_{Jw}) = (X_{Jt}\cos\theta + Z_{Jt}\sin\theta, Y_{Jt}, Z_{Jt}\cos\theta + X_{Jt}\sin\theta)
 \end{equation}
-
-Tj XTj, YTj, ZTj= Xj-XC, Yj-YC, Zj-ZC, for j=1 .. J
-Wj XWj, YWj, ZWj=XTj cos  + ZTj sin , YTj, ZTj cos  +XTj sin 
-
-Wj XWj, YWj, ZWj=XTj cos  + ZTj sin , YTj, ZTj cos  +XTj sin 
-
-To derive XTj and ZTjfrom XWjand ZWj using matrices:
-cos , sin    
--sin , cos 
 
 \subsection{Tracking by detection}
 
@@ -338,9 +337,15 @@ Since the positions of all potential skeletons are updated every frame, the syst
 
 \subsection{Strengths}
 
+\textbf{TODO}
+
 \subsection{Limitations}
 
+\textbf{TODO}
+
 \subsection{Improvements}
+
+\textbf{TODO}
 
 \section{System}
 \label{sec:system}
@@ -350,6 +355,8 @@ The final application demonstrates that the system works as intended. The main c
 The system is a standalone application written in C\# (.NET Framework 4.5), but it can also integrate with other applications, such as a heart rate estimation application using Kinect color data. More details on the design and implementation of the application will be discussed in section ``\nameref{sec:application}".
 
 \subsection{Running the application}
+
+\textbf{TODO}
 
 \subsection{Design}
 
@@ -488,9 +495,13 @@ The tracker runs the tracking algorithm on the Kinect BodyFrames from multiple K
 
 \subsection{Logger Implementation}
 
+\textbf{TODO}
+
 \textbf{``Disjoined'' or called something else}
 
 \subsection{Integration with Heart Rate Monitoring}
+
+\textbf{TODO}
 
 \section{Testing}
 \label{sec:testing}
@@ -598,6 +609,8 @@ The fourth study involves two people. They stand next to each other. The person 
 
 \subsection{Study 5: Interaction 2?}
 
+\textbf{TODO}
+
 \subsection{Study 6: Occlusion}
 
 Participants are asked to walk around a large obstacle, which is a large poster in the current study. The obstacle divides the field of view of two Kinects at 90 degrees apart (See Figure \ref{fig:studies_obstacle}). The participant starts on the right hand side of the obstacle, where he is visible to both Kinects. As the participant walks around the obstacle, from the back, then to the left side of the obstacle, the Kinect that was looking at the side of the participant will slowly lose the sight of the person. When the participant is on the other side of the obstacle, only the front-facing Kinect will have sight of the person. The study should demonstrate that the system would still be able to track the person despite that one of the Kinect loses the person's sight temporarily. The study is only done with Kinects placed 90 degrees apart.
@@ -635,21 +648,27 @@ Discuss results. Compare them with Wei et al.
 \section{Future Work}
 \label{sec:future_work}
 
+\textbf{TODO}
+
 \subsection{User studies}
+
+\textbf{TODO}
 
 \subsection{Application}
 
+\textbf{TODO}
+
 \section{SH Project Reflection}
 
-SECTION
+\textbf{TODO}
 
 \subsection{Requirements}
 
 \section{Acknowledgements}
 \label{sec:acknowledge}
 
-I declare that, unless otherwise stated, the work is completed by myself, Chi-Jui Wu, under the supervision of Dr. David Harris-Birtill. The code for skeleton visualization is written based on the official Microsoft Kinect Developer example.
-In addition, all infographics, excluding real-life images, are created by Ching Su. I retain the copyright of this work.
+I, Chi-Jui Wu, hereby declare that, unless otherwise stated, the work is completed by myself, under the supervision of Dr. David Harris-Birtill. The code for skeleton visualization is modified based on the official Microsoft Kinect Developer example.
+All infographics are created by Ching Su. I own the copyright to this work.
 
 \balance{}
 
