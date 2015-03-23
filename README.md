@@ -1,7 +1,7 @@
 KinectMultiTrack: Tracking People with Multiple Kinects
 ======
 
-The current work progress of my, Chi-Jui Wu, Seniour Honours Project in the School of Computer Science, University of St Andrews.
+This is the working repository of my, Chi-Jui Wu, undergraduate thesis in the School of Computer Science, University of St Andrews.
 
 The project is about tracking people in occluded environments with multiple Kinects.
 
