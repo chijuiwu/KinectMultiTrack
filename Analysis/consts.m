@@ -57,7 +57,7 @@ log_c_count = length(log_c_headers) + joint_count*log_data_per_joint;
 
 % Differences Data
 %
-% timestamp person j1_dx j1_dy j1_dz j1_dd ... j25 ...
+% study_id kinect_config scenario_id timestamp person_id j1_dx j1_dy j1_dz j1_dd ... j25 ...
 % 
 diff_data_per_joint = 4;
 diff_c_count = 2+joint_count*diff_data_per_joint;
@@ -66,7 +66,7 @@ diff_c_joint = 3;
 
 % Averages Data
 %
-% person j1_dx_avg j1_dx_sd j1_dy_avg j1_dy_sd j1_dz_avg j1_dz_sd j1_dd_avg
+% study_id kinect_config scenario_id person j1_dx_avg j1_dx_sd j1_dy_avg j1_dy_sd j1_dz_avg j1_dz_sd j1_dd_avg
 % j1_dd_sd ... j25 ...
 % 
 avg_data_per_joint = 8;
