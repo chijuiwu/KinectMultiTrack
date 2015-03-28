@@ -10,7 +10,7 @@ joints_util;
 first_variable_names = {
     'Kinect_Config','Scenario_Id','Person_Id'
 };
-first_average_idx = length(first_variable_names)+1;
+average_data_idx = 5;
 
 % 
 % Joints_avg_dx Joints_sd_dx Joints_avg_dy Joints_sd_dy ...
@@ -41,24 +41,33 @@ for k = unique(joints_average_table.Kinect_Config,'rows').'
         scen_table = k_table(k_table.Scenario_Id==scen_id,:);
 
         for p_id = unique(scen_table.Person_Id,'rows').'
-            person_joints_data = scen_table(scen_table.Person_Id==p_id,:);
+            joints_average_over_time = scen_table(scen_table.Person_Id==p_id,:);
 
             average_row.Kinect_Config = k;
             average_row.Scenario_Id = scen_id;
             average_row.Person_Id = p_id;
             
-            % offset 1 because previous table (time_average_table contains Study_Id)
-            average_data_idx = first_average_idx+1;
-            average_data_over_time = person_joints_data(:,average_data_idx:average_data_idx+7);
+            joints_average_over_time = joints_average_over_time(:,average_data_idx:average_data_idx+7);
             
-            % 4 difference avg types (dx, dy, dz, dd)
-            for avg_type_num = 1:4
-                avg_idx = 1+(avg_type_num-1)*2;
-                all_study_avg = mean(average_data_over_time{:,avg_idx},2);
-                all_study_std = std(average_data_over_time{:,avg_idx},2);
-                average_row.(joints_average_types{1,avg_idx}) = all_study_avg;
-                average_row.(joints_average_types{1,avg_idx+1}) = all_study_std;
-            end
+            avg_all_dx = mean(joints_average_over_time{:,1});
+            std_all_dx = std(joints_average_over_time{:,1});
+            avg_all_dy = mean(joints_average_over_time{:,3});
+            std_all_dy = std(joints_average_over_time{:,3});
+            avg_all_dz = mean(joints_average_over_time{:,5});
+            std_all_dz = std(joints_average_over_time{:,5});
+            avg_all_dd = mean(joints_average_over_time{:,7});
+            std_all_dd = std(joints_average_over_time{:,7});
+            
+            average_row.(joints_average_types{1,1}) = avg_all_dx;
+            average_row.(joints_average_types{1,2}) = std_all_dx;
+            average_row.(joints_average_types{1,3}) = avg_all_dy;
+            average_row.(joints_average_types{1,4}) = std_all_dy;
+            average_row.(joints_average_types{1,5}) = avg_all_dz;
+            average_row.(joints_average_types{1,6}) = std_all_dz;
+            average_row.(joints_average_types{1,7}) = avg_all_dd;
+            average_row.(joints_average_types{1,8}) = std_all_dd;
+
+            display(average_row);
             
             study_average_table(row_counter,:) = struct2table(average_row);
             row_counter = row_counter+1;

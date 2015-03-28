@@ -58,6 +58,9 @@ for s_id = unique(data_table.Study_Id,'rows').'
                     difference_row.Tracker_Time = t;
                     difference_row.Person_Id = p_id;
 
+                    fprintf('s_id=%d, k=%d, scen_id=%d, t=%.3f, p_id=%d\n', ...
+                        s_id, k, scen_id, t, p_id);
+                    
                     for jt_num = 1:length(joint_types)
                         % 3 because Joint_X, Joint_Y, Joint_Z
                         jt_idx = first_joint_idx + (jt_num-1)*3;
