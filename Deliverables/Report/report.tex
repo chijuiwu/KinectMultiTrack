@@ -37,8 +37,8 @@ Copyright \copyright~Chi-Jui Wu. \\
 \usepackage{nameref}
 
 % Set figures directory
-\graphicspath{{./figures/}}
-\setsvg{svgpath = figures/}
+\graphicspath{{./Figures/}}
+\setsvg{svgpath = ./Figures/}
 
 % llt: Define a global style for URLs, rather that the default one
 \makeatletter
@@ -593,13 +593,13 @@ There are no legitimate ethical concerns about participating in the studies. The
 
 \subsection{Study 1: Stationary}
 
-In the first study, participants are required to remain stationary for ten seconds in the center of the block. The study is done with all three Kinect configurations.
+In the first study, participants are required to remain stationary for ten seconds in the center of the block. The study is done with all three Kinect configurations (Parallel, 45 degrees-apart and 90 degrees-apart)
 
-\subsection{Study 2: Basic Movements}
+\subsection{Study 2: Steps (Basic movements)}
 
 The second study requires the participants to move in the same way as explained in the Wei et al study. These are basic movements such as moving forward, backward, left, and right. The study is done with all three Kinect configurations.
 
-\subsection{Study 3: Continuous Movements}
+\subsection{Study 3: Walk (Continuous Movements)}
 
 The third study requires the participants to walk around the perimeter of the block and walk diagonally to each of four corners. Like the previous two studies, study 3 is done with all three Kinect configurations. Studies 1, 2, 3 are conducted in succession for every participant.
 
@@ -622,28 +622,154 @@ Participants are asked to walk around a large obstacle, which is a large poster 
   \label{fig:studies_obstacle}
 \end{figure}
 
-\section{Evaluation}
+\section{Results}
 \label{sec:evaluation}
 
-Discuss results. Compare them with Wei et al.
+This section reports the results in each user study and the overall result across al experiment setups. For each study, the coordinate differences in x, y, z, and distance between multiple skeletons are reported. The changes in the coordinate differences over time are also shown in the figures. The differences for each joint type are presented to display more details.
 
-\begin{figure}[!h]
-  \centering
-  \includesvg[width=0.9\columnwidth]{stationary_p0_d7_all}
-  \caption{One person all joints}~\label{fig:one_person_all}
-\end{figure}
+\subsection{Stationary}
 
-\begin{figure}[!h]
-  \centering
-  \includesvg[width=0.9\columnwidth]{stationary_p0_d7_average}
-  \caption{One person average}~\label{fig:one_person_average}
-\end{figure}
+The averge distances between multiple skeletons over time in the Parallel, 45 degrees-apart and 90 degrees-apart Kinect configurations for the stationary scenario are shown in Figure \ref{fig:results_stationary}.
 
-\begin{figure}[!h]
+In the stationary scenario, the average distances over time are generally constant over time. The distances are small (less than five centimeters) in the Parallel and 45 degrees-apart Kinect configurations. The average distances in the 90 degrees-apart Kinect configuration are higher. They are mostly under ten centimeters, but there is a number of joints that have particularly high coordinate differences. In this setting, the large average distances are dominanted by the joints: Elbow Left, Hand Left, Hand Tip Left, Shoulder Left, Thumb Left, and Wrist Left. The left joints are furthest away from the Kinect at the 90 degrees angle.
+
+\begin{figure*}
   \centering
-  \includesvg[width=0.9\columnwidth]{scenarios}
-  \caption{All scenarios}~\label{fig:scenarios}
-\end{figure}
+
+  \includesvg[width=1.0\columnwidth]{Average_Distance_over_Time_Participant_0_KinectConfig_0_ScenarioId_1}
+  \includesvg[width=1.0\columnwidth]{Joints_Average_Participant_0_KinectConfig_0_ScenarioId_1} \\
+  \includesvg[width=1.0\columnwidth]{Average_Distance_over_Time_Participant_0_KinectConfig_1_ScenarioId_1}
+  \includesvg[width=1.0\columnwidth]{Joints_Average_Participant_0_KinectConfig_1_ScenarioId_1} \\
+  \includesvg[width=1.0\columnwidth]{Average_Distance_over_Time_Participant_0_KinectConfig_2_ScenarioId_1}
+  \includesvg[width=1.0\columnwidth]{Joints_Average_Participant_0_KinectConfig_2_ScenarioId_1}
+
+  \caption{Average distances ($\Delta x$, $\Delta y$, $\Delta z$, $\Delta d$) between multiple skeletons
+    of the same person when performing the stationary task}
+
+  \label{fig:results_stationary}
+\end{figure*}
+
+\begin{figure*}
+  \centering
+
+  \includesvg[width=1.0\columnwidth]{Joints_over_Time_Participant_0_KinectConfig_0_ScenarioId_1} \\
+  \includesvg[width=1.0\columnwidth]{Joints_over_Time_Participant_0_KinectConfig_1_ScenarioId_1} \\
+  \includesvg[width=1.0\columnwidth]{Joints_over_Time_Participant_0_KinectConfig_2_ScenarioId_1}
+
+  \caption{Average distances ($\Delta x$, $\Delta y$, $\Delta z$, $\Delta d$) between multiple skeletons
+    of the same person when performing the stationary task}
+
+  \label{fig:results_stationary_3d}
+\end{figure*}
+
+\subsection{Steps}
+
+The averge distances between multiple skeletons over time in the Parallel, 45 degrees-apart and 90 degrees-apart Kinect configurations for the steps scenario are shown in figure \ref{fig:eval_steps_0_time}, \ref{fig:eval_steps_1_time}, and \ref{fig:eval_steps_2_time}, respectively. The average changes in distance between multiple skeletons for each joint type are shown in figure \ref{fig:eval_steps_0}, \ref{fig:eval_steps_1}, and \ref{fig:eval_steps_2}, respectively.
+
+
+\begin{figure*}
+  \centering
+
+  \includesvg[width=1.0\columnwidth]{Average_Distance_over_Time_Participant_0_KinectConfig_0_ScenarioId_2}
+  \includesvg[width=1.0\columnwidth]{Joints_Average_Participant_0_KinectConfig_0_ScenarioId_2} \\
+  \includesvg[width=1.0\columnwidth]{Average_Distance_over_Time_Participant_0_KinectConfig_1_ScenarioId_2}
+  \includesvg[width=1.0\columnwidth]{Joints_Average_Participant_0_KinectConfig_1_ScenarioId_2} \\
+  \includesvg[width=1.0\columnwidth]{Average_Distance_over_Time_Participant_0_KinectConfig_2_ScenarioId_2}
+  \includesvg[width=1.0\columnwidth]{Joints_Average_Participant_0_KinectConfig_2_ScenarioId_2}
+
+  \caption{Average distances ($\Delta x$, $\Delta y$, $\Delta z$, $\Delta d$) between multiple skeletons
+    of the same person when performing the Steps task}
+
+  \label{fig:results_steps}
+\end{figure*}
+
+\begin{figure*}
+  \centering
+
+  \includesvg[width=1.0\columnwidth]{Joints_over_Time_Participant_0_KinectConfig_0_ScenarioId_2} \\
+  \includesvg[width=1.0\columnwidth]{Joints_over_Time_Participant_0_KinectConfig_1_ScenarioId_2} \\
+  \includesvg[width=1.0\columnwidth]{Joints_over_Time_Participant_0_KinectConfig_2_ScenarioId_2}
+
+  \caption{Average distances ($\Delta x$, $\Delta y$, $\Delta z$, $\Delta d$) between multiple skeletons
+    of the same person when performing the stationary task}
+
+  \label{fig:results_steps_3d}
+\end{figure*}
+
+\subsection{Walk}
+
+Donec ut dolor viverra, tincidunt nibh in, finibus quam. Nam arcu leo, euismod sit amet nisl ac, eleifend ultrices quam. Nam imperdiet volutpat consectetur. Phasellus nulla mi, eleifend sed lorem in, suscipit venenatis eros. Proin imperdiet accumsan eros eget aliquam. Maecenas vel orci quis urna vehicula vulputate in sit amet mauris. Aenean efficitur dignissim neque non bibendum.
+Donec ut dolor viverra, tincidunt nibh in, finibus quam. Nam arcu leo, euismod sit amet nisl ac, eleifend ultrices quam. Nam imperdiet volutpat consectetur. Phasellus nulla mi, eleifend sed lorem in, suscipit venenatis eros. Proin imperdiet accumsan eros eget aliquam. Maecenas vel orci quis urna vehicula vulputate in sit amet mauris. Aenean efficitur dignissim neque non bibendum.Donec ut dolor viverra, tincidunt nibh in, finibus quam. Nam arcu leo, euismod sit amet nisl ac, eleifend ultrices quam. Nam imperdiet volutpat consectetur. Phasellus nulla mi, eleifend sed lorem in, suscipit venenatis eros. Proin imperdiet accumsan eros eget aliquam. Maecenas vel orci quis urna vehicula vulputate in sit amet mauris. Aenean efficitur dignissim neque non bibendum.Donec ut dolor viverra, tincidunt nibh in, finibus quam. Nam arcu leo, euismod sit amet nisl ac, eleifend ultrices quam. Nam imperdiet volutpat consectetur. Phasellus nulla mi, eleifend sed lorem in, suscipit venenatis eros. Proin imperdiet accumsan eros eget aliquam. Maecenas vel orci quis urna vehicula vulputate in sit amet mauris. Aenean efficitur dignissim neque non bibendum.Donec ut dolor viverra, tincidunt nibh in, finibus quam. Nam arcu leo, euismod sit amet nisl ac, eleifend ultrices quam. Nam imperdiet volutpat consectetur. Phasellus nulla mi, eleifend sed lorem in, suscipit venenatis eros. Proin imperdiet accumsan eros eget aliquam. Maecenas vel orci quis urna vehicula vulputate in sit amet mauris. Aenean efficitur dignissim neque non bibendum.
+
+\begin{figure*}
+  \centering
+
+  \includesvg[width=1.0\columnwidth]{Average_Distance_over_Time_Participant_0_KinectConfig_0_ScenarioId_3}
+  \includesvg[width=1.0\columnwidth]{Joints_Average_Participant_0_KinectConfig_0_ScenarioId_3} \\
+  \includesvg[width=1.0\columnwidth]{Average_Distance_over_Time_Participant_0_KinectConfig_1_ScenarioId_3}
+  \includesvg[width=1.0\columnwidth]{Joints_Average_Participant_0_KinectConfig_1_ScenarioId_3} \\
+  \includesvg[width=1.0\columnwidth]{Average_Distance_over_Time_Participant_0_KinectConfig_2_ScenarioId_3}
+  \includesvg[width=1.0\columnwidth]{Joints_Average_Participant_0_KinectConfig_2_ScenarioId_3}
+
+  \caption{Average distances ($\Delta x$, $\Delta y$, $\Delta z$, $\Delta d$) between multiple skeletons
+    of the same person when performing the Walk task}
+
+  \label{fig:results_walk}
+\end{figure*}
+
+
+\begin{figure*}
+  \centering
+
+  % \includesvg[width=1.0\columnwidth]{Joints_over_Time_Participant_0_KinectConfig_0_ScenarioId_3} \\ did not create
+  \includesvg[width=1.0\columnwidth]{Joints_over_Time_Participant_0_KinectConfig_1_ScenarioId_3} \\
+  \includesvg[width=1.0\columnwidth]{Joints_over_Time_Participant_0_KinectConfig_2_ScenarioId_3}
+
+  \caption{Average distances ($\Delta x$, $\Delta y$, $\Delta z$, $\Delta d$) between multiple skeletons
+    of the same person when performing the stationary task}
+
+  \label{fig:results_walk_3d}
+\end{figure*}
+
+\subsection{Obstacle}
+
+\begin{figure*}
+  \centering
+
+  \includesvg[width=1.0\columnwidth]{Joints_Average_Participant_0_KinectConfig_2_ScenarioId_6} \\
+  \includesvg[width=1.0\columnwidth]{Joints_over_Time_Participant_0_KinectConfig_2_ScenarioId_6} \\
+
+  \caption{Average distances ($\Delta x$, $\Delta y$, $\Delta z$, $\Delta d$) between multiple skeletons
+    of the same person when performing the stationary task}
+
+  \label{fig:results_obstacle}
+\end{figure*}
+
+\subsection{Overall results}
+
+Donec ut dolor viverra, tincidunt nibh in, finibus quam. Nam arcu leo, euismod sit amet nisl ac, eleifend ultrices quam. Nam imperdiet volutpat consectetur. Phasellus nulla mi, eleifend sed lorem in, suscipit venenatis eros. Proin imperdiet accumsan eros eget aliquam. Maecenas vel orci quis urna vehicula vulputate in sit amet mauris. Aenean efficitur dignissim neque non bibendum.
+Donec ut dolor viverra, tincidunt nibh in, finibus quam. Nam arcu leo, euismod sit amet nisl ac, eleifend ultrices quam. Nam imperdiet volutpat consectetur. Phasellus nulla mi, eleifend sed lorem in, suscipit venenatis eros. Proin imperdiet accumsan eros eget aliquam. Maecenas vel orci quis urna vehicula vulputate in sit amet mauris. Aenean efficitur dignissim neque non bibendum.Donec ut dolor viverra, tincidunt nibh in, finibus quam. Nam arcu leo, euismod sit amet nisl ac, eleifend ultrices quam. Nam imperdiet volutpat consectetur. Phasellus nulla mi, eleifend sed lorem in, suscipit venenatis eros. Proin imperdiet accumsan eros eget aliquam. Maecenas vel orci quis urna vehicula vulputate in sit amet mauris. Aenean efficitur dignissim neque non bibendum.Donec ut dolor viverra, tincidunt nibh in, finibus quam. Nam arcu leo, euismod sit amet nisl ac, eleifend ultrices quam. Nam imperdiet volutpat consectetur. Phasellus nulla mi, eleifend sed lorem in, suscipit venenatis eros. Proin imperdiet accumsan eros eget aliquam. Maecenas vel orci quis urna vehicula vulputate in sit amet mauris. Aenean efficitur dignissim neque non bibendum.Donec ut dolor viverra, tincidunt nibh in, finibus quam. Nam arcu leo, euismod sit amet nisl ac, eleifend ultrices quam. Nam imperdiet volutpat consectetur. Phasellus nulla mi, eleifend sed lorem in, suscipit venenatis eros. Proin imperdiet accumsan eros eget aliquam. Maecenas vel orci quis urna vehicula vulputate in sit amet mauris. Aenean efficitur dignissim neque non bibendum.
+
+Report actual values
+
+
+\begin{figure*}
+  \centering
+
+  \includesvg[width=1.0\columnwidth]{Studies_Average_KinectConfig} \\
+  \includesvg[width=1.0\columnwidth]{Studies_Average_Scenarios} \\
+  \includesvg[width=1.0\columnwidth]{Studies_Overall_Average} \\
+
+  \caption{Average distances ($\Delta x$, $\Delta y$, $\Delta z$, $\Delta d$) between multiple skeletons
+    for three Kinect configurations (Parallel, 45 and 90 degrees) over different scenarios (Stationary, Steps, and Walk).}
+
+  \label{fig:results_steps}
+\end{figure*}
+
+
+\section{Discussion}
+
+\textbf{TODO}
 
 \section{Future Work}
 \label{sec:future_work}
