@@ -35,6 +35,21 @@ Copyright \copyright~Chi-Jui Wu. \\
 \usepackage{amsmath}
 \usepackage[toc,page]{appendix}
 \usepackage{nameref}
+\usepackage{algorithm}
+\usepackage[noend]{algorithmic}
+
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+
+\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+\newcommand{\Acronym}[1]{\ensuremath{{{\texttt{#1}}}}}
+\newcommand{\Symbol}[1]{\ensuremath{\mathcal{#1}}}
+\newcommand{\Function}[1]{\ensuremath{{ \textsc{#1}}}}
+\newcommand{\Constant}[1]{\ensuremath{{\texttt{#1}}}}
+\newcommand{\Var}[1]{\ensuremath{{{\textsl{#1}}}}}
+\newcommand{\False}{\Constant{false}}
+\newcommand{\True}{\Constant{true}}
+\newcommand{\Null}{\Constant{null}}
 
 % Set figures directory
 \graphicspath{{./Figures/}}
@@ -245,7 +260,7 @@ The following definitions are from the Wei et al study \cite{wei_kinect_calibrat
 
 Initial center position is defined as the average of a skeleton's joints coordinates over the duration of calibration.
 
-Let J = number of joints per skeleton (20). Let T = number of frames used for calibration (120).
+Let N = number of joints per skeleton (20). Let T = number of frames used for calibration (120).
 
 Let S = joints sum. Let A = joints average. Let C = joints center (over time). 
 
@@ -256,7 +271,7 @@ S(X_S, Y_S, Z_S) = \sum_{j=1}^J (X_j, Y_j, Z_j)
 
 \begin{equation}
 \label{eq:joints_average}
-A(X_A, Y_A, Z_A) = S(X_S, Y_S, Z_S) / J
+A(X_A, Y_A, Z_A) = S(X_S, Y_S, Z_S) / N
 \end{equation}
 
 \begin{equation}
@@ -295,7 +310,52 @@ The system uses 120 Kinect BodyFrames for calibration. The Kinect provides BodyF
 
 The system will automatically restart the calibration process if people move their joints over ten centimeters during calibration. The current implementation checks movements at the person's head, left hand, and right hand.
 
-\textbf{(TODO: PSEUDOCODE)}. 
+
+\begin{algorithm}[ht,width=0.9\columnwidth]
+    \caption{$\Function{RemainStationary}(jt, c, p, msg)$}
+    \algorithmicrequire{
+        \\$jt$: Joint type
+        \\$c$: Serialized body in the current frame
+        \\$p$: Serialized body in the previous frame
+        \\$msg$: Error message
+    }
+    \\\algorithmicensure{
+        \\Whether the person has moved the joint during calibration
+    }
+    \label{algo:prm}
+    \begin{algorithmic}[1]
+        \setcounter{ALC@line}{0}
+        \vspace*{1mm}
+
+        \IF{$c = \Null \vee \newline
+            \neg \Function{ContainsJoint}(c, jt) \vee \neg \Function{ContainsJoint}(p, jt)$}
+              \STATE $msg \leftarrow \texttt{"Missing"} + jt$
+              \RETURN $\False$
+        \ENDIF
+
+        \STATE $cJt \leftarrow Joint(c, jt)$
+        \STATE $pJt \leftarrow Joint(p, jt)$
+        \STATE $d \leftarrow \sqrt()$
+
+        \FOR{$k = 1$ \TO $n$}
+            \STATE $q \leftarrow \Function{RandomPoint2D}(w, h)$
+            \IF{$\bigwedge_{o \in O} \neg \Function{Collision}(o, q)$}
+                \STATE $V \leftarrow V \cup \{q\}$
+            \ENDIF
+        \ENDFOR
+
+        \FORALL{$i \in V$}
+            \FORALL{$j \in V$}
+            \IF{$i \neq j \wedge ||i - j|| \leq d \wedge
+                \bigwedge_{o \in O} \neg \Function{Collision}(o, i, j)$}
+                    \STATE $E \leftarrow E \cup \{(i, j)\}$
+                \ENDIF
+            \ENDFOR
+        \ENDFOR
+        \RETURN $(V,E)$
+    \end{algorithmic}
+\end{algorithm}
+
 
 \subsection{Coordinate transformation}
 
@@ -312,6 +372,18 @@ J_t (X_{Jt}, Y_{Jt}, Z_{Jt}) = (X_j - X_C, Y_j - Y_C, Z_j - Z_C)
 \label{eq:joint_worldview}
 J_w (X_{Jw}, Y_{Jw}, Z_{Jw}) = (X_{Jt}\cos\theta + Z_{Jt}\sin\theta, Y_{Jt}, Z_{Jt}\cos\theta + X_{Jt}\sin\theta)
 \end{equation}
+
+
+% \begin{equation}
+% \label{eq:joint_backtokinect}
+% \end{gathered}
+% J_w (X_{Jw}, Y_{Jw}, Z_{Jw}) = (X_{Jt}\cos\theta + Z_{Jt}\sin\theta, Y_{Jt}, Z_{Jt}\cos\theta + X_{Jt}\sin\theta)
+% \begin{bmatrix} \cos\theta & -\sin\theta \\ \sin\theta & \cos\theta \end{bmatrix} = \left[
+% \begin{array}{c} x \\ y \end{array} \right] \times \left[
+% \begin{array}{cc} z & w \end{array} \right]
+
+% \end{gathered}
+% \end{equation}
 
 \subsection{Tracking by detection}
 
@@ -644,7 +716,9 @@ In the stationary scenario, the average distances over time are generally consta
   \includesvg[width=1.0\columnwidth]{Joints_Average_Participant_0_KinectConfig_2_ScenarioId_1}
 
   \caption{Average distances ($\Delta x$, $\Delta y$, $\Delta z$, $\Delta d$) between multiple skeletons
-    of the same person when performing the stationary task}
+    of the same person when performing the Stationary task with different Kinect configurations
+    (Parallel, 45 degrees-apart, and 90 degrees-apart). These figures show the average distances either
+    over time or joint types.}
 
   \label{fig:results_stationary}
 \end{figure*}
@@ -657,7 +731,9 @@ In the stationary scenario, the average distances over time are generally consta
   \includesvg[width=1.0\columnwidth]{Joints_over_Time_Participant_0_KinectConfig_2_ScenarioId_1}
 
   \caption{Average distances ($\Delta x$, $\Delta y$, $\Delta z$, $\Delta d$) between multiple skeletons
-    of the same person when performing the stationary task}
+    of the same person when performing the Stationary task with different Kinect configurations
+    (Parallel, 45 degrees-apart, and 90 degrees-apart). These figures show the average distances over both
+    time and joint types.}
 
   \label{fig:results_stationary_3d}
 \end{figure*}
@@ -678,7 +754,9 @@ The averge distances between multiple skeletons over time in the Parallel, 45 de
   \includesvg[width=1.0\columnwidth]{Joints_Average_Participant_0_KinectConfig_2_ScenarioId_2}
 
   \caption{Average distances ($\Delta x$, $\Delta y$, $\Delta z$, $\Delta d$) between multiple skeletons
-    of the same person when performing the Steps task}
+    of the same person when performing the Steps task with different Kinect configurations
+    (Parallel, 45 degrees-apart, and 90 degrees-apart). These figures show the average distances either
+    over time or joint types.}
 
   \label{fig:results_steps}
 \end{figure*}
@@ -691,7 +769,9 @@ The averge distances between multiple skeletons over time in the Parallel, 45 de
   \includesvg[width=1.0\columnwidth]{Joints_over_Time_Participant_0_KinectConfig_2_ScenarioId_2}
 
   \caption{Average distances ($\Delta x$, $\Delta y$, $\Delta z$, $\Delta d$) between multiple skeletons
-    of the same person when performing the stationary task}
+    of the same person when performing the Steps task with different Kinect configurations
+    (Parallel, 45 degrees-apart, and 90 degrees-apart). These figures show the average distances over both
+    time and joint types.}
 
   \label{fig:results_steps_3d}
 \end{figure*}
@@ -712,7 +792,9 @@ Donec ut dolor viverra, tincidunt nibh in, finibus quam. Nam arcu leo, euismod s
   \includesvg[width=1.0\columnwidth]{Joints_Average_Participant_0_KinectConfig_2_ScenarioId_3}
 
   \caption{Average distances ($\Delta x$, $\Delta y$, $\Delta z$, $\Delta d$) between multiple skeletons
-    of the same person when performing the Walk task}
+    of the same person when performing the Walk task with different Kinect configurations
+    (Parallel, 45 degrees-apart, and 90 degrees-apart). These figures show the average distances either
+    over time or joint types.}
 
   \label{fig:results_walk}
 \end{figure*}
@@ -721,12 +803,14 @@ Donec ut dolor viverra, tincidunt nibh in, finibus quam. Nam arcu leo, euismod s
 \begin{figure*}
   \centering
 
-  % \includesvg[width=1.0\columnwidth]{Joints_over_Time_Participant_0_KinectConfig_0_ScenarioId_3} \\ did not create
+  \includesvg[width=1.0\columnwidth]{Joints_over_Time_Participant_0_KinectConfig_0_ScenarioId_3} \\
   \includesvg[width=1.0\columnwidth]{Joints_over_Time_Participant_0_KinectConfig_1_ScenarioId_3} \\
   \includesvg[width=1.0\columnwidth]{Joints_over_Time_Participant_0_KinectConfig_2_ScenarioId_3}
 
   \caption{Average distances ($\Delta x$, $\Delta y$, $\Delta z$, $\Delta d$) between multiple skeletons
-    of the same person when performing the stationary task}
+    of the same person when performing the Steps task with different Kinect configurations
+    (Parallel, 45 degrees-apart, and 90 degrees-apart). These figures show the average distances over both
+    time and joint types.}
 
   \label{fig:results_walk_3d}
 \end{figure*}
@@ -736,11 +820,12 @@ Donec ut dolor viverra, tincidunt nibh in, finibus quam. Nam arcu leo, euismod s
 \begin{figure*}
   \centering
 
+  \includesvg[width=1.0\columnwidth]{Average_Distance_over_Time_Participant_0_KinectConfig_2_ScenarioId_6}
   \includesvg[width=1.0\columnwidth]{Joints_Average_Participant_0_KinectConfig_2_ScenarioId_6} \\
-  \includesvg[width=1.0\columnwidth]{Joints_over_Time_Participant_0_KinectConfig_2_ScenarioId_6} \\
+  \includesvg[width=1.0\columnwidth]{Joints_over_Time_Participant_0_KinectConfig_2_ScenarioId_6}
 
   \caption{Average distances ($\Delta x$, $\Delta y$, $\Delta z$, $\Delta d$) between multiple skeletons
-    of the same person when performing the stationary task}
+    of the same person when performing the Obstacle task with 45 degrees-apart Kinect configuration.}
 
   \label{fig:results_obstacle}
 \end{figure*}
@@ -753,15 +838,15 @@ Donec ut dolor viverra, tincidunt nibh in, finibus quam. Nam arcu leo, euismod s
 Report actual values
 
 
-\begin{figure*}
+\begin{figure*}z
   \centering
 
   \includesvg[width=1.0\columnwidth]{Studies_Average_KinectConfig} \\
   \includesvg[width=1.0\columnwidth]{Studies_Average_Scenarios} \\
   \includesvg[width=1.0\columnwidth]{Studies_Overall_Average} \\
 
-  \caption{Average distances ($\Delta x$, $\Delta y$, $\Delta z$, $\Delta d$) between multiple skeletons
-    for three Kinect configurations (Parallel, 45 and 90 degrees) over different scenarios (Stationary, Steps, and Walk).}
+  \caption{Overall result showing the average distances ($\Delta x$, $\Delta y$, $\Delta z$, $\Delta d$) between multiple skeletons
+    for three Kinect configurations (Parallel, 45 and 90 degrees) and different scenarios (Stationary, Steps, and Walk).}
 
   \label{fig:results_steps}
 \end{figure*}
