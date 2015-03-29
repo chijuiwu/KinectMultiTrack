@@ -32,16 +32,16 @@ namespace KinectMultiTrack
         public static readonly int KINECT_LEFT_45 = 3;
         public static readonly int KINECT_LEFT_90 = 4;
 
-        private static readonly string STUDY = "Study";
-        private static readonly string KINECT_CONFIG = "KinectConfig";
-        private static readonly string USER_SCENARIO = "Scenario";
+        private static readonly string STUDY = "Study_Id";
+        private static readonly string KINECT_CONFIG = "Kinect_Config";
+        private static readonly string USER_SCENARIO = "Scenario_Id";
         private static readonly string TRACKER_TIME = "Tracker_Time";
-        private static readonly string PERSON = "Person#";
-        private static readonly string SKEL = "Skeleton#";
+        private static readonly string PERSON = "Person_Id";
+        private static readonly string SKEL = "Skeleton_Id";
         private static readonly string SKEL_TIME = "Skeleton_Time";
         private static readonly string SKEL_INIT_ANGLE = "Skeleton_Init_Angle";
         private static readonly string SKEL_INIT_DIST = "Skeleton_Init_Dist";
-        private static readonly string KINECT = "Kinect#";
+        private static readonly string KINECT = "Kinect_Id";
         private static readonly string KINECT_TILT_ANGLE = "Kinect_Tilt_Angle";
         private static readonly string KINECT_HEIGHT = "Kinect_Height";
         private static readonly string X = "X";

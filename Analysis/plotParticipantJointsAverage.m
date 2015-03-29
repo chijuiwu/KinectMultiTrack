@@ -5,7 +5,7 @@ function [] = plotParticipantJointsAverage(time_average_table)
 
 joints_util;
 
-title_format = 'Joints Average: [Participant: %d; KinectConfig: %d; ScenarioId: %d]';
+title_format = 'Joints Average - [Participant: %d; KinectConfig: %d; ScenarioId: %d]';
 dir = 'Plots/Joints_Average/';
 filename_format = strcat(dir,'Joints_Average_Participant_%d_KinectConfig_%d_ScenarioId_%d');
 
@@ -14,6 +14,11 @@ first_avg_dy = 7;
 first_avg_dz = 9;
 first_avg_dd = 11;
 last_idx = 4+length(joint_types)*8;
+
+red = [.549 .086 .086];
+green = [0 .389 .247];
+blue = [.118 .259 0.651];
+black = [0 0 0];
 
 for participant_id = unique(time_average_table.Study_Id,'rows').'
     s_table = time_average_table(time_average_table.Study_Id==participant_id,:);
@@ -37,10 +42,10 @@ for participant_id = unique(time_average_table.Study_Id,'rows').'
             
 			figure;
 			hold on;
-			errorbar(x,avg_dx,std_dx,'-r','LineStyle','none','Marker','x');
-			errorbar(x,avg_dy,std_dy,'-g','LineStyle','none','Marker','x');
-			errorbar(x,avg_dz,std_dz,'-b','LineStyle','none','Marker','x');
-			errorbar(x,avg_dd,std_dd,'-k','LineStyle','none','Marker','o','MarkerSize',12);
+			errorbar(x,avg_dx,std_dx,'MarkerEdgeColor',red,'MarkerFaceColor',red,'Color',red,'LineStyle','none','Marker','o');
+            errorbar(x,avg_dy,std_dy,'MarkerEdgeColor',green,'MarkerFaceColor',green,'Color',green,'LineStyle','none','Marker','o');
+			errorbar(x,avg_dz,std_dz,'MarkerEdgeColor',blue,'MarkerFaceColor',blue,'Color',blue,'LineStyle','none','Marker','o');
+			errorbar(x,avg_dd,std_dd,'MarkerEdgeColor',black,'MarkerFaceColor',black,'Color',black,'LineStyle','none','Marker','x','MarkerSize',10);
             box on;
 			hold off;
 
@@ -55,14 +60,9 @@ for participant_id = unique(time_average_table.Study_Id,'rows').'
 			rotateticklabel(gca, -90);
 			legend('\Delta x','\Delta y','\Delta z','\Delta d','Location','northwest');
             
-%             xh = get(gca,'XLabel');
-%             set(xh,'Units','Normalized');
-%             set(xh,'Position',get(xh,'Position')-[0 0.1 0]);
-            
             set(gcf,'Visible','Off');
 			set(gcf,'PaperPositionMode','Manual');
 			set(gcf,'PaperUnits','Normalized');
-% 			set(gcf,'PaperPosition', [0 0 1 0.6])
 			print('-dsvg','-painters',plot_filename);
 		end
 	end

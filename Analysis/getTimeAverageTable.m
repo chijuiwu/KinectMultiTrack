@@ -42,7 +42,7 @@ for s_id = unique(difference_table.Study_Id,'rows').'
         for scen_id = unique(k_table.Scenario_Id,'rows').'
             scen_table = k_table(k_table.Scenario_Id==scen_id,:);
             
-            total_row_count = length(unique(scen_table.Person_Id,'rows').');
+            total_row_count = total_row_count+length(unique(scen_table.Person_Id,'rows').');
         end
     end
 end

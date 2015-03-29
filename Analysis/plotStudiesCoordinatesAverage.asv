@@ -1,0 +1,133 @@
+function [] = plotStudiesCoordinatesAverage(study_average_table)
+% 
+% Per participant
+% 
+
+joints_util;
+
+title = 'Studies Coordinates Average';
+filename = 'Studies_Coordinates_Average';
+
+avg_dx_idx = 4;
+avg_dy_idx = 6;
+avg_dz_idx = 8;
+avg_dd_idx = 10;
+
+red = [.549 .086 .086];
+green = [0 .389 .247];
+blue = [.118 .259 0.651];
+black = [0 0 0];
+
+scenario_merged_types = {
+  'KinectConfig_0_Scenario_1', 'KinectConfig_0_Scenario_2', 'KinectConfig_0_Scenario_3', ...
+  'KinectConfig_1_Scenario_1', 'KinectConfig_0_Scenario_2', 'KinectConfig_0_Scenario_3', ...
+  'KinectConfig_2_Scenario_1', 'KinectConfig_0_Scenario_2', 'KinectConfig_0_Scenario_3', ...
+  'KinectConfig_2_Scenario_6'
+};
+
+x = (1:length(scenario_merged_types))';
+% Assume one row (one person)
+studies_avg_dx = study_average_table{:,avg_dx_idx};
+studies_std_dx = study_average_table{:,avg_dx_idx+1};
+studies_avg_dy = study_average_table{:,avg_dy_idx};
+studies_std_dy = study_average_table{:,avg_dy_idx+1};
+studies_avg_dz = study_average_table{:,avg_dz_idx};
+studies_std_dz = study_average_table{:,avg_dz_idx+1};
+studies_avg_dd = study_average_table{:,avg_dd_idx};
+studies_std_dd = study_average_table{:,avg_dd_idx+1};
+
+figure;
+hold on;
+errorbar(x,studies_avg_dx,studies_std_dx,'MarkerEdgeColor',red,'MarkerFaceColor',red,'Color',red,'LineStyle','none','Marker','o');
+errorbar(x,studies_avg_dy,studies_std_dy,'MarkerEdgeColor',green,'MarkerFaceColor',green,'Color',green,'LineStyle','none','Marker','o');
+errorbar(x,studies_avg_dz,studies_std_dz,'MarkerEdgeColor',blue,'MarkerFaceColor',blue,'Color',blue,'LineStyle','none','Marker','o');
+errorbar(x,studies_avg_dd,studies_std_dd,'MarkerEdgeColor',black,'MarkerFaceColor',black,'Color',black,'LineStyle','none','Marker','x','MarkerSize',10);
+box on;
+hold off;
+
+plot_title = sprintf(title, participant_id, kinect_config, scenario_id);
+plot_filename = sprintf(filename);
+
+title(plot_title,'Fontsize',15);
+xlabel({'','','','','Joint Types',''},'Fontsize',15);
+ylabel('Distance (cm)','Fontsize',15);
+set(gca,'XLim',[0.5 length(scenario_merged_types)+0.5]);
+set(gca,'XTick',1:length(scenario_merged_types),'XTickLabel',scenario_merged_types);
+rotateticklabel(gca, -90);
+legend('\Delta x','\Delta y','\Delta z','\Delta d','Location','northwest');
+
+set(gcf,'Visible','Off');
+set(gcf,'PaperPositionMode','Manual');
+set(gcf,'PaperUnits','Normalized');
+print('-dsvg','-painters',plot_filename);
+end
+
+x = all_scenarios_table(:,scenarios_c_scenario);
+time_dependent_avg_dd = all_scenarios_table(:,scenarios_c_dd_avg);
+time_dependent_sd_dd = all_scenarios_table(:,scenarios_c_dd_sd);
+figure;
+hold on;
+errorbar(x,time_dependent_avg_dd,time_dependent_sd_dd,'-xr');
+set(gca,'XLim',[0.5 scenario_count+0.5])
+set(gca,'XTick',1:1,'XTickLabel',scenario_types);
+set(gca, 'XTick',get(gca,'XTick'),'fontsize',10);
+rotateticklabel(gca, -90);
+hold off;
+
+title(plot_title);
+x_axis_label = xlabel('Scenarios');
+set(x_axis_label,'Position',get(x_axis_label,'Position')-[0,1.5,0]);
+ylabel('Distance(cm)');
+legend('Time indepedent Avg. \Delta x','Location','northeastoutside');
+
+set(gcf, 'PaperPositionMode', 'manual');
+set(gcf, 'PaperUnits', 'normalized');
+set(gcf, 'PaperPosition', [0 0 1 0.7])
+print('-dsvg', '-painters', plot_filename);
+
+
+for kinect_config = unique(study_average_table.Kinect_Config,'rows').'
+    k_table = study_average_table(study_average_table.Kinect_Config==kinect_config,:);
+    
+    for scenario_id = unique(k_table.Scenario_Id,'rows').'
+        scen_table = k_table(k_table.Scenario_Id==scenario_id,:);
+
+		x = joint_types;
+		 = scen_table(:,avg_dx_idx:8:last_avg_dd).';
+		std_dx = scen_table(:,avg_dx_idx+1:8:last_avg_dd).';
+		avg_dy = scen_table(:,first_avg_dy:8:last_avg_dd).';
+		std_dy = scen_table(:,first_avg_dy+1:8:last_avg_dd).';
+		avg_dz = scen_table(:,first_avg_dz:8:last_avg_dd).';
+		std_dz = scen_table(:,first_avg_dz+1:8:last_avg_dd).';
+		avg_dd = scen_table(:,first_avg_dd:8:last_avg_dd).';
+		std_dd = scen_table(:,first_avg_dd+1:8:last_avg_dd).';
+
+		figure;
+		hold on;
+		errorbar(x,avg_dx_idx,std_dx,'-r','LineStyle','none','Marker','x');
+		errorbar(x,avg_dy,std_dy,'-g','LineStyle','none','Marker','x');
+		errorbar(x,avg_dz,std_dz,'-b','LineStyle','none','Marker','x');
+		errorbar(x,avg_dd,std_dd,'-k','LineStyle','none','Marker','o');
+		set(gca,'XLim',[0.5 length(joint_types)+0.5])
+		set(gca,'XTick',1:length(joint_types),'XTickLabel',joint_types);
+		rotateticklabel(gca, -90);
+		hold off;
+
+		plot_title = sprintf('Participant %d (Kinect_Config: %d, Scenario_id: %d) - Joints over time', participant_id, kinect_config, scenario_id);
+		plot_filename = sprintf('Plots/Participant_%d_KinectConfig_%d_ScenarioId_%d_Joints_over_time', participant_id, kinect_config, scenario_id);
+
+		title(plot_title);
+		x_axis_label = xlabel('Joint Types');
+		set(x_axis_label,'Position',get(x_axis_label,'Position')-[0,4,0]);
+		ylabel('Distance(cm)');
+		legend('\Delta x','\Delta y','\Delta z','\Delta d','Location','northeastoutside');
+
+		set(gcf, 'PaperPositionMode', 'manual');
+		set(gcf, 'PaperUnits', 'normalized');
+		set(gcf, 'PaperPosition', [0 0 1 0.6])
+		print('-dsvg', '-painters', plot_filename);
+
+	end
+end
+
+end
