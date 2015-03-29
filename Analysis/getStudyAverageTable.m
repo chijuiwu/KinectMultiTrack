@@ -22,7 +22,12 @@ joints_average_types = {
 };
 
 % get row count
-total_row_count = length(unique(joints_average_table.Study_Id,'rows').');
+total_row_count = 0;
+for k = unique(joints_average_table.Kinect_Config,'rows').'
+    k_table = joints_average_table(joints_average_table.Kinect_Config==k,{'Scenario_Id'});
+
+    total_row_count = total_row_count + length(unique(k_table.Scenario_Id,'rows').');
+end
 
 table_variable_names = [first_variable_names joints_average_types];
 row_count = total_row_count;
@@ -67,8 +72,6 @@ for k = unique(joints_average_table.Kinect_Config,'rows').'
             average_row.(joints_average_types{1,7}) = avg_all_dd;
             average_row.(joints_average_types{1,8}) = std_all_dd;
 
-            display(average_row);
-            
             study_average_table(row_counter,:) = struct2table(average_row);
             row_counter = row_counter+1;
 
