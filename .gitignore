@@ -4,6 +4,10 @@
 # matlab
 *.mat
 
+# report
+*.pdf_tex
+
+
 # User-specific files
 *.suo
 *.user

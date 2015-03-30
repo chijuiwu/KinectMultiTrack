@@ -10,7 +10,6 @@ joints_util;
 first_variable_names = {
     'Kinect_Config','Scenario_Id','Person_Id'
 };
-average_data_idx = 5;
 
 % 
 % Joints_avg_dx Joints_sd_dx Joints_avg_dy Joints_sd_dy ...
@@ -25,7 +24,6 @@ joints_average_types = {
 total_row_count = 0;
 for k = unique(joints_average_table.Kinect_Config,'rows').'
     k_table = joints_average_table(joints_average_table.Kinect_Config==k,{'Scenario_Id'});
-
     total_row_count = total_row_count + length(unique(k_table.Scenario_Id,'rows').');
 end
 
@@ -37,6 +35,8 @@ average_row = struct();
 for field = table_variable_names
     average_row.(char(field)) = 0;
 end
+
+average_data_idx = 5;
 
 row_counter = 1;
 for k = unique(joints_average_table.Kinect_Config,'rows').'

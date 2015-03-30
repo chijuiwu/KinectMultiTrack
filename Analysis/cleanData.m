@@ -21,6 +21,8 @@ for s_id = unique(data_table.Study_Id,'rows').'
         for scen_id = unique(k_table.Scenario_Id,'rows').'
             scen_table = k_table(k_table.Scenario_Id==scen_id,{'Tracker_Time'});
   
+            fprintf('Setting time interval - Participant: %d, Kinect_Config: %d, Scenario_Id: %d\n', s_id, k, scen_id);
+            
             init_time = scen_table{1,1};
             
             rows = clean_data_table.Study_Id==s_id & ...
@@ -67,6 +69,8 @@ for s_id = unique(clean_data_table.Study_Id,'rows').'
         for scen_id = unique(k_table.Scenario_Id,'rows').'
             scen_table = k_table(k_table.Scenario_Id==scen_id, ...
                 {'Scenario_Id','Tracker_Time','Person_Id','Skeleton_Id'});
+            
+            fprintf('Checking single skeletons - Participant: %d, Kinect_Config: %d, Scenario_Id: %d\n', s_id, k, scen_id);
             
             for t = unique(scen_table.Tracker_Time,'rows').'
                 t_table = scen_table(scen_table.Tracker_Time==t, ...

@@ -1,4 +1,4 @@
-function [time_average_table] = getTimeAverageTable(difference_table, difference_joint_types)
+function [time_average_table, time_average_joint_types] = getTimeAverageTable(difference_table, difference_joint_types)
 %
 % Study_Id Kinect_Config Scenario_Id Person_Id ...
 % Joint_1_avg_dx Joint_1_sd_dx Joint_1_avg_dy Joint_1_sd_dy ...
@@ -11,7 +11,6 @@ joints_util;
 first_variable_names = {
     'Study_Id','Kinect_Config','Scenario_Id','Person_Id'
 };
-first_joint_idx = length(first_variable_names)+1;
 
 % 
 % AnkleLeft_avg_dx, AnkleLeft_sd_dx, AnkleLeft_avg_dy, AnkleLeft_sd_dy, ...
@@ -55,6 +54,8 @@ average_row = struct();
 for field = table_variable_names
     average_row.(char(field)) = 0;
 end
+
+first_joint_idx = length(first_variable_names)+1;
 
 row_counter = 1;
 for s_id = unique(difference_table.Study_Id,'rows').'
