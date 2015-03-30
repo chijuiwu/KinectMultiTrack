@@ -1,22 +1,12 @@
 dir_experiments_1_2_3_6 = '../Data/Experiments_1_2_3_6/';
 dir_experiments_4 = '../Data/Experiments_4/';
 
-raw_data_table = table();
-
-% loading data
-files = dir(strcat(dir_experiments_1_2_3_6,'*.csv'));
-for i=1:length(files)
-    file_name = strcat(dir_experiments_1_2_3_6,files(i).name);
-    fprintf('Loading file, filename=%s\n',file_name);
-    raw_data_table = [raw_data_table;readtable(file_name,'ReadVariableNames',true)];
-end
-files = dir(strcat(dir_experiments_4,'*.csv'));
-for i=1:length(files)
-    file_name = strcat(dir_experiments_4,files(i).name);
-    fprintf('Loading file, filename=%s\n',file_name);
-    raw_data_table = [raw_data_table;readtable(file_name,'ReadVariableNames',true)];
-end
-fprintf('All files loaded!!!\n');
+% raw_data_table = table();
+% 
+% % loading data
+% raw_data_table = readData(dir_experiments_1_2_3_6, raw_data_table);
+% raw_data_table = readData(dir_experiments_4, raw_data_table);
+% fprintf('All files loaded!!!\n');
 
 disp('Cleaning data...');
 tic;

@@ -5,7 +5,8 @@
 *.mat
 
 # report
-*.pdf_tex
+Deliverables/Report/Figures/*.pdf_tex
+Deliverables/Report/Figures/*.pdf
 
 
 # User-specific files

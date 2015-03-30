@@ -92,7 +92,7 @@ namespace KinectMultiTrack.Studies
             new UserTask(UserTask.PERSON_1_AROUND, Logger.SCENARIO_INTERACTION_1_P1),
             new UserTask(UserTask.READY, Logger.SCENARIO_NA),
             new UserTask(UserTask.PERSON_2_WALK, Logger.SCENARIO_INTERACTION_1_P2),
-            new UserTask(UserTask.PERSON_2_AROUND, Logger.SCENARIO_INTERACTION_1_P1),
+            new UserTask(UserTask.PERSON_2_AROUND, Logger.SCENARIO_INTERACTION_1_P2),
             new UserTask(UserTask.DONE, Logger.SCENARIO_NA)
         };
 
