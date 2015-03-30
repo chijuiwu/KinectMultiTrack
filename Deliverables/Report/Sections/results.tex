@@ -1,0 +1,236 @@
+\section{Results}
+\label{sec:results}
+
+This section reports the results in each user study and the overall result across al experiment setups. For each study, the coordinate differences in x, y, z, and distance between multiple skeletons are reported. The changes in the coordinate differences over time are also shown in the figures. The differences for each joint type are presented to display more details.
+
+\subsection{Cleaning the data}
+
+The logging data are post-processed for ease of plotting the results. The initial logging data, for all aforementioned studies, contain 244,527 rows and 87 columns in total. The final data for evaluation contain 243,550 rows and 87 columns. 977 rows are deleted for various reasons documented below.
+
+\subsubsection{Logging error}
+There is also an error in code where a scenario id is logged incorrectly. In the second part of scenario 8, when the second participant is asked to walk around the first participant, the scenario id is falsely written as 4. This logging error is corrected by replacing all occurrences of scenario id 4 that are immediately after scenario id 8 and before scenario id 5, which is the next task in line for the participants.
+
+\subsubsection{Setting time intervals}
+The tracker time is stored as the server's current time in milliseconds. The times for each user task (scenario) are reset. The current timestamps refer to the amount of time passed in each scenario, for a particular Kinect configuration and experiment.
+
+The times are also converted from milliseconds to seconds.
+
+\subsubsection{Converting joint coordinates}
+
+The joint coordinates are converted from meters to centimeters.
+
+\subsubsection{Removing singleton skeletons}
+
+The studies are interested in the amount of coordinate differences between multiple skeletons after transformation during tracking. Thus, evaluation requires the joint positions of more than one skeletons (from different Kinect fields of view) at any given timestamp. 
+
+\subsection{Stationary}
+
+Average distances ($\Delta x$, $\Delta y$, $\Delta z$, $\Delta d$) between multiple skeletons of the same person when performing the Stationary task, with different Kinect configurations (Parallel, 45 degrees-apart, and 90 degrees-apart) are shown in Figure \ref{fig:results_stationary}.
+
+
+\begin{figure*}[h!]
+  \centering
+
+  \includesvg[width=1.0\columnwidth]{Average_Distance_over_Time_Participant_0_KinectConfig_0_ScenarioId_1}
+  \includesvg[width=1.0\columnwidth]{Joints_Average_Participant_0_KinectConfig_0_ScenarioId_1} \\
+  \includesvg[width=1.0\columnwidth]{Average_Distance_over_Time_Participant_0_KinectConfig_1_ScenarioId_1}
+  \includesvg[width=1.0\columnwidth]{Joints_Average_Participant_0_KinectConfig_1_ScenarioId_1} \\
+  \includesvg[width=1.0\columnwidth]{Average_Distance_over_Time_Participant_0_KinectConfig_2_ScenarioId_1}
+  \includesvg[width=1.0\columnwidth]{Joints_Average_Participant_0_KinectConfig_2_ScenarioId_1}
+
+  \caption{Average distances ($\Delta x$, $\Delta y$, $\Delta z$, $\Delta d$) between multiple skeletons
+    of the same person when performing the Stationary task, with different Kinect configurations
+    (Parallel, 45 degrees-apart, and 90 degrees-apart). These figures show the changes in average distances
+    with time, as well as the overall average distances for each joint type over time.}
+
+  \label{fig:results_stationary}
+\end{figure*}
+
+\begin{figure*}[h!]
+  \centering
+
+  \includesvg[width=1.0\columnwidth]{Joints_over_Time_Participant_0_KinectConfig_0_ScenarioId_1} \\
+  \includesvg[width=1.0\columnwidth]{Joints_over_Time_Participant_0_KinectConfig_1_ScenarioId_1} \\
+  \includesvg[width=1.0\columnwidth]{Joints_over_Time_Participant_0_KinectConfig_2_ScenarioId_1}
+
+  \caption{Average distances ($\Delta x$, $\Delta y$, $\Delta z$, $\Delta d$) between multiple skeletons
+    of the same person when performing the Stationary task, with different Kinect configurations
+    (Parallel, 45 degrees-apart, and 90 degrees-apart). These figures show the changes in average distances
+    with time for different joint types.}
+
+  \label{fig:results_stationary_3d}
+\end{figure*}
+
+The average distances for each joint over time across all studies are report in table.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{||c c c c c||} 
+ \hline
+ Joint Type & $\Delta x$ & $\Delta y$ & $\Delta z$ & $\Delta d$ \\ [0.5ex] 
+ \hline\hline
+ All Joints & 1 & 6 & 87837 & 787 \\ 
+ \hline\hline
+ AnkleLeft & 1 & 6 & 87837 & 787 \\ 
+ \hline
+ AnkleRight & 1 & 7 & 78 & 5415 \\
+ \hline
+ ElbowLeft & 1 & 545 & 778 & 7507 \\
+ \hline
+ ElbowRight & 1 & 545 & 18744 & 7560 \\
+ \hline
+ FootLeft & 1 & 88 & 788 & 6344 \\
+ \hline
+ FootRight & 1 & 88 & 788 & 6344 \\
+ \hline
+ HandLeft & 1 & 88 & 788 & 6344 \\
+ \hline
+ HandRight & 1 & 88 & 788 & 6344 \\
+ \hline
+ HandTipLeft & 1 & 88 & 788 & 6344 \\
+ \hline
+ HandTipRight & 1 & 88 & 788 & 6344 \\ 
+ \hline
+ Head & 1 & 88 & 788 & 6344 \\
+ \hline
+ HipLeft & 1 & 88 & 788 & 6344 \\  
+ \hline
+ HipRight & 1 & 88 & 788 & 6344 \\ 
+ \hline
+ KneeLeft & 1 & 88 & 788 & 6344 \\ 
+ \hline
+ KneeRight & 1 & 88 & 788 & 6344 \\ 
+ \hline
+ Neck & 1 & 88 & 788 & 6344 \\
+ \hline
+ ShoulderLeft & 1 & 88 & 788 & 6344 \\ 
+ \hline
+ ShoulderRight & 1 & 88 & 788 & 6344 \\
+ \hline
+ SpineBase & 1 & 88 & 788 & 6344 \\
+ \hline
+ SpineMid & 1 & 88 & 788 & 6344 \\ 
+ \hline
+ SpineShoulder & 1 & 88 & 788 & 6344 \\ 
+ \hline
+ ThumbLeft & 1 & 88 & 788 & 6344 \\ 
+ \hline
+ ThumbRight & 1 & 88 & 788 & 6344 \\ 
+ \hline
+ WristLeft & 1 & 88 & 788 & 6344 \\
+ \hline
+ WristRight & 1 & 88 & 788 & 6344 \\ [1ex] 
+ \hline
+\end{tabular}
+\caption{Average differences between multiple skeletons for each joint type in the Stationary scenario, across all Kinect configurations and }
+\label{table:stationary}
+\end{table}
+
+\subsection{Steps}
+
+The averge distances between multiple skeletons over time in the Parallel, 45 degrees-apart and 90 degrees-apart Kinect configurations for the Steps scenario are shown in Figure \ref{fig:results_steps}.
+
+\begin{figure*}
+  \centering
+
+  \includesvg[width=1.0\columnwidth]{Average_Distance_over_Time_Participant_0_KinectConfig_0_ScenarioId_2}
+  \includesvg[width=1.0\columnwidth]{Joints_Average_Participant_0_KinectConfig_0_ScenarioId_2} \\
+  \includesvg[width=1.0\columnwidth]{Average_Distance_over_Time_Participant_0_KinectConfig_1_ScenarioId_2}
+  \includesvg[width=1.0\columnwidth]{Joints_Average_Participant_0_KinectConfig_1_ScenarioId_2} \\
+  \includesvg[width=1.0\columnwidth]{Average_Distance_over_Time_Participant_0_KinectConfig_2_ScenarioId_2}
+  \includesvg[width=1.0\columnwidth]{Joints_Average_Participant_0_KinectConfig_2_ScenarioId_2}
+
+  \caption{Average distances ($\Delta x$, $\Delta y$, $\Delta z$, $\Delta d$) between multiple skeletons
+    of the same person when performing the Steps task with different Kinect configurations
+    (Parallel, 45 degrees-apart, and 90 degrees-apart). These figures show the average distances either
+    over time or joint types.}
+
+  \label{fig:results_steps}
+\end{figure*}
+
+\begin{figure*}
+  \centering
+
+  \includesvg[width=1.0\columnwidth]{Joints_over_Time_Participant_0_KinectConfig_0_ScenarioId_2} \\
+  \includesvg[width=1.0\columnwidth]{Joints_over_Time_Participant_0_KinectConfig_1_ScenarioId_2} \\
+  \includesvg[width=1.0\columnwidth]{Joints_over_Time_Participant_0_KinectConfig_2_ScenarioId_2}
+
+  \caption{Average distances ($\Delta x$, $\Delta y$, $\Delta z$, $\Delta d$) between multiple skeletons
+    of the same person when performing the Steps task with different Kinect configurations
+    (Parallel, 45 degrees-apart, and 90 degrees-apart). These figures show the average distances over both
+    time and joint types.}
+
+  \label{fig:results_steps_3d}
+\end{figure*}
+
+\subsection{Walk}
+
+The averge distances between multiple skeletons over time in the Parallel, 45 degrees-apart and 90 degrees-apart Kinect configurations for the Walk scenario are shown in Figure \ref{fig:results_walk}.
+
+\begin{figure*}
+  \centering
+
+  \includesvg[width=1.0\columnwidth]{Average_Distance_over_Time_Participant_0_KinectConfig_0_ScenarioId_3}
+  \includesvg[width=1.0\columnwidth]{Joints_Average_Participant_0_KinectConfig_0_ScenarioId_3} \\
+  \includesvg[width=1.0\columnwidth]{Average_Distance_over_Time_Participant_0_KinectConfig_1_ScenarioId_3}
+  \includesvg[width=1.0\columnwidth]{Joints_Average_Participant_0_KinectConfig_1_ScenarioId_3} \\
+  \includesvg[width=1.0\columnwidth]{Average_Distance_over_Time_Participant_0_KinectConfig_2_ScenarioId_3}
+  \includesvg[width=1.0\columnwidth]{Joints_Average_Participant_0_KinectConfig_2_ScenarioId_3}
+
+  \caption{Average distances ($\Delta x$, $\Delta y$, $\Delta z$, $\Delta d$) between multiple skeletons
+    of the same person when performing the Walk task with different Kinect configurations
+    (Parallel, 45 degrees-apart, and 90 degrees-apart). These figures show the average distances either
+    over time or joint types.}
+
+  \label{fig:results_walk}
+\end{figure*}
+
+\begin{figure*}
+  \centering
+
+  \includesvg[width=1.0\columnwidth]{Joints_over_Time_Participant_0_KinectConfig_0_ScenarioId_3} \\
+  \includesvg[width=1.0\columnwidth]{Joints_over_Time_Participant_0_KinectConfig_1_ScenarioId_3} \\
+  \includesvg[width=1.0\columnwidth]{Joints_over_Time_Participant_0_KinectConfig_2_ScenarioId_3}
+
+  \caption{Average distances ($\Delta x$, $\Delta y$, $\Delta z$, $\Delta d$) between multiple skeletons
+    of the same person when performing the Walk task with different Kinect configurations
+    (Parallel, 45 degrees-apart, and 90 degrees-apart). These figures show the average distances over both
+    time and joint types.}
+
+  \label{fig:results_walk_3d}
+\end{figure*}
+
+\subsection{Obstacle}
+
+\begin{figure*}
+  \centering
+
+  \includesvg[width=1.0\columnwidth]{Average_Distance_over_Time_Participant_0_KinectConfig_2_ScenarioId_6}
+  \includesvg[width=1.0\columnwidth]{Joints_Average_Participant_0_KinectConfig_2_ScenarioId_6} \\
+  \includesvg[width=1.0\columnwidth]{Joints_over_Time_Participant_0_KinectConfig_2_ScenarioId_6}
+
+  \caption{Average distances ($\Delta x$, $\Delta y$, $\Delta z$, $\Delta d$) between multiple skeletons
+    of the same person when performing the Obstacle task with 45 degrees-apart Kinect configuration.}
+
+  \label{fig:results_obstacle}
+\end{figure*}
+
+\subsection{Overall results}
+
+Donec ut dolor viverra, tincidunt nibh in, finibus quam. Nam arcu leo, euismod sit amet nisl ac, eleifend ultrices quam. Nam imperdiet volutpat consectetur. Phasellus nulla mi, eleifend sed lorem in, suscipit venenatis eros. Proin imperdiet accumsan eros eget aliquam. Maecenas vel orci quis urna vehicula vulputate in sit amet mauris. Aenean efficitur dignissim neque non bibendum.
+Donec ut dolor viverra, tincidunt nibh in, finibus quam. Nam arcu leo, euismod sit amet nisl ac, eleifend ultrices quam. Nam imperdiet volutpat consectetur. Phasellus nulla mi, eleifend sed lorem in, suscipit venenatis eros. Proin imperdiet accumsan eros eget aliquam. Maecenas vel orci quis urna vehicula vulputate in sit amet mauris. Aenean efficitur dignissim neque non bibendum.Donec ut dolor viverra, tincidunt nibh in, finibus quam. Nam arcu leo, euismod sit amet nisl ac, eleifend ultrices quam. Nam imperdiet volutpat consectetur. Phasellus nulla mi, eleifend sed lorem in, suscipit venenatis eros. Proin imperdiet accumsan eros eget aliquam. Maecenas vel orci quis urna vehicula vulputate in sit amet mauris. Aenean efficitur dignissim neque non bibendum.Donec ut dolor viverra, tincidunt nibh in, finibus quam. Nam arcu leo, euismod sit amet nisl ac, eleifend ultrices quam. Nam imperdiet volutpat consectetur. Phasellus nulla mi, eleifend sed lorem in, suscipit venenatis eros. Proin imperdiet accumsan eros eget aliquam. Maecenas vel orci quis urna vehicula vulputate in sit amet mauris. Aenean efficitur dignissim neque non bibendum.Donec ut dolor viverra, tincidunt nibh in, finibus quam. Nam arcu leo, euismod sit amet nisl ac, eleifend ultrices quam. Nam imperdiet volutpat consectetur. Phasellus nulla mi, eleifend sed lorem in, suscipit venenatis eros. Proin imperdiet accumsan eros eget aliquam. Maecenas vel orci quis urna vehicula vulputate in sit amet mauris. Aenean efficitur dignissim neque non bibendum.
+
+Report actual values
+
+\begin{figure*}
+  \centering
+
+  \includesvg[width=1.0\columnwidth]{Studies_Average_KinectConfig} \\
+  \includesvg[width=1.0\columnwidth]{Studies_Average_Scenarios} \\
+  \includesvg[width=1.0\columnwidth]{Studies_Overall_Average} \\
+
+  \caption{Overall result showing the average distances ($\Delta x$, $\Delta y$, $\Delta z$, $\Delta d$) between multiple skeletons
+    for three Kinect configurations (Parallel, 45 and 90 degrees) and different scenarios (Stationary, Steps, and Walk).}
+
+  \label{fig:results_steps}
+\end{figure*}
