@@ -18,7 +18,7 @@ first_avg_dd = 10;
 last_idx = 3+length(joint_types)*8;
 
 kinect_config_types = {
-  'Parallel', '45 Degrees-apart','90 Degrees-apart'
+  'Parallel', '45-Degrees-apart','90-Degrees-apart'
 };
 
 for k = unique(joints_average_study_table.Kinect_Config,'rows').'
