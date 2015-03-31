@@ -54,11 +54,9 @@ for k = unique(time_average_table.Kinect_Config,'rows').'
             average_row.Person_Id = p_id;
             
             for nth_joint = 1:length(joint_types)
-                % 4 because Joint_dx, Joint_dy, Joint_dz, Joint_dd
-                jt_idx_in_k_scen = first_joint_idx + (nth_joint-1)*4;
-                % 3 because Joint_dx + 3 = Joint_dd
-                person_joint = person_in_k_scen(:,jt_idx_in_k_scen:jt_idx_in_k_scen+3);
-                dx=1; dy=2; dz=3; dd=4;
+                jt_idx_in_k_scen = first_joint_idx + (nth_joint-1)*8;
+                person_joint = person_in_k_scen(:,jt_idx_in_k_scen:jt_idx_in_k_scen+7);
+                dx=1; dy=3; dz=5; dd=7;
 
                 avg_dx = mean(person_joint{:,dx});
                 std_dx = std(person_joint{:,dx});
@@ -80,6 +78,7 @@ for k = unique(time_average_table.Kinect_Config,'rows').'
                 average_row.(joints_average_types{1,jt_avg_type_idx+5}) = std_dz;
                 average_row.(joints_average_types{1,jt_avg_type_idx+6}) = avg_dd;
                 average_row.(joints_average_types{1,jt_avg_type_idx+7}) = std_dd;
+                
             end
 
             joints_average_study_table(row_counter,:) = struct2table(average_row);

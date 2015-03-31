@@ -24,7 +24,7 @@ for scen_id = unique(joints_average_study_table.Scenario_Id,'rows').'
 end
 
 table_variable_names = [first_variable_names joints_average_types];
-row_count = count_person_in_all_scen;
+row_count = count_person_in_all_scen+1;
 col_count = length(table_variable_names);
 joints_average_scenario_table = array2table(zeros(row_count,col_count),'VariableNames',table_variable_names);
 average_row = struct();
