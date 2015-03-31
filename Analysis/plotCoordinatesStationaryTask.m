@@ -60,10 +60,11 @@ box on;
 hold off;
 
 title(main_title,'Fontsize',15);
-xlabel({'','Kinect Configurations'},'Fontsize',15);
+xlh = xlabel({'','Kinect Configurations'},'Fontsize',15);
 ylabel({'Distance (cm)',''},'Fontsize',15);
 set(gca,'XLim',[0.5 length(kinect_config_types)+0.5]);
-set(gca,'XTick',1:length(kinect_config_types),'XTickLabel',kinect_config_types);
+set(gca,'XTick',1:length(kinect_config_types),'XTickLabel',kinect_config_types,'Fontsize',12);
+% set(xlh,'Fontsize',20);
 ax = gca;
 ax.XTickLabelRotation = -90;
 legend('\Delta x','\Delta y','\Delta z','\Delta d','Location','northwest');

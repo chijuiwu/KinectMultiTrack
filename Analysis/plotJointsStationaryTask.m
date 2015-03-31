@@ -61,7 +61,7 @@ for k = unique(joints_average_study_table.Kinect_Config,'rows').'
         xlabel({'','Joint Types'},'Fontsize',15);
         ylabel({'Distance (cm)',''},'Fontsize',15);
         set(gca,'XLim',[0.5 length(joint_types)+0.5]);
-        set(gca,'XTick',1:length(joint_types),'XTickLabel',joint_types);
+        set(gca,'XTick',1:length(joint_types),'XTickLabel',joint_types,'Fontsize',12);
         ax = gca;
         ax.XTickLabelRotation = -90;
         legend('\Delta x','\Delta y','\Delta z','\Delta d','Location','northwest');

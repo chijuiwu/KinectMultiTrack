@@ -46,7 +46,7 @@ title(main_plot_title,'Fontsize',15);
 xlabel({'','','','','','','Scenarios'},'Fontsize',15);
 ylabel({'Distance (cm)',''},'Fontsize',15);
 set(gca,'XLim',[0.5 length(all_experiment_types)+0.5]);
-set(gca,'XTick',1:length(all_experiment_types),'XTickLabel',all_experiment_types);
+set(gca,'XTick',1:length(all_experiment_types),'XTickLabel',all_experiment_types,'Fontsize',12);
 rotateticklabel(gca, -90);
 legend('\Delta x','\Delta y','\Delta z','\Delta d','Location','northwest');
 
