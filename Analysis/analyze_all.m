@@ -56,7 +56,7 @@ fprintf('Done!!!, time=%.2f\n',time);
 % % %  
 disp('Creating coordinates average study table...');
 tic;
-[coordinates_average_study_table, coordinates_average_types] = getCoordinatesAverageStudyTable(joints_average_study_table);
+[coordinates_average_study_table, coordinates_average_types, coordinates_merged_average_study_table] = getCoordinatesAverageStudyTable(joints_average_study_table);
 time = toc;
 fprintf('Done!!!, time=%.2f\n',time);
 

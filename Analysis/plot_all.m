@@ -43,6 +43,15 @@ plotCoordinatesFirstThreeTasksKinectConfig(coordinates_average_kinect_config_tab
 time = toc;
 fprintf('Done!!!, time=%.2f\n',time);
 
+% 
+% Overall studies
+% 
+disp('Plotting coordinates average for all scenarios & kinect configs...');
+tic;
+plotCoordinatesAllStudies(coordinates_merged_average_study_table);
+time = toc;
+fprintf('Done!!!, time=%.2f\n',time);
+
 % disp('Plotting participant joints average...');
 % plotParticipantJointsAverage(time_average_table);
 % fprintf('Done!!!\n');

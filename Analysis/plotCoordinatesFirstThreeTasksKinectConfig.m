@@ -4,7 +4,7 @@ joints_util;
 plot_colors;
 
 main_title = 'Coordinates Averages for Parallel, 45, and 90 Degrees-apart Kinects';
-dir = 'Plots/Stationary_Task/';
+dir = 'Plots/Overall/';
 main_filename = strcat(dir,'Coordinates_First_Three_Tasks_Kinect_Config');
 
 kinect_config_types = {
@@ -58,8 +58,8 @@ box on;
 hold off;
 
 title(main_title,'Fontsize',15);
-xlabel({'','Scenarios',''},'Fontsize',15);
-ylabel('Distance (cm)','Fontsize',15);
+xlabel({'','Scenarios'},'Fontsize',15);
+ylabel({'Distance (cm)',''},'Fontsize',15);
 set(gca,'XLim',[0.5 length(kinect_config_types)+0.5]);
 set(gca,'XTick',1:length(kinect_config_types),'XTickLabel',kinect_config_types);
 ax = gca;

@@ -1,4 +1,4 @@
-function [coordinates_average_study_table, coordinates_average_types] = getCoordinatesAverageStudyTable(joints_average_table)
+function [coordinates_average_study_table, coordinates_average_types, coordinates_merged_average_study_table] = getCoordinatesAverageStudyTable(joints_average_study_table)
 %
 % Get joints averages for each study
 % 
@@ -23,7 +23,7 @@ coordinates_average_types = {
 };
 
 table_variable_names = [first_variable_names coordinates_average_types];
-row_count = size(joints_average_table,1);
+row_count = size(joints_average_study_table,1);
 col_count = length(table_variable_names);
 coordinates_average_study_table = array2table(zeros(row_count,col_count),'VariableNames',table_variable_names);
 average_row = struct();
@@ -38,8 +38,8 @@ first_joint_dd = first_joint_dz + 2;
 last_joint_dd = length(first_variable_names)+length(joint_types)*8;
 
 row_counter = 1;
-for k = unique(joints_average_table.Kinect_Config,'rows').'
-    k_table = joints_average_table(joints_average_table.Kinect_Config==k,:);
+for k = unique(joints_average_study_table.Kinect_Config,'rows').'
+    k_table = joints_average_study_table(joints_average_study_table.Kinect_Config==k,:);
 
     for scen_id = unique(k_table.Scenario_Id,'rows').'
         scen_table = k_table(k_table.Scenario_Id==scen_id,:);
@@ -81,6 +81,47 @@ for k = unique(joints_average_table.Kinect_Config,'rows').'
             coordinates_average_study_table(row_counter,:) = struct2table(average_row);
             row_counter = row_counter+1;
 
+        end
+    end
+end
+
+% 
+% 
+% 
+
+merged_joints_average_table = coordinates_average_study_table;
+[row,~] = find(coordinates_average_study_table.Scenario_Id == 5 | coordinates_average_study_table.Scenario_Id == 8);
+for r = row.'
+    merged_joints_average_table{r,'Scenario_Id'} = 4;
+end
+
+coordinates_merged_average_study_table = table();
+% collapse scenario 4
+for k = unique(merged_joints_average_table.Kinect_Config,'rows').'
+    k_table = merged_joints_average_table(merged_joints_average_table.Kinect_Config==k,:);
+
+    for scen_id = unique(k_table.Scenario_Id,'rows').'
+        scen_table = k_table(k_table.Scenario_Id==scen_id,:);
+        
+        if (scen_id == 4)
+            struct_x = struct();
+            struct_x_fieldnames = coordinates_average_study_table.Properties.VariableNames;
+            struct_x.(struct_x_fieldnames{1}) = scen_table{1,1};
+            struct_x.(struct_x_fieldnames{2}) = scen_table{1,2};
+            struct_x.(struct_x_fieldnames{3}) = scen_table{1,3};
+            struct_x.(struct_x_fieldnames{4}) = mean(scen_table{:,4},1);
+            struct_x.(struct_x_fieldnames{5}) = std(scen_table{:,4},0,1);
+            struct_x.(struct_x_fieldnames{6}) = mean(scen_table{:,6},1);
+            struct_x.(struct_x_fieldnames{7}) = std(scen_table{:,6},0,1);
+            struct_x.(struct_x_fieldnames{8}) = mean(scen_table{:,8},1);
+            struct_x.(struct_x_fieldnames{9}) = std(scen_table{:,8},0,1);
+            struct_x.(struct_x_fieldnames{10}) = mean(scen_table{:,10},1);
+            struct_x.(struct_x_fieldnames{11}) = std(scen_table{:,10},0,1);
+            coordinates_merged_average_study_table = [coordinates_merged_average_study_table;struct2table(struct_x)];
+        else
+            rows = merged_joints_average_table.Kinect_Config==k & ...
+                merged_joints_average_table.Scenario_Id==scen_id;
+            coordinates_merged_average_study_table = [coordinates_merged_average_study_table;merged_joints_average_table(rows,:)];
         end
     end
 end

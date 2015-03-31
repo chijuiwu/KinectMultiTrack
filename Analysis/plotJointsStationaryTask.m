@@ -8,7 +8,7 @@ joints_util;
 plot_colors;
 
 title_format = 'Joints Averages for the Stationary Task, with %s Kinects';
-dir = 'Plots/Stationary_Task/';
+dir = 'Plots/Overall/';
 filename_format = strcat(dir,'Joints_Stationary_Task_KinectConfig_%s');
 
 first_avg_dx = 4;
@@ -58,8 +58,8 @@ for k = unique(joints_average_study_table.Kinect_Config,'rows').'
         plot_filename = sprintf(filename_format, kinect_config_types{1,k+1});
 
         title(plot_title,'Fontsize',15);
-        xlabel({'Joint Types',''},'Fontsize',15);
-        ylabel('Distance (cm)','Fontsize',15);
+        xlabel({'','Joint Types'},'Fontsize',15);
+        ylabel({'Distance (cm)',''},'Fontsize',15);
         set(gca,'XLim',[0.5 length(joint_types)+0.5]);
         set(gca,'XTick',1:length(joint_types),'XTickLabel',joint_types);
         ax = gca;
