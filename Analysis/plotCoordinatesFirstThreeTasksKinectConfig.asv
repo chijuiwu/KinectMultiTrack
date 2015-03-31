@@ -1,11 +1,11 @@
-function [] = plotCoordinatesFirstThreeTasks(coordinates_average_scenario_table)
+function [] = plotCoordinatesFirstThreeTasksKinectConfig(coordinates_average_scenario_table)
 
 joints_util;
 plot_colors;
 
-main_title = 'Coordinates Averages for the Stationary, Steps and Walk Tasks';
+main_title = 'Coordinates Averages for the Parallel, 45, and 90 Degr';
 dir = 'Plots/Stationary_Task/';
-main_filename = strcat(dir,'Coordinates_First_Three_Tasks');
+main_filename = strcat(dir,'Coordinates_First_Three_Tasks_Kinect_Config');
 
 kinect_config_types = {
   'Parallel', '45 Degrees-apart','90 Degrees-apart','Average'

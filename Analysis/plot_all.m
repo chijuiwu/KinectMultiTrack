@@ -1,5 +1,8 @@
 % load('analysis_data.mat');
 
+% 
+% First three scenarios
+% 
 disp('Plotting joints average for Stationary task...');
 tic;
 plotJointsStationaryTask(joints_average_study_table);
@@ -27,6 +30,16 @@ fprintf('Done!!!, time=%.2f\n',time);
 disp('Plotting coordinates average for first three tasks...');
 tic;
 plotCoordinatesFirstThreeTasks(coordinates_average_scenario_table);
+time = toc;
+fprintf('Done!!!, time=%.2f\n',time);
+
+% 
+% First three scenarios configurations
+% 
+
+disp('Plotting coordinates average for first three tasks over all kinect configs...');
+tic;
+plotCoordinatesFirstThreeTasksKinectConfig(coordinates_average_kinect_config_table);
 time = toc;
 fprintf('Done!!!, time=%.2f\n',time);
 
