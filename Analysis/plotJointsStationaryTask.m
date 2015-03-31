@@ -111,7 +111,7 @@ plot_title = sprintf(title_format);
 plot_filename = sprintf(filename_format);
 
 title(plot_title,'Fontsize',15);
-xlabel({'','Joint Types'},'Fontsize',15);
+xlabel({'Joint Types'},'Fontsize',15);
 ylabel({'Distance (cm)',''},'Fontsize',15);
 set(gca,'XLim',[0.5 length(joint_types)+0.5]);
 set(gca,'XTick',1:length(joint_types),'XTickLabel',joint_types,'Fontsize',12);
