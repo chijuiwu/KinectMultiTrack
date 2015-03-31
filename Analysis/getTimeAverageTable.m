@@ -67,6 +67,9 @@ for s_id = unique(difference_table.Study_Id,'rows').'
         for scen_id = unique(k_table.Scenario_Id,'rows').'
             scen_table = k_table(k_table.Scenario_Id==scen_id,:);
             
+            fprintf('Calculating average coordinates over time - Participant=%d, Kinect_Config=%d, Scenario=%d\n', ...
+                s_id, k, scen_id);
+            
             for p_id = unique(scen_table.Person_Id,'rows').'
                 person_joints_data = scen_table(scen_table.Person_Id==p_id,:);
                 

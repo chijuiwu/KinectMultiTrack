@@ -8,6 +8,20 @@ joints_util;
 clean_data_table = data_table;
 
 % 
+% Changing wrong scenario ids 4 to 8
+% 
+fprintf('Fixing wrong scenario id due to code...\n');
+tic;
+[row,~] = find(clean_data_table.Scenario_Id == 4);
+for r = row.'
+    if clean_data_table{r-1,'Scenario_Id'}(1) == 8
+        clean_data_table{r,'Scenario_Id'} = 8;
+    end
+end
+time = toc;
+fprintf('Done!!!, time=%.2f\n',time);
+
+% 
 % Set time intervals
 %
 fprintf('Setting time intervals...\n');
@@ -83,11 +97,11 @@ for s_id = unique(clean_data_table.Study_Id,'rows').'
                     skel_row_count = size(p_table,1);
                     if (skel_row_count < 2)
                         rows = ...
-                                clean_data_table.Study_Id==s_id & ...
-                                clean_data_table.Kinect_Config==k & ...
-                                clean_data_table.Scenario_Id==scen_id & ...
-                                clean_data_table.Tracker_Time==t & ...
-                                clean_data_table.Person_Id==p_id;
+                            clean_data_table.Study_Id==s_id & ...
+                            clean_data_table.Kinect_Config==k & ...
+                            clean_data_table.Scenario_Id==scen_id & ...
+                            clean_data_table.Tracker_Time==t & ...
+                            clean_data_table.Person_Id==p_id;
                         clean_data_table(rows,:) = [];
                     end
                 end
