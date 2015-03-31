@@ -24,6 +24,12 @@ plotCoordinatesWalkTask(coordinates_average_study_table, coordinates_average_sce
 time = toc;
 fprintf('Done!!!, time=%.2f\n',time);
 
+disp('Plotting coordinates average for first three tasks...');
+tic;
+plotCoordinatesFirstThreeTasks(coordinates_average_scenario_table);
+time = toc;
+fprintf('Done!!!, time=%.2f\n',time);
+
 % disp('Plotting participant joints average...');
 % plotParticipantJointsAverage(time_average_table);
 % fprintf('Done!!!\n');

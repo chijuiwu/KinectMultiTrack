@@ -1,19 +1,22 @@
-function [] = plotCoordinatesStepsTask(coordinates_average_study_table, coordinates_average_scenario_table)
+function [] = plotCoordinatesFirstThreeTasks(coordinates_average_scenario_table)
 
 joints_util;
 plot_colors;
 
-scenario_id = 2;
-main_title = 'Coordinates Averages for the Steps Task';
+main_title = 'Coordinates Averages for the Stationary, Steps and Walk Tasks';
 dir = 'Plots/Stationary_Task/';
-main_filename = strcat(dir,'Coordinates_Steps_Task');
+main_filename = strcat(dir,'Coordinates_First_Three_Tasks');
+
+coordinate_dx_idx = 3;
+coordinate_dy_idx = 5;
+coordinate_dz_idx = 7;
+coordinate_dd_idx = 9;
 
 kinect_config_types = {
   'Parallel', '45 Degrees-apart','90 Degrees-apart','Average'
 };
 
-scen_table = coordinates_average_study_table(coordinates_average_study_table.Scenario_Id==scenario_id,:);
-rows = size(scen_table,1)+1;
+rows = size(coordinates_average_scenario_table,1)+1;
 
 kinect_config_x = 1:length(kinect_config_types);
 kinect_config_avg_dx = zeros(rows,1);
@@ -26,8 +29,8 @@ kinect_config_avg_dd = zeros(rows,1);
 kinect_config_std_dd = zeros(rows,1);
 
 row_counter = 1;
-for kinect_config = unique(scen_table.Kinect_Config,'rows').'
-    k_table = scen_table(scen_table.Kinect_Config==kinect_config,:);
+for r = 1:size(coordinates_average_scenario_table,1);
+    k_table = coordinates_average_scenario_table(r,:);
     
     kinect_config_avg_dx(row_counter,1) = k_table{1,'Joints_avg_dx'};
     kinect_config_std_dx(row_counter,1) = k_table{1,'Joints_sd_dx'};
@@ -41,14 +44,14 @@ for kinect_config = unique(scen_table.Kinect_Config,'rows').'
     row_counter = row_counter+1;
 end
 
-kinect_config_avg_dx(row_counter,1) = coordinates_average_scenario_table{scenario_id,'Joints_avg_dx'};
-kinect_config_std_dx(row_counter,1) = coordinates_average_scenario_table{scenario_id,'Joints_sd_dx'};
-kinect_config_avg_dy(row_counter,1) = coordinates_average_scenario_table{scenario_id,'Joints_avg_dy'};
-kinect_config_std_dy(row_counter,1) = coordinates_average_scenario_table{scenario_id,'Joints_sd_dy'};
-kinect_config_avg_dz(row_counter,1) = coordinates_average_scenario_table{scenario_id,'Joints_avg_dz'};
-kinect_config_std_dz(row_counter,1) = coordinates_average_scenario_table{scenario_id,'Joints_sd_dz'};
-kinect_config_avg_dd(row_counter,1) = coordinates_average_scenario_table{scenario_id,'Joints_avg_dd'};
-kinect_config_std_dd(row_counter,1) = coordinates_average_scenario_table{scenario_id,'Joints_sd_dd'};
+kinect_config_avg_dx(row_counter,1) = mean(coordinates_average_scenario_table{:,'Joints_avg_dx'});
+kinect_config_std_dx(row_counter,1) = std(coordinates_average_scenario_table{:,'Joints_avg_dx'});
+kinect_config_avg_dy(row_counter,1) = mean(coordinates_average_scenario_table{:,'Joints_avg_dy'});
+kinect_config_std_dy(row_counter,1) = std(coordinates_average_scenario_table{:,'Joints_avg_dy'});
+kinect_config_avg_dz(row_counter,1) = mean(coordinates_average_scenario_table{:,'Joints_avg_dz'});
+kinect_config_std_dz(row_counter,1) = std(coordinates_average_scenario_table{:,'Joints_avg_dz'});
+kinect_config_avg_dd(row_counter,1) = mean(coordinates_average_scenario_table{:,'Joints_avg_dd'});
+kinect_config_std_dd(row_counter,1) = std(coordinates_average_scenario_table{:,'Joints_avg_dd'});
 
 figure;
 hold on;

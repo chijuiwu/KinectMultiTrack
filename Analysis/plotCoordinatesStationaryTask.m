@@ -8,11 +8,6 @@ main_title = 'Coordinates Averages for the Stationary Task';
 dir = 'Plots/Stationary_Task/';
 main_filename = strcat(dir,'Coordinates_Stationary_Task');
 
-coordinate_dx_idx = 4;
-coordinate_dy_idx = 6;
-coordinate_dz_idx = 8;
-coordinate_dd_idx = 10;
-
 kinect_config_types = {
   'Parallel', '45 Degrees-apart','90 Degrees-apart','Average'
 };
@@ -34,31 +29,26 @@ row_counter = 1;
 for kinect_config = unique(scen_table.Kinect_Config,'rows').'
     k_table = scen_table(scen_table.Kinect_Config==kinect_config,:);
     
-    kinect_config_avg_dx(row_counter,1) = k_table{1,coordinate_dx_idx};
-    kinect_config_std_dx(row_counter,1) = k_table{1,coordinate_dx_idx+1};
-    kinect_config_avg_dy(row_counter,1) = k_table{1,coordinate_dy_idx};
-    kinect_config_std_dy(row_counter,1) = k_table{1,coordinate_dy_idx+1};
-    kinect_config_avg_dz(row_counter,1) = k_table{1,coordinate_dz_idx};
-    kinect_config_std_dz(row_counter,1) = k_table{1,coordinate_dz_idx+1};
-    kinect_config_avg_dd(row_counter,1) = k_table{1,coordinate_dd_idx};
-    kinect_config_std_dd(row_counter,1) = k_table{1,coordinate_dd_idx+1};
+    kinect_config_avg_dx(row_counter,1) = k_table{1,'Joints_avg_dx'};
+    kinect_config_std_dx(row_counter,1) = k_table{1,'Joints_sd_dx'};
+    kinect_config_avg_dy(row_counter,1) = k_table{1,'Joints_avg_dy'};
+    kinect_config_std_dy(row_counter,1) = k_table{1,'Joints_sd_dy'};
+    kinect_config_avg_dz(row_counter,1) = k_table{1,'Joints_avg_dz'};
+    kinect_config_std_dz(row_counter,1) = k_table{1,'Joints_sd_dz'};
+    kinect_config_avg_dd(row_counter,1) = k_table{1,'Joints_avg_dd'};
+    kinect_config_std_dd(row_counter,1) = k_table{1,'Joints_sd_dd'};
     
     row_counter = row_counter+1;
 end
 
-avg_dx_idx = 3;
-avg_dy_idx = 5;
-avg_dz_idx = 7;
-avg_dd_idx = 9;
-average_table = coordinates_average_scenario_table(scenario_id,:);
-kinect_config_avg_dx(row_counter,1) = average_table{1,avg_dx_idx};
-kinect_config_std_dx(row_counter,1) = average_table{1,avg_dx_idx+1};
-kinect_config_avg_dy(row_counter,1) = average_table{1,avg_dy_idx};
-kinect_config_std_dy(row_counter,1) = average_table{1,avg_dy_idx+1};
-kinect_config_avg_dz(row_counter,1) = average_table{1,avg_dz_idx};
-kinect_config_std_dz(row_counter,1) = average_table{1,avg_dz_idx+1};
-kinect_config_avg_dd(row_counter,1) = average_table{1,avg_dd_idx};
-kinect_config_std_dd(row_counter,1) = average_table{1,avg_dd_idx+1};
+kinect_config_avg_dx(row_counter,1) = coordinates_average_scenario_table{scenario_id,'Joints_avg_dx'};
+kinect_config_std_dx(row_counter,1) = coordinates_average_scenario_table{scenario_id,'Joints_sd_dx'};
+kinect_config_avg_dy(row_counter,1) = coordinates_average_scenario_table{scenario_id,'Joints_avg_dy'};
+kinect_config_std_dy(row_counter,1) = coordinates_average_scenario_table{scenario_id,'Joints_sd_dy'};
+kinect_config_avg_dz(row_counter,1) = coordinates_average_scenario_table{scenario_id,'Joints_avg_dz'};
+kinect_config_std_dz(row_counter,1) = coordinates_average_scenario_table{scenario_id,'Joints_sd_dz'};
+kinect_config_avg_dd(row_counter,1) = coordinates_average_scenario_table{scenario_id,'Joints_avg_dd'};
+kinect_config_std_dd(row_counter,1) = coordinates_average_scenario_table{scenario_id,'Joints_sd_dd'};
 
 figure;
 hold on;
