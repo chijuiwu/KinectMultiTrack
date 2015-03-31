@@ -1,0 +1,161 @@
+\section{System}
+\label{sec:system}
+
+The final application demonstrates that the system works as intended. The main components of the system consist of a server, a tracker, a user interface, and a logger. The server passes on the Kinect BodyFrames received from the clients to the tracker. The tracker then processes the data and signals the user interface when the latest result is available. The user interface displays the tracking result on the skeleton visualization. When required by the end user, the logger would write tracking result to files.
+
+The system is a standalone application written in C\# (.NET Framework 4.5), but it can also integrate with other applications, such as a heart rate estimation application using Kinect color data. More details on the design and implementation of the application will be discussed in section ``\nameref{sec:application}".
+
+\subsection{Running the application}
+
+\textbf{TODO}
+
+\subsection{Design}
+
+The application should be intuitive and easy to use. Since it is a prototype demonstrating the capability of the tracking system, it puts large emphasis on the skeleton visualization, showing that the combined skeletons match the expected outcome of the tracking process. The application displays the skeletons before and apply applying coordinate transformation and skeleton matching. The combined skeletons should render at the same speed as the server receives BodyFrames from multiple sources. 
+
+The application provides the end users essential functionalities for running the application, including start and stop the server, recalibrate, view tracked skeletons from different views, and send the average skeleton stream to other applications. The user interface will fire a ``OnDisplayResult'' event when the rendering of the skeleton visualization is completed. This lets the server know when to signal the logger.
+
+The overall control flow of the application is now clear. The server handles data from the clients. The tracker processes the data. The user interface visaulizaes the data and provides additional control for the user. If required, the server then tells the logger to store the tracking done after the visualization is shown.
+
+\textbf{(todo: implement recalibration and stop button and the last feature)}
+
+The application does not take the following elements into design decision:
+
+\begin{itemize}
+  \item The security of the application.
+  \item The privacy of users' tracking information
+  \item The scalability and robustness of the client and server.
+\end{itemize}
+
+\subsection{System architecture}
+
+The system topology consists of one or more machines in a client-server model. The latest Kinect v2 SDK at the time of writing (version 2.0.1410.19000) still does not support running multiple Kinects on a single machine, as a result, the system leverages the TCP/IP protocol for communicating between multiple Kinects. In the current system architecture, each client is running one Kinect (Figure \ref{fig:system_architecture}). There is only one server, and any client machine can also run the server. All clients send Kinect Body frames to the server. The server is the workhorse of the system. It serves incoming client connections, establishes network streams with the clients, runs the user interface and exchanges information with the tracker (whom in runs the tracking algorithm), and lastly, informs the logger to write tracking data to files.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.9\columnwidth]{system_architecture}
+  \caption{An overview of the system topology}
+  \label{fig:system_architecture}
+\end{figure}
+
+\subsection{Client Implementation}
+
+The clients and servers communicate through TCP connections. The server opens the a port on the TPC network, and clients request connections to the server via sockets. When a client starts running, it will also start the Kinect \textbf{(change code: only start the Kinect after it's connected to the server)}. The client will continuously make connection requests until the server responds. If a connection is terminated by the server before the client stops running, the client will keep trying to reconnect to the server.
+
+After the client establishes a connection with the server, it will start sending Kinect Body frames to the server. The low level networking is handled by the Microsoft .Net framework. The client serializes this data before transmitting it to the server, and the server will deserialize it. The server will then passes on the data to the tracker.
+
+\subsection{Server Implementation}
+
+The application is written in C\# with the .NET 4.5 framework, and the user interface is created using the .NET WPF framework, because the official Microsoft Kinect SDK is written in C\# and the latest examples use the WPF framework. 
+
+The application leverages the C\# events and delegates model. The application components subscribe to the event queues of other components. When new data is available from the subscribing component, the subscribed component consumes the data, does something with it, and fires events to all of its subscribed components. The components on the receiving end do the same, and so on. The server aseembles the overall communication via events.
+
+The application is started with one parameter, the server port number. It then creates a server to be run at that port number. The server will only start running when it receives such command from the user. After the server is created, it creates the user interface thread as a Single Threaded Apartment running in the background. The user interface will appear now.
+
+The server will receive the following events from the user interface:
+
+\begin{itemize}
+  \item Setup parameters for the server
+  \item Start the server
+  \item Stop the server
+  \item When the user interface has displayed the tracking result (then the server will notify the logger)
+\end{itemize}
+
+The user will have control over the server, hence the system.
+
+The server will pass the following events to the user interface:
+
+\begin{itemize}
+  \item Clients (Kinects) have been connected to the server
+  \item Clients (Kinects) have been removed from the server
+\end{itemize}
+
+The user interface can know which Kinects are connected to the server, giving the user feedback and later allowing him to choose from which Kinect perspective to view tracked people's skeletons.
+
+The server will bind the following events from the tracker to the user interface:
+
+\begin{itemize}
+  \item The tracker is waiting for Kinects to be connected
+  \item The tracker is calibrating (and how many frames remaining)
+  \item The tracker needs recalibration (and for what reason)
+  \item The tracker has synchronized the latest BodyFrame with the tracking result 
+\end{itemize}
+
+The user interface would show more feedback, including the latest result, from the tracker.
+
+\subsubsection{Communication Protocol}
+
+The application listens for TCP client connections. This work is done in a separate thread, called the ServerWorkerThread. When the TCP socket listener receives a new connection, the server will handle it in a new, separate thread. In the socket thread, the server will create a network stream between the client and the server. After the connection is established, the server will fire a ``OnKinectConnected'' event to the user interface. Later on, the server will receive Kinect BodyFrames from the client through the network stream it had created. Upon receiving some data, the server would deserialize it into a BodyFrame object, then it would fire another event called ``Track'' to the tracker with information about the sender and the BodyFrame itself. Lastly, the server will send a response (a string) back to the client. The response is trivial; it is used to tell the client that the data has been received. The client is also implemented so that it In the current implementation, the server returns ``Okay''. The server will continue to process additional BodyFrames received on its end of the netwrok stream, and the above procedure repeats.
+
+\textbf{(todo: fix the server so that it can stop and report the additions)}
+
+\subsection{User Interface Implementation}
+
+The application has one window. It has a number of small buttons as controls on the top of the interface. Below the controls the window is split into halves. The left hand side shows the visualization for merged skeletons after applying coordinate transformation, and the right hand side shows the visualization of skeletons in their original fields of view. Displaying the two different views at once demonstrates the system's tracking algorithm.
+
+The design decisions on the look of the user interface are not discussed, because aesthetic features were not taken into consideration when the user interface was developed.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.9\columnwidth]{ui}
+  \caption{UI}
+  \label{fig:ui}
+\end{figure}
+
+\subsubsection{Controls}
+
+Available user controls are shown as buttons. The user interface responds to click events on each button. Buttons representing functionalities are that not meant to be used are disabled. For instance, when the start button is pressed, signaling the server to start running, the setup button, which parameterizes the server, should be disabled. A full set of constraints on the availability of the buttons are specified below:
+
+\textbf{(todo: should I put this down?)}
+
+\subsubsection{Events}
+
+When the user interface receives events from the server about new and old connections with clients, the user interface adds and remvoes option to transform the kinect Bodies into the particular Kinect's field of view, respectively. The user interface would also display texts, centered on the left hand side visualization, about the progress of calibration or any interrupted action causing calibration to fail. How the user interface displays the BodyFrames is discussed in the next subsections  ``\nameref{subsec:tracking_view}'' and ``\nameref{subsec:disjoined_view}''.
+
+\subsubsection{Tracking View}
+\label{subsec:tracking_view}
+
+The Tracking View shows the skeleton visualization of the tracking result. The merged skeletons are drawn from the perspective of the selected Kinect, specified by the user or is defaulted to the local client's Kinect (The local client is the client that is also running on the server machine). The average skeleton is calculated at this stage. The potential skeletons of a person share the same color, and the average skeleton is always colored white. There are six avaialble colors, because the system sets the cap of number of tracked people to six.
+
+The skeleton visaulization in both Tracking View and Disjoined View has the same implementation. The bones of the skeletons are drawn first, then the joints. The simplified list of human bones using the Kinect joints are taken from the Microsfot Kinect Developer examples. The inferred bones are displayed thinner than the tracked bones.
+
+\textbf{(todo: default to local Kinect)}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.9\columnwidth]{tracking_view}
+  \caption{The Tracking View}
+  \label{fig:tracking_view}
+\end{figure}
+
+\subsubsection{Disjoined View}
+\label{subsec:disjoined_view}
+
+The Disjoined View shows the skeleton visualization of the tracked skeletons in their original Kinect coordinate system. The skeletons are colored with respect to their Kinect origin. In other words, skeletons coming from the same Kinect would share the same color. The number of available colors is also limited to six.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.9\columnwidth]{disjoined_view}
+  \caption{The Disjoined View}
+  \label{fig:disjoined_view}
+\end{figure}
+
+\subsection{Tracker Implementation}
+
+The tracker runs the tracking algorithm on the server. Much of the algorithm has been explained in section \ref{fig:current_approach}. This section will explain how the algorithm has been implemented.
+
+The tracker contains a dictionay of clients' IP address (as key) and a generic data structure (as value), called kinectClient, storing information about the Kinect connected to the client and all the frames receivied from it.
+
+In calibration phase, all frames are stored in a stack inside each KinectClient. This allows the tracker to quickly find the latest 120 frames for calibration. Each KinectClient also keeps track of a list of active skeletons, or TrackingSkeletons. Throughout the livetime of a tracking process, the tracker updates the position of the TrackingSkeletons.
+
+\subsection{Logger Implementation}
+
+The logger takes a tracking result and writes it to the file. The complete list of items logged at each time interval can be found in appendix \ref{sec:logging}.
+
+During the experiments, after the user interface displays the tracking result, it will fire an event to the server. The server will write every other tracking result to a file on the local disk. The user interface will not signal the server about the result if the experiment is paused between tasks.
+
+The logger recevies the joint coordinates in World coordinate system (as stored in the result), therefore, it converts them into coordinates in the local Kinect's camera space. The local Kinect is the one which is connected to the server machine via a TCP client. The logger flushes the buffer after it completes the action.
+
+\subsection{Integration with Heart Rate Monitoring}
+
+\textbf{TODO}
