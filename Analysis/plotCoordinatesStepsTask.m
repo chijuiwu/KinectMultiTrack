@@ -1,12 +1,12 @@
-function [] = plotCoordinatesStationaryTask(coordinates_average_study_table, coordinates_average_scenario_table)
+function [] = plotCoordinatesStepsTask(coordinates_average_study_table, coordinates_average_scenario_table)
 
 joints_util;
 plot_colors;
 
-scenario_id = 1;
-main_title = 'Coordinates Averages for the Stationary Task';
+scenario_id = 2;
+main_title = 'Coordinates Averages for the Steps Task';
 dir = 'Plots/Stationary_Task/';
-main_filename = strcat(dir,'Coordinates_Stationary_Task');
+main_filename = strcat(dir,'Coordinates_Steps_Task');
 
 coordinate_dx_idx = 4;
 coordinate_dy_idx = 6;
