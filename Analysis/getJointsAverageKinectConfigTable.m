@@ -11,7 +11,7 @@ function [joints_average_kinect_config_table] = getJointsAverageKinectConfigTabl
 joints_util;
 
 first_variable_names = {
-    'Kinect_Config','Scenario_Id','Person_Id'
+    'Kinect_Config','Person_Id'
 };
 
 % get count for people in all kinect configurations and scenarios
@@ -19,11 +19,10 @@ count_person_in_all_k = 0;
 for k = unique(joints_average_study_table.Kinect_Config,'rows').'
     k_table = joints_average_study_table(joints_average_study_table.Kinect_Config==k,{'Scenario_Id','Person_Id'});
     for scen_id = unique(k_table.Scenario_Id,'rows').'
-        if (scen_id == 2 || scen_id == 3)
-            continue;
+        if (scen_id == 1)
+            scen_table = k_table(k_table.Scenario_Id==scen_id,:);
+            count_person_in_all_k = count_person_in_all_k + length(unique(scen_table.Person_Id,'rows').');
         end
-        scen_table = k_table(k_table.Scenario_Id==scen_id,:);
-        count_person_in_all_k = count_person_in_all_k + length(unique(scen_table.Person_Id,'rows').');
     end
 end
 
@@ -47,15 +46,11 @@ for k = unique(joints_average_study_table.Kinect_Config,'rows').'
     first_three_scenarios = k_table.Scenario_Id==1 | ...
         k_table.Scenario_Id==2 | k_table.Scenario_Id==3;
     first_three_scenarios_table = k_table(first_three_scenarios,:);
-    other_scenarios = k_table.Scenario_Id==4 | k_table.Scenario_Id==5 | ...
-        k_table.Scenario_Id==6 | k_table.Scenario_Id==8;
-    other_scenarios_table = k_table(other_scenarios,:);
     
     %
     % first three
     %
     average_row.Kinect_Config = k;
-    average_row.Scenario_Id = 1;
     average_row.Person_Id = 0;
     jt_avg_type_idx = 1;
     for nth_joint_dx = first_joint_idx:8:(first_joint_idx-1)+length(joints_average_types)
@@ -84,24 +79,6 @@ for k = unique(joints_average_study_table.Kinect_Config,'rows').'
     %
     % end first three
     %
-    
-    %
-    % others
-    %
-    for scen_id = unique(other_scenarios_table.Scenario_Id,'rows').'
-        scen_table = other_scenarios_table(other_scenarios_table.Scenario_Id==scen_id,:);
-
-        for p_id = unique(scen_table.Person_Id,'rows').'
-            person_in_k_scen = scen_table(scen_table.Person_Id==p_id,:);
-            
-            for i = 1:size(person_in_k_scen,2)
-                average_row.(table_variable_names{i}) = person_in_k_scen{1,i};
-            end
-            
-            joints_average_kinect_config_table(row_counter,:) = struct2table(average_row);
-            row_counter = row_counter+1;
-        end
-    end
 end
 
 end

@@ -2,7 +2,7 @@ function [coordinates_average_scenario_table] = getCoordinatesAverageScenarioTab
 %
 % Get joints averages for each study
 % 
-% Scenario_Id Person_Id ...
+% Kinect_Config Scenario_Id Person_Id ...
 % Joints_avg_dx Joints_sd_dx Joints_avg_dy Joints_sd_dy ...
 % Joints_avg_dz Joints_sd_dz Joints_avg_dd Joints_sd_dd
 % 
@@ -10,7 +10,7 @@ function [coordinates_average_scenario_table] = getCoordinatesAverageScenarioTab
 joints_util;
 
 first_variable_names = {
-    'Scenario_Id','Person_Id'
+    'Kinect_Config','Scenario_Id','Person_Id'
 };
 
 % get count for people in all kinect configurations and scenarios
@@ -19,7 +19,6 @@ for scen_id = unique(coordinates_average_study_table.Scenario_Id,'rows').'
     scen_table = coordinates_average_study_table(coordinates_average_study_table.Scenario_Id==scen_id,{'Kinect_Config','Person_Id'});
     if (scen_id == 1 || scen_id == 2 || scen_id == 3)
         count_person_in_all_scen = count_person_in_all_scen + length(unique(scen_table.Person_Id,'rows').');
-    end
 end
 
 table_variable_names = [first_variable_names coordinates_average_types];
@@ -37,15 +36,12 @@ row_counter = 1;
 for scen_id = unique(coordinates_average_study_table.Scenario_Id,'rows').'
     scen_table = coordinates_average_study_table(coordinates_average_study_table.Scenario_Id==scen_id,:);
 
-    if (scen_id ~= 1 && scen_id ~= 2 && scen_id ~= 3)
-        continue;
-    end
-    
     fprintf('Calculating coordinate averages over scenario - Scenario=%d\n',scen_id);
     
     for p_id = unique(scen_table.Person_Id,'rows').'
         person_in_scen = scen_table(scen_table.Person_Id==p_id,:);
         
+        average_row.Kinect_Config = person_in_scen{1,'Kinect_Config'};
         average_row.Scenario_Id = scen_id;
         average_row.Person_Id = p_id;
         

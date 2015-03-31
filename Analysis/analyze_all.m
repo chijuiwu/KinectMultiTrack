@@ -1,36 +1,36 @@
-dir_experiments_1_2_3_6 = '../Data/Experiments_1_2_3_6/';
-dir_experiments_4 = '../Data/Experiments_4/';
-
-raw_data_table = table();
-
-% loading data
-disp('Loading data...');
-tic;
-raw_data_table = readData(dir_experiments_1_2_3_6, raw_data_table);
-raw_data_table = readData(dir_experiments_4, raw_data_table);
-time = toc;
-fprintf('Loading data...Done!!!, time=%.2f\n',time);
-
-% % % 
-disp('Cleaning data...');
-tic;
-data_table = cleanData(raw_data_table);
-time = toc;
-fprintf('Cleaning data...Done!!!, time=%.2f\n',time);
-
-% % % 
-disp('Creating difference table...');
-tic;
-[difference_table, joints_difference_types] = getJointDifferenceTable(data_table);
-time = toc;
-fprintf('Done!!!, time=%.2f\n',time);
-
-% % % 
-disp('Creating time average table...');
-tic;
-[time_average_table, joints_average_types] = getTimeAverageTable(difference_table, joints_difference_types);
-time = toc;
-fprintf('Done!!!, time=%.2f\n',time);
+% dir_experiments_1_2_3_6 = '../Data/Experiments_1_2_3_6/';
+% dir_experiments_4 = '../Data/Experiments_4/';
+% 
+% raw_data_table = table();
+% 
+% % loading data
+% disp('Loading data...');
+% tic;
+% raw_data_table = readData(dir_experiments_1_2_3_6, raw_data_table);
+% raw_data_table = readData(dir_experiments_4, raw_data_table);
+% time = toc;
+% fprintf('Loading data...Done!!!, time=%.2f\n',time);
+% 
+% % % % 
+% disp('Cleaning data...');
+% tic;
+% data_table = cleanData(raw_data_table);
+% time = toc;
+% fprintf('Cleaning data...Done!!!, time=%.2f\n',time);
+% 
+% % % % 
+% disp('Creating difference table...');
+% tic;
+% [difference_table, joints_difference_types] = getJointDifferenceTable(data_table);
+% time = toc;
+% fprintf('Done!!!, time=%.2f\n',time);
+% 
+% % % % 
+% disp('Creating time average table...');
+% tic;
+% [time_average_table, joints_average_types] = getTimeAverageTable(difference_table, joints_difference_types);
+% time = toc;
+% fprintf('Done!!!, time=%.2f\n',time);
 
 % % % 
 disp('Creating joints average study table...');
