@@ -68,6 +68,12 @@ for s_id = unique(data_table.Study_Id,'rows').'
 
                         % Assume 2 skeletons             
                         dx = abs(joints_data{1,x}-joints_data{2,x});
+                        
+                        display(joints_data{1,x});
+                        display(joints_data{2,x});
+                        display(dx);
+                        display(a);
+                        
                         dy = abs(joints_data{1,y}-joints_data{2,y});
                         dz = abs(joints_data{1,z}-joints_data{2,z});
                         dd = sqrt(dx.^2 + dy.^2 + dz.^2);

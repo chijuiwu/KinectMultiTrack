@@ -17,7 +17,7 @@ first_variable_names = {
 % AnkleLeft_avg_dz, AnkleLeft_sd_dz, AnkleLeft_avg_dd, AnkleLeft_sd_dd, ...
 % 
 average_types = {
-    'avg_dx','sd_dx','avg_dy','sd_dy','avg_dz','sd_dz','avg_dd','sd_dd'
+    'avg_dx','std_dx','avg_dy','std_dy','avg_dz','std_dz','avg_dd','std_dd'
 };
 time_average_joint_types = cell(1,length(joint_types)*length(average_types));
 counter = 0;
@@ -94,7 +94,7 @@ for s_id = unique(difference_table.Study_Id,'rows').'
                     avg_dd = mean(joints_data_over_time{:,dd});
                     std_dd = std(joints_data_over_time{:,dd});
                     
-                    % 8 because Joint_avg_dx, Joint_sd_dx, ..., Joint_sd_dd
+                    % 8 because Joint_avg_dx, Joint_std_dx, ..., Joint_std_dd
                     jt_avg_type_idx = 1 + (jt_num-1)*8;
                     
                     average_row.(time_average_joint_types{1,jt_avg_type_idx}) = avg_dx;

@@ -1,6 +1,7 @@
 function [joints_average_scenario_table] = getJointsAverageScenarioTable(joints_average_study_table, joints_average_types)
 %
-% Get joints averages for each study
+% Get joints averages for each of the first three scenarios scenario for
+% all kinect configurations
 % 
 % Scenario_Id Person_Id ...
 % Joint_1_avg_dx Joint_1_sd_dx Joint_1_avg_dy Joint_1_sd_dy ...
@@ -17,10 +18,14 @@ first_variable_names = {
 % get count for people in all kinect configurations and scenarios
 count_person_in_all_scen = 0;
 for scen_id = unique(joints_average_study_table.Scenario_Id,'rows').'
-    scen_table = joints_average_study_table(joints_average_study_table.Scenario_Id==scen_id,{'Kinect_Config','Person_Id'});
-    if (scen_id == 1 || scen_id == 2 || scen_id == 3)
-        count_person_in_all_scen = count_person_in_all_scen + length(unique(scen_table.Person_Id,'rows').');
+    
+    if (scen_id ~= 1 || scen_id ~= 2 || scen_id ~= 3)
+        continue;
     end
+    
+    scen_table = joints_average_study_table(joints_average_study_table.Scenario_Id==scen_id,{'Kinect_Config','Person_Id'});
+    count_person_in_all_scen = count_person_in_all_scen + length(unique(scen_table.Person_Id,'rows').');
+    
 end
 
 table_variable_names = [first_variable_names joints_average_types];
@@ -32,11 +37,11 @@ for field = table_variable_names
     average_row.(char(field)) = 0;
 end
 
-first_joint_idx = 4;
+first_joint_idx = length(first_variable_names)+1;
 
 row_counter = 1;
 for scen_id = unique(joints_average_study_table.Scenario_Id,'rows').'
-    scen_table = joints_average_study_table(joints_average_study_table.Scenario_Id==scen_id,:);
+    scen_table = joints_average_study_table(joints_average_study_table.Scenario_Id==scen_id,table_variable_names);
 
     if (scen_id ~= 1 && scen_id ~= 2 && scen_id ~= 3)
         continue;
@@ -44,39 +49,77 @@ for scen_id = unique(joints_average_study_table.Scenario_Id,'rows').'
     
     fprintf('Calculating joint averages over scenario - Scenario=%d\n',scen_id);
     
-    for p_id = unique(scen_table.Person_Id,'rows').'
-        person_in_scen = scen_table(scen_table.Person_Id==p_id,:);
-        
-        average_row.Scenario_Id = scen_id;
-        average_row.Person_Id = p_id;
-        
-        jt_avg_type_idx = 1;
-        for nth_joint_dx = first_joint_idx:8:(first_joint_idx-1)+length(joints_average_types)
-            jt_avg_dx = mean(person_in_scen{:,nth_joint_dx});
-            jt_std_dx = std(person_in_scen{:,nth_joint_dx});
-            jt_avg_dy = mean(person_in_scen{:,nth_joint_dx+2});
-            jt_std_dy = std(person_in_scen{:,nth_joint_dx+2});
-            jt_avg_dz = mean(person_in_scen{:,nth_joint_dx+4});
-            jt_std_dz = std(person_in_scen{:,nth_joint_dx+4});
-            jt_avg_dd = mean(person_in_scen{:,nth_joint_dx+6});
-            jt_std_dd = std(person_in_scen{:,nth_joint_dx+6});
+    average_row.Scenario_Id = scen_id;
+    average_row.Person_Id = 0; % hardcoded 1 person
+    
+    for nth_joint = 1:length(joint_types)
+        jt_idx = first_joint_idx + (nth_joint-1)*8;
+        first_three_scenario_joint = scen_table(:,jt_idx:jt_idx+7);
+        dx=1; dy=3; dz=5; dd=7;
 
-            average_row.(joints_average_types{1,jt_avg_type_idx}) = jt_avg_dx;
-            average_row.(joints_average_types{1,jt_avg_type_idx+1}) = jt_std_dx;
-            average_row.(joints_average_types{1,jt_avg_type_idx+2}) = jt_avg_dy;
-            average_row.(joints_average_types{1,jt_avg_type_idx+3}) = jt_std_dy;
-            average_row.(joints_average_types{1,jt_avg_type_idx+4}) = jt_avg_dz;
-            average_row.(joints_average_types{1,jt_avg_type_idx+5}) = jt_std_dz;
-            average_row.(joints_average_types{1,jt_avg_type_idx+6}) = jt_avg_dd;
-            average_row.(joints_average_types{1,jt_avg_type_idx+7}) = jt_std_dd;
+        avg_dx = mean(first_three_scenario_joint{:,dx});
+        std_dx = std(first_three_scenario_joint{:,dx});
+        avg_dy = mean(first_three_scenario_joint{:,dy});
+        std_dy = std(first_three_scenario_joint{:,dy});
+        avg_dz = mean(first_three_scenario_joint{:,dz});
+        std_dz = std(first_three_scenario_joint{:,dz});
+        avg_dd = mean(first_three_scenario_joint{:,dd});
+        std_dd = std(first_three_scenario_joint{:,dd});
 
-            jt_avg_type_idx = jt_avg_type_idx + 8;
-        end
-        
-        joints_average_scenario_table(row_counter,:) = struct2table(average_row);
-        row_counter = row_counter+1;
-        
+        % 8 because Joint_avg_dx, Joint_std_dx, ..., Joint_std_dd
+        jt_avg_type_idx = 1 + (nth_joint-1)*8;
+
+        average_row.(joints_average_types{1,jt_avg_type_idx}) = avg_dx;
+        average_row.(joints_average_types{1,jt_avg_type_idx+1}) = std_dx;
+        average_row.(joints_average_types{1,jt_avg_type_idx+2}) = avg_dy;
+        average_row.(joints_average_types{1,jt_avg_type_idx+3}) = std_dy;
+        average_row.(joints_average_types{1,jt_avg_type_idx+4}) = avg_dz;
+        average_row.(joints_average_types{1,jt_avg_type_idx+5}) = std_dz;
+        average_row.(joints_average_types{1,jt_avg_type_idx+6}) = avg_dd;
+        average_row.(joints_average_types{1,jt_avg_type_idx+7}) = std_dd;
+
     end
+    
+    joints_average_scenario_table(row_counter,:) = struct2table(average_row);
+    row_counter = row_counter+1;
+        
 end
+
+% Average
+
+fprintf('Calculating joint averages over scenarios - Average\n');
+
+average_row.Scenario_Id = average_row.Scenario_Id+1;
+average_row.Person_Id = 0; % hardcoded 1 person
+
+for nth_joint = 1:length(joint_types)
+    jt_idx = first_joint_idx + (nth_joint-1)*8;
+    average_joint = joints_average_scenario_table(:,jt_idx:jt_idx+7);
+    dx=1; dy=3; dz=5; dd=7;
+
+    avg_dx = mean(average_joint{:,dx});
+    std_dx = std(average_joint{:,dx});
+    avg_dy = mean(average_joint{:,dy});
+    std_dy = std(average_joint{:,dy});
+    avg_dz = mean(average_joint{:,dz});
+    std_dz = std(average_joint{:,dz});
+    avg_dd = mean(average_joint{:,dd});
+    std_dd = std(average_joint{:,dd});
+
+    % 8 because Joint_avg_dx, Joint_std_dx, ..., Joint_std_dd
+    jt_avg_type_idx = 1 + (nth_joint-1)*8;
+
+    average_row.(joints_average_types{1,jt_avg_type_idx}) = avg_dx;
+    average_row.(joints_average_types{1,jt_avg_type_idx+1}) = std_dx;
+    average_row.(joints_average_types{1,jt_avg_type_idx+2}) = avg_dy;
+    average_row.(joints_average_types{1,jt_avg_type_idx+3}) = std_dy;
+    average_row.(joints_average_types{1,jt_avg_type_idx+4}) = avg_dz;
+    average_row.(joints_average_types{1,jt_avg_type_idx+5}) = std_dz;
+    average_row.(joints_average_types{1,jt_avg_type_idx+6}) = avg_dd;
+    average_row.(joints_average_types{1,jt_avg_type_idx+7}) = std_dd;
+
+end
+    
+joints_average_scenario_table(row_counter,:) = struct2table(average_row);
 
 end

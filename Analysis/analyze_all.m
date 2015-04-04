@@ -24,53 +24,53 @@
 % [difference_table, joints_difference_types] = getJointDifferenceTable(data_table);
 % time = toc;
 % fprintf('Done!!!, time=%.2f\n',time);
-% 
-% % % % 
-% disp('Creating time average table...');
-% tic;
-% [time_average_table, joints_average_types] = getTimeAverageTable(difference_table, joints_difference_types);
-% time = toc;
-% fprintf('Done!!!, time=%.2f\n',time);
+
+% % % 
+disp('Creating time average table...');
+tic;
+[time_average_table, joints_average_types] = getTimeAverageTable(difference_table, joints_difference_types);
+time = toc;
+fprintf('Done!!!, time=%.2f\n',time);
 
 % % % 
 disp('Creating joints average study table...');
 tic;
-joints_average_study_table = getJointsAverageStudyTable(time_average_table, joints_average_types);
+[joints_average_study_table, joints_average_study_merged_table] = getJointsAverageStudyTable(time_average_table, joints_average_types);
 time = toc;
 fprintf('Done!!!, time=%.2f\n',time);
 
 % % % 
 disp('Creating all joints average Kinect Configuration table...');
 tic;
-joints_average_kinect_config_table = getJointsAverageKinectConfigTable(joints_average_study_table, joints_average_types);
+joints_average_kinect_config_table = getJointsAverageKinectConfigTable(joints_average_study_merged_table, joints_average_types);
 time = toc;
 fprintf('Done!!!, time=%.2f\n',time);
 
 % % %  
 disp('Creating all joints average Scenario table...');
 tic;
-joints_average_scenario_table = getJointsAverageScenarioTable(joints_average_study_table, joints_average_types);
+joints_average_scenario_table = getJointsAverageScenarioTable(joints_average_study_merged_table, joints_average_types);
 time = toc;
 fprintf('Done!!!, time=%.2f\n',time);
 
 % % %  
 disp('Creating coordinates average study table...');
 tic;
-[coordinates_average_study_table, coordinates_average_types, coordinates_merged_average_study_table] = getCoordinatesAverageStudyTable(joints_average_study_table);
+[coordinates_average_study_table, coordinates_average_types, coordinates_average_study_merged_table] = getCoordinatesAverageStudyTable(joints_average_study_table);
 time = toc;
 fprintf('Done!!!, time=%.2f\n',time);
 
 % % %  
 disp('Creating coordinates Kinect Configuration table...');
 tic;
-coordinates_average_kinect_config_table = getCoordinatesAverageKinectConfigTable(coordinates_average_study_table, coordinates_average_types);
+coordinates_average_kinect_config_table = getCoordinatesAverageKinectConfigTable(coordinates_average_study_merged_table, coordinates_average_types);
 time = toc;
 fprintf('Done!!!, time=%.2f\n',time);
 
 % % %  
 disp('Creating coordinates Scenario table...');
 tic;
-coordinates_average_scenario_table = getCoordinatesAverageScenarioTable(coordinates_average_study_table, coordinates_average_types);
+coordinates_average_scenario_table = getCoordinatesAverageScenarioTable(coordinates_average_study_merged_table, coordinates_average_types);
 time = toc;
 fprintf('Done!!!, time=%.2f\n',time);
 
