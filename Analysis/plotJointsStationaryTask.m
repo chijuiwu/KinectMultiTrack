@@ -104,7 +104,7 @@ errorbar(joint_types_x,avg_dd,std_dd,'MarkerEdgeColor',black,'MarkerFaceColor',b
 box on;
 hold off;
 
-title_format = 'Joints Averages for the Stationary Task, with All Kinect Configurations';
+title_format = 'Joints Averages for the Stationary Task over All Kinect Configurations';
 dir = 'Plots/Overall/';
 filename_format = strcat(dir,'Joints_Stationary_Task_KinectConfig_All');
 plot_title = sprintf(title_format);
