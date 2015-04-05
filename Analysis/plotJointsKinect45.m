@@ -1,6 +1,7 @@
-function [] = plotJointsFirstThreeTasksParallel(joints_average_scenario_table)
+function [] = plotJointsKinect45(joints_average_scenario_table)
 % 
-% Per participant joints average
+% joint types over joints averages for 45 kinects over the first 3
+% tasks
 % showing dx, dy, dz, dd for all joints
 % 
 
@@ -8,7 +9,7 @@ joints_util;
 plot_colors;
 
 % average
-k = 1;
+k = 2;
 
 joint_types_x = (1:length(joint_types))';
 
@@ -37,9 +38,9 @@ errorbar(joint_types_x,avg_dd,std_dd,'MarkerEdgeColor',black,'MarkerFaceColor',b
 box on;
 hold off;
 
-title_format = 'Joints Averages for the First Three Tasks, with Parallel Kinect';
-dir = 'Plots/Overall/';
-filename_format = strcat(dir,'Joints_First_Three_Tasks_KinectConfig_Parallel');
+title_format = 'Joints Averages for the 45-Degrees-apart Kinect over the First Three Tasks';
+dir = '../../KinectMultiTrackPlots/Overall/';
+filename_format = strcat(dir,'Joints_Kinect_45');
 plot_title = sprintf(title_format);
 plot_filename = sprintf(filename_format);
 

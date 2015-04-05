@@ -1,7 +1,7 @@
-function [] = plotJointsWalkTask(joints_average_scenario_table)
+function [] = plotJointsKinect90(joints_average_scenario_table)
 % 
-% joint types over joints averages for walk task over all kinect
-% configurations
+% joint types over joints averages for 90 kinects over the first 3
+% tasks
 % showing dx, dy, dz, dd for all joints
 % 
 
@@ -9,7 +9,7 @@ joints_util;
 plot_colors;
 
 % average
-scen_id = 3;
+k = 3;
 
 joint_types_x = (1:length(joint_types))';
 
@@ -20,14 +20,14 @@ first_avg_dd = 9;
 last_idx = 2+length(joint_types)*8;
 
 % Assume one row (one person)
-avg_dx = joints_average_scenario_table{scen_id,first_avg_dx:8:last_idx}.';
-std_dx = joints_average_scenario_table{scen_id,first_avg_dx+1:8:last_idx}.';
-avg_dy = joints_average_scenario_table{scen_id,first_avg_dy:8:last_idx}.';
-std_dy = joints_average_scenario_table{scen_id,first_avg_dy+1:8:last_idx}.';
-avg_dz = joints_average_scenario_table{scen_id,first_avg_dz:8:last_idx}.';
-std_dz = joints_average_scenario_table{scen_id,first_avg_dz+1:8:last_idx}.';
-avg_dd = joints_average_scenario_table{scen_id,first_avg_dd:8:last_idx}.';
-std_dd = joints_average_scenario_table{scen_id,first_avg_dd+1:8:last_idx}.';
+avg_dx = joints_average_scenario_table{k,first_avg_dx:8:last_idx}.';
+std_dx = joints_average_scenario_table{k,first_avg_dx+1:8:last_idx}.';
+avg_dy = joints_average_scenario_table{k,first_avg_dy:8:last_idx}.';
+std_dy = joints_average_scenario_table{k,first_avg_dy+1:8:last_idx}.';
+avg_dz = joints_average_scenario_table{k,first_avg_dz:8:last_idx}.';
+std_dz = joints_average_scenario_table{k,first_avg_dz+1:8:last_idx}.';
+avg_dd = joints_average_scenario_table{k,first_avg_dd:8:last_idx}.';
+std_dd = joints_average_scenario_table{k,first_avg_dd+1:8:last_idx}.';
 
 figure;
 hold on;
@@ -38,9 +38,9 @@ errorbar(joint_types_x,avg_dd,std_dd,'MarkerEdgeColor',black,'MarkerFaceColor',b
 box on;
 hold off;
 
-title_format = 'Joints Averages for the Walk Task over all Kinect Configurations';
+title_format = 'Joints Averages for the 90-Degrees-apart Kinect over the First Three Tasks';
 dir = '../../KinectMultiTrackPlots/Overall/';
-filename_format = strcat(dir,'Joints_Task_Walk');
+filename_format = strcat(dir,'Joints_Kinect_90');
 plot_title = sprintf(title_format);
 plot_filename = sprintf(filename_format);
 

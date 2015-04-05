@@ -1,17 +1,17 @@
-function [] = plotCoordinatesFirstThreeTasksKinectConfig(coordinates_average_kinect_config_table)
+function [] = plotCoordinatesKinectAll(coordinates_average_kinect_config_table)
 
 joints_util;
 plot_colors;
 
 main_title = 'Coordinates Averages for Parallel, 45, and 90 Degrees-apart Kinects';
-dir = 'Plots/Overall/';
-main_filename = strcat(dir,'Coordinates_First_Three_Tasks_Kinect_Config');
+dir = '../../KinectMultiTrackPlots/Overall/';
+main_filename = strcat(dir,'Coordinates_Kinect_All');
 
 kinect_config_types = {
   'Stationary', 'Steps','Walk','Average'
 };
 
-rows = size(coordinates_average_kinect_config_table,1)+1;
+rows = size(coordinates_average_kinect_config_table,1);
 
 kinect_config_x = 1:length(kinect_config_types);
 kinect_config_avg_dx = zeros(rows,1);
@@ -28,25 +28,16 @@ for r = 1:size(coordinates_average_kinect_config_table,1);
     scen_table = coordinates_average_kinect_config_table(r,:);
     
     kinect_config_avg_dx(row_counter,1) = scen_table{1,'Joints_avg_dx'};
-    kinect_config_std_dx(row_counter,1) = scen_table{1,'Joints_sd_dx'};
+    kinect_config_std_dx(row_counter,1) = scen_table{1,'Joints_std_dx'};
     kinect_config_avg_dy(row_counter,1) = scen_table{1,'Joints_avg_dy'};
-    kinect_config_std_dy(row_counter,1) = scen_table{1,'Joints_sd_dy'};
+    kinect_config_std_dy(row_counter,1) = scen_table{1,'Joints_std_dy'};
     kinect_config_avg_dz(row_counter,1) = scen_table{1,'Joints_avg_dz'};
-    kinect_config_std_dz(row_counter,1) = scen_table{1,'Joints_sd_dz'};
+    kinect_config_std_dz(row_counter,1) = scen_table{1,'Joints_std_dz'};
     kinect_config_avg_dd(row_counter,1) = scen_table{1,'Joints_avg_dd'};
-    kinect_config_std_dd(row_counter,1) = scen_table{1,'Joints_sd_dd'};
+    kinect_config_std_dd(row_counter,1) = scen_table{1,'Joints_std_dd'};
     
     row_counter = row_counter+1;
 end
-
-kinect_config_avg_dx(row_counter,1) = mean(coordinates_average_kinect_config_table{:,'Joints_avg_dx'});
-kinect_config_std_dx(row_counter,1) = std(coordinates_average_kinect_config_table{:,'Joints_avg_dx'});
-kinect_config_avg_dy(row_counter,1) = mean(coordinates_average_kinect_config_table{:,'Joints_avg_dy'});
-kinect_config_std_dy(row_counter,1) = std(coordinates_average_kinect_config_table{:,'Joints_avg_dy'});
-kinect_config_avg_dz(row_counter,1) = mean(coordinates_average_kinect_config_table{:,'Joints_avg_dz'});
-kinect_config_std_dz(row_counter,1) = std(coordinates_average_kinect_config_table{:,'Joints_avg_dz'});
-kinect_config_avg_dd(row_counter,1) = mean(coordinates_average_kinect_config_table{:,'Joints_avg_dd'});
-kinect_config_std_dd(row_counter,1) = std(coordinates_average_kinect_config_table{:,'Joints_avg_dd'});
 
 figure;
 hold on;

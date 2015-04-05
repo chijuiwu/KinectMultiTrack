@@ -1,6 +1,6 @@
-function [] = plotJointsWalkTask(joints_average_scenario_table)
+function [] = plotJointsThreeTaks(joints_average_scenario_table)
 % 
-% joint types over joints averages for walk task over all kinect
+% joint types over joints averages for the first three task over all kinect
 % configurations
 % showing dx, dy, dz, dd for all joints
 % 
@@ -9,7 +9,7 @@ joints_util;
 plot_colors;
 
 % average
-scen_id = 3;
+scen_id = 4;
 
 joint_types_x = (1:length(joint_types))';
 
@@ -38,9 +38,9 @@ errorbar(joint_types_x,avg_dd,std_dd,'MarkerEdgeColor',black,'MarkerFaceColor',b
 box on;
 hold off;
 
-title_format = 'Joints Averages for the Walk Task over all Kinect Configurations';
+title_format = 'Joints Averages for the First Three Tasks over All Kinect Configurations';
 dir = '../../KinectMultiTrackPlots/Overall/';
-filename_format = strcat(dir,'Joints_Task_Walk');
+filename_format = strcat(dir,'Joints_Task_All');
 plot_title = sprintf(title_format);
 plot_filename = sprintf(filename_format);
 
