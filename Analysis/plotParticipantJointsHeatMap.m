@@ -19,7 +19,7 @@ scenarios = {
 
 title_format = 'Participant %d - Individual Joints %cd Distances over Time \n %s Scenario with %s Kinects';
 dir = '../../KinectMultiTrackPlots/Participants_joints_averages_over_time_heatmap/';
-filename_format = strcat(dir,'Participant_%d_Task_%s_Kinect_%s');
+filename_format = strcat(dir,'Participant_%d_Task_%s_Kinect_%s_Heatmap_dd');
 
 first_avg_dx = 6;
 first_avg_dy = 7;
@@ -61,7 +61,7 @@ for participant_id = unique(difference_table.Study_Id,'rows').'
                 figure;
                 hold on;
                 scatter3(x,y,dd_avg,[],dd_avg,'filled');
-                colormap(hot);
+                colormap(winter);
                 view(0,-90);
                 box on;
                 hold off;
