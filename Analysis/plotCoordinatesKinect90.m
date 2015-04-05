@@ -4,9 +4,9 @@ joints_util;
 plot_colors;
 
 kinect_config_id = 3;
-main_title = 'Coordinates Averages for 45 Degrees-apart Kinects';
+main_title = 'Coordinates Averages for 90 Degrees-apart Kinects';
 dir = '../../KinectMultiTrackPlots/Overall/';
-main_filename = strcat(dir,'Coordinates_Kinect_45');
+main_filename = strcat(dir,'Coordinates_Kinect_90');
 
 kinect_scenario_types = {
   'Stationary', 'Steps','Walk','Average'

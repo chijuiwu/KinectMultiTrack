@@ -6,12 +6,12 @@ function [] = plotCoordinatesAllStudies(coordinates_merged_average_study_table)
 joints_util;
 plot_colors;
 
-dir = 'Plots/Overall/';
+dir = '../../KinectMultiTrackPlots/Overall/';
 
 % 
 % Overall Average
 % 
-main_plot_title = 'Coordinates Averages for All Kinect Configurations and Scenarios';
+main_plot_title = 'Coordinates Averages for all Kinect Configurations and Scenarios';
 main_filename = strcat(dir,'Coordinates_All');
 
 all_experiment_types = {
@@ -25,13 +25,13 @@ all_experiment_types = {
 all_experiment_types_x = 1:length(all_experiment_types);
 
 studies_avg_dx = coordinates_merged_average_study_table{:,'Joints_avg_dx'};
-studies_std_dx = coordinates_merged_average_study_table{:,'Joints_sd_dx'};
+studies_std_dx = coordinates_merged_average_study_table{:,'Joints_std_dx'};
 studies_avg_dy = coordinates_merged_average_study_table{:,'Joints_avg_dy'};
-studies_std_dy = coordinates_merged_average_study_table{:,'Joints_sd_dy'};
+studies_std_dy = coordinates_merged_average_study_table{:,'Joints_std_dy'};
 studies_avg_dz = coordinates_merged_average_study_table{:,'Joints_avg_dz'};
-studies_std_dz = coordinates_merged_average_study_table{:,'Joints_sd_dz'};
+studies_std_dz = coordinates_merged_average_study_table{:,'Joints_std_dz'};
 studies_avg_dd = coordinates_merged_average_study_table{:,'Joints_avg_dd'};
-studies_std_dd = coordinates_merged_average_study_table{:,'Joints_sd_dd'};
+studies_std_dd = coordinates_merged_average_study_table{:,'Joints_std_dd'};
 
 figure;
 hold on;
@@ -43,11 +43,12 @@ box on;
 hold off;
 
 title(main_plot_title,'Fontsize',15);
-xlabel({'','','','','','','Scenarios'},'Fontsize',15);
+xlabel({'','Scenarios'},'Fontsize',15);
 ylabel({'Distance (cm)',''},'Fontsize',15);
 set(gca,'XLim',[0.5 length(all_experiment_types)+0.5]);
 set(gca,'XTick',1:length(all_experiment_types),'XTickLabel',all_experiment_types,'Fontsize',12);
-rotateticklabel(gca, -90);
+ax = gca;
+ax.XTickLabelRotation = -90;
 legend('\Delta x','\Delta y','\Delta z','\Delta d','Location','northwest');
 
 set(gcf,'Visible','Off');

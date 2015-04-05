@@ -1,4 +1,4 @@
-function [] = plotParticipantJointsOverTime(difference_table)
+function [] = plotParticipantJointsHeatMap(difference_table)
 % 
 % Per participant joints over time
 % 
@@ -17,8 +17,8 @@ scenarios = {
     'Stationary', 'Steps', 'Walk', '', '', 'Obstacle'
 };
 
-title_format = 'Participant %d - Individual Joints Distances over Time \n %s Scenario with %s Kinects';
-dir = '../../KinectMultiTrackPlots/Participants_joints_averages_over_time/';
+title_format = 'Participant %d - Individual Joints %cd Distances over Time \n %s Scenario with %s Kinects';
+dir = '../../KinectMultiTrackPlots/Participants_joints_averages_over_time_heatmap/';
 filename_format = strcat(dir,'Participant_%d_Task_%s_Kinect_%s');
 
 first_avg_dx = 6;
@@ -60,23 +60,23 @@ for participant_id = unique(difference_table.Study_Id,'rows').'
 
                 figure;
                 hold on;
-                scatter3(x,y,dd_avg,[],y,'filled');
-                colormap(jet);
-                view(45,30);
+                scatter3(x,y,dd_avg,[],dd_avg,'filled');
+                colormap(hot);
+                view(0,-90);
                 box on;
                 hold off;
 
-                plot_title = sprintf(title_format, participant_id, scenarios{1,scenario_id}, kinect_configs{1,kinect_config+1});
+                plot_title = sprintf(title_format, participant_id, char(916), scenarios{1,scenario_id}, kinect_configs{1,kinect_config+1});
                 plot_filename = sprintf(filename_format, participant_id, scenarios{1,scenario_id}, kinect_configs_filename{1,kinect_config+1});
 
-                title(plot_title,'Fontsize',15);
+                title(plot_title,'Fontsize',15,'interpreter','tex');
                 xlabel('Timestamp (sec)','Fontsize',15);
                 ylabel({'','Joint Types'},'Fontsize',15);
                 zlabel('\Delta Distance (cm)','Fontsize',15);
                 set(gca,'YLim',[0.5 length(joint_types)+0.5]);
                 set(gca,'YTick',1:length(joint_types),'YTickLabel',joint_types);
                 ax = gca;
-                ax.YTickLabelRotation = -45;
+                ax.YTickLabelRotation = 0;
 
                 set(gcf,'Visible','Off');
                 set(gcf,'PaperPositionMode','Manual');
