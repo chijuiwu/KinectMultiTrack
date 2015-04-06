@@ -62,7 +62,7 @@ main_filename = strcat(dir,'Coordinates_Task_Walk');
 
 plot_title = sprintf(title_format,char(176),char(176));
 title(plot_title,'Fontsize',15);
-xlabel({'Kinect Configurations'},'Fontsize',15);
+xlabel({'Kinect Placements'},'Fontsize',15);
 ylabel({'Distance (cm)',''},'Fontsize',15);
 set(gca,'XLim',[0.5 length(kinect_config_types)+0.5]);
 set(gca,'XTick',1:length(kinect_config_types),'XTickLabel',kinect_config_types,'Fontsize',12);
