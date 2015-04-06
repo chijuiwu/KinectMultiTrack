@@ -9,7 +9,7 @@ There are two types of occlusions. Static occlusion refers to occlusion caused b
 
 A simple instance of the problem is illustrated in Figure \ref{fig:occlusion_problem}. In the figure, both skeletons are invisible to the front Kinect but visible to the side Kinect. They are occluded by the red obstacle. When they step out of the obstacle into the views of both Kinects, the system should merge the skeletons of the same person from different perspectives. The main objective of the project is to avoid occlusion by extending the field of view of the system. The proposed algorithm would combine depth sensor information from multiple Kinects to achieve this goal.
 
-\begin{figure}[h!]
+\begin{figure}[!htb]
   \centering
   \includegraphics[width=0.9\columnwidth]{occlusion_problem}
   \caption{The occlusion problem}

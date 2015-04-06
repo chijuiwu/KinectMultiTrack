@@ -38,6 +38,12 @@ Copyright \copyright~Chi-Jui Wu. \\
 \usepackage{algorithm}
 \usepackage[noend]{algorithmic}
 \usepackage{subfiles}
+\usepackage{float}
+\usepackage{placeins}
+\usepackage{tabulary}
+\usepackage{tabularx}
+\usepackage{caption}
+\usepackage{graphicx}
 
 \renewcommand{\algorithmicrequire}{\textbf{Input:}}
 \renewcommand{\algorithmicensure}{\textbf{Output:}}
@@ -136,15 +142,23 @@ This paper is my undergraduate thesis, completed in School of Computer Science, 
 
 \subfile{Sections/results}
 
+\subfile{Sections/future_work}
+
+\FloatBarrier
 \subfile{Sections/discussion}
 
 \subfile{Sections/reflection}
 
+\newpage
+%TC:ignore 
 \section{Acknowledgements}
 \label{sec:acknowledge}
 
 I, Chi-Jui Wu, hereby declare that, unless otherwise stated, the work is completed by myself, under the supervision of Dr. David Harris-Birtill. The code for skeleton visualization is modified based on the official Microsoft Kinect Developer example.
-All infographics are created by Ching Su. I own the copyright to this work.
+
+All infographics are created by Ching Su.
+
+I own the copyright to this work.
 
 \balance{}
 
@@ -152,5 +166,6 @@ All infographics are created by Ching Su. I own the copyright to this work.
 \bibliography{report_bib}
 
 \subfile{Sections/appendices}
+%TC:endignore
 
 \end{document}

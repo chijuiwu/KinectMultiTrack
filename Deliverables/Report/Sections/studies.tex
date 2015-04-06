@@ -7,7 +7,7 @@ To reiterate, a potential skeleton is a skeleton from a single Kinect field of v
 
 Figure \ref{fig:studies_example}
 
-\begin{figure}[h!]
+\begin{figure}[!htb]
   \centering
   \includegraphics[width=0.9\columnwidth]{studies_example}
   \caption{A participant doing the experiment}
@@ -44,7 +44,7 @@ Participants are multinational university students and staff. There are particip
 
 The studies take place in a semi-controlled environment (See Figure \ref{fig:studies_setting}). The two Kinects are placed at either three pre-defined locations, where they are approximately parallel, 45 and 90 degrees apart. One Kinect is always placed at the front position; it is the Kinect on the left in the image. (\textbf{(todo: measure the exact angles and distances between them - they are marked by duct tapes so shouldn't be too hard)}) Duct tapes are used to mark the precise locations of the Kinects. The boundary within which the participants will be moving is also marked with duct tapes. The sides of the block are found empirically to be near the minimum distance of the Kinect viewing range of the full body skeleton. The dimension of the boundary is x by x meters (\textbf{(todo: find the dimensions in meters)}). Each potential step is marked with duct tapes colored in a hue (either black or red) different from that on the duct tapes in the previous step. The starting position has a distinct color (green) from all other steps.
 
-\begin{figure}[h!]
+\begin{figure}[!htb]
   \centering
   \includegraphics[width=0.9\columnwidth]{studies_setting}
   \caption{The setting where the user studies took place}
@@ -55,7 +55,7 @@ The studies take place in a semi-controlled environment (See Figure \ref{fig:stu
 
 Firstly, participants are introduced to the project aims and objectives. They are given sufficient time to ask questions and decide whether to participate in the experiment before signing the consent form. Participants are free to withdraw from the studies at any time without any explanation. Secondly, participants are told beforehand what instructions they would expect during the experiments. This is because the studies are designed to measure how well the system tracks people, not how participants react to some situations. In user studies mode, the application would show instructions on the right hand side of the screen, telling the participants where to put their feet next. For instance, it would tell the participant to move forward (See Figure \ref{fig:studies_instruction}). The application will try to log as least amount of stationary movements as possible for tasks where they require participants to be moving. Not only because testing for differences in joint coordinates when the participant remains stationary is a standalone study, but also the researcher is interested in how the tracking algorithm performs when tracked people are constantly moving. To achieve this goal, the application introduces pauses between tasks. The researcher has control over the starting time of the next task. During the pauses, the researcher would give additional details about the studies to the participants.
 
-\begin{figure}[h!]
+\begin{figure}[!htb]
   \centering
   \includegraphics[width=0.9\columnwidth]{studies_instruction}
   \caption{Instructions during the user studies}
@@ -86,7 +86,7 @@ Participants are asked to walk around a large obstacle, which is a large poster 
 
 The interaction study involves two people. They stand next to each other. The person on the left will walk to the front of the other person, then back to his initial position. Then he will walk around the person, from the front to the back, then return to his starting position. The other person does the same. In the end, both people exchange positions.
 
-\begin{figure}[h!]
+\begin{figure}[!htb]
   \centering
   \includegraphics[width=0.9\columnwidth]{studies_obstacle}
   \caption{The obstacle in the actual experiment}
