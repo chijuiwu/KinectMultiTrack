@@ -59,9 +59,7 @@ ax.XTickLabelRotation = -90;
 legend('\Delta x','\Delta y','\Delta z','\Delta d','Location','northwest');
 
 set(gcf,'Visible','Off');
-set(gcf,'PaperPositionMode','Manual');
-set(gcf,'PaperUnits','Normalized');
-% print('-dsvg','-painters',main_filename);
+figuresize(20,15,'centimeters');
 saveas(gcf,main_filename,'pdf');
 
 end
