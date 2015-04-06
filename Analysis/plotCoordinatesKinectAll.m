@@ -3,10 +3,6 @@ function [] = plotCoordinatesKinectAll(coordinates_average_kinect_config_table)
 joints_util;
 plot_colors;
 
-main_title = 'Coordinates Averages for Parallel, 45, and 90 Degrees-apart Kinects \n ';
-dir = '../../KinectMultiTrackPlots/Overall/';
-main_filename = strcat(dir,'Coordinates_Kinect_All');
-
 kinect_config_types = {
   'Stationary', 'Steps','Walk','Average'
 };
@@ -48,7 +44,12 @@ errorbar(kinect_config_x,kinect_config_avg_dd,kinect_config_std_dd,'MarkerEdgeCo
 box on;
 hold off;
 
-title(main_title,'Fontsize',15);
+title_format = 'Coordinates Averages with Parallel, 45%c and 90%c apart Kinects \n for the Stationary, Steps, and Walk Tasks';
+dir = '../../KinectMultiTrackPlots/Overall/';
+main_filename = strcat(dir,'Coordinates_Kinect_All');
+
+plot_title = sprintf(title_format,char(176),char(176));
+title(plot_title,'Fontsize',15);
 xlabel({'Scenarios'},'Fontsize',15);
 ylabel({'Distance (cm)',''},'Fontsize',15);
 set(gca,'XLim',[0.5 length(kinect_config_types)+0.5]);

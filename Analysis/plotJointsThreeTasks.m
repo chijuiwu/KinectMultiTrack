@@ -38,7 +38,7 @@ errorbar(joint_types_x,avg_dd,std_dd,'MarkerEdgeColor',black,'MarkerFaceColor',b
 box on;
 hold off;
 
-title_format = 'Joints Averages in the First Three Tasks over \n Parallel, 45%c and 90%c apart Kinects';
+title_format = 'Joints Averages in the Stationary, Steps, and Walk tasks averaged over \n Parallel, 45%c and 90%c apart Kinects';
 dir = '../../KinectMultiTrackPlots/Overall/';
 filename_format = strcat(dir,'Joints_Task_All');
 plot_title = sprintf(title_format,char(176),char(176));

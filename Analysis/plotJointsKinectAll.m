@@ -38,12 +38,12 @@ errorbar(joint_types_x,avg_dd,std_dd,'MarkerEdgeColor',black,'MarkerFaceColor',b
 box on;
 hold off;
 
-title_format = 'Joints Averages with Parallel, 45%c and 90%c apart Kinects over \n Stationary, Steps, and Walk Tasks';
+title_format = 'Joints Averages with Parallel, 45%c and 90%c apart Kinects averaged over \n Stationary, Steps, and Walk Tasks';
 dir = '../../KinectMultiTrackPlots/Overall/';
 filename_format = strcat(dir,'Joints_Kinect_All');
-plot_title = sprintf(title_format,char(176),char(176));
 plot_filename = sprintf(filename_format);
 
+plot_title = sprintf(title_format,char(176),char(176));
 title(plot_title,'Fontsize',15);
 xlabel({'Joint Types'},'Fontsize',15);
 ylabel({'Distance (cm)',''},'Fontsize',15);

@@ -4,12 +4,9 @@ joints_util;
 plot_colors;
 
 kinect_config_id = 3;
-main_title = 'Coordinates Averages for 90 Degrees-apart Kinects';
-dir = '../../KinectMultiTrackPlots/Overall/';
-main_filename = strcat(dir,'Coordinates_Kinect_90');
 
 kinect_scenario_types = {
-  'Stationary', 'Steps','Walk','Average'
+  'Stationary', 'Steps', 'Walk', 'Average'
 };
 
 rows = coordinates_average_study_table.Kinect_Config==kinect_config_id-1 & ...
@@ -63,7 +60,12 @@ errorbar(kinect_scenario_x,kinect_scenario_avg_dd,kinect_scenario_std_dd,'Marker
 box on;
 hold off;
 
-title(main_title,'Fontsize',15);
+title_format = 'Coordinates Averages wtih 90%c apart Kinects \n for the Stationary, Steps, and Walk Tasks';
+dir = '../../KinectMultiTrackPlots/Overall/';
+main_filename = strcat(dir,'Coordinates_Kinect_90');
+
+plot_title = sprintf(title_format,char(176));
+title(plot_title,'Fontsize',15);
 xlabel({'Scenarios'},'Fontsize',15);
 ylabel({'Distance (cm)',''},'Fontsize',15);
 set(gca,'XLim',[0.5 length(kinect_scenario_types)+0.5]);
