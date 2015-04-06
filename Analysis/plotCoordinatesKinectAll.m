@@ -44,7 +44,7 @@ errorbar(kinect_config_x,kinect_config_avg_dd,kinect_config_std_dd,'MarkerEdgeCo
 box on;
 hold off;
 
-title_format = 'Coordinates Averages with Parallel, 45%c and 90%c apart Kinects \n for the Stationary, Steps, and Walk Tasks';
+title_format = 'Coordinates Averages over Parallel, 45%c and 90%c apart Kinects \n in the Stationary, Steps, and Walk Tasks';
 dir = '../../KinectMultiTrackPlots/Overall/';
 main_filename = strcat(dir,'Coordinates_Kinect_All');
 
