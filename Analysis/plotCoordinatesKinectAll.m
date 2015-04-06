@@ -1,4 +1,4 @@
-function [] = plotCoordinatesKinectAll(coordinates_average_kinect_config_table)
+function [] = plotCoordinatesKinectAll(coordinates_average_scenario_table)
 
 joints_util;
 plot_colors;
@@ -7,7 +7,7 @@ kinect_config_types = {
   'Stationary', 'Steps','Walk','Average'
 };
 
-rows = size(coordinates_average_kinect_config_table,1);
+rows = size(coordinates_average_scenario_table,1);
 
 kinect_config_x = 1:length(kinect_config_types);
 kinect_config_avg_dx = zeros(rows,1);
@@ -20,8 +20,8 @@ kinect_config_avg_dd = zeros(rows,1);
 kinect_config_std_dd = zeros(rows,1);
 
 row_counter = 1;
-for r = 1:size(coordinates_average_kinect_config_table,1);
-    scen_table = coordinates_average_kinect_config_table(r,:);
+for r = 1:size(coordinates_average_scenario_table,1);
+    scen_table = coordinates_average_scenario_table(r,:);
     
     kinect_config_avg_dx(row_counter,1) = scen_table{1,'Joints_avg_dx'};
     kinect_config_std_dx(row_counter,1) = scen_table{1,'Joints_std_dx'};

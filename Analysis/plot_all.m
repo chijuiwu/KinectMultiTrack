@@ -74,7 +74,7 @@ fprintf('Done!!!, time=%.2f\n',time);
 
 disp('Plotting coordinates average for the first three tasks...');
 tic;
-plotCoordinatesThreeTasks(coordinates_average_scenario_table);
+plotCoordinatesThreeTasks(coordinates_average_kinect_config_table);
 time = toc;
 fprintf('Done!!!, time=%.2f\n',time);
 
@@ -102,7 +102,7 @@ fprintf('Done!!!, time=%.2f\n',time);
 
 disp('Plotting coordinates average for all kinect configs...');
 tic;
-plotCoordinatesKinectAll(coordinates_average_kinect_config_table);
+plotCoordinatesKinectAll(coordinates_average_scenario_table);
 time = toc;
 fprintf('Done!!!, time=%.2f\n',time);
 
