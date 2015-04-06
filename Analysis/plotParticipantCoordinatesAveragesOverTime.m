@@ -19,7 +19,7 @@ scenarios = {
 
 title_format = 'Participant %d - Average Coordinates Distances over Time \n %s Task with %s Kinects';
 dir = '../../KinectMultiTrackPlots/Participants_coordinates_averages_over_time/';
-filename_format = strcat(dir,'Participant_%d_Task_%s_Kinect_%s');
+filename_format = strcat(dir,'Participant_%d_Task_%s_Kinect_%s_Coordinates');
 
 first_avg_dx = 6;
 first_avg_dy = 7;
