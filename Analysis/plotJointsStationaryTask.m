@@ -57,6 +57,11 @@ legend('\Delta x','\Delta y','\Delta z','\Delta d','Location','northwest');
 set(gcf,'Visible','Off');
 set(gcf,'PaperPositionMode','Manual');
 set(gcf,'PaperUnits','Normalized');
-print('-dsvg','-painters',plot_filename);
+% set(gca,'LooseInset',get(gca,'TightInset'));
+% set(gcf, 'PaperPosition', [-0.5 -0.25 6 5.5]); %Position the plot further to the left and down. Extend the plot to fill entire paper.
+% set(gcf, 'PaperSize', [5 5]); %Keep the same paper size
+% saveas(gcf, 'test', 'pdf')
+% saveas(gcf,plot_filename,'pdf');
+saveas(gcf,plot_filename,'pdf');
 
 end

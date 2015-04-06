@@ -4,11 +4,6 @@
 # matlab
 *.mat
 
-# report
-Deliverables/Report/Figures/*.pdf_tex
-Deliverables/Report/Figures/*.pdf
-
-
 # User-specific files
 *.suo
 *.user

@@ -87,7 +87,8 @@ for participant_id = unique(difference_table.Study_Id,'rows').'
             set(gcf,'Visible','Off');
             set(gcf,'PaperPositionMode','Manual');
             set(gcf,'PaperUnits','Normalized');
-            print('-dsvg','-painters',plot_filename);
+%             print('-dsvg','-painters',plot_filename);
+            saveas(gcf,plot_filename,'pdf');
 
         end
     end

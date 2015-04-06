@@ -61,7 +61,7 @@ legend('\Delta x','\Delta y','\Delta z','\Delta d','Location','northwest');
 set(gcf,'Visible','Off');
 set(gcf,'PaperPositionMode','Manual');
 set(gcf,'PaperUnits','Normalized');
-print('-dsvg','-painters',main_filename);
-
+% print('-dsvg','-painters',main_filename);
+saveas(gcf,main_filename,'pdf');
 
 end
