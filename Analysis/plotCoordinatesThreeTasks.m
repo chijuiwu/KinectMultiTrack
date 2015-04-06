@@ -5,7 +5,7 @@ plot_colors;
 
 main_title = 'Coordinates Averages for the Stationary, Steps and Walk Tasks';
 dir = '../../KinectMultiTrackPlots/Overall/';
-main_filename = strcat(dir,'Coordinates_Tasks_All');
+main_filename = strcat(dir,'Coordinates_Task_All');
 
 kinect_config_types = {
   'Parallel', '45 Degrees-apart','90 Degrees-apart','Average'

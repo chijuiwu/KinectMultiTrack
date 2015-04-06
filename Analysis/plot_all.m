@@ -1,8 +1,8 @@
-% % load('analysis_data.mat');
+% load('analysis_data.mat');
 % 
-% %
-% % First three scenarios
-% % 
+% 
+% First three scenarios
+% 
 % 
 % disp('Plotting joints average for the Stationary task...');
 % tic;
@@ -52,7 +52,7 @@
 % time = toc;
 % fprintf('Done!!!, time=%.2f\n',time);
 % 
-% % % % % % % 
+% % % % % % 
 % 
 % disp('Plotting coordinates average for Stationary task...');
 % tic;
@@ -78,9 +78,9 @@
 % time = toc;
 % fprintf('Done!!!, time=%.2f\n',time);
 % 
-% % 
-% % First three scenarios configurations
-% % 
+% 
+% First three scenarios configurations
+% 
 % 
 % disp('Plotting coordinates average for parallel kinects...');
 % tic;
@@ -109,15 +109,15 @@
 % Overall studies
 % disp('Plotting coordinates average for all scenarios & kinect configs...');
 % tic;
-% plotCoordinatesAllStudies(coordinates_average_study_merged_table);
+plotCoordinatesAllStudies(coordinates_average_study_merged_table);
 % time = toc;
 % fprintf('Done!!!, time=%.2f\n',time);
 % 
 % disp('Plotting participant average over time...');
 % tic;
-plotParticipantCoordinatesAveragesOverTime(difference_table);
+% plotParticipantCoordinatesAveragesOverTime(difference_table);
 % plotParticipantJointsOverTime(difference_table);
 % plotParticipantJointsHeatMap(difference_table);
 % time = toc;
 % fprintf('Done!!!, time=%.2f\n',time);
-
+% 
