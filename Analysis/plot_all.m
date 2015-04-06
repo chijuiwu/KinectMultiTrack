@@ -24,7 +24,7 @@ fprintf('Done!!!, time=%.2f\n',time);
 
 disp('Plotting joints average for the first three tasks...');
 tic;
-plotJointsThreeTasks(joints_average_scenario_table);
+plotJointsThreeTasks(joints_average_kinect_config_table);
 time = toc;
 fprintf('Done!!!, time=%.2f\n',time);
 
@@ -48,7 +48,7 @@ fprintf('Done!!!, time=%.2f\n',time);
 
 disp('Plotting joints average for all kinect configurations over the first three tasks...');
 tic;
-plotJointsKinectAll(joints_average_kinect_config_table);
+plotJointsKinectAll(joints_average_scenario_table);
 time = toc;
 fprintf('Done!!!, time=%.2f\n',time);
 % 
