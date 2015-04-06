@@ -24,7 +24,7 @@
 % 
 % disp('Plotting joints average for the first three tasks...');
 % tic;
-% plotJointsThreeTaks(joints_average_scenario_table);
+% plotJointsThreeTasks(joints_average_scenario_table);
 % time = toc;
 % fprintf('Done!!!, time=%.2f\n',time);
 % 
@@ -54,30 +54,30 @@
 % 
 % % % % % % 
 % 
-% disp('Plotting coordinates average for Stationary task...');
-% tic;
-% plotCoordinatesStationaryTask(coordinates_average_study_merged_table, coordinates_average_scenario_table);
-% time = toc;
-% fprintf('Done!!!, time=%.2f\n',time);
-% 
-% disp('Plotting coordinates average for Steps task...');
-% tic;
-% plotCoordinatesStepsTask(coordinates_average_study_merged_table, coordinates_average_scenario_table);
-% time = toc;
-% fprintf('Done!!!, time=%.2f\n',time);
-% 
-% disp('Plotting coordinates average for Walk task...');
-% tic;
-% plotCoordinatesWalkTask(coordinates_average_study_merged_table, coordinates_average_scenario_table);
-% time = toc;
-% fprintf('Done!!!, time=%.2f\n',time);
-% 
-% disp('Plotting coordinates average for the first three tasks...');
-% tic;
-% plotCoordinatesThreeTasks(coordinates_average_scenario_table);
-% time = toc;
-% fprintf('Done!!!, time=%.2f\n',time);
-% 
+disp('Plotting coordinates average for Stationary task...');
+tic;
+plotCoordinatesStationaryTask(coordinates_average_study_merged_table, coordinates_average_scenario_table);
+time = toc;
+fprintf('Done!!!, time=%.2f\n',time);
+
+disp('Plotting coordinates average for Steps task...');
+tic;
+plotCoordinatesStepsTask(coordinates_average_study_merged_table, coordinates_average_scenario_table);
+time = toc;
+fprintf('Done!!!, time=%.2f\n',time);
+
+disp('Plotting coordinates average for Walk task...');
+tic;
+plotCoordinatesWalkTask(coordinates_average_study_merged_table, coordinates_average_scenario_table);
+time = toc;
+fprintf('Done!!!, time=%.2f\n',time);
+
+disp('Plotting coordinates average for the first three tasks...');
+tic;
+plotCoordinatesThreeTasks(coordinates_average_scenario_table);
+time = toc;
+fprintf('Done!!!, time=%.2f\n',time);
+
 % 
 % First three scenarios configurations
 % 

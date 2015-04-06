@@ -11,15 +11,13 @@ dir = '../../KinectMultiTrackPlots/Overall/';
 % 
 % Overall Average
 % 
-main_plot_title = 'Coordinates Averages for all Kinect Configurations and Scenarios';
-main_filename = strcat(dir,'Coordinates_All');
 
 all_experiment_types = {
   'Parallel, Stationary', 'Parallel, Steps', 'Parallel, Walk', ...
-  '45 Degrees, Stationary', '45 Degrees, Steps', '45 Degrees, Walk', ...
-  '45 Degrees, Interaction', ...
-  '90 Degrees, Stationary', '90 Degrees, Steps', '90 Degrees, Walk', ...
-  '90 Degrees, Obstacle'
+  '45^{\circ}, Stationary', '45^{\circ}, Steps', '45^{\circ}, Walk', ...
+  '45^{\circ}, Interaction', ...
+  '90^{\circ}, Stationary', '90^{\circ}, Steps', '90^{\circ}, Walk', ...
+  '90^{\circ}, Obstacle'
 };
 
 all_experiment_types_x = 1:length(all_experiment_types);
@@ -42,8 +40,12 @@ errorbar(all_experiment_types_x,studies_avg_dd,studies_std_dd,'MarkerEdgeColor',
 box on;
 hold off;
 
-title(main_plot_title,'Fontsize',15);
-xlabel({'','Scenarios'},'Fontsize',15);
+title_format = 'Coordinates Averages for all Scenarios with \n Parallel, 45%c and 90%c apart Kinects';
+main_filename = strcat(dir,'Coordinates_All');
+
+plot_title = sprintf(title_format,char(176),char(176));
+title(plot_title,'Fontsize',15);
+xlabel({'Scenarios'},'Fontsize',15);
 ylabel({'Distance (cm)',''},'Fontsize',15);
 set(gca,'XLim',[0.5 length(all_experiment_types)+0.5]);
 set(gca,'XTick',1:length(all_experiment_types),'XTickLabel',all_experiment_types,'Fontsize',12);

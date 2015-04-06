@@ -3,7 +3,7 @@ function [] = plotCoordinatesKinectAll(coordinates_average_kinect_config_table)
 joints_util;
 plot_colors;
 
-main_title = 'Coordinates Averages for Parallel, 45, and 90 Degrees-apart Kinects';
+main_title = 'Coordinates Averages for Parallel, 45, and 90 Degrees-apart Kinects \n ';
 dir = '../../KinectMultiTrackPlots/Overall/';
 main_filename = strcat(dir,'Coordinates_Kinect_All');
 

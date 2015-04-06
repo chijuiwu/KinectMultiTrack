@@ -1,4 +1,4 @@
-function [] = plotJointsThreeTaks(joints_average_scenario_table)
+function [] = plotJointsThreeTasks(joints_average_scenario_table)
 % 
 % joint types over joints averages for the first three task over all kinect
 % configurations
@@ -38,10 +38,10 @@ errorbar(joint_types_x,avg_dd,std_dd,'MarkerEdgeColor',black,'MarkerFaceColor',b
 box on;
 hold off;
 
-title_format = 'Joints Averages for the First Three Tasks over All Kinect Configurations';
+title_format = 'Joints Averages in the First Three Tasks over \n Parallel, 45%c and 90%c apart Kinects';
 dir = '../../KinectMultiTrackPlots/Overall/';
 filename_format = strcat(dir,'Joints_Task_All');
-plot_title = sprintf(title_format);
+plot_title = sprintf(title_format,char(176),char(176));
 plot_filename = sprintf(filename_format);
 
 title(plot_title,'Fontsize',15);

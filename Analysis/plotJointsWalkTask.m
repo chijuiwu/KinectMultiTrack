@@ -38,10 +38,10 @@ errorbar(joint_types_x,avg_dd,std_dd,'MarkerEdgeColor',black,'MarkerFaceColor',b
 box on;
 hold off;
 
-title_format = 'Joints Averages for the Walk Task over all Kinect Configurations';
+title_format = 'Joints Averages in the Walk Task with \n Parallel, 45%c and 90%c apart Kinects';
 dir = '../../KinectMultiTrackPlots/Overall/';
 filename_format = strcat(dir,'Joints_Task_Walk');
-plot_title = sprintf(title_format);
+plot_title = sprintf(title_format,char(176),char(176));
 plot_filename = sprintf(filename_format);
 
 title(plot_title,'Fontsize',15);
