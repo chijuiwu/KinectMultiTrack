@@ -61,18 +61,16 @@ dir = '../../KinectMultiTrackPlots/Overall/';
 main_filename = strcat(dir,'Coordinates_Task_Stationary');
 
 plot_title = sprintf(title_format,char(176),char(176));
-title(plot_title,'Fontsize',15);
-xlabel({'Kinect Placements'},'Fontsize',15);
-ylabel({'Distance (cm)'},'Fontsize',15);
+title(plot_title);
+xlabel({'Kinect Placements'});
+ylabel({'Distance (cm)'});
 set(gca,'XLim',[0.5 length(kinect_config_types)+0.5]);
-set(gca,'XTick',1:length(kinect_config_types),'XTickLabel',kinect_config_types,'Fontsize',12);
+set(gca,'XTick',1:length(kinect_config_types),'XTickLabel',kinect_config_types);
 % set(xlh,'Fontsize',20);
 ax = gca;
 ax.XTickLabelRotation = -90;
 legend('\Delta x','\Delta y','\Delta z','\Delta d','Location','northwest');
 
 set(gcf,'Visible','Off');
-figuresize(20,15,'centimeters');
-saveas(gcf,main_filename,'pdf');
-
+savepdf(main_filename);
 end

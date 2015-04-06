@@ -4,9 +4,6 @@ joints_util;
 plot_colors;
 
 kinect_config_id = 2;
-main_title = 'Coordinates Averages for 45 Degrees-apart Kinects';
-dir = '../../KinectMultiTrackPlots/Overall/';
-main_filename = strcat(dir,'Coordinates_Kinect_45');
 
 kinect_scenario_types = {
   'Stationary', 'Steps','Walk','Average'
@@ -63,18 +60,22 @@ errorbar(kinect_scenario_x,kinect_scenario_avg_dd,kinect_scenario_std_dd,'Marker
 box on;
 hold off;
 
-title(main_title,'Fontsize',15);
-xlabel({'Scenarios'},'Fontsize',15);
-ylabel({'Distance (cm)',''},'Fontsize',15);
+main_title = 'Coordinates Averages wtih 90%c apart Kinects \n for the Stationary, Steps, and Walk Tasks';
+dir = '../../KinectMultiTrackPlots/Overall/';
+main_filename = strcat(dir,'Coordinates_Kinect_45');
+
+plot_title = sprintf(main_title,char(176));
+title(plot_title);
+xlabel({'Scenarios'});
+ylabel({'Distance (cm)'});
 set(gca,'XLim',[0.5 length(kinect_scenario_types)+0.5]);
-set(gca,'XTick',1:length(kinect_scenario_types),'XTickLabel',kinect_scenario_types,'Fontsize',12);
+set(gca,'XTick',1:length(kinect_scenario_types),'XTickLabel',kinect_scenario_types);
 % set(xlh,'Fontsize',20);
 ax = gca;
 ax.XTickLabelRotation = -90;
 legend('\Delta x','\Delta y','\Delta z','\Delta d','Location','northwest');
 
 set(gcf,'Visible','Off');
-figuresize(20,15,'centimeters');
-saveas(gcf,main_filename,'pdf');
+savepdf(main_filename);
 
 end

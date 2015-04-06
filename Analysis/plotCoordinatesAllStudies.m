@@ -44,17 +44,16 @@ title_format = 'Coordinates Averages for all Scenarios with \n Parallel, 45%c an
 main_filename = strcat(dir,'Coordinates_All');
 
 plot_title = sprintf(title_format,char(176),char(176));
-title(plot_title,'Fontsize',15);
-xlabel({'Scenarios'},'Fontsize',15);
-ylabel({'Distance (cm)',''},'Fontsize',15);
+title(plot_title);
+xlabel({'Scenarios'});
+ylabel({'Distance (cm)'});
 set(gca,'XLim',[0.5 length(all_experiment_types)+0.5]);
-set(gca,'XTick',1:length(all_experiment_types),'XTickLabel',all_experiment_types,'Fontsize',12);
+set(gca,'XTick',1:length(all_experiment_types),'XTickLabel',all_experiment_types);
 ax = gca;
 ax.XTickLabelRotation = -90;
 legend('\Delta x','\Delta y','\Delta z','\Delta d','Location','northwest');
 
 set(gcf,'Visible','Off');
-figuresize(20,15,'centimeters');
-saveas(gcf,main_filename,'pdf');
+savepdf(main_filename);
 
 end
