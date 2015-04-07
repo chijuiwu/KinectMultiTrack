@@ -1,0 +1,175 @@
+\documentclass{sigchi}
+
+% Use this command to override the default ACM copyright statement
+% (e.g. for preprints).  Consult the conference website for the
+% camera-ready copyright statement.
+
+
+%% EXAMPLE BEGIN -- HOW TO OVERRIDE THE DEFAULT COPYRIGHT STRIP -- (July 22, 2013 - Paul Baumann)
+\toappear{
+{\emph{University of St Andrews}}, April 10th, 2015, United Kingdom. \\
+Copyright \copyright~Chi-Jui Wu. \\
+}
+%% EXAMPLE END -- HOW TO OVERRIDE THE DEFAULT COPYRIGHT STRIP -- (July 22, 2013 - Paul Baumann)
+
+
+% Arabic page numbers for submission.  Remove this line to eliminate
+% page numbers for the camera ready copy
+
+%\pagenumbering{arabic}
+
+% Load basic packages
+\usepackage{balance}  % to better equalize the last page
+\usepackage{graphics} % for EPS, load graphicx instead
+%\usepackage[T1]{fontenc}
+\usepackage{txfonts}
+\usepackage{times}    % comment if you want LaTeX's default font
+\usepackage[pdftex]{hyperref}
+% \usepackage{url}      % llt: nicely formatted URLs
+\usepackage{color}
+\usepackage{textcomp}
+\usepackage{booktabs}
+\usepackage{ccicons}
+\usepackage{todonotes}
+\usepackage{svg}
+\usepackage{amsmath}
+\usepackage[toc,page]{appendix}
+\usepackage{nameref}
+\usepackage{algorithm}
+\usepackage[noend]{algorithmic}
+\usepackage{subfiles}
+\usepackage{float}
+\usepackage{placeins}
+\usepackage{tabulary}
+\usepackage{tabularx}
+\usepackage{graphicx}
+% \usepackage[format=hang,singlelinecheck=0,font={sf,small},labelfont=bf]{subfig}
+\usepackage{caption}
+\usepackage[noabbrev]{cleveref}
+
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+
+\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+\newcommand{\Acronym}[1]{\ensuremath{{{\texttt{#1}}}}}
+\newcommand{\Symbol}[1]{\ensuremath{\mathcal{#1}}}
+\newcommand{\Function}[1]{\ensuremath{{ \textsc{#1}}}}
+\newcommand{\Constant}[1]{\ensuremath{{\texttt{#1}}}}
+\newcommand{\Var}[1]{\ensuremath{{{\textsl{#1}}}}}
+\newcommand{\False}{\Constant{false}}
+\newcommand{\True}{\Constant{true}}
+\newcommand{\Null}{\Constant{null}}
+
+% Set figures directory
+\graphicspath{{./Figures/}}
+\setsvg{svgpath = ./Figures/}
+
+\captionsetup[subfigure]{subrefformat=simple,labelformat=simple,listofformat=subsimple}
+\renewcommand\thesubfigure{(\alph{subfigure})}
+
+% llt: Define a global style for URLs, rather that the default one
+\makeatletter
+\def\url@leostyle{%
+  \@ifundefined{selectfont}{\def\UrlFont{\sf}}{\def\UrlFont{\small\bf\ttfamily}}}
+\makeatother
+\urlstyle{leo}
+
+% To make various LaTeX processors do the right thing with page size.
+\def\pprw{8.5in}
+\def\pprh{11in}
+\special{papersize=\pprw,\pprh}
+\setlength{\paperwidth}{\pprw}
+\setlength{\paperheight}{\pprh}
+\setlength{\pdfpagewidth}{\pprw}
+\setlength{\pdfpageheight}{\pprh}
+
+% Make sure hyperref comes last of your loaded packages, to give it a
+% fighting chance of not being over-written, since its job is to
+% redefine many LaTeX commands.
+\definecolor{linkColor}{RGB}{6,125,233}
+\hypersetup{%
+  pdftitle={SIGCHI Conference Proceedings Format},
+  pdfauthor={LaTeX},
+  pdfkeywords={SIGCHI, proceedings, archival format},
+  bookmarksnumbered,
+  pdfstartview={FitH},
+  colorlinks,
+  citecolor=black,
+  filecolor=black,
+  linkcolor=black,
+  urlcolor=linkColor,
+  breaklinks=true,
+}
+
+% create a shortcut to typeset table headings
+% \newcommand\tabhead[1]{\small\textbf{#1}}
+
+% End of preamble. Here it comes the document.
+\begin{document}
+
+\title{Tracking People with Multiple Kinects}
+
+\numberofauthors{1}
+\author{%
+  \alignauthor{Chi-Jui Wu\\
+    \affaddr{Computer Science, University of St Andrews}\\
+    \affaddr{United Kingdom}\\
+    \email{cjw21@st-andrews.ac.uk}}\\
+}
+
+\maketitle
+
+\begin{abstract}
+This paper is my undergraduate thesis, completed in School of Computer Science, University of St Andrews, in 2015. The project is about tracking people with multiple Kinects. The goal is to reliably track people in uncertain, occluded real-world environments. The final submission contains an interactive application that demonstrates the tracking system as well as a series of user studies reporting the success of the system. The strengths and limitations of the system are discussed. An outline of future work to make the current system deployable in the real life is described.
+
+\end{abstract}
+
+\keywords{Tracking; Occlusion; Kinect; Calibration; HCI}
+
+\category{H.5.m.}{Information Interfaces and Presentation
+  (e.g. HCI)}{Miscellaneous}{}{}
+
+\subfile{Sections/introduction}
+
+\subfile{Sections/problem_statement}
+
+\subfile{Sections/contributions}
+
+\subfile{Sections/background}
+
+\subfile{Sections/current_approach}
+
+\subfile{Sections/system}
+
+\subfile{Sections/testing}
+
+\subfile{Sections/studies}
+
+\subfile{Sections/results}
+
+\subfile{Sections/future_work}
+
+\subfile{Sections/discussion}
+
+\subfile{Sections/reflection}
+
+\newpage
+%TC:ignore 
+\section{Acknowledgements}
+\label{sec:acknowledge}
+
+I, Chi-Jui Wu, hereby declare that, unless otherwise stated, the work is completed by myself, under the supervision of Dr. David Harris-Birtill. The code for skeleton visualization is modified based on the official Microsoft Kinect Developer example.
+
+All infographics are created by Ching Su.
+
+I own the copyright to this work.
+
+\balance{}
+
+\bibliographystyle{SIGCHI-Reference-Format}
+\bibliography{report_bib}
+
+\subfile{Sections/appendices}
+%TC:endignore
+
+\end{document}
