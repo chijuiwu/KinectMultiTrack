@@ -68,7 +68,7 @@ At last, the results obtained from different scenarios and Kinect placements are
 
 This section reports average coordinates and joints distances in the Stationary task with parallel, 45$^{\circ}$ and 90$^{\circ}$ apart Kinects.
 
-The $\Delta d$ distance in the Stationary task with parallel Kinects is $3.52$. The $\Delta d$ distance in the Stationary task with 45$^{\circ}$ apart Kinects is $3.95$. The $\Delta d$ distance in the Stationary task with 90$^{\circ}$ apart Kinects is $11.39$. The average $\Delta d$ distance in the Stationary task over all Kinect placements is $7.9$, with a standard deviation of $3.95$.
+The $\Delta d$ distance in the Stationary task with parallel Kinects is $3.52$ cm. The $\Delta d$ distance in the Stationary task with 45$^{\circ}$ apart Kinects is $3.95$ cm. The $\Delta d$ distance in the Stationary task with 90$^{\circ}$ apart Kinects is $11.39$ cm. The difference between the best and worst cases is $7.87$ cm. The average $\Delta d$ distance in the Stationary task over all Kinect placements is $7.9$,cm, with a standard deviation of $3.95$ cm.
 
 \begin{figure}[!h]
   \centering
@@ -112,7 +112,7 @@ The $\Delta d$ distance in the Stationary task with parallel Kinects is $3.52$. 
    \hline
   \end{tabulary}
   
-  \caption{Average coordinates distances in the Steps task with Parallel, 45$^{\circ}$ and 90$^{\circ}$ Kinects, as well as the average case. The means and standard deviations for $\Delta x$, $\Delta y$, $\Delta z$, and $\Delta d$ are reported.}
+  \caption{Average coordinates distances in the Stationary task with Parallel, 45$^{\circ}$ and 90$^{\circ}$ Kinects, as well as the average case. The means and standard deviations for $\Delta x$, $\Delta y$, $\Delta z$, and $\Delta d$ are reported.}
   
   \label{table:stationary_coordinates_values}
 \end{table}
@@ -242,16 +242,24 @@ Figure \ref{fig:results_three_coordinates_joints} shows two different plots. Fir
   \centering
 
   \subfloat[Average coordinates distances in the Stationary, Steps, and Walk tasks averaged over Parallel, 45$^{\circ}$ and 90$^{\circ}$ apart Kinects.]{
+
     \includegraphics[width=0.5\linewidth]{figs/Coordinates_Kinect_All}
+  
   }
   \subfloat[Average joints distances in the Stationary, Steps, and Walk tasks averaged over Parallel, 45$^{\circ}$ and 90$^{\circ}$ apart Kinects.]{
+  
     \includegraphics[width=0.5\linewidth]{figs/Joints_Kinect_All}
+  
   } \\
     \subfloat[Average coordinates distances with Parallel, 45$^{\circ}$ and 90$^{\circ}$ apart Kinects averaged over Stationary, Steps, and Walk tasks.]{
+  
     \includegraphics[width=0.5\linewidth]{figs/Coordinates_Task_All}
+  
   }
   \subfloat[Average joints distances with Parallel, 45$^{\circ}$ and 90$^{\circ}$ apart Kinects averaged over Stationary, Steps, and Walk tasks.]{
+  
     \includegraphics[width=0.5\linewidth]{figs/Joints_Task_All}
+  
   }
 
   \caption{Plots showing the overall results in the Stationary, Steps, and Walk tasks with different Kinect placements.}
@@ -262,49 +270,52 @@ Figure \ref{fig:results_three_coordinates_joints} shows two different plots. Fir
 \begin{table}[!h]
   \centering
 
-  \begin{tabulary}{1.0\linewidth}{||c c c c c||} 
-  \hline
-  \textbf{Distances} & \textbf{Stationary} & \textbf{Steps} & \textbf{Walk} & \textbf{Average} \\ [0.5ex] 
-  \hline\hline
-  \textbf{Avg.} \bm{$\Delta x$} & 0 & 0 & 0 & 0 \\
-  \hline
-  \textbf{Std.} \bm{$\Delta x$} & 0 & 0 & 0 & 0 \\
-  \hline
-  \textbf{Avg.} \bm{$\Delta y$} & 0 & 0 & 0 & 0 \\
-  \hline
-  \textbf{Std.} \bm{$\Delta y$} & 0 & 0 & 0 & 0 \\
-  \hline
-  \textbf{Avg.} \bm{$\Delta z$} & 0 & 0 & 0 & 0 \\
-  \hline
-  \textbf{Std.} \bm{$\Delta z$} & 0 & 0 & 0 & 0 \\
-  \hline
-  \textbf{Avg.} \bm{$\Delta d$} & 0 & 0 & 0 & 0 \\
-  \hline
-  \textbf{Std.} \bm{$\Delta d$} & 0 & 0 & 0 & 0 \\
-  \hline
-  \end{tabulary}  
-
-  \begin{tabulary}{1.0\linewidth}{||c c c c c||} 
-  \hline
-  \textbf{Distances} & \textbf{Parallel} & \textbf{45$^{\circ}$} & \textbf{90$^{\circ}$} & \textbf{Average} \\ [0.5ex] 
-  \hline\hline
-  \textbf{Avg.} \bm{$\Delta x$} & 4.03 & 7.25 & 15.00 & 6.57 \\
-  \hline
-  \textbf{Std.} \bm{$\Delta x$} & 2.00 & 3.50 & 7.00 & 6.35 \\
-  \hline
-  \textbf{Avg.} \bm{$\Delta y$} & 2.19 & 4.49 & 5.01 & 2.92 \\
-  \hline
-  \textbf{Std.} \bm{$\Delta y$} & 0.95 & 1.15 & 0.58 & 2.30 \\
-  \hline
-  \textbf{Avg.} \bm{$\Delta z$} & 3.90 & 6.53 & 12.68 & 5.78 \\
-  \hline
-  \textbf{Std.} \bm{$\Delta z$} & 2.00 & 3.39 & 6.99 & 5.33 \\
-  \hline
-  \textbf{Avg.} \bm{$\Delta d$} & 6.85 & 12.47 & 22.97 & 10.57 \\
-  \hline
-  \textbf{Std.} \bm{$\Delta d$} & 3.32 & 5.36 & 10.66 & 9.71 \\
-  \hline
-  \end{tabulary}  
+  \subfloat[caption]{
+    \begin{tabulary}{0.5\linewidth}{||c c c c c||} 
+    \hline
+    \textbf{Distances} & \textbf{Stationary} & \textbf{Steps} & \textbf{Walk} & \textbf{Average} \\ [0.5ex] 
+    \hline\hline
+    \textbf{Avg.} \bm{$\Delta x$} & 4.17 & 9.78 & 12.32 & 8.76 \\
+    \hline
+    \textbf{Std.} \bm{$\Delta x$} & 2.82 & 6.25 & 7.85 & 4.17 \\
+    \hline
+    \textbf{Avg.} \bm{$\Delta y$} & 3.07 & 3.81 & 4.81 & 3.90 \\
+    \hline
+    \textbf{Std.} \bm{$\Delta y$} & 1.60 & 1.56 & 1.42 & 0.87 \\
+    \hline
+    \textbf{Avg.} \bm{$\Delta z$} & 3.48 & 7.96 & 11.67 & 7.70 \\
+    \hline
+    \textbf{Std.} \bm{$\Delta z$} & 1.57 & 5.28 & 6.67 & 4.10 \\
+    \hline
+    \textbf{Avg.} \bm{$\Delta d$} & 7.29 & 14.93 & 20.07 & 14.10 \\
+    \hline
+    \textbf{Std.} \bm{$\Delta d$} & 3.95 & 9.32 & 11.30 & 6.43 \\
+    \hline
+    \end{tabulary} 
+  }
+  \subfloat[caption]{
+    \begin{tabulary}{0.5\linewidth}{||c c c c c||} 
+    \hline
+    \textbf{Distances} & \textbf{Parallel} & \textbf{45$^{\circ}$} & \textbf{90$^{\circ}$} & \textbf{Average} \\ [0.5ex] 
+    \hline\hline
+    \textbf{Avg.} \bm{$\Delta x$} & 4.03 & 7.25 & 15.00 & 6.57 \\
+    \hline
+    \textbf{Std.} \bm{$\Delta x$} & 2.00 & 3.50 & 7.00 & 6.35 \\
+    \hline
+    \textbf{Avg.} \bm{$\Delta y$} & 2.19 & 4.49 & 5.01 & 2.92 \\
+    \hline
+    \textbf{Std.} \bm{$\Delta y$} & 0.95 & 1.15 & 0.58 & 2.30 \\
+    \hline
+    \textbf{Avg.} \bm{$\Delta z$} & 3.90 & 6.53 & 12.68 & 5.78 \\
+    \hline
+    \textbf{Std.} \bm{$\Delta z$} & 2.00 & 3.39 & 6.99 & 5.33 \\
+    \hline
+    \textbf{Avg.} \bm{$\Delta d$} & 6.85 & 12.47 & 22.97 & 10.57 \\
+    \hline
+    \textbf{Std.} \bm{$\Delta d$} & 3.32 & 5.36 & 10.66 & 9.71 \\
+    \hline
+    \end{tabulary}  
+  }
 
   \caption{Table showing coordinates distances in the Walk task with Parallel, 45$^{\circ}$ and 90$^{\circ}$ Kinects, as well as the average case. The means and standard deviations for $\Delta x$, $\Delta y$, $\Delta z$, and $\Delta d$ are reported.}
   
@@ -320,7 +331,7 @@ Figure \ref{fig:results_three_coordinates_joints} shows two different plots. Fir
 \section{Overall}
 \label{sec:results_overall}
 
-\begin{figure}[!h]
+\begin{figure}[!htb]
   \centering
 
   \includegraphics[width=1.0\linewidth]{figs/Coordinates_All}
@@ -333,7 +344,7 @@ Figure \ref{fig:results_three_coordinates_joints} shows two different plots. Fir
 \begin{table}[!h]
   \centering
 
-  \begin{tabulary}{1.0\columnwidth}{||c c c c c||} 
+  \begin{tabulary}{0.5\linewidth}{||c c c c c||} 
   \hline
   \textbf{Setup} & Avg. $\Delta x$ & Avg. $\Delta y$ & Avg. $\Delta z$ & Avg. $\Delta d$ \\ [0.5ex] 
   \hline\hline
