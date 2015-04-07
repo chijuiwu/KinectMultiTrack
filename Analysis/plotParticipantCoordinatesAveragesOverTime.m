@@ -69,10 +69,10 @@ for participant_id = unique(difference_table.Study_Id,'rows').'
 
             figure;
             hold on;
-            x_h = shadedErrorBar(timestamps_x,avg_dx,std_dx,'-r',1);
-            y_h = shadedErrorBar(timestamps_x,avg_dy,std_dy,'-g',1);
-            z_h = shadedErrorBar(timestamps_x,avg_dz,std_dz,'-b',1);
-            d_h = shadedErrorBar(timestamps_x,avg_dd,std_dd,'-k',1);
+            x_h = shadedErrorBar(timestamps_x,avg_dx,std_dx,{'MarkerEdgeColor',red,'MarkerFaceColor',red,'Color',red,},1);
+            y_h = shadedErrorBar(timestamps_x,avg_dy,std_dy,{'MarkerEdgeColor',green,'MarkerFaceColor',green,'Color',green,},1);
+            z_h = shadedErrorBar(timestamps_x,avg_dz,std_dz,{'MarkerEdgeColor',blue,'MarkerFaceColor',blue,'Color',blue,},1);
+            d_h = shadedErrorBar(timestamps_x,avg_dd,std_dd,{'MarkerEdgeColor',black,'MarkerFaceColor',black,'Color',black,},1);
             box on;
             hold off;
 
@@ -85,8 +85,8 @@ for participant_id = unique(difference_table.Study_Id,'rows').'
             legend([x_h.mainLine,y_h.mainLine,z_h.mainLine,d_h.mainLine],'Avg. \Delta x','Avg. \Delta y','Avg. \Delta z','Avg. \Delta d','Location','northwest');
 
             set(gcf,'Visible','Off');
-            savepdf(plot_filename);
-            
+            savepdf_shaded(plot_filename);
+           
         end
     end
 end
