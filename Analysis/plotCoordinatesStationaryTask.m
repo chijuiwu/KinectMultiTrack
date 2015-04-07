@@ -6,7 +6,7 @@ plot_colors;
 scenario_id = 1;
 
 kinect_config_types = {
-  'Parallel', '45^{\circ}','90^{\circ}','Average'
+  'Parallel', '45^{\circ}', '90^{\circ}', 'Average'
 };
 
 scen_table = coordinates_average_study_table(coordinates_average_study_table.Scenario_Id==scenario_id,:);

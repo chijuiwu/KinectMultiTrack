@@ -7,7 +7,7 @@ joints_util;
 plot_colors;
 
 kinect_configs = {
-    'Parallel', '45-Degrees-apart', '90-Degrees-apart'
+    'Parallel', '45^{\circ} apart', '90^{\circ} apart'
 };
 kinect_configs_filename = {
     'Parallel', '45', '90'
@@ -17,9 +17,9 @@ scenarios = {
     'Stationary', 'Steps', 'Walk', '', '', 'Obstacle'
 };
 
-title_format = 'Participant %d - Individual Joints %cd Distances over Time \n %s Scenario with %s Kinects';
-dir = '../../KinectMultiTrackPlots/Participants_joints_averages_over_time_heatmap_hot/';
-filename_format = strcat(dir,'Participant_%d_Task_%s_Kinect_%s_Heatmap_hot_dd');
+title_format = 'Participant %d - Individual Joints %cd Distances over Time \n %s in Scenario with %s Kinects';
+dir = '../../KinectMultiTrackPlots/Participants_joints_averages_over_time_hot/';
+filename_format = strcat(dir,'Participant_%d_Task_%s_Kinect_%s_hot_dd');
 
 first_avg_dx = 6;
 first_avg_dy = 7;
@@ -69,24 +69,23 @@ for participant_id = unique(difference_table.Study_Id,'rows').'
                 plot_title = sprintf(title_format, participant_id, char(916), scenarios{1,scenario_id}, kinect_configs{1,kinect_config+1});
                 plot_filename = sprintf(filename_format, participant_id, scenarios{1,scenario_id}, kinect_configs_filename{1,kinect_config+1});
 
-                title(plot_title,'Fontsize',15,'interpreter','tex');
-                xlabel('Timestamp (sec)','Fontsize',15);
-                ylabel({'','Joint Types'},'Fontsize',15);
-                zlabel('\Delta Distance (cm)','Fontsize',15);
+                title(plot_title,'interpreter','tex');
+                xlabel('Timestamp (sec)');
+                ylabel({'Joint Types'});
+                zlabel('\Delta Distance (cm)');
                 set(gca,'YLim',[0.5 length(joint_types)+0.5]);
                 set(gca,'YTick',1:length(joint_types),'YTickLabel',joint_types);
                 ax = gca;
                 ax.YTickLabelRotation = 0;
 
                 set(gcf,'Visible','Off');
-                set(gcf,'PaperPositionMode','Manual');
-                set(gcf,'PaperUnits','Normalized');
-%                 print('-dsvg','-painters',plot_filename);
-                saveas(gcf,plot_filename,'pdf');
+                savepdf(plot_filename);
+                
             catch
             end
         end
     end
+    break;
 end
 
 end

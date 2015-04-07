@@ -60,7 +60,7 @@ errorbar(kinect_scenario_x,kinect_scenario_avg_dd,kinect_scenario_std_dd,'Marker
 box on;
 hold off;
 
-main_title = 'Coordinates Averages wtih 90%c apart Kinects \n for the Stationary, Steps, and Walk Tasks';
+main_title = 'Coordinates Averages wtih 90%c apart Kinects \n in the Stationary, Steps, and Walk Tasks';
 dir = '../../KinectMultiTrackPlots/Overall/';
 main_filename = strcat(dir,'Coordinates_Kinect_45');
 

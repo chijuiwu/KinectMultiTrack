@@ -7,7 +7,7 @@ joints_util;
 plot_colors;
 
 kinect_configs = {
-    'Parallel', '45-Degrees-apart', '90-Degrees-apart'
+    'Parallel', '45^{\circ} apart', '90^{\circ} apart'
 };
 kinect_configs_filename = {
     'Parallel', '45', '90'
@@ -17,9 +17,9 @@ scenarios = {
     'Stationary', 'Steps', 'Walk', '', '', 'Obstacle'
 };
 
-title_format = 'Participant %d - Average Coordinates Distances over Time \n %s Task with %s Kinects';
+title_format = 'Participant %d - Average Coordinates Distances over Time \n in %s Task with %s Kinects';
 dir = '../../KinectMultiTrackPlots/Participants_coordinates_averages_over_time/';
-filename_format = strcat(dir,'Participant_%d_Task_%s_Kinect_%s_Coordinates');
+filename_format = strcat(dir,'Participant_%d_Task_%s_Kinect_%s_coordinates_over_time');
 
 first_avg_dx = 6;
 first_avg_dy = 7;
@@ -79,17 +79,14 @@ for participant_id = unique(difference_table.Study_Id,'rows').'
             plot_title = sprintf(title_format, participant_id, scenarios{1,scenario_id}, kinect_configs{1,kinect_config+1});
             plot_filename = sprintf(filename_format, participant_id, scenarios{1,scenario_id}, kinect_configs_filename{1,kinect_config+1});
 
-            title(plot_title,'Fontsize',15);
-            xlabel('Time (s)','Fontsize',15);
-            ylabel('Distance (cm)','Fontsize',15);
+            title(plot_title);
+            xlabel('Time (s)');
+            ylabel('Distance (cm)');
             legend([x_h.mainLine,y_h.mainLine,z_h.mainLine,d_h.mainLine],'Avg. \Delta x','Avg. \Delta y','Avg. \Delta z','Avg. \Delta d','Location','northwest');
 
             set(gcf,'Visible','Off');
-            set(gcf,'PaperPositionMode','Manual');
-            set(gcf,'PaperUnits','Normalized');
-%             print('-dsvg','-painters',plot_filename);
-            saveas(gcf,plot_filename,'pdf');
-
+            savepdf(plot_filename);
+            
         end
     end
 end

@@ -1,4 +1,4 @@
-function [clean_data_table] = cleanData(data_table)
+function [clean_data_table] = clean_data(data_table)
 % 
 % 
 % 

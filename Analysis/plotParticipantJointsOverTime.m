@@ -7,7 +7,7 @@ joints_util;
 plot_colors;
 
 kinect_configs = {
-    'Parallel', '45-Degrees-apart', '90-Degrees-apart'
+    'Parallel', '45^{\circ} apart', '90^{\circ} apart'
 };
 kinect_configs_filename = {
     'Parallel', '45', '90'
@@ -17,7 +17,7 @@ scenarios = {
     'Stationary', 'Steps', 'Walk', '', '', 'Obstacle'
 };
 
-title_format = 'Participant %d - Individual Joints %cd Distances over Time \n %s Scenario with %s Kinects';
+title_format = 'Participant %d - Individual Joints %cd Distances over Time \n in %s Task with %s Kinects';
 dir = '../../KinectMultiTrackPlots/Participants_joints_averages_over_time/';
 filename_format = strcat(dir,'Participant_%d_Task_%s_Kinect_%s');
 
@@ -28,13 +28,13 @@ first_avg_dd = 9;
 last_idx = 5+length(joint_types)*4;
 
 for participant_id = unique(difference_table.Study_Id,'rows').'
-    s_table = difference_table(difference_table.Study_Id==0,:);
+    s_table = difference_table(difference_table.Study_Id==participant_id,:);
 
     for kinect_config = unique(s_table.Kinect_Config,'rows').'
-        k_table = s_table(s_table.Kinect_Config==0,:);
+        k_table = s_table(s_table.Kinect_Config==kinect_config,:);
 
         for scenario_id = unique(k_table.Scenario_Id,'rows').'
-            scen_table = k_table(k_table.Scenario_Id==1,:);
+            scen_table = k_table(k_table.Scenario_Id==scenario_id,:);
 
             if (scenario_id ~= 1 && scenario_id~=2 && scenario_id~=3 && scenario_id~=6)
                 continue;
@@ -69,20 +69,17 @@ for participant_id = unique(difference_table.Study_Id,'rows').'
                 plot_title = sprintf(title_format, participant_id, char(916), scenarios{1,scenario_id}, kinect_configs{1,kinect_config+1});
                 plot_filename = sprintf(filename_format, participant_id, scenarios{1,scenario_id}, kinect_configs_filename{1,kinect_config+1});
 
-                title(plot_title,'Fontsize',15);
-                xlabel('Timestamp (sec)','Fontsize',15);
-                ylabel({'','Joint Types'},'Fontsize',15);
-                zlabel('\Delta Distance (cm)','Fontsize',15);
+                title(plot_title);
+                xlabel('Timestamp (sec)');
+                ylabel({'Joint Types'});
+                zlabel('\Delta Distance (cm)');
                 set(gca,'YLim',[0.5 length(joint_types)+0.5]);
                 set(gca,'YTick',1:length(joint_types),'YTickLabel',joint_types);
                 ax = gca;
                 ax.YTickLabelRotation = -45;
 
                 set(gcf,'Visible','Off');
-                set(gcf,'PaperPositionMode','Manual');
-                set(gcf,'PaperUnits','Normalized');
-%                 print('-dsvg','-painters',plot_filename);
-                saveas(gcf,plot_filename,'pdf');
+                savepdf(plot_filename);
             catch
             end
         end

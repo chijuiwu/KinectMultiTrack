@@ -55,7 +55,7 @@ errorbar(kinect_scenario_x,kinect_scenario_avg_dd,kinect_scenario_std_dd,'Marker
 box on;
 hold off;
 
-title_format = 'Coordinates Averages with Paralel Kinects \n for the Stationary, Steps, and Walk Tasks';
+title_format = 'Coordinates Averages with Paralel Kinects \n in the Stationary, Steps, and Walk Tasks';
 dir = '../../KinectMultiTrackPlots/Overall/';
 main_filename = strcat(dir,'Coordinates_Kinect_Parallel');
 

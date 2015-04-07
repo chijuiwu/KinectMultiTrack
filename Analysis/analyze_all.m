@@ -14,7 +14,7 @@
 % % % % 
 % disp('Cleaning data...');
 % tic;
-% data_table = cleanData(raw_data_table);
+% data_table = clean_data(raw_data_table);
 % time = toc;
 % fprintf('Cleaning data...Done!!!, time=%.2f\n',time);
 % 
