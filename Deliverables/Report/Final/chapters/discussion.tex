@@ -5,8 +5,61 @@
 
 \label{chapter:discussion}
 
-\section{Evaluation}
+This chapter discusses the results stated in Chapter \ref{chapter:results}, compare and contrast them with the Wei et al study \cite{wei_kinect_calibration}.
+
+For each of the primary tasks, namely Stationary, Steps, and Walk, the discussion will consist of how the average coordinates and joints distances change with different Kinect placements. The spread of distances values over different joint types in each task will also be discussed.
+
+It is worth noting that Wei et al only studied Stationary and Steps tasks, with near parallel and 45$^{\circ}$ apart Kinects. Therefore, the current chapter will only compare results with those in Wei et al's study where appropriate \cite{wei_kinect_calibration}.
+
+\section{Stationary}
+\label{sec:discussion_stationary}
+
+This section discusses results in the Stationary task.
+
+The Stationary task shows best results when the Kinects are parallel to each other and worst when they are 90$^{\circ}$ apart. All measures of distances follow the same trend, from $\Delta x$ to $\Delta z$ (See Table \ref{table:stationary_coordinates_values}). The results show that coordinates distances in the Stationary task increases with increasing angle between Kinects.
+
+In general, the $\Delta x$ values are the highest, then $\Delta z$ and $\Delta y$. This shows that the tracking algorithm makes the largest errors in the coordinates transformation of the x axis and least errors in the y axis. A feasible explanation would be that the heights of both Kinects are the same, and the participants are not moving on the y axis.
+
+The standard deviations of $\Delta d$ in the average case is within the range of standard deviations across different Kinect placements. This shows that in the Stationary task the coordinates distances are consistent both within and between different Kinect placements.
+
+The average joints distances are smallest for joints in the torso, namely the head, hips, knees, neck, shoulders, and spine (See Figure \subref*{fig:stationary_joints}). These joints appear to have similar coordinates distances. On the contrary, joints in the arm and foot regions have higher coordinates distances. The researcher speculates that the results are influenced by Kinect's internal performance; it produces more reliable and consistent results in the torso compared to other regions of the body.
+
+All average coordinates distances are also higher for the left joints compared to right joints (See Figure \subref*{fig:stationary_coordinates}). In summary, right hand side joints in the torso have the smallest coordinates disances, whereas left hand side joints in the arm and foot regions have the highest coordinates distances. The researcher also speculates that these results are due to the Kinect itself, which produces higher quality depth map in the torso.
+
+Wei et al reported lower results compared to the current study \cite{wei_kinect_calibration}. In their Stationary task with $4.25^{\circ}$ apart Kinects, the coordinates distances are $0.00$, $1.00$, and $2.00$ cm for $\Delta x$, $\Delta y$, and $\Delta z$, respectively. The numbers yield $2.24$ cm in $\Delta d$, which is lower than the $3.52$ cm found in the current study with parallel Kinects. In their same task with $44.37^{\circ}$ apart Kinects, the coordinates distances are $1.00$, $1.00$, and $1.50$ cm for $\Delta x$, $\Delta y$, and $\Delta z$, respectively. The numbers yield $2.06$ cm for $\Delta d$, also lower than the $6.95$ cm found in the current study with $45^{\circ}$ apart Kinects.
+
+\section{Steps}
+\label{sec:discussion_steps}
+
+This section discusses results in the Walk task. The results are similar to those in the Stationary task, but all coordinates distances are higher.
+
+The Walk task also shows best results when the Kinects are parallel to each other and worst when they are 90$^{\circ}$ apart. All measures of distances follow the same trend, from $\Delta x$ to $\Delta z$ (See Table \ref{table:steps_coordinates_values}). Alike to the results in the Stationary task, the studies for the Steps task show that coordinates distances in also increase with increasing angle between Kinects.
+
+For all Kinect placements, the $\Delta x$ values are the highest, then $\Delta z$ and $\Delta y$. The results support those found in the Stationary task. This shows that the tracking algorithm produces consistent coordinates transformation across different tasks.
+
+The standard deviation of $\Delta d$ within each type of Kinect placement is lower than the same setup in the Stationary task. The standard deviations of $\Delta d$ in the Stationary task are $1.33$, $2.67$, $4.45$, and $3.95$ cm, for Parallel, 45$^{\circ}$, and 90$^{\circ}$ apart Kinects, respectively. On the other hand, the Steps task yields $0.90$, $1.92$, $3.46$, and $9.32$ for the same measures. These values suggest that the algorithm produces less variations within different Kinect configurations in the Steps task compared to the Stationary task. However, the Steps task has a higher standard deviation of $\Delta d$ in the average case, compared to that of in the Stationary task. Even though the system shows smaller variations within different Kinect placements in the Steps task, the variation between different Kinect placements is large. The system performs better across different Kinect placements in the Stationary task.
+
+Unlike
+
+The average joints distances are smallest for joints in the torso, namely the head, hips, knees, neck, shoulders, and spine (See Figure \subref*{fig:stationary_joints}). These joints appear to have similar coordinates distances. On the contrary, joints in the arm and foot regions have higher coordinates distances.
+
+All average coordinates distances are also higher for the left joints compared to right joints (See Figure \subref*{fig:stationary_coordinates}). In summary, right hand side joints in the torso have the smallest coordinates disances, whereas left hand side joints in the arm and foot regions have the highest coordinates distances.
+
+\section{Walk}
+\label{sec:discussion_walk}
+
+
+
+\section{Tasks: Stationary, Steps, Walk}
+\label{sec:discussion_stationary}
+
+
+\section{Kinect placements: Parallel, 45$^{\circ}$ and 90$^{\circ}$}
+\label{sec:discussion_stationary}
+
+\section{Criticism of the analysis}
 
 \section{Future Work}
+\label{sec:discussion_future_Work}
 
 \end{document}
