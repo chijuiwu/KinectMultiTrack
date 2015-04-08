@@ -17,7 +17,7 @@ scenarios = {
     'Stationary', 'Steps', 'Walk', '', '', 'Obstacle'
 };
 
-title_format = 'Participant %d - Individual Joints %cd Distances over Time \n %s in Scenario with %s Kinects';
+title_format = 'Participant %d - Individual Joints %cd Distances over Time \n in %s Task with %s Kinects';
 dir = '../../KinectMultiTrackPlots/Participants_joints_averages_over_time_hot/';
 filename_format = strcat(dir,'Participant_%d_Task_%s_Kinect_%s_hot_dd');
 
@@ -69,7 +69,7 @@ for participant_id = unique(difference_table.Study_Id,'rows').'
                 plot_title = sprintf(title_format, participant_id, char(916), scenarios{1,scenario_id}, kinect_configs{1,kinect_config+1});
                 plot_filename = sprintf(filename_format, participant_id, scenarios{1,scenario_id}, kinect_configs_filename{1,kinect_config+1});
 
-                title(plot_title,'interpreter','tex');
+                title(plot_title);
                 xlabel('Timestamp (sec)');
                 ylabel({'Joint Types'});
                 zlabel('\Delta Distance (cm)');
@@ -85,7 +85,6 @@ for participant_id = unique(difference_table.Study_Id,'rows').'
             end
         end
     end
-    break;
 end
 
 end

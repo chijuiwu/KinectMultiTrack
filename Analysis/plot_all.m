@@ -113,9 +113,9 @@
 
 disp('Plotting participant average over time...');
 tic;
-plotParticipantCoordinatesAveragesOverTime(difference_table);
-plotParticipantJointsOverTime(difference_table);
-% plotParticipantJointsHeatMap(difference_table);
+% plotParticipantCoordinatesAveragesOverTime(difference_table);
+% plotParticipantJointsOverTime(difference_table);
+plotParticipantJointsHeatMap(difference_table);
 time = toc;
 fprintf('Done!!!, time=%.2f\n',time);
 
