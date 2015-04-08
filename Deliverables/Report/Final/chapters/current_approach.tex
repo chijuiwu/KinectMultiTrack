@@ -5,36 +5,50 @@
 
 \label{chapter:current_appraoch}
 
-The current chapter describes the people tracking algorithm.
+This chapter identifies the main source of comparison in literature, then it proceeds to describe the tracking algorithm.
 
-The current work is an extension of the Wei et al study \cite{wei_kinect_calibration}. It applies the same algorithms for doing calibration and coordinate transformation on skeleton joints. The differences are that the current system accommodates multiple Kinects (not limited to parallel with other) and multiple people (six people). The number of tracked people is limited by the maximum number of skeletons one Kinect can recognize through its BodyFrame stream.
+The current work is an extension of Wei et al.\'s study~\cite{wei_kinect_calibration}. It applies the same algorithms for doing calibration and coordinate transformation on the skeletal joints. The system will use the transformation technique to convert a skeleton's spatial position in one Kinect to another Kinect's field of view. Subsequently, the system can merge skeletons of the same person from different Kinects fields of view to achieve persistent tracking. The technology allows the system to continuously track people when the targets are obstructed by obstacles in the scene, as long as they remain in the extended field of view. 
+
+Both work uses only two Kinects, but the current work does a wider range of experiments. Wei et al.\ places the Kinects side by side. The current system is evaluated with Kinects that are not only adjacent to each other but further away from each other and have larger angle gaps. The former study also uses only one participant, whereas the current work uses up to two people in evaluation and can theoretically track up to six people, where the number of tracked person is limited by the maximum number of skeletons a single Kinect can recognize. Wei et al.\ uses simple movements to measure the performance of the tracking system. On the other hand, the current work introduces more complex movements. Occlusion is not discussed in Wei et al.\'s study.
 
 \section{Running the application}
 \label{sec:current_approach_running_application}
 
-KinectMultiTrack is available at \url{https://github.com/cjw-charleswu/KinectMultiTrack}.
+KinectMultiTrack is available at \url{https://github.com/cjw-charleswu/KinectMultiTrack}. The application should run on the Microsoft Windows operating system. It is developed, tested, and maintained on Windows 8.
 
-\textbf{ADD INSTRUCTIONS}
+The application consists of a server and client. There must be at least one server and one client when running the system. It is recommended that there be at least two client. One machine can run both as the server and client.
+
+Run the server:
+
+{\centering
+  contents\par
+}
+
+Run the client:
+
+
 
 \section{Overview}
 \label{sec:current_approach_overview}
 
-% The complete system architecture is explained in section ``\nameref{sec:system}''. In short, the clients send Kinect BodyFrames to the server. The server will perform both the calibration and tracking. On the other hand, Wei et al designed the system so that each indivdual machine running a Kinect will perform its calibration then transmit the transformed coordinates to the server \cite{wei_kinect_calibration} \textbf{TODO: DOUBLE CHECK}. The current approach puts weights on the server machine and requires less computational resources on the client side. The clients are essentially Kinect hotspots, simply redirecting depth information to the server. However, the tradeoffs of two different approaches are not studied.
+The complete system architecture will be explained in section~\ref{sec:design_architecture}. In short, the clients send Kinect BodyFrames to the server. Later, the server process the data, performs calibration and tracking. Wei et al.\ designed a system where each individual machine running a Kinect will perform its own calibration then transmit the calibrated, transformed coordinates to the server~\cite{wei_kinect_calibration}. The current approach puts the burden of processing on the server machine, and it requires less computational resources on the client side. Essentially, the clients are like Kinect hotspots sending skeletal information to the server. The tradeoffs between the two different approaches are not investigated.
 
-The calibration process allows the system to precisely transform the skeleton joints coordinates into a new coordinate system, also known as the World View. The system can now compare skeletons in different Kinects fields of view based on their spatial positions in the World coordinate system. Furthermore, the system can transform any skeleton in World View back to the perspective of any connected Kinect, because it knows the initial position and angle of the skeleton in that particular Kinect's camera space.
+Calibration allows the current system to precisely convert the skeletal joints coordinates from the original kinect's camera space into the new coordinate system, also known as the World coordinate system. After calibration, the system will combine multiple skeletons of each tracked person from different Kinects fields of view. This constitutes the initial tracking result. The system matches the skeletons based on their proximity of spatial positions in the World View, or the field of view of the World coordinate system.
 
-After calibration, the system would combine skeletons of each tracked person in multiple Kinects. This is the initial tracking result. When the server receives a new BodyFrame from a client, or effectiviely a Kinect, the system would update each skeleton's spatial position in that particular field of view. Therefore, the person represented by the skeleton will also have his position updated.
+When the server receives a new BodyFrame from the client, which is effectively a process running a Kinect sensor, it will update the spatial positions of the skeletons in the particular field of view. The person whose skeletons comprised of that skeleton will now have an updated position in the World View. The server handles multiple clients, hence multiple Kinects, in parallel to perform tracking.
 
-Any imperfect transformation process will produce errors \textbf{TODO: ERRORS???}. For instance, for skeletons of the same person in different Kinects fields of view, the algorithm may produce two skeletons that are in similar, not same, spatial locations in the World View. To overcome this inherent handicap, the system will minimize the skeleton joint differences by creating an average skeleton for every person. The average skeleton is the average of all skeletons of a person.
+The tracking process relies heavily on the initial result created after calibration. Any imperfect transformation process will produce errors, so as the current system. In this current context, error refers to the coordinates distances between multiple skeletons when converged from different Kinects fields of view into the same field of view. For instance, the system will try its best at merging skeletons of the same person from different Kinects fields of view into the same positions in the World View. Since the transformation process is not perfect, the underlying algorithm will produce two skeletons in the World View that have similar, but not exactly the same, positions. The system will minimize the skeletal joint differences by constructing an average skeleton for every person.
+
+The following chapter will explain all the steps leading to transformed skeletons in a single viewing perspective.
 
 \section{Serialization}
 \label{sec:current_approach_serialization}
 
-The Kinect BodyFrame contains real-time skeletal information of people who are trakced by a Kinect sensor. It was called SkeletonFrame in the Kinect v1 SDK. The BodyFrames are computed by the Kinect sensor internally from its depth data; they provide a higher level API for programming with skeletons. The current system uses the preprocessed information to track individuals.
+The Kinect BodyFrame contains real-time skeletal information of people who are tracked by a Kinect sensor. It was called SkeletonFrame in the Kinect v1 SDK. The BodyFrames are computed by the Kinect sensor internally from its depth data; they provide a higher level API for programming with skeletons. The current system uses the preprocessed information to track individuals.
 
 Each frame contains at most six Kinect Body data, where each Body represents a skeleton from the Kinect's field of view. A Body contains a skeleton's joints coordinates and metadata.
 
-TCP network clients and server exchange data in bytes, thus requiring any content passed between the two nodes to be serialized. Unfortunately, the Kinect v2 SDK does not support serialization of Kinect BodyFrame. To resolve the inconvenience, the current work builds a Kinect BodyFrame serialization library. The most important pieces of information are the skeleton joints, their coordinates in the Kinect Camera Space, types and tracking states. See Appendix \ref{sec:bodyframe_serialization} for a complete list of serialized properties.
+TCP network clients and server exchange data in bytes, thus requiring any content passed between the two nodes to be serialized. Unfortunately, the Kinect v2 SDK does not support serialization of Kinect BodyFrame. To resolve the inconvenience, the current work builds a Kinect BodyFrame serialization library. The most important pieces of information are the skeleton joints, their coordinates in the Kinect Camera Space, types and tracking states. See Appendix~\ref{sec:appendix_bodyframe_serialization} for a complete list of serialized properties.
 
 \section{Calibration}
 \label{sec:current_approach_calibration}
