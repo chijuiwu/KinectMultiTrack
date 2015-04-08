@@ -112,8 +112,7 @@ The system will automatically restart the calibration process if people move the
         \setcounter{ALC@line}{0}
         \vspace*{1mm}
 
-        \IF{$(c = \Null) \vee \newline
-          (\neg \Function{Contains}(c, jt)) \vee (\neg \Function{Contains}(p, jt))$}
+        \IF{$(c = \Null) \vee (\neg \Function{Contains}(c, jt)) \vee (\neg \Function{Contains}(p, jt))$}
           \STATE $msg \leftarrow \texttt{"Missing"} + jt$
           \RETURN $\False$
         \ENDIF

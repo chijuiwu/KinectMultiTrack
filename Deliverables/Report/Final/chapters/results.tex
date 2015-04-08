@@ -238,27 +238,35 @@ This section summarizes the results in the Stationary, Steps, and Walk tasks wit
 
 Figure \ref{fig:results_three_coordinates_joints} shows two different plots. Firstly, it shows the average coordinates and joints distances in the Stationary, Steps, and Walk tasks averaged over different Kinect placements (Parallel, 45$^{\circ}$ and 90$^{\circ}$ apart Kinects). The reverse is also shown. The figure also shows the average coordinates and joints distances with Parallel, 45$^{\circ}$ and 90$^{\circ}$ apart Kinects averaged over different tasks (Stationary, , Steps, and Walk). The figure shows how the complexity of tasks and the placement of the Kinects, respectively, affect the accuracy of the tracking algorithm.
 
+When the Kinect placements are averaged, the best case is $7.29$ cm (Stationary), the worst case is $20.07$ cm (Walk), and the average case is $14.10$ cm.
+
+When the tasks are averaged, the best case is $6.85$ cm (Parallel), the worst case is $22.97$ cm (90$^{\circ}$), and the average case is $10.57$ cm.
+
 \begin{figure}[!h]
   \centering
 
   \subfloat[Average coordinates distances in the Stationary, Steps, and Walk tasks averaged over Parallel, 45$^{\circ}$ and 90$^{\circ}$ apart Kinects.]{
 
     \includegraphics[width=0.5\linewidth]{figs/Coordinates_Kinect_All}
+    \label{fig:results_coordinates_kinect_all}
   
   }
   \subfloat[Average joints distances in the Stationary, Steps, and Walk tasks averaged over Parallel, 45$^{\circ}$ and 90$^{\circ}$ apart Kinects.]{
   
     \includegraphics[width=0.5\linewidth]{figs/Joints_Kinect_All}
+    \label{fig:results_joints_kinect_all}
   
   } \\
     \subfloat[Average coordinates distances with Parallel, 45$^{\circ}$ and 90$^{\circ}$ apart Kinects averaged over Stationary, Steps, and Walk tasks.]{
   
     \includegraphics[width=0.5\linewidth]{figs/Coordinates_Task_All}
+    \label{fig:results_coordinates_task_all}
   
   }
   \subfloat[Average joints distances with Parallel, 45$^{\circ}$ and 90$^{\circ}$ apart Kinects averaged over Stationary, Steps, and Walk tasks.]{
   
     \includegraphics[width=0.5\linewidth]{figs/Joints_Task_All}
+    \label{fig:results_coordinates_task_all}
   
   }
 
@@ -271,7 +279,7 @@ Figure \ref{fig:results_three_coordinates_joints} shows two different plots. Fir
   \centering
 
   \subfloat[caption]{
-    \begin{tabulary}{0.5\linewidth}{||c c c c c||} 
+    \begin{tabulary}{1.0\linewidth}{||c c c c c||} 
     \hline
     \textbf{Distances} & \textbf{Stationary} & \textbf{Steps} & \textbf{Walk} & \textbf{Average} \\ [0.5ex] 
     \hline\hline
@@ -292,9 +300,9 @@ Figure \ref{fig:results_three_coordinates_joints} shows two different plots. Fir
     \textbf{Std.} \bm{$\Delta d$} & 3.95 & 9.32 & 11.30 & 6.43 \\
     \hline
     \end{tabulary} 
-  }
+  } \\
   \subfloat[caption]{
-    \begin{tabulary}{0.5\linewidth}{||c c c c c||} 
+    \begin{tabulary}{1.0\linewidth}{||c c c c c||} 
     \hline
     \textbf{Distances} & \textbf{Parallel} & \textbf{45$^{\circ}$} & \textbf{90$^{\circ}$} & \textbf{Average} \\ [0.5ex] 
     \hline\hline
@@ -322,11 +330,66 @@ Figure \ref{fig:results_three_coordinates_joints} shows two different plots. Fir
   \label{table:results_three_coordinates_values}
 \end{table}
 
+
+Figure \ref{fig:results_three_coordinates_over_time} shows the average joints distances over time in the Stationary, Steps, and Walk tasks with Parallel, 45$^{\circ}$ and 90$^{\circ}$ apart Kinects. These figures demonstrate the stability of the tracking algorithm for different joints over time when performing different tasks in different Kinect placements. The figures are taken from participant 18.
+
+\begin{figure}[!h]
+  \centering
+
+  \subfloat[Stationary]{
+    \includegraphics[width=0.33\linewidth]{figs/Participant_19_Task_Stationary_Kinect_Parallel_coordinates_over_time} 
+    \includegraphics[width=0.33\linewidth]{figs/Participant_19_Task_Stationary_Kinect_45_coordinates_over_time}
+    \includegraphics[width=0.33\linewidth]{figs/Participant_19_Task_Stationary_Kinect_90_coordinates_over_time}
+  } \\
+  \subfloat[Steps]{
+    \includegraphics[width=0.33\linewidth]{figs/Participant_19_Task_Steps_Kinect_Parallel_coordinates_over_time} 
+    \includegraphics[width=0.33\linewidth]{figs/Participant_19_Task_Steps_Kinect_45_coordinates_over_time}
+    \includegraphics[width=0.33\linewidth]{figs/Participant_19_Task_Steps_Kinect_90_coordinates_over_time}
+  } \\
+  \subfloat[Walk]{
+    \includegraphics[width=0.33\linewidth]{figs/Participant_19_Task_Walk_Kinect_Parallel_coordinates_over_time} 
+    \includegraphics[width=0.33\linewidth]{figs/Participant_19_Task_Walk_Kinect_45_coordinates_over_time}
+    \includegraphics[width=0.33\linewidth]{figs/Participant_19_Task_Walk_Kinect_90_coordinates_over_time}
+  }
+
+  \caption{Average coordinates distances over time in the Stationary, Steps, and Walk tasks with Parallel, 45$^{\circ}$, and 90 $^{\circ}$ apart Kinects.}
+
+  \label{fig:results_three_coordinates_over_time}
+\end{figure}
+
+\begin{figure}[!h]
+  \centering
+
+  \subfloat[Stationary]{
+    \includegraphics[width=0.33\columnwidth]{figs/Participant_19_Task_Stationary_Kinect_Parallel} 
+    \includegraphics[width=0.33\columnwidth]{figs/Participant_19_Task_Stationary_Kinect_45}
+    \includegraphics[width=0.33\columnwidth]{figs/Participant_19_Task_Stationary_Kinect_90}
+  } \\
+  \subfloat[Steps]{
+    \includegraphics[width=0.33\columnwidth]{figs/Participant_19_Task_Steps_Kinect_Parallel} 
+    \includegraphics[width=0.33\columnwidth]{figs/Participant_19_Task_Steps_Kinect_45}
+    \includegraphics[width=0.33\columnwidth]{figs/Participant_19_Task_Steps_Kinect_90}
+  } \\
+  \subfloat[Walk]{
+    \includegraphics[width=0.33\columnwidth]{figs/Participant_19_Task_Walk_Kinect_Parallel} 
+    \includegraphics[width=0.33\columnwidth]{figs/Participant_19_Task_Walk_Kinect_45}
+    \includegraphics[width=0.33\columnwidth]{figs/Participant_19_Task_Walk_Kinect_90}
+  }
+
+  \caption{Average coordinates distances over time in the Stationary, Steps, and Walk tasks with Parallel, 45$^{\circ}$, and 90 $^{\circ}$ apart Kinects.}
+
+  \label{fig:results_three_joints_over_time}
+\end{figure}
+
 \section{Obstacle}
 \label{sec:results_obstacle}
 
+\textbf{TODO}
+
 \section{Interactions}
 \label{sec:results_interactions}
+
+\textbf{TODO}
 
 \section{Overall}
 \label{sec:results_overall}
@@ -334,7 +397,7 @@ Figure \ref{fig:results_three_coordinates_joints} shows two different plots. Fir
 \begin{figure}[!htb]
   \centering
 
-  \includegraphics[width=1.0\linewidth]{figs/Coordinates_All}
+  \includegraphics[width=0.8\linewidth]{figs/Coordinates_All}
 
   \caption{Plot showing the overall results for all scenarios in the studies}
 
@@ -350,9 +413,9 @@ Figure \ref{fig:results_three_coordinates_joints} shows two different plots. Fir
   \hline\hline
   \textbf{Parallel, Stationery} & 1.84 & 3.38 & 7.30 & 4.17 \\
   \hline
-  \textbf{Parallel, Steps} $\Delta y$ & 0.49 & 1.50 & 2.15 & 1.60 \\
+  \textbf{Parallel, Steps} & 0.49 & 1.50 & 2.15 & 1.60 \\
   \hline
-  \textbf{Parallel, Walk} $\Delta y$ & 0.49 & 1.50 & 2.15 & 1.60 \\
+  \textbf{Parallel, Walk} & 0.49 & 1.50 & 2.15 & 1.60 \\
   \hline
   \textbf{45$^{\circ}$, Stationery} & 1.03 & 1.52 & 2.94 & 2.82 \\
   \hline

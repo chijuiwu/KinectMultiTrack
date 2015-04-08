@@ -63,7 +63,7 @@ The design decisions on the look of the user interface are not discussed, becaus
 
 \begin{figure}[!h]
   \centering
-  \includegraphics[width=0.8\linewidth]{figs/ui}
+  \includegraphics[width=0.5\linewidth]{figs/ui}
   \caption{UI}
   \label{fig:ui}
 \end{figure}
@@ -83,7 +83,12 @@ The skeleton visualization in both Tracking View and Disjoined View has the same
 
 \begin{figure}[!h]
   \centering
-  \includegraphics[width=0.8\linewidth]{figs/tracking_view}
+  \subfloat[]{
+    \includegraphics[width=0.5\linewidth]{figs/tracking_view}
+  }
+  \subfloat[]{
+    \includegraphics[width=0.5\linewidth]{figs/disjoined_view}
+  }
   \caption{The Tracking View}
   \label{fig:tracking_view}
 \end{figure}
@@ -92,13 +97,6 @@ The skeleton visualization in both Tracking View and Disjoined View has the same
 \label{sec:implementation_disjoined_view}
 
 The Disjoined View shows the skeleton visualization of the tracked skeletons in their original Kinect coordinate system. The skeletons are colored with respect to their Kinect origin. In other words, skeletons coming from the same Kinect would share the same color. The number of available colors is also limited to six.
-
-\begin{figure}[!h]
-  \centering
-  \includegraphics[width=0.8\linewidth]{figs/disjoined_view}
-  \caption{The Disjoined View}
-  \label{fig:disjoined_view}
-\end{figure}
 
 \section{Tracker}
 \label{sec:implementation_tracker}
