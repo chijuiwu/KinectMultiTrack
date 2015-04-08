@@ -26,7 +26,9 @@ Run the server:
 
 Run the client:
 
-
+{\centering
+  contents\par
+}
 
 \section{Overview}
 \label{sec:current_approach_overview}
@@ -37,45 +39,38 @@ Calibration allows the current system to precisely convert the skeletal joints c
 
 When the server receives a new BodyFrame from the client, which is effectively a process running a Kinect sensor, it will update the spatial positions of the skeletons in the particular field of view. The person whose skeletons comprised of that skeleton will now have an updated position in the World View. The server handles multiple clients, hence multiple Kinects, in parallel to perform tracking.
 
-The tracking process relies heavily on the initial result created after calibration. Any imperfect transformation process will produce errors, so as the current system. In this current context, error refers to the coordinates distances between multiple skeletons when converged from different Kinects fields of view into the same field of view. For instance, the system will try its best at merging skeletons of the same person from different Kinects fields of view into the same positions in the World View. Since the transformation process is not perfect, the underlying algorithm will produce two skeletons in the World View that have similar, but not exactly the same, positions. The system will minimize the skeletal joint differences by constructing an average skeleton for every person.
+The tracking process relies heavily on the initial result created after calibration. Any imperfect transformation process will produce errors, so as the current system. In this current context, error refers to the coordinates distances between multiple skeletons when converged from different Kinects fields of view into the same field of view. For instance, the system will try its best at merging skeletons of the same person from different Kinects fields of view into the same positions in the World View. Since the transformation process is not perfect, the underlying algorithm will produce two skeletons in the World View that have similar, but not exactly the same, positions. The system will minimize the skeletal joint differences by constructing an average skeleton.
 
-The following chapter will explain all the steps leading to transformed skeletons in a single viewing perspective.
+The following chapter will explain all the steps leading to the transformed skeletons in a single viewing perspective.
 
 \section{Serialization}
 \label{sec:current_approach_serialization}
 
-The Kinect BodyFrame contains real-time skeletal information of people who are tracked by a Kinect sensor. It was called SkeletonFrame in the Kinect v1 SDK. The BodyFrames are computed by the Kinect sensor internally from its depth data; they provide a higher level API for programming with skeletons. The current system uses the preprocessed information to track individuals.
+The Kinect BodyFrame is the wrapper around skeleton infromation at each frame. The same data structure was called SkeletonFrame in the Kinect v1 SDK. The BodyFrames are assembled by the Kinect sensor internally from its depth data; they provide a high level API for programming with skeletons. Each BodyFrame contains at most six Kinect Bodies, where each Body represents a person's skeleton from the Kinect's field of view. A Body encloses the skeletal joints coordinates and other related metadata. The current system uses this preprocessed information to track individuals in the scene.
 
-Each frame contains at most six Kinect Body data, where each Body represents a skeleton from the Kinect's field of view. A Body contains a skeleton's joints coordinates and metadata.
-
-TCP network clients and server exchange data in bytes, thus requiring any content passed between the two nodes to be serialized. Unfortunately, the Kinect v2 SDK does not support serialization of Kinect BodyFrame. To resolve the inconvenience, the current work builds a Kinect BodyFrame serialization library. The most important pieces of information are the skeleton joints, their coordinates in the Kinect Camera Space, types and tracking states. See Appendix~\ref{sec:appendix_bodyframe_serialization} for a complete list of serialized properties.
+The current Kinect v2 SDK does not support running multiple Kinects on a single machine. Therefore, the researcher writes a simple TCP server and client framework to pass Kinect BodyFrames from the clients to the server. TCP sockets deal with data in bytes, therefore the server and clients must exchange serialized data. Unfortunately, the Kinect v2 SDK does not support serialization of the Kinect BodyFrame. To resolve such inconvenience, the researcher also develops a Kinect BodyFrame serialization library. See Appendix~\ref{sec:appendix_bodyframe_serialization} for a complete list of serialized data. The most important pieces of information are the skeletal joints and their tracking states, because the system requires people's spatial positions and Kinect's confidence level about those information. The system will give more weights to actively tracked skeletal joints when creating the average skeleton.
 
 \section{Calibration}
 \label{sec:current_approach_calibration}
 
-To perform coordinate transformation on a skeleton from its current Kinect field of view into the World coordinate system, the system requires its initial center position and initial angle between itself and the Kinect.  
+The calibration procedure requies each skeleton's initial center position and angle between itself and the Kinect. The number of skeletons to be calibrated increases with the number of Kinects. For example, if there is only one person in the scene with two Kinects, there is a total of two skeletons, one from each of the Kinect's field of view, and so on.
 
-The following definitions are from the Wei et al study \cite{wei_kinect_calibration}.
+Wei et al.\ defined the initial center position and angle as follows~\cite{wei_kinect_calibration}:
 
-Initial center position is defined as the average of a skeleton's joints coordinates over the duration of calibration.
+\begin{description}
+  \item[Initial center position] A skeleton's intial center position is its average of all joints coordinates over the duration of calibration. The center position is represented as $C(x_c, y_c, z_c)$, where $x_c$, $y_c$, and $z_c$ are the $x$, $y$, and $z$ coordinates, respectively.
+  \item[Initial angle] A skeleton's initial angle is the angle between the skeleton and Kinect in the last frame. The initial angle is represented as $\theta$.
+\end{description}
 
-Let N = number of joints per skeleton (20). Let T = number of frames used for calibration (120).
-
-Let S = joints sum. Let A = joints average. Let C = joints center (over time). 
-
-\begin{equation}
-\label{eq:joints_sum}
-S(X_S, Y_S, Z_S) = \sum_{j=1}^J (X_j, Y_j, Z_j)
-\end{equation}
+$N$ denotes the number of joints per skeleton. $N$ equals $25$ in the current Kinect SDK. $T$ denotes the number of frames used for calibration. $T$ equals $120$ in both the Wei et al.\ and the current study. $S(x_s, y_s, z_s)$ denotes the the sum of the joints coordinates in all calibration frames. $A(x_a, y_a, z_a)$ denotes the average of the joints coordinates in all calibration frames. $C(x_c, y_c, z_c)$ can be derived from the above information. The derviation is shown in equation.~\ref{eq:initial_center_position}
 
 \begin{equation}
-\label{eq:joints_average}
-A(X_A, Y_A, Z_A) = S(X_S, Y_S, Z_S) / N
-\end{equation}
-
-\begin{equation}
-\label{eq:joints_center}
-C(X_C, Y_C, Z_C) = A(X_A, Y_A, Z_A) / T
+\label{eq:initial_center_position}
+\begin{gathered}
+S(x_s, y_s, z_s) = \sum_{t=1}^T (\sum_{j=1}^N (x_{t,j}, y_{t,j}, z_{t,j})) \\
+A(x_a, y_a, z_a) = A(x_a, y_a, z_a) / N \\
+C(x_c, y_c, z_c) = C(x_c, y_c, z_c) / T
+\end{gathered}
 \end{equation}
 
 The initial angle is defined as the the angle between the Kinect and the skeleton.
