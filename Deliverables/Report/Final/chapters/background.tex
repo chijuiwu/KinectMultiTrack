@@ -7,25 +7,26 @@
 
 This chapter will review the the state of the art people detection and tracking techniques.
 
+Tracking by detection is a popular appraoch to tracking objects in complex environments. A tracking by detection algorithm would detect interested objects in every frame update, thus updating the tracks in the internal of the algorithm. Tracking based on corrleation or changed-based matching between frames introduces new challenges, such as stochastic movements, sensor noise, illumination changes, cluttered and dynamic backgrounds, and occlusion. Current tracking methods combine this simple approach and predictions about object trajectory to achieve better results. Kalman Filter is the fundamental building block of many tracking algorithms for predicting the states of the objects in the scene. Other variations of the Kalman Filter include the Extended Kalman Filter~\cite{ljung_extended_kalman} and Unscented Kalman Filter~\cite{julier_unscented_kalman}.
+
 The problem of people detection and tracking has been researched extensively in surveillance video, using techniques such as particle filters~\cite{sherrah_particle_filter_video_surveillance}, background subtraction techniques and color histograms~\cite{mckenna_tracking_groups_of_people}, 3D pose estimation~\cite{andriluka_3d_pose_estimation_tracking}, occlusion-aware people dectors~\cite{tang_people_dectector}, and clustering the motion paths of local features~\cite{gudys_cluster_local_features}.
 
-With the advent of time-of-flight cameras like the Kinect, 
-
-\section{Tracking by detection}
-
-Tracking by detection is the primary approach to people tracking. The approach leverages the technology of reliable, inexpensive RGB-D sensors, such as the Microsoft Kinect. Person detection has been performed using depth information [12, 13, 14], and with Kinect depth data [18, 19]. Others use only RGB data [1, 15, 16]. Methods using a combination of appearance and depth information also show promising results [5, 17]. 
-
-Tracking by detection is often applied in RGB-depth based tracking. In general, color information is great at distinguishing people who are far apart from each other and look somewhat different. Depth information provides more clues to the spatial position of each person within a large group.
-
-RGB-based tracking invovles.
-
-Depth-based tracking.
-
-Kalman filter
+With the advent of inexpensive, time-of-flight cameras like the Kinect, various tracking algorithms have taken the advantage of high frame rates depth and RGB data. They are portable and easily depolyable in real world environments.
 
 \section{Tracking with Kinect}
 
-This section describes a number of different methodologies of tracking people using the Kinect in recent research.
+This section describes a number of different methodologies of tracking people using the Kinect in recent research. Tracking with RGB-D cameras such as the Kinect usually uses both the color and depth information. In general, color information is great at distinguishing people who look somewhat different, using local features or gradient orientations from the body region. However, color information can fail to track people correctly when the occlusion is severe. On the other hand, depth information is great at segmenting a cluster of people based on their depth values and the derived height values. This is important because people may not have persistence color and texture when they move about in the environment or interact with others. The next two paragraphs will review some common techniques in tracking with color and depth information.
+
+Color normalization and histograms are common techniques in RGB-based tracking. The distribution of color values in an image may change accordingly to the illumination level in the environment when the image was taken. Color normalization can migitate this unwanted effect~\cite{reinhard_color_transfers}. Some studies use other color spaces for tracking purposes. For instance, Liu et al.\ uses the hue component in the HSV color space to minize the effects of illumination~\cite{liu_tracking_with_pei}.
+
+Color histograms represent an image by showing the the amount of pixels each range of color values occupies in that image. Correlation or intersection of two histograms can be used in similarity matching between tracks. In particular, histogram of oriented gradients (HOG) is a power feature descriptor for tracking similar tragets~\cite{dalal_hog, dollar_pedestrian_detection, munaro_tracking_within_groups_with_mobile_robot, luber_rgbd_boosted_models}. An image gradient is a directional change in the color intensity of a fixed-size detection window. Each detection window is divided into cells. A local histogram of gradient directions is created for each cell, hence local features can be characterized by the distribution of the local gradients. The descriptor can be used to train a linear Support Vector Machine (SVM) to do person and non-person classification, as well as to detect multiple people with a discriminative appearance model.
+
+Depth-based tracking makes detection decisions using the technique of segmentation. 
+
+
+% Plagemann et al proposes an interest points detector to identify different body parts in depth images [21]. Ikemura and Fujiyoshi perform people detection using similarity features from local depth histograms[22]. Other discriminative models detect people using directional changes in depth map [5] and incorporating multiple sensor inputs [17].
+
+% Xia et al proposes a generative method for people tracking using depth information from the Kinect [19]. Initially, the proposed method uses the nearest neighbor interpolation algorithm to fill missing depth data with similar values to the neighbors. It also applies a median filter on the depth array to smooth the depth pixels. Then, a process known as 2D chamfer distance matching is used to find regions that may contain a person by using edge information in the depth array. The method translate and position a head template to match it against the resulting edge map of the selected regions. A 2-D head contour model and a 3-D head surface models are used to differentiate whether a region is actually a head. The whole body contours are then extracted using a region growing algorithm. This allows the tracked body to be segmented from other objects nearby. Color-based tracking is performed based on the assumption that an object would have similar RGB values in successive time frames. On the other hand, depth-based tracking measures the movements of the objects in 3-D space. The method assume that the coordinates and speed of each detected person change slowly, hence the tracking is performed by matching targets with the least energy scores.
 
 \subsection{Subclustering and appearance classifiers}
 
@@ -52,12 +53,14 @@ The tracking algrorithm takes the surving points in PEI from the current frame a
   % \item Real-time Human Motion Tracking using Multiple Depth Cameras
   % \item Human Detection Using Depth Information by Kinect
 
-\section{Coordinate transformation}
+\section{Coordinate Transformation}
 
 
 \cite{eggert_four_algorithms}
 \cite{horn_unit_quaternions}
 \cite{wei_kinect_calibration}
 
+
+\section{Limitations of Related Work}
 
 \end{document}
