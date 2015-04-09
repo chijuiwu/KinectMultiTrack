@@ -7,7 +7,15 @@
 
 People detection and tracking is the process of identifying and following people in an environment. 
 
-The problem of detection and tracking is a challenging issue in surveillance, interactive systems, medical imaging, and humanoid robotics.
+The problem of detection and tracking is a challenging issue in surveillance, interactive systems, medical imaging, and humanoid robotics. why is it important
+
+human traffic
+Counting people in crowds with a real-time network of simple image sensors
+Counting Crowded Moving Objects
+
+human behaviour analysis
+A survey of advances in vision-based human
+motion capture and analysis
 
 The current work proposes an algorithm for tracking people with multiple Kinects which resolves the problem of occlusion.
 
@@ -59,8 +67,17 @@ Kinect is a commodity depth sensor for body motion capturing and tracking. It pr
 
 The current work uses the Kinect BodyFrame stream, which includes the skeletal information of the people in the sensor's field of view. The complete API reference for the Kinect v2 SDK is accessible at \url{https://msdn.microsoft.com/en-us/library/windowspreview.kinect.aspx}.
 
-The system manipulates coordinates in the Kinect Camera Space. These coordinates are 3D points, consisted of the x, y, and z components, in meters. The origin of the coordinate system at (0, 0, 0) is ``located at the center of the IR sensor on Kinect"~\cite{microsoft_kinect_coordinates}. The x axis grows to the left of the sensor, the y axis grows upward from the sensor, and the z axis grows outward from the direction the sensor.
+The system manipulates coordinates in the Kinect Camera Space. These coordinates are 3D points, consisted of the x, y, and z components, in meters. The origin of the coordinate system at (0, 0, 0) is ``located at the center of the IR sensor on Kinect"~\cite{microsoft_kinect_coordinates}. The x axis grows to the left of the sensor, the y axis grows upward from the sensor, and the z axis grows outward from the direction the sensor (See Figure~\ref{fig:kinect_camera_space}).
 
-\textbf{Show Kinect camera spae}
+
+\begin{figure}[!h]
+  \centering
+
+  \includegraphics[width=0.5\linewidth]{figs/kinect_camera_space}
+  
+  \caption{The Kinect Camera Space}
+  
+  \label{fig:kinect_camera_space}
+\end{figure}
 
 \end{document}

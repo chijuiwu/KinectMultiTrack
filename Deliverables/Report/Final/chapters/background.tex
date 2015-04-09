@@ -5,44 +5,59 @@
 
 \label{chapter:background}
 
-% \textbf{TODO}
+This chapter will review the the state of the art people detection and tracking techniques.
 
-% Existing people detection and tracking techniques. Tracking people in surveillance video and in real time. Tracking using mobile and wearable devices. Motion sensors and wireless. Time-of-flight and structured-light cameras.
+The problem of people detection and tracking has been researched extensively in surveillance video, using techniques such as particle filters~\cite{sherrah_particle_filter_video_surveillance}, background subtraction techniques and color histograms~\cite{mckenna_tracking_groups_of_people}, 3D pose estimation~\cite{andriluka_3d_pose_estimation_tracking}, occlusion-aware people dectors~\cite{tang_people_dectector}, and clustering the motion paths of local features~\cite{gudys_cluster_local_features}.
 
-% \begin{enumerate}
-%   \item Particle filter to track multiple people for visual surveillance
-%   \item Tracking People in Video Sequences by Clustering Feature Motion Paths
-%   \item Evaluation of real time people tracking for indoor environments using ubiquitous motion sensors and limited wireless network infrastructure
-%   \item Tracking people under heavy occlusions by layered data association
-%   \item Detection and Tracking of Occluded People
-% \end{enumerate}
+With the advent of time-of-flight cameras like the Kinect, 
 
-% \subsection{Tracking people}
+\section{Tracking by detection}
 
-% \textbf{TODO}
+Tracking by detection is the primary approach to people tracking. The approach leverages the technology of reliable, inexpensive RGB-D sensors, such as the Microsoft Kinect. Person detection has been performed using depth information [12, 13, 14], and with Kinect depth data [18, 19]. Others use only RGB data [1, 15, 16]. Methods using a combination of appearance and depth information also show promising results [5, 17]. 
 
-% \subsection{Coordinate transformation}
+Tracking by detection is often applied in RGB-depth based tracking. In general, color information is great at distinguishing people who are far apart from each other and look somewhat different. Depth information provides more clues to the spatial position of each person within a large group.
 
-% \textbf{TODO}
+RGB-based tracking invovles.
 
-% \cite{eggert_four_algorithms}
-% \cite{horn_unit_quaternions}
+Depth-based tracking.
 
-% \subsection{Tracking using depth data}
+Kalman filter
 
-% \textbf{TODO}
+\section{Tracking with Kinect}
 
-% \subsection{Tracking using color data}
+This section describes a number of different methodologies of tracking people using the Kinect in recent research.
 
-% \textbf{TODO}
+\subsection{Subclustering and appearance classifiers}
 
-% \begin{enumerate}
-%   \item Tracking people within groups using RGB-D data
-%   \item Detecting and tracking people in real time with RGB-D camera
-%   \item Applications for a people detection and tracking algorithm using a time-of-flight camera
-%   \item Real-time Human Motion Tracking using Multiple Depth Cameras
-%   \item Human Detection Using Depth Information by Kinect
-% \end{enumerate}
+Munaro et al.\ proposes a people tracking algorithm for mobile robots using depth sensor information~\cite{munaro_tracking_within_groups_with_mobile_robot}. The proposed algoritm performs clustering on the scene for initial detection, then uses Kalman filter on the motion and appearance features to track multiple people within groups. The method assumes people are on the ground plane.
+
+Initially, the method reduces the size of the Kinect depth point cloud through voxel grid filtering. The process divides the depth map into voxels, where the value of each voxel is the averaged depth value over an area. Then, depth clustering is used to segment the scene in to potential people with different heights. Sub clusters are created by finding the local maxima inside the entire cluster, where each sub-cluster is a bounding box enclosing a person's body. A HOG confidence is calculated for every sub-cluster, which will be compared against the HOG distribution when the person is occluded. The output will become the initial people detection result.
+
+The tracking module leverages the AdaBoost, or Adaptive Boosting, learning algorithm to learn the color appearance of every tracked person, which is computed from the RGB histogram. The machine learning technique will improve the mode over time based on minimizing the errors in the previous models. The tracking module also estimates the motion for each person from their current position using an unscented Kalman Filter with a constant velocity model. Lastly, the system uses a people detector that helps the robot distinguish different people when they are close to each other using color information, as well as keeps it on tracked targets without moving towards obstacles when their colors are similar to those of the targets.
+
+\subsection{Point ensemble image (PEI), histogram of height difference (HOHD), joint histogram of color and height (JHCH)}
+
+Liu et a.\ proposes a number of new techniques for tracking in realtime with a single Kinect sensor~\cite{liu_tracking_with_pei}, namely the point ensemble image (PEI), histogram of height difference (HOHD), and joint histogram of color and height (JHCH). The proposed method is divided into four stages stages. It transforms the RGB-D data into point ensemble images, then uses a detector to find positions of the human body, and finally a feature classifier that uses both histogram of height difference and joint histogram of color and height for fined-grained characterization of the human shape and apperance. Data association of the detection results over time with Kalman Filter is used to generate 3D trajectories for tracking.
+
+A PEI representation combines the person's point cloud with height information. Firstly, the original point cloud of a person is transformed into the plan-view perspective, which is a 2D view of the model's depth data from the top-down perspective. A height map is generated from the point cloud in plan-view perspective. The height map color codes each cell with the highest point value. The final PEI image overlaps the original 3D point cloud with the height map.
+
+In the second stage, the method detects human bodies from the generated PEI in two steps. Similarly to Munaro et al.\'s appraoch, they find the local maxima points representing the head and draw a cylindrical boundary with radius $\omega/2$, where $\omega$ is the average width of the human torso. The points are selected with a constraint specifying the minimum and maximum height, thus filtering out a large amount of unfeasible points. Later on, the method tests whether the potential bodies are indeed humans using a shape and appearance classifier with data extracted from the neighboring points of the potential head position.
+
+The features used in the classifier are HOHD and JHCH. HOHD leverages the information that the height of the head crown is larger than other points on the head and points around the shoulder. The height difference between the head and shoulder is less than a quarter of the average human height. JHCH analyzes the color and height distribution of the human head. The method examines the probability distribution of the skin and hair color with respect to height for neighboring points around the head whose height values are within the average length of the human head. Normally, the probability of the skin color occurrence decreases as the probability of the hair color increases.
+
+The tracking algrorithm takes the surving points in PEI from the current frame as input and returns the association result with the current tracks as output. The color similarity is computed from the JHCH, and the spatial position similarity is computed from difference between the actual position and predicted position using Kalman Filter. The algorithm labels detection results which have have no corresponding tracks as new tracked targets in the scene.
+
+  % \item 
+  % \item Applications for a people detection and tracking algorithm using a time-of-flight camera
+  % \item Real-time Human Motion Tracking using Multiple Depth Cameras
+  % \item Human Detection Using Depth Information by Kinect
+
+\section{Coordinate transformation}
+
+
+\cite{eggert_four_algorithms}
+\cite{horn_unit_quaternions}
+\cite{wei_kinect_calibration}
 
 
 \end{document}

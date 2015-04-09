@@ -63,14 +63,38 @@ The design decisions on the look of the user interface are not discussed, becaus
 
 \begin{figure}[!h]
   \centering
-  \includegraphics[width=0.5\linewidth]{figs/ui}
-  \caption{UI}
+
+  \includegraphics[width=0.8\linewidth]{figs/ui}
+  
+  \caption{The user interface}
+  
   \label{fig:ui}
 \end{figure}
 
 Available user controls are shown as buttons. The user interface responds to click events on each button. Buttons representing functionalities are that not meant to be used are disabled. For instance, when the start button is pressed, signaling the server to start running, the setup button, which parameterized the server, should be disabled.
 
-When the user interface receives events from the server about new and old connections with clients, the user interface adds and removes option to transform the kinect Bodies into the particular Kinect's field of view, respectively. The user interface would also display texts, centered on the left hand side visualization, about the progress of calibration or any interrupted action causing calibration to fail. How the user interface displays the BodyFrames is discussed in the next subsections ``Tracking View'' and ``Disjoined View''.
+When the user interface receives events from the server about new and old connections with clients, the user interface adds and removes option to transform the kinect Bodies into the particular Kinect's field of view, respectively. The user interface would also display texts, centered on the left hand side visualization, about the progress of calibration or any interrupted action causing calibration to fail. How the user interface displays the BodyFrames is discussed in the next subsections ``Tracking View'' and ``Disjoined View''. 
+
+\begin{figure}[!h]
+  \centering
+  \subfloat[Person standing in the center of the scene, from the perspective of the front-facing Kinect]{
+    \includegraphics[width=0.5\linewidth]{figs/center_front}
+  }
+  \subfloat[Person standing in the center the scene, from the perspective of the side-facing Kinect]{
+    \includegraphics[width=0.5\linewidth]{figs/center_45}
+  }
+  \\
+  \subfloat[Person standing at the back of the scene, from the perspective of the front-facing Kinect]{
+    \includegraphics[width=0.5\linewidth]{figs/away_front}
+  }
+  \subfloat[Person standing at the back of scene, from the perspective of the side-facing Kinect]{
+    \includegraphics[width=0.5\linewidth]{figs/away_45}
+  }
+
+  \caption{The user interface showing both the tracking and disjoined views when the same person stands in different positions, from both the front-facing and side-facing Kinects' perspectives}
+  
+  \label{fig:tracking_disjoined_views}
+\end{figure}
 
 \subsection{Tracking View}
 \label{sec:implementation_tracking_view}
@@ -78,20 +102,6 @@ When the user interface receives events from the server about new and old connec
 The Tracking View shows the skeleton visualization of the tracking result. The merged skeletons are drawn from the perspective of the selected Kinect, specified by the user or is defaulted to the local client's Kinect (The local client is the client that is also running on the server machine). The average skeleton is calculated at this stage. The potential skeletons of a person share the same color, and the average skeleton is always colored white. There are six available colors, because the system sets the cap of number of tracked people to six.
 
 The skeleton visualization in both Tracking View and Disjoined View has the same implementation. The bones of the skeletons are drawn first, then the joints. The simplified list of human bones using the Kinect joints are taken from the Microsoft Kinect Developer examples. The inferred bones are displayed thinner than the tracked bones.
-
-\textbf{(todo: default to local Kinect)}
-
-\begin{figure}[!h]
-  \centering
-  \subfloat[]{
-    \includegraphics[width=0.5\linewidth]{figs/tracking_view}
-  }
-  \subfloat[]{
-    \includegraphics[width=0.5\linewidth]{figs/disjoined_view}
-  }
-  \caption{The Tracking View}
-  \label{fig:tracking_view}
-\end{figure}
 
 \subsection{Disjoined View}
 \label{sec:implementation_disjoined_view}

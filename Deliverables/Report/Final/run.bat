@@ -8,6 +8,6 @@ perl texcount.pl chapters/*.tex
 @echo off
 echo.
 echo.
-echo SH Project Report (report.pdf)
+echo Undergraduate Thesis (thesis.pdf)
 echo Chi-Jui Wu 2015
 echo.
