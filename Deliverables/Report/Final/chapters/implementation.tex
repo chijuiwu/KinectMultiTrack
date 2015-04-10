@@ -111,7 +111,7 @@ The Disjoined View shows the skeleton visualization of the tracked skeletons in 
 \section{Tracker}
 \label{sec:implementation_tracker}
 
-The tracker runs the tracking algorithm on the server. Much of the algorithm has been explained in section \ref{fig:current_approach}. This section will explain how the algorithm has been implemented.
+The tracker runs the tracking algorithm on the server. Much of the algorithm has been explained in Section~\ref{fig:current_approach}. This section will explain how the algorithm has been implemented.
 
 The tracker contains a dictionary of clients' IP address (as key) and a generic data structure (as value), called kinectClient, storing information about the Kinect connected to the client and all the frames received from it.
 
@@ -120,7 +120,7 @@ In calibration phase, all frames are stored in a stack inside each KinectClient.
 \section{Logger}
 \label{sec:implementation_logger}
 
-The logger takes a tracking result and writes it to the file. The complete list of items logged at each time interval can be found in appendix \ref{sec:logging}.
+The logger takes a tracking result and writes it to the file. The complete list of items logged at each time interval can be found in Appendix~\ref{sec:logging}.
 
 During the experiments, after the user interface displays the tracking result, it will fire an event to the server. The server will write every other tracking result to a file on the local disk. The user interface will not signal the server about the result if the experiment is paused between tasks.
 

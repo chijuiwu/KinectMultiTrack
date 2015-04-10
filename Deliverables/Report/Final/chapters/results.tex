@@ -4,7 +4,7 @@
 \chapter{Results}
 \label{chapter:results}
 
-This chapter summarizes the results in each user study and makes comparisons between a number of different studies. The results should provide insights into the reliability and accuracy of the tracking algorithm in different settings. In additiona, it would show the coordinates and joints that yield the most stable results during normal human activities.
+This chapter summarizes the results in each user study and makes comparisons between a number of different studies. The results should provide insights into the reliability and accuracy of the tracking algorithm in different settings. In addition, it would show the coordinates and joints that yield the most stable results during normal human activities.
 
 \section{Accessing the data}
 \label{sec:results_access_data}
@@ -23,7 +23,7 @@ There is also an error in code where a scenario id is logged incorrectly. In the
 
 The tracker time is stored as the server's current time in milliseconds. The times for each user task (scenario) are reset. The current timestamps refer to the amount of time passed in each scenario, for a particular Kinect configuration and experiment.
 
-The timesalso converted from milliseconds to seconds. The joint coordinates are converted from meters to centimeters.
+The times are also converted from milliseconds to seconds. The joint coordinates are converted from meters to centimeters.
 
 The studies are interested in the amount of coordinate differences between multiple skeletons after transformation during tracking. Thus, evaluation requires the joint positions of more than one skeletons (from different Kinect fields of view) at any given timestamp.
 
@@ -55,9 +55,9 @@ Coordinates and joints distances are defined as:
 
 There are three main results sections, one for each of the primary tasks, namely the Stationary, Steps, and Walk tasks. Each of these sections contains three basic visualizations showing the effects of the particular scenario on coordinates transformation errors when tracked with Kinects at different locations.
 
-Each main section will begin with a figure showing changes in the average coordinates and joints distances with Parallel, 45$^{\circ}$ and 90$^{\circ}$ apart Kinects. The x asis will be the position of Kinect placement. The y axis will be the average coordinates distances, in terms of $\Delta x$, $\Delta y$, $\Delta z$, and $\Delta d$ (as defined in section~\ref{sec:results_definitions}). The figures will also entail the average coordinates distances over all of the Kinect placements.
+Each main section will begin with a figure showing changes in the average coordinates and joints distances with Parallel, 45$^{\circ}$ and 90$^{\circ}$ apart Kinects. The x axis will be the position of Kinect placement. The y axis will be the average coordinates distances, in terms of $\Delta x$, $\Delta y$, $\Delta z$, and $\Delta d$ (as defined in section~\ref{sec:results_definitions}). The figures will also entail the average coordinates distances over all of the Kinect placements.
 
-The second figure will give more details about the average case shown in the previous figure. It will show changes in the average coordinates distances for each of the joint types. The x asis will be the joint type. The y axis will be the average joints distances, also in terms of $\Delta x$, $\Delta y$, $\Delta z$, and $\Delta d$.
+The second figure will give more details about the average case shown in the previous figure. It will show changes in the average coordinates distances for each of the joint types. The x axis will be the joint type. The y axis will be the average joints distances, also in terms of $\Delta x$, $\Delta y$, $\Delta z$, and $\Delta d$.
 
 Then, each section will finish with a table summarizing the actual values of the average coordinates distances for the presented task with each of the Kinect placements, as well as averaged over all different placements. The figures show how Kinect placements affect the average coordinates and joints distances during the Steps task.
 
@@ -333,7 +333,7 @@ When the tasks are averaged, the best case is $6.85$ cm (Parallel), the worst ca
 
 Figure \ref{fig:results_three_coordinates_over_time} shows the average joints distances over time in the Stationary, Steps, and Walk tasks with Parallel, 45$^{\circ}$ and 90$^{\circ}$ apart Kinects. These figures demonstrate the stability of the tracking algorithm for different joints over time when performing different tasks in different Kinect placements. The figures are taken from participant 18.
 
-% The average coordinates distances over time in the Steps task with different Kinect placements shows rapid changes during time intervals when the partcipants take a step to a new position (See Figure~\subref*{steps_coordinates_over_time}).
+% The average coordinates distances over time in the Steps task with different Kinect placements shows rapid changes during time intervals when the participants take a step to a new position (See Figure~\subref*{steps_coordinates_over_time}).
 
 \begin{figure}[!h]
   \centering

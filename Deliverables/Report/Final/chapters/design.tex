@@ -12,7 +12,7 @@ The application should be intuitive and easy to use. Since it is a prototype dem
 
 The application provides the end users essential functionalities for running the application, including to start and stop the server, recalibrate, view tracked skeletons from different views, and send the average skeleton stream to other applications. The logger should also store the tracking data on demand.
 
-The researcher has discarded the following requriments for the software, due to time constraints and the scope of the project:
+The researcher has discarded the following requirements for the software, due to time constraints and the scope of the project:
 
 \begin{itemize}
   \item The security of the application.
@@ -23,17 +23,14 @@ The researcher has discarded the following requriments for the software, due to 
 \section{Software stack}
 \label{sec:design_software_stack}
 
-The current work uses Kinects for XBox One.
-
-The system is written in C\# with the 4.5 .NET framework, and the user interface is 
-created using the .NET WPF framework. The choices are made because the official Microsoft Kinect SDK is in C\# , and the latest examples use the WPF framework for the user interface. 
+The current work uses Kinects for XBox One. The Microsoft Kinect SDKs are in both C++ and C\#. The system is written in C\# with the 4.5 .NET framework, and the user interface is created using the .NET WPF framework. C\# is chosen over C++ because of the ease of development given the researcher's background in Java, which is considered to be a similar language to C\#. The WPF framework is selected over traditional Windows Forms, because the the latest examples included in the official SDK use this framework.
 
 \section{System architecture}
 \label{sec:design_architecture}
 
 The main components of the system consist of a server, a tracker, a user interface, and a logger. The server passes on the Kinect BodyFrames received from the clients to the tracker. The tracker then processes the data and signals the user interface when the latest result is available. The user interface displays the tracking result on the skeleton visualization. When required by the end user, the logger would write tracking result to files.
 
-The system topology consists of one or more machines in a client-server model. The latest Kinect v2 SDK at the time of writing (version 2.0.1410.19000) still does not support running multiple Kinects on a single machine, as a result, the system leverages the TCP/IP protocol for communicating between multiple Kinects. In the current system architecture, each client is running one Kinect (Figure \ref{fig:system_architecture}). There is only one server, and any client machine can also run the server. All clients send Kinect Body frames to the server. The server is the workhorse of the system. It serves incoming client connections, establishes network streams with the clients, runs the user interface and exchanges information with the tracker (whom in runs the tracking algorithm), and lastly, informs the logger to write tracking data to files.
+The system topology consists of one or more machines in a client-server model. The latest Kinect v2 SDK at the time of writing (version 2.0.1410.19000) still does not support running multiple Kinects on a single machine, as a result, the system leverages the TCP/IP protocol for communicating between multiple Kinects. In the current system architecture, each client is running one Kinect (See Figure~\ref{fig:system_architecture}). There is only one server, and any client machine can also run the server. All clients send Kinect Body frames to the server. The server is the workhorse of the system. It serves incoming client connections, establishes network streams with the clients, runs the user interface and exchanges information with the tracke which runs the tracking algorithm, and lastly, informs the logger to write tracking data to files when required.
 
 \begin{figure}[!h]
   \centering

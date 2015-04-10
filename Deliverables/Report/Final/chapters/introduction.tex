@@ -5,25 +5,12 @@
 
 \label{chapter:introduction}
 
-People detection and tracking is the process of identifying and following people in an environment. 
-
-The problem of detection and tracking is a challenging issue in surveillance, interactive systems, medical imaging, and humanoid robotics. why is it important
-
-human traffic
-Counting people in crowds with a real-time network of simple image sensors
-Counting Crowded Moving Objects
-
-human behaviour analysis
-A survey of advances in vision-based human motion capture and analysis
-Kinects and human kinetics: A new approach for studying pedestrian behavior
-Robust Gaze Estimation Based on Adaptive Fusion of Multiple Cameras
-
-The current work proposes an algorithm for tracking people with multiple Kinects which resolves the problem of occlusion.
+People detection and tracking is the process of identifying and following people in an environment. Knowing where people are is important for human traffic~\cite{yang_count_people} and behaviour analysis~\cite{seer_pedestrian_behaviour, arar_gaze_estimation}. There is also a growing interest in human-robot interactions~\cite{mutlu_human_robot_interaction}. It is likely that in the future there will be many social robots interacting with people and with other robots, thus requiring them to navigate around a stochastic environment. These robots must be able to avoid obstacles and track people persistently, either through a centralized control (orchestration) or decentralized, autonomous cooperation (choreography). There is ongoing research in using mobile robots for tracking people~\cite{choi_indoor_robots, munaro_tracking_within_groups_with_mobile_robot, munaro_tracking_2, glas_people_tracking_robot_localization, satake_stereo_robot}. The current work focuses on tracking people under occlusion.
 
 \section{Problem Statement}
 \label{sec:introduction_problem_statement}
 
-Tracking depends on initial detection results. The current work leverages Kinect sensor's ability to identify people from a depth map. This allows the researcher to focus on the problem of tracking.
+The efficacy of tracking algorithms often depends on the quality of initial detection results. The current work leverages Kinect sensor's ability to identify people from a depth map. This allows the researcher to focus on the problem of tracking.
 
 Tracking moving objects is non-trivial. There are many sources of tracking errors, including raw sensor data noise, illumination levels, changing backgrounds, and occlusion. Tracking in real-life scenarios are even harder. The environment is unpredictive and complex, often consisting of multiple people. A crowded environment with complex human interactions gives rise the the problem of occlusion.
 
@@ -69,7 +56,6 @@ Kinect is a commodity depth sensor for body motion capturing and tracking. It pr
 The current work uses the Kinect BodyFrame stream, which includes the skeletal information of the people in the sensor's field of view. The complete API reference for the Kinect v2 SDK is accessible at \url{https://msdn.microsoft.com/en-us/library/windowspreview.kinect.aspx}.
 
 The system manipulates coordinates in the Kinect Camera Space. These coordinates are 3D points, consisted of the x, y, and z components, in meters. The origin of the coordinate system at (0, 0, 0) is ``located at the center of the IR sensor on Kinect"~\cite{microsoft_kinect_coordinates}. The x axis grows to the left of the sensor, the y axis grows upward from the sensor, and the z axis grows outward from the direction the sensor (See Figure~\ref{fig:kinect_camera_space}).
-
 
 \begin{figure}[!h]
   \centering
