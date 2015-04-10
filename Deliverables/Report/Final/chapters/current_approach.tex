@@ -21,14 +21,18 @@ The application consists of a server and client. There must be at least one serv
 Run the server:
 
 {\centering
-  Run ``\\KinectMultiTrack\\KinectMultiTrack\\MultiTrackServer\\bin\\Release\\KinectMultiTrack.\\exe''
+  Run ``\\KinectMultiTrack\\KinectMultiTrack\\MultiTrackServer\\bin\\Release\\KinectMultiTrack.\\exe [port]''
 }
+
+The port number is optional. If the field is empty, the server will start listening for connections at port 12345.
 
 Run the client:
 
 {\centering
-  Run ``\\KinectMultiTrack\\KinectMultiTrack\\MultiTrackClient\\bin\\Release\\MultiTrackClient.\\exe''
+  Run ``\\KinectMultiTrack\\KinectMultiTrack\\MultiTrackClient\\bin\\Release\\MultiTrackClient.\\exe [address] [port]''
 }
+
+The address and port number are option. If the fields are empty, the client will send BodyFrames to the researcher's machine.
 
 \section{Overview}
 \label{sec:current_approach_overview}
