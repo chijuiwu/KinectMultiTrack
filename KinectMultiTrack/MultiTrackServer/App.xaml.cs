@@ -13,12 +13,22 @@ namespace KinectMultiTrack
     /// </summary>
     public partial class App : Application
     {
-        public const int serverPort = 12345;
+        public const int DEFAULT_PORT = 12345;
+        public int PORT = DEFAULT_PORT;
 
         private Server server;
 
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            if (e.Args.Length == 1)
+            {
+                this.PORT = Convert.ToInt32(e.Args[0]);
+            }
+            Console.WriteLine("Configured server to run at port: " + this.PORT);
+            this.server = new Server(this.PORT);
+        }
+
         public App() {
-            this.server = new Server(App.serverPort);
         }
     }
 }
