@@ -333,6 +333,8 @@ When the tasks are averaged, the best case is $6.85$ cm (Parallel), the worst ca
 
 Figure \ref{fig:results_three_coordinates_over_time} shows the average joints distances over time in the Stationary, Steps, and Walk tasks with Parallel, 45$^{\circ}$ and 90$^{\circ}$ apart Kinects. These figures demonstrate the stability of the tracking algorithm for different joints over time when performing different tasks in different Kinect placements. The figures are taken from participant 18.
 
+% The average coordinates distances over time in the Steps task with different Kinect placements shows rapid changes during time intervals when the partcipants take a step to a new position (See Figure~\subref*{steps_coordinates_over_time}).
+
 \begin{figure}[!h]
   \centering
 
@@ -340,16 +342,19 @@ Figure \ref{fig:results_three_coordinates_over_time} shows the average joints di
     \includegraphics[width=0.33\linewidth]{figs/Participant_19_Task_Stationary_Kinect_Parallel_coordinates_over_time} 
     \includegraphics[width=0.33\linewidth]{figs/Participant_19_Task_Stationary_Kinect_45_coordinates_over_time}
     \includegraphics[width=0.33\linewidth]{figs/Participant_19_Task_Stationary_Kinect_90_coordinates_over_time}
+    \label{fig:stationary_coordinates_over_time}
   } \\
   \subfloat[Steps]{
     \includegraphics[width=0.33\linewidth]{figs/Participant_19_Task_Steps_Kinect_Parallel_coordinates_over_time} 
     \includegraphics[width=0.33\linewidth]{figs/Participant_19_Task_Steps_Kinect_45_coordinates_over_time}
     \includegraphics[width=0.33\linewidth]{figs/Participant_19_Task_Steps_Kinect_90_coordinates_over_time}
+    \label{fig:steps_coordinates_over_time}
   } \\
   \subfloat[Walk]{
     \includegraphics[width=0.33\linewidth]{figs/Participant_19_Task_Walk_Kinect_Parallel_coordinates_over_time} 
     \includegraphics[width=0.33\linewidth]{figs/Participant_19_Task_Walk_Kinect_45_coordinates_over_time}
     \includegraphics[width=0.33\linewidth]{figs/Participant_19_Task_Walk_Kinect_90_coordinates_over_time}
+    \label{fig:walk_coordinates_over_time}
   }
 
   \caption{Plots showing average coordinates distances over time in the Stationary, Steps, and Walk tasks with Parallel, 45$^{\circ}$, and 90$^{\circ}$ apart Kinects.}
@@ -384,17 +389,79 @@ Figure \ref{fig:results_three_coordinates_over_time} shows the average joints di
 \section{Obstacle}
 \label{sec:results_obstacle}
 
-\textbf{TODO}
+Figure~\ref{fig:results_obstacle_timeline}
+
+\begin{figure}[!h]
+  \centering
+
+  \subfloat{
+    \includegraphics[width=0.33\linewidth]{figs/obstacle_1}
+    \includegraphics[width=0.33\linewidth]{figs/obstacle_2}
+    \includegraphics[width=0.33\linewidth]{figs/obstacle_3}
+  } \\
+  \subfloat{
+    \includegraphics[width=0.33\linewidth]{figs/obstacle_4}
+    \includegraphics[width=0.33\linewidth]{figs/obstacle_5}
+    \includegraphics[width=0.33\linewidth]{figs/obstacle_6}
+  } \\
+  \subfloat{
+    \includegraphics[width=0.33\linewidth]{figs/obstacle_7}
+    \includegraphics[width=0.33\linewidth]{figs/obstacle_8}
+    \includegraphics[width=0.33\linewidth]{figs/obstacle_9}
+  }
+
+  \caption{The skeleton visualization showing both the tracking and disjoined views when the same person stands in different positions, from both the front-facing and side-facing Kinects' perspectives}
+  
+  \label{fig:results_obstacle_timeline}
+\end{figure}
 
 \section{Interactions}
 \label{sec:results_interactions}
 
-\textbf{TODO}
+Figure~\ref{fig:results_obstacle_timeline}
+
+\begin{figure}[!h]
+  \centering
+
+  \subfloat{
+    \includegraphics[width=0.20\linewidth]{figs/interaction_1}
+    \includegraphics[width=0.20\linewidth]{figs/interaction_2}
+    \includegraphics[width=0.20\linewidth]{figs/interaction_3}
+  } \\
+  \subfloat{
+    \includegraphics[width=0.20\linewidth]{figs/interaction_4}
+    \includegraphics[width=0.20\linewidth]{figs/interaction_5}
+    \includegraphics[width=0.20\linewidth]{figs/interaction_6}
+  } \\
+  \subfloat{
+    \includegraphics[width=0.20\linewidth]{figs/interaction_7}
+    \includegraphics[width=0.20\linewidth]{figs/interaction_8}
+    \includegraphics[width=0.20\linewidth]{figs/empty}
+  }
+
+  \caption{Figures showing the timeline of a participant completing the first stage of the Interactions task. He is asked to walk to the front of the other participant and back.}
+  
+  \label{fig:results_interaction_timeline}
+\end{figure}
+
+\begin{figure}[!h]
+  \centering
+
+  \subfloat{
+    \includegraphics[width=0.20\linewidth]{figs/swap_1}
+    \includegraphics[width=0.20\linewidth]{figs/swap_2}
+    \includegraphics[width=0.20\linewidth]{figs/swap_3}
+  }
+
+  \caption{Figures showing the timeline of two participants completing the third stage of the Interactions task. They are asked to exchanged positions.}
+  
+  \label{fig:results_swap_timeline}
+\end{figure}
 
 \section{Overall}
 \label{sec:results_overall}
 
-\begin{figure}[!htb]
+\begin{figure}[!h]
   \centering
 
   \includegraphics[width=0.8\linewidth]{figs/Coordinates_All}

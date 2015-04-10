@@ -26,6 +26,8 @@ All average coordinates distances are also higher for the left joints compared t
 
 Wei et al reported lower values compared to the current study~\cite{wei_kinect_calibration}. In their Stationary task (Average Difference before Movement) with Parallel ($4.25^{\circ}$) apart Kinects, the coordinates distances are $0.00$, $1.00$, and $2.00$ cm for $\Delta x$, $\Delta y$, and $\Delta z$, respectively. The $\Delta d$ will be $2.24$ cm, which is lower than the $3.52$ cm (See Table \ref{table:stationary_coordinates_values}) found in the current study. In their same task with $45^{\circ}$ ($44.37^{\circ}$) apart Kinects, the coordinates distances are $1.00$, $1.00$, and $1.50$ cm for $\Delta x$, $\Delta y$, and $\Delta z$, respectively. The $\Delta d$ will be $2.06$ cm, also lower than the $6.95$ cm found in the current study.
 
+The average coordinates distances over time in the Stationary task with different Kinect placements are near constant (See Figure~\subref*{stationary_coordinates_over_time}). The result verifies the claim that the tracking algorithm produces persistent results over time when the target is stationary, regardless of Kinect plaecements.
+
 \section{Steps}
 \label{sec:discussion_steps}
 
@@ -42,6 +44,8 @@ The standard deviation of $\Delta d$ within each type of Kinect placement is low
 There is a less visible difference in the coordinates distances between joints in the torso and other body regions (See Figure~\subref*{fig:steps_joints}), but it remains when examined closely. However, the pattern that left joints have higher coordinates distances is still very noticeable. Overall, the variations of the distances in each joint are still large, except for the $\Delta y$ distances. The $\Delta y$ distances and their standard deviations reamin small.
 
 Wei et al also reported lower results compared to the current study. In their Steps task (Average Difference after Movement) with Parallel ($4.25^{\circ}$ apart) Kinects, the coordinates distances are $2.00$, $1.28$, and $3.78$ cm for $\Delta x$, $\Delta y$, and $\Delta z$, respectively. The $\Delta d$ will equal to $4.46$ cm, which is lower than the $6.87$ cm (See Table~\ref{table:steps_coordinates_values}) found in the current study. In their same task with $45^{\circ}$ ($44.37^{\circ}$) apart Kinects, the coordinates distances are $4.28$, $1.64$, and $5.28$ cm for $\Delta x$, $\Delta y$, and $\Delta z$, respectively. The $\Delta d$ will equal to $6.99$ cm, also lower than the $12.80$ cm found in the current study.
+
+The average coordinates distances over time in the Steps task with different Kinect placements shows rapid changes when the partcipant follows the instruction and takes a step to a new position (See Figure~\subref*{steps_coordinates_over_time}). This is expected, because the participant will move towards a position, away from the center, that leads to less accurate coordinate transformation. When the participant isn't moving, the coordinates distances over time remain constant, as shown in the Stationary task.
 
 \section{Walk}
 \label{sec:discussion_walk}
@@ -60,10 +64,12 @@ There are common patterns in the joints distances between different tasks. First
 
 Wei et al did not run experiments containing longer, continuous walking tasks. The researcher has not found results for a similar task in the literature.
 
+The average coordinates distances over time in the Walk task with different Kinect placements shows even more rapid changes when the partcipant walks diagonally and around the perimeter (See Figure~\subref*{walk_coordinates_over_time}). There appears to be a correlation between the distance moved from the starting position and the amount of coordinates differences between multiple skeletons. The further away a person is from the starting position, the larger errors the coordinates transformation will produce.
+
 \section{Stationary, Steps, Walk}
 \label{sec:discussion_scenarios}
 
-The tasks Stationary, Steps, and Walk are ordered in increasing complexity, where the former requires zero movements, and the latter requires constant movements. The studies show that coordinates distances increase with increasing complexity of the tasks (See Figure~\ref{fig:results_coordinates_kinect_all}). The relationship can be attributed to increasing amount of joints movements and turning of the shoulder, of which the coordinates transformation uses for calculating the angle between the Kinects and the person. In addition, when averaged over different Kinect placements, the coordinates distances for different joints in Stationary, Steps, and Walk tasks are roughly the same, but there is a distinct difference between coordinates of the left and right joints (See Figure~\ref{fig:results_joints_kinect_all}).
+The tasks Stationary, Steps, and Walk are ordered in increasing complexity, where the former requires zero movements, and the latter requires constant movements. The studies show that coordinates distances increase with increasing complexity of the tasks (See Figure~\ref{fig:results_coordinates_kinect_all}). The relationship can be attributed to increasing amount of joints movements and turning of the shoulder, of which the coordinates transformation uses for calculating the angle between the Kinects and the person. In addition, when averaged over different Kinect placements, the coordinates distances for different joints in Stationary, Steps, and Walk tasks are roughly the same, but there is a distinct difference between coordinates of the left and right joints (See Figure~\ref{fig:results_joints_kinect_all}). This observation may attribute to the fact that the studies are done using Kinects which are placed within the positive $90^{\circ}$ angle, and the differences between the left and right joints may disappear if the results are averaged over Kinect placements that are within the negative $90^{\circ}$ angle.
 
 The Kinect placements of parallel, 45$^{\circ}$ and 90$^{\circ}$ are ordered in increasing angle. The studies show that coordinates distances increase with increasing angle (See Figure~\ref{fig:results_coordinates_task_all}). The angle between Kinects correlates to the degree of rotation used in the transformation of multiple skeletons. The larger the angle is between Kinects, the skeletons will be rotated more, hence producing larger coordinates differences. The joints distances follow a similar pattern as shown in the plot with different tasks averaged over different Kinect placements. The left joints also have larger coordinates differences compared to the right joints, but there is less variation between joints, and the averages are slightly smaller (See Figure~\ref{fig:results_joints_task_all}).
 
@@ -71,42 +77,47 @@ When varying only either the complexity of the tasks or the angle of Kinect plac
 
 The worse average cases show that the $\Delta d$ distances are around $20$ cm (See Figure~\ref{fig:results_three_coordinates_joints}). This boundary is still within the personal space, or the space where only one person is most likely to exist. The results show preliminary success in tracking people using transformed 3D coordinates to find their spatial positions and joints.
 
-\textbf{Time}
+The coordinates distances over time for the three tasks with different Kinect placements show that the larger the movements, which in turn correspond to the complexity of the task, the larger the coordinates differences will be observed (See Figure~\ref{fig:results_three_coordinates_over_time}). The argument also holds true for every joint in the human body (See Figure~\ref{fig:results_three_joints_over_time}).
 
 \section{Obstacle}
 \label{sec:discussion_obstacle}
 
-\textbf{TODO}
+The Obstacle task demonstrates that the tracking algorithm is able to combine joint information from multiple Kinects to construct the average skeleton. The system knows to update the skeletal positions of the person using all sensors after they reappear from occlusion.
 
 \section{Interaction}
 \label{sec:discussion_interaction}
 
-\textbf{TODO}
+The Interaction task shows the same outcome. Every tracked person will acquire joint information to its extent during partial and full occlusion.
 
 \section{Summary}
 
 The researcher summarizes the findings as follows:
 
 \begin{enumerate}
-  \item $\Delta x$, $\Delta y$, $\Delta z$, and $\Delta d$ increase with increasing complexity of tasks, from being stationary to walking
-  \item $\Delta x$, $\Delta y$, $\Delta z$, and $\Delta d$ increase with increasing angle between Kinects
-  \item The torso (head, hip, knee, neck, shoulder, and spine) is more reliable than other body regions
-  \item The left joints are more reliable than the right joints
-  \item $\Delta d$ is less than $15$ cm on average, over different tasks and Kinect placements
+  \item $\Delta x$, $\Delta y$, $\Delta z$, and $\Delta d$ increase with increasing complexity of tasks, from remaining stationary to walking.
+  \item $\Delta x$, $\Delta y$, $\Delta z$, and $\Delta d$ increase with increasing angle between different Kinects
+  \item The torso (head, hip, knee, neck, shoulder, and spine) is more reliable than other body regions.
+  \item $\Delta d$ is less than $15$ cm on average over different tasks and Kinect placements. The value is within the margin of personal space, thus allowing additioanl algorithms which takes personal body regions as inputs to be incorporated to the current system.
 \end{enumerate}
 
 \section{Criticisms}
 \label{sec:discussion_criticisms}
 
-The data collection (logging) procedure was flawed due to software failure. The logger did not log the same length of stationary movement for all participants and different Kinect placements. The lengths of the results in the Stationary task do not all equal to ten seconds as described in chapter~\ref{chapter:studies}.
+The data collection, or the logging, procedure was flawed due to software failure. The logger did not log the same length of stationary movement for all participants and different Kinect placements. The lengths of the results in the Stationary task do not all equal to ten seconds as described in Chapter~\ref{chapter:studies}.
 
 The data cleaning process is also not rigourous. In both the Steps and Walk tasks, the participants remained in the same positions between instructions. The skeletons data for when the participants remained in the same positions should be discarded before doing any further analysis investigating the effects of task complexity and Kinect placements.
 
-The analysis did not include significance testings on the hypotheses. The results are only descriptive, not inferrential.
+The analysis did not include significance testings on the hypotheses. Therefore, the results are only descriptive, not inferrential. The studies are carried out with Kinects placed at the same height and tilting angle, hence the results do not fully describe the limitations of the current tracking algorithm. Furthermore, the studies only use two Kinects. The relationship between the number of Kinects and the accuracy of the tracking algorithm is not investigated.
+
+The current approach relies the Kinect BodyFrame. Unlike some algorithms in previous research which use color and depth data, the current system is limited to tracking up to six people due to the constraint of the Kinect BodyFrame API.
 
 \section{Future Work}
 \label{sec:discussion_future_Work}
 
-Future work can be divided into two domains, one for the tracking system, including the algorithms and application, and the other one for the user studies.
+Future work can be divided into two areas, the application and user studies.
+
+The application has the potential to incorporate other algorithms which uses the joint information from the tracking results, because the average coordinates distances ($\Delta d$) are within the personal space. The algorithms may be gesture recognition or motion tracking. Furthermore, the current application can send image patches around the joints to other applications for different purposes. A potential application would be to track the blood oxygenation level of the users during occlusion. The advantages and disadvantages of distributing the current algorithm, as well as the calibration procedure to the client machines are not discussed. Other tracking and calibration techniques from previous research can be implemented, and future work would compare the errors that each technique makes when performing the same set of tasks. For example, an alternative to using targes' shoulder joints for calibration would be triangulating some static objects in the scene. 
+
+The results from the user studies can be further analyzed using significance testings, such as using ANOVA to compare the coordinates distances between different tasks and Kinect placements. The current work discards the cost of using additional Kinects. An interesting extension would be to derive a cost function which determines the optimal placement of the Kinects in a known environment for obtaining the largest possible field of view while minzing the average coordinates distances.
 
 \end{document}

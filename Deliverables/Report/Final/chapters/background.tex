@@ -13,24 +13,27 @@ The problem of people detection and tracking has been researched extensively in 
 
 With the advent of inexpensive, time-of-flight cameras like the Kinect, various tracking algorithms have taken the advantage of high frame rates depth and RGB data. They are portable and easily depolyable in real world environments.
 
-\section{Tracking with Kinect}
+\section{Tracking with Color and Depth Data}
 
-This section describes a number of different methodologies of tracking people using the Kinect in recent research. Tracking with RGB-D cameras such as the Kinect usually uses both the color and depth information. In general, color information is great at distinguishing people who look somewhat different, using local features or gradient orientations from the body region. However, color information can fail to track people correctly when the occlusion is severe. On the other hand, depth information is great at segmenting a cluster of people based on their depth values and the derived height values. This is important because people may not have persistence color and texture when they move about in the environment or interact with others. The next two paragraphs will review some common techniques in tracking with color and depth information.
+Tracking with RGB-D cameras such as the Kinect usually uses both the color and depth information. In general, color information is great at distinguishing people who look somewhat different, using local features or gradient orientations from the body region. However, color information can fail to track people correctly when the occlusion is severe. On the other hand, depth information is great at segmenting a cluster of people based on their depth values and the derived height values. This is important because people may not have persistence color and texture when they move about in the environment or interact with others. Despite the differences, tracking using color or depth data usually makes the same assumption that the same object in successive frames will have similar colors and positions (small changes in velocity). The following section will review some common techniques in tracking using color and depth information.
 
 Color normalization and histograms are common techniques in RGB-based tracking. The distribution of color values in an image may change accordingly to the illumination level in the environment when the image was taken. Color normalization can migitate this unwanted effect~\cite{reinhard_color_transfers}. Some studies use other color spaces for tracking purposes. For instance, Liu et al.\ uses the hue component in the HSV color space to minize the effects of illumination~\cite{liu_tracking_with_pei}.
 
 Color histograms represent an image by showing the the amount of pixels each range of color values occupies in that image. Correlation or intersection of two histograms can be used in similarity matching between tracks. In particular, histogram of oriented gradients (HOG) is a power feature descriptor for tracking similar tragets~\cite{dalal_hog, dollar_pedestrian_detection, munaro_tracking_within_groups_with_mobile_robot, luber_rgbd_boosted_models}. An image gradient is a directional change in the color intensity of a fixed-size detection window. Each detection window is divided into cells. A local histogram of gradient directions is created for each cell, hence local features can be characterized by the distribution of the local gradients. The descriptor can be used to train a linear Support Vector Machine (SVM) to do person and non-person classification, as well as to detect multiple people with a discriminative appearance model.
 
-Depth-based tracking makes detection decisions using the technique of segmentation. 
+Depth-based tracking makes detection decisions based on the technique of segmentation. It classify the depth map into regions of the same depth value, allowing futher algorithms to do human detection on the clusters. Depth data can be used like color data, such as extracting similarity features from local depth histograms~\cite{ikemura_depth_simialrity_features} and gradient changes in depth map~\cite{spinello_depth_gradients}.
 
+Plagemann et al.\ proposes a interest point detector for localizing human body parts from depth images~\cite{plagemann_body_from_depth}. Interests points are points on the images that are invariant to movements and noise over time, meaning that they represent actual points on the potential human body. The proposed algorithm estimates the orientation of the interest points and normalizes the points according to that orientation. As mentioned earlier, these interest points are potential human body parts. A classifier learns to assign descriptors to the same interests points using training data from a marker-based motion capture system.
 
-% Plagemann et al proposes an interest points detector to identify different body parts in depth images [21]. Ikemura and Fujiyoshi perform people detection using similarity features from local depth histograms[22]. Other discriminative models detect people using directional changes in depth map [5] and incorporating multiple sensor inputs [17].
+Xie et a.\ proposes a similar method ~\cite{xia_2d_depth_3d_model}. Instead of points, the algorithm uses edges in the depth map to find potential regions containing a human body. A predefined head template is used to match against those regions by positioning the template at various locations. The region is verified as a human body if a constructed 3D model around that region matches against predefined 3D head models. A region growing algorithm is then applied to extract the whole body contours. Tracking is performed by matching body contours those have the least ``energy score'', calculated using the changes in coordinates.
 
-% Xia et al proposes a generative method for people tracking using depth information from the Kinect [19]. Initially, the proposed method uses the nearest neighbor interpolation algorithm to fill missing depth data with similar values to the neighbors. It also applies a median filter on the depth array to smooth the depth pixels. Then, a process known as 2D chamfer distance matching is used to find regions that may contain a person by using edge information in the depth array. The method translate and position a head template to match it against the resulting edge map of the selected regions. A 2-D head contour model and a 3-D head surface models are used to differentiate whether a region is actually a head. The whole body contours are then extracted using a region growing algorithm. This allows the tracked body to be segmented from other objects nearby. Color-based tracking is performed based on the assumption that an object would have similar RGB values in successive time frames. On the other hand, depth-based tracking measures the movements of the objects in 3-D space. The method assume that the coordinates and speed of each detected person change slowly, hence the tracking is performed by matching targets with the least energy scores.
+\section{Tracking with Kinect}
+
+his section describes a number of different methodologies of tracking people using the Kinect in recent research. The proposed methods use a combination of RGB and depth based tracking techniques to achieve better results.
 
 \subsection{Subclustering and appearance classifiers}
 
-Munaro et al.\ proposes a people tracking algorithm for mobile robots using depth sensor information~\cite{munaro_tracking_within_groups_with_mobile_robot}. The proposed algoritm performs clustering on the scene for initial detection, then uses Kalman filter on the motion and appearance features to track multiple people within groups. The method assumes people are on the ground plane.
+Munaro et al.\ proposes a people tracking algorithm for mobile robots using depth sensor information~\cite{munaro_tracking_within_groups_with_mobile_robot, munaro_tracking_2}. The proposed algoritm performs clustering on the scene for initial detection, then uses Kalman filter on the motion and appearance features to track multiple people within groups. The method assumes people are on the ground plane.
 
 Initially, the method reduces the size of the Kinect depth point cloud through voxel grid filtering. The process divides the depth map into voxels, where the value of each voxel is the averaged depth value over an area. Then, depth clustering is used to segment the scene in to potential people with different heights. Sub clusters are created by finding the local maxima inside the entire cluster, where each sub-cluster is a bounding box enclosing a person's body. A HOG confidence is calculated for every sub-cluster, which will be compared against the HOG distribution when the person is occluded. The output will become the initial people detection result.
 
@@ -46,21 +49,26 @@ In the second stage, the method detects human bodies from the generated PEI in t
 
 The features used in the classifier are HOHD and JHCH. HOHD leverages the information that the height of the head crown is larger than other points on the head and points around the shoulder. The height difference between the head and shoulder is less than a quarter of the average human height. JHCH analyzes the color and height distribution of the human head. The method examines the probability distribution of the skin and hair color with respect to height for neighboring points around the head whose height values are within the average length of the human head. Normally, the probability of the skin color occurrence decreases as the probability of the hair color increases.
 
-The tracking algrorithm takes the surving points in PEI from the current frame as input and returns the association result with the current tracks as output. The color similarity is computed from the JHCH, and the spatial position similarity is computed from difference between the actual position and predicted position using Kalman Filter. The algorithm labels detection results which have have no corresponding tracks as new tracked targets in the scene.
+The tracking algrorithm takes the ``surving points'' in PEI from the current frame as input and returns the association result with the current tracks as output. The color similarity is computed from the JHCH, and the spatial position similarity is computed from difference between the actual position and predicted position using Kalman Filter. The algorithm labels detection results which have have no corresponding tracks as new tracked targets in the scene.
 
+% \subsection{}
+
+  % \item **Real-time Human Motion Tracking using Multiple Depth Cameras
   % \item 
   % \item Applications for a people detection and tracking algorithm using a time-of-flight camera
-  % \item Real-time Human Motion Tracking using Multiple Depth Cameras
   % \item Human Detection Using Depth Information by Kinect
+% \itemA General Framework for Tracking MultiplePeople from a Moving Camera
+% Tracking People across Multiple Non-Overlapping RGB-D Sensors
+% Context-Aware 3D Gesture Interaction Based on Multiple Kinects
 
 \section{Coordinate Transformation}
 
+Eggert et al.\ surveyed four techniques for 3-D rigid body transformations~\cite{eggert_four_algorithms}, namely singular value decomposition, orthonormal matrices, unit quaternions, and dual quaternions. The current work is baed on unit quaternions proposed by Horn~\cite{horn_unit_quaternions}, which represents the translational, scale, and rotational offsets betwene two coordinate systems in a $4x4$ matrix.
 
-\cite{eggert_four_algorithms}
-\cite{horn_unit_quaternions}
-\cite{wei_kinect_calibration}
-
+Wei et al.~\cite{wei_kinect_calibration} and Caon et al.~\cite{caon_context_aware_gesture} use unit quaternions to transform two Kinect coordinate systems. The current work uses the same method, and will discuss the methodology in chapter~\ref{chapter:current_approach}.
 
 \section{Limitations of Related Work}
+
+The main limitation of the research described is that the joint positions of a person are not readily accessible during occlusion. The existing algorithms are good at tracking people in complex environments and retracking them after occlusion, but spatial and visual information about the people during occlusion are limited and almost non-existent~\cite{munaro_tracking_within_groups_with_mobile_robot}. In addition, the same person reappearing after occlusion will have a different tracking id~\cite{liu_tracking_with_pei}. Multiple Kinects will provide a larger field of view, allowing the system to track the occluded person' movements when they are outside the viewing angle of a single sensor. Previous research has shown promising tracking results using multiple cameras in both overlapping ~\cite{zhang_multiple_depth_cameras, chu_multiple_cameras_transfer_functions, yildiz_multiple_cameras_constraints, yamashita_multiple_cameras_face_detection} and non-overlapping views~\cite{cai_intercamera_context_tracking, javed_tracking_disjoint}. However, these findings have not discussed persistent joint, or body region, tracking during one camera partial occlusion.
 
 \end{document}

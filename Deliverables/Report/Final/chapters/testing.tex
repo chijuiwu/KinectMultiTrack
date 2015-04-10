@@ -16,10 +16,35 @@ The system running multiple Kinects is verified by looking at the skeleton visua
 
 \section{Tracking}
 
-Curabitur porttitor quam ut ante condimentum, in sollicitudin urna pulvinar. Maecenas tincidunt sed enim ac posuere. Donec ligula odio, dignissim eu nisl at, placerat rutrum enim. Nullam tincidunt condimentum leo, sit amet tristique libero aliquam ac. Curabitur ornare elit tortor, non dapibus sapien sollicitudin sit amet. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nullam et lorem a risus cursus aliquet sit amet ut urna. Nunc sodales felis nec tortor efficitur venenatis. Curabitur et suscipit sem. Nunc rhoncus, ligula ut sagittis congue, ante dolor blandit ipsum, non accumsan elit augue at neque. Aenean volutpat sed turpis vel ultricies.
+Figure~\ref{fig:tracking_disjoined_views}
+
+\begin{figure}[!h]
+  \centering
+  
+  \includegraphics[width=0.5\linewidth]{figs/confused}
+
+  \caption{User interface showing a reminder when the tracker detects people have disappeared.}
+  
+  \label{fig:tracking_confused}
+\end{figure}
 
 \section{Occlusion}
 
 The main goal of the project is to show persistent tracking results in occluded environments and scenarios where complex human interactions are in play. The researcher has verified this requirement by partially and fully obstructing users in the scene. In the simplest case, a person may be self-occluded if he stands in a position such that one Kinect cannot fully see all the joints but two Kinects combined can have a complete view of the person. \textbf{(todo: show an illustration)} The research stands back-facing the main Kinect, while showing his right arm only to the second Kinect. The system would form the average skeleton using the actively tracked information from both Kinects; the average skeleton would contain joint coordinates that both Kinects are most sure about.
+
+
+\begin{figure}[!h]
+  \centering
+  \subfloat[The skeletons when the person is visible to both Kinects]{
+    \includegraphics[width=0.5\linewidth]{figs/fill_in_gaps_before}
+  }
+  \subfloat[The skeletons when the person is self-occluded]{
+    \includegraphics[width=0.5\linewidth]{figs/fill_in_gaps_after}
+  }
+
+  \caption{Skeleton visualization showing the average skeleton by selecting actively tracked joints from multiple Kinects.}
+  
+  \label{fig:occlusion_fill_in_gaps}
+\end{figure}
 
 \end{document}
