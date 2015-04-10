@@ -3,9 +3,9 @@
 
 \chapter{Current Approach}
 
-\label{chapter:current_appraoch}
+\label{chapter:current_approach}
 
-This chapter identifies the main source of comparison in literature, then it proceeds to describe the tracking algorithm.
+This chapter describe the tracking algorithm.
 
 The current work is an extension of Wei et al.\'s study~\cite{wei_kinect_calibration}. It applies the same algorithms for doing calibration and coordinate transformation on the skeletal joints. The system will use the transformation technique to convert a skeleton's spatial position in one Kinect to another Kinect's field of view. Subsequently, the system can merge skeletons of the same person from different Kinects fields of view to achieve persistent tracking. The technology allows the system to continuously track people when the targets are obstructed by obstacles in the scene, as long as they remain in the extended field of view. 
 
@@ -193,7 +193,7 @@ The system will automatically restart the calibration process if people move the
         \\$msg$: Error message
     }
     \\\algorithmicensure{
-        \\Whether the person has moved the joint during calibration
+        \\Whether the person has remained stationary during calibration
     }
     \label{algo:algo_interference}
     \begin{algorithmic}[1]

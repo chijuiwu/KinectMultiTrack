@@ -5,7 +5,11 @@
 
 \label{chapter:introduction}
 
-People detection and tracking is the process of identifying and following people in an environment. Knowing where people are is important for human traffic~\cite{yang_count_people} and behaviour analysis~\cite{seer_pedestrian_behaviour, arar_gaze_estimation}. There is also a growing interest in human-robot interactions~\cite{mutlu_human_robot_interaction}. It is likely that in the future there will be many social robots interacting with people and with other robots, thus requiring them to navigate around a stochastic environment. These robots must be able to avoid obstacles and track people persistently, either through a centralized control (orchestration) or decentralized, autonomous cooperation (choreography). There is ongoing research in using mobile robots for tracking people~\cite{choi_indoor_robots, munaro_tracking_within_groups_with_mobile_robot, munaro_tracking_2, glas_people_tracking_robot_localization, satake_stereo_robot}. The current work focuses on tracking people under occlusion.
+People detection and tracking is the process of identifying and following people in an environment. Knowing where people are is important for human traffic~\cite{yang_count_people} and behaviour analysis~\cite{seer_pedestrian_behaviour, arar_gaze_estimation}. There is also a growing interest in human-robot interactions~\cite{mutlu_human_robot_interaction}. It is very likely that in the future there will be many opportunities for human-robot interactions, thus requiring the robots to navigate around a stochastic environment, avoid obstacles, and track people persistently. There is ongoing research in tracking people with mobile robots~\cite{choi_indoor_robots, munaro_tracking_within_groups_with_mobile_robot, munaro_tracking_2, glas_people_tracking_robot_localization, satake_stereo_robot}.
+
+The current work focuses on tracking people under occlusion with multiple Kinects. Resolving the problem of occlusion will not only allow existing tracking systems to collect complete human body motions but also enable novel interactive technologies, such as continuous gesture recognition during occlusion. The current tracking system leverages 3D coordinate transformation based on unit quaternions.
+
+The report is organized into chapters. At first, it defines a problem statement, provides a literature review on existing techniques for solving the problem, and describes the current approach. The proposed system is evaluated using a series of user studies. The setting, method and procedure for the studies are clearly stated. The software and data collected the user studies are available online, allowing the studies to be easily replicated. The results are analyzed and discussed. An outline for future work and a concise conclusion are presented.
 
 \section{Problem Statement}
 \label{sec:introduction_problem_statement}
@@ -19,7 +23,7 @@ Occlusion occurs when the tracked target is masked by other objects in the scene
 There are two types of occlusions: static and dynamic. They are defined as:
 
 \begin{description}
-  \item[Static occlusion] Occlusion caused by stationary objects in the environment 
+  \item[Static occlusion] Occlusion caused by static objects in the environment 
   \item[Dynamic occlusion] Occlusion caused by people interactions in the environment
 \end{description}
 
@@ -51,7 +55,7 @@ The contributions of the current work are\ldots
 \section{Kinect}
 \label{sec:introduction_kinect}
 
-Kinect is a commodity depth sensor for body motion capturing and tracking. It provides depth and RGB streams at 30 frames per second~\cite{kinect_sensor_specs}, allowing for the possibility of robust tracking using these devices.
+Kinect is a commodity depth sensor for body motion capturing and tracking. It provides depth and RGB streams at 30 frames per second~\cite{microsoft_kinect_spec}, allowing for the possibility of robust tracking using these devices.
 
 The current work uses the Kinect BodyFrame stream, which includes the skeletal information of the people in the sensor's field of view. The complete API reference for the Kinect v2 SDK is accessible at \url{https://msdn.microsoft.com/en-us/library/windowspreview.kinect.aspx}.
 
