@@ -67,8 +67,7 @@ namespace KinectMultiTrack.UI
         private static readonly string CALIBRATION_FORMAT = "Calibrating...\n{0} frames remaining";
         private static readonly string RE_CALIBRATION_FORMAT = "Confused!!!\n{0}";
 
-
-        private const int SHOW_MULTI_UI_FRAME_INTERVAL = 3;
+        private const int SHOW_MULTI_UI_FRAME_INTERVAL = 4;
         private int currentFrameCount = 1;
 
         public TrackingUI()
