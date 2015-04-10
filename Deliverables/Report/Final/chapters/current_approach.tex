@@ -18,19 +18,15 @@ KinectMultiTrack is available at \url{https://github.com/cjw-charleswu/KinectMul
 
 The application consists of a server and client. There must be at least one server and one client when running the system. It is recommended that there be at least two client. One machine can run both as the server and client.
 
-Run the server:
+Running the server:
 
-{\centering
-  Run ``\\KinectMultiTrack\\KinectMultiTrack\\MultiTrackServer\\bin\\Release\\KinectMultiTrack.\\exe [port]''
-}
+\textbf{Type ``\textbackslash{KinectMultiTrack}\textbackslash{KinectMultiTrack}\textbackslash{MultiTrackServer}\textbackslash{bin}\textbackslash{Release}\textbackslash{KinectMultiTrack}.exe [port]'' into the Windows Command Prompt or Windows PowerShell.}
 
 The port number is optional. If the field is empty, the server will start listening for connections at port 12345.
 
-Run the client:
+Running the client:
 
-{\centering
-  Run ``\\KinectMultiTrack\\KinectMultiTrack\\MultiTrackClient\\bin\\Release\\MultiTrackClient.\\exe [address] [port]''
-}
+\textbf{Type ``\textbackslash{KinectMultiTrack}\textbackslash{KinectMultiTrack}\textbackslash{MultiTrackClient}\textbackslash{bin}\textbackslash{Release}\textbackslash{MultiTrackClient}.exe [address] [port]''  into the Windows Command Prompt or Windows PowerShell.}
 
 The address and port number are option. If the fields are empty, the client will send BodyFrames to the researcher's machine.
 
@@ -66,51 +62,65 @@ Wei et al.\ defined the initial center position and angle as follows~\cite{wei_k
   \item[Initial angle] A skeleton's initial angle is the angle between the skeleton and Kinect in the last frame. The initial angle is represented as $\theta$.
 \end{description}
 
-$N$ denotes the number of joints per skeleton. $N$ equals $25$ in the current Kinect SDK. $T$ denotes the number of frames used for calibration. $T$ equals $120$ in both the Wei et al.\ and the current study. $S(x_s, y_s, z_s)$ denotes the the sum of the joints coordinates in all calibration frames. $A(x_a, y_a, z_a)$ denotes the average of the joints coordinates in all calibration frames. $C(x_c, y_c, z_c)$ can be derived from the above information. The derivation is shown in Equation.~\ref{eq:initial_center_position}
+The derivation of the initial center position shown in Equation~\ref{eq:initial_center_position}. $J$ denotes the number of joints per skeleton. $N$ equals $25$ in the current Kinect SDK. $T$ denotes the number of frames used for calibration. $T$ equals $120$ in both the Wei et al.\ and the current study. $S(x_s, y_s, z_s)$ denotes the the sum of the joints coordinates in all calibration frames. $A(x_a, y_a, z_a)$ denotes the average of the joints coordinates in all calibration frames. $C(x_c, y_c, z_c)$ can be derived from the above information.
 
-\begin{equation}
+\begin{equation}[!h]
 \label{eq:initial_center_position}
 \begin{gathered}
-S(x_s, y_s, z_s) = \sum_{t=1}^T (\sum_{j=1}^N (x_{t,j}, y_{t,j}, z_{t,j})) \\
+S(x_s, y_s, z_s) = \sum_{t=1}^T (\sum_{j=1}^J (x_{t,j}, y_{t,j}, z_{t,j})) \\
 A(x_a, y_a, z_a) = A(x_a, y_a, z_a) / N \\
 C(x_c, y_c, z_c) = C(x_c, y_c, z_c) / T
 \end{gathered}
 \end{equation}
 
-The initial angle is defined as the the angle between the Kinect and the skeleton.
+The derivation of the initial angle is shown in Equation~\ref{eq:initial_angle}. $Z_r$ is the right shoulder z coordinate. $Z_l$ is the left shoulder z coordinate. $X_r$ is the right shoulder x coordinate. $X_r$ is the left shoulder x coordinate.
 
-\begin{equation}
-\label{eq:theta_d}
+\begin{equation}[!h]
+\label{eq:initial_angle}
 \begin{gathered}
-\text{Let } Z_r = \text{Right shoulder z coordinate} \\
-\text{Let } Z_l = \text{Left shoulder z coordinate} \\
-D = Z_r - Z_l
-\end{gathered}
-\end{equation}
-
-\begin{equation}
-\label{eq:theta_w}
-\begin{gathered}
-\text{Let } X_r = \text{Right shoulder x coordinate} \\
-\text{Let } X_l = \text{Left shoulder x coordinate} \\
-W = X_r - X_l
-\end{gathered}
-\end{equation}
-
-\begin{equation}
-\label{eq:theta}
+D = Z_r - Z_l \\
+W = X_r - X_l \\
 \theta = \arctan(D/W)
+\end{gathered}
 \end{equation}
 
-The system uses 120 Kinect BodyFrames for calibration. The Kinect provides BodyFrame at 30 frames per second, meaning the calibration process will take at least four seconds. The system will initiate the calibration process once it has received sufficient frames from all connected clients. If more frames were available from a connected Kinect, the system would use the latest 120 frames. The calibration procedure uses the coordinates in the Kinect Camera Space for all calculations.
+
+The system uses 120 Kinect BodyFrames for calibration, implying that the process will take at least four seconds, becasue the Kinect provides BodyFrames at 30 frames per second, and the system does not assume all Kinects start at the same time. The system will initiate the calibration process once it has received sufficient frames from all connected clients. If more frames were available from a connected Kinect, the system would use the latest 120 frames. The calibration procedure uses the coordinates in the Kinect Camera Space for all calculations.
+
+\subsection{Coordinate transformation}
+
+After the system completes calibration, it can transform any calibrated skeleton into the World coordinate system. Skeletal joints in the new coordinate system can also be transformed back to any Kinect's field of view. The transformation process is the very first step of filling the missing joints of a skeleton during occlusion. The average skeleton represents a person' complete joint coordinates, joined from multiple Kinects fields of view. Unsurprisingly, the accuracy of the system depends on how well the transformation algorithm is implemented.
+
+Given the initial center position $C(X_C, Y_C, Z_C)$, initial angle $\theta$, and the number of joints per skeleton, a skeletal joint in the World coordinate system can be expressed as follows:
+
+\begin{equation}[!h]
+\label{eq:joint_translated}
+J_t (X_{Jt}, Y_{Jt}, Z_{Jt}) = (X_j - X_C, Y_j - Y_C, Z_j - Z_C)
+\end{equation}
+
+\begin{equation}[!h]
+\label{eq:joint_worldview}
+J_w (X_{Jw}, Y_{Jw}, Z_{Jw}) = (X_{Jt}\cos\theta + Z_{Jt}\sin\theta, Y_{Jt}, Z_{Jt}\cos\theta - X_{Jt}\sin\theta)
+\end{equation}
+
+% \begin{equation}
+% \label{eq:joint_backtokinect}
+% \end{gathered}
+
+% \begin{bmatrix} X_{Jt} & Z_{Jt} \end{bmatrix} = 
+% \left[\begin{array}{c} X_{Jw} & Y_{Jw} \end{array} \right] \times
+% \left[\begin{array}{cc} z & w \end{array} \right]
+
+% \end{gathered}
+% \end{equation}
+
 
 \subsection{Detecting interference}
 
-The system will automatically restart the calibration process if people move their joints over ten centimeters during calibration. The current implementation checks movements at the person's head, left hand, and right hand.
+The system will automatically restart the calibration process if people move their joints over ten centimeters during calibration. The vaue of ten centimeters is chosen through trial and error by the researcher, below which the Kinect sensor may cause the tracking algorithm to recalibrate unecessarily due to sensor noise. The current implementation checks movements at the person's head, left hand, and right hand (S)
 
-
-\begin{algorithm}[ht,width=0.9\columnwidth]
-    \caption{$\Function{RemainStationary}(jt, c, p, msg)$}
+\begin{algorithm}[!h,width=0.9\columnwidth]
+    \caption{$\Function{IsStationary}(jt, c, p, msg)$}
     \algorithmicrequire{
         \\$jt$: Joint type
         \\$c$: Serialized body in the current frame
@@ -120,7 +130,7 @@ The system will automatically restart the calibration process if people move the
     \\\algorithmicensure{
         \\Whether the person has moved the joint during calibration
     }
-    \label{algo:prm}
+    \label{algo:algo_defect}
     \begin{algorithmic}[1]
         \setcounter{ALC@line}{0}
         \vspace*{1mm}
@@ -142,34 +152,6 @@ The system will automatically restart the calibration process if people move the
         \RETURN $\True$
     \end{algorithmic}
 \end{algorithm}
-
-
-\subsection{Coordinate transformation}
-
-After the system completes calibration, it can transform any calibrated skeleton into the World coordinate system. Skeletal joints in the new coordinate system can also be transformed back to any Kinect's field of view. The transformation process is the very first step of filling the missing joints of a skeleton during occlusion. The average skeleton represents a person' complete joint coordinates, joined from multiple Kinects fields of view. Unsurprisingly, the accuracy of the system depends on how well the transformation algorithm is implemented.
-
-Given the initial center position $C(X_C, Y_C, Z_C)$, initial angle $\theta$, and the number of joints per skeleton, a skeletal joint in the World coordinate system can be expressed as follows:
-
-\begin{equation}
-\label{eq:joint_translated}
-J_t (X_{Jt}, Y_{Jt}, Z_{Jt}) = (X_j - X_C, Y_j - Y_C, Z_j - Z_C)
-\end{equation}
-
-\begin{equation}
-\label{eq:joint_worldview}
-J_w (X_{Jw}, Y_{Jw}, Z_{Jw}) = (X_{Jt}\cos\theta + Z_{Jt}\sin\theta, Y_{Jt}, Z_{Jt}\cos\theta - X_{Jt}\sin\theta)
-\end{equation}
-
-% \begin{equation}
-% \label{eq:joint_backtokinect}
-% \end{gathered}
-
-% \begin{bmatrix} X_{Jt} & Z_{Jt} \end{bmatrix} = 
-% \left[\begin{array}{c} X_{Jw} & Y_{Jw} \end{array} \right] \times
-% \left[\begin{array}{cc} z & w \end{array} \right]
-
-% \end{gathered}
-% \end{equation}
 
 \section{Tracking by detection}
 \label{sec:current_approach_tracking_by_detection}
