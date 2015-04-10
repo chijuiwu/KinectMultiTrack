@@ -201,6 +201,7 @@ namespace KinectMultiTrack.UI
         {
             this.SetupBtn.IsEnabled = false;
             // TODO: Fix stopping server
+            this.StartBtn.IsEnabled = false;
             //this.StopBtn.IsEnabled = true;
             this.RecalibrateBtn.IsEnabled = true;
             this.KinectFOVBtn.IsEnabled = true;
