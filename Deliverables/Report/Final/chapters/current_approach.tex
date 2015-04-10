@@ -20,15 +20,15 @@ The application consists of a server and client. There must be at least one serv
 
 Running the server:
 
-\textbf{Type ``\textbackslash{KinectMultiTrack}\textbackslash{KinectMultiTrack}\textbackslash{MultiTrackServer}\textbackslash{bin}\textbackslash{Release}\textbackslash{KinectMultiTrack}.exe [port]'' into the Windows Command Prompt or Windows PowerShell.}
+\textbf{Type} ``KinectMultiTrack\textbackslash{KinectMultiTrack}\textbackslash{MultiTrackServer}\textbackslash{bin}\textbackslash{Release}\textbackslash{KinectMultiTrack}.exe [port]'' \textbf{into the Windows Command Prompt or Windows PowerShell.}
 
 The port number is optional. If the field is empty, the server will start listening for connections at port 12345.
 
 Running the client:
 
-\textbf{Type ``\textbackslash{KinectMultiTrack}\textbackslash{KinectMultiTrack}\textbackslash{MultiTrackClient}\textbackslash{bin}\textbackslash{Release}\textbackslash{MultiTrackClient}.exe [address] [port]''  into the Windows Command Prompt or Windows PowerShell.}
+\textbf{Type} ``KinectMultiTrack\textbackslash{KinectMultiTrack}\textbackslash{MultiTrackClient}\textbackslash{bin}\textbackslash{Release}\textbackslash{MultiTrackClient}.exe [address] [port]'' \textbf{into the Windows Command Prompt or Windows PowerShell.}
 
-The address and port number are option. If the fields are empty, the client will send BodyFrames to the researcher's machine.
+The server address and port number are optional. If the fields are empty, the client will send BodyFrames to the researcher's machine.
 
 \section{Overview}
 \label{sec:current_approach_overview}
@@ -58,24 +58,24 @@ The calibration procedure requires each skeleton's initial center position and a
 Wei et al.\ defined the initial center position and angle as follows~\cite{wei_kinect_calibration}:
 
 \begin{description}
-  \item[Initial center position] A skeleton's initial center position is its average of all joints coordinates over the duration of calibration. The center position is represented as $C(x_c, y_c, z_c)$, where $x_c$, $y_c$, and $z_c$ are the $x$, $y$, and $z$ coordinates, respectively.
+  \item[Initial center position] A skeleton's initial center position is its average of all joints coordinates over the duration of calibration. The center position is represented as $C(X_c, Y_c, Z_c)$, where $X_c$, $Y_c$, and $Z_c$ are the $x$, $y$, and $z$ coordinates, respectively.
   \item[Initial angle] A skeleton's initial angle is the angle between the skeleton and Kinect in the last frame. The initial angle is represented as $\theta$.
 \end{description}
 
-The derivation of the initial center position shown in Equation~\ref{eq:initial_center_position}. $J$ denotes the number of joints per skeleton. $N$ equals $25$ in the current Kinect SDK. $T$ denotes the number of frames used for calibration. $T$ equals $120$ in both the Wei et al.\ and the current study. $S(x_s, y_s, z_s)$ denotes the the sum of the joints coordinates in all calibration frames. $A(x_a, y_a, z_a)$ denotes the average of the joints coordinates in all calibration frames. $C(x_c, y_c, z_c)$ can be derived from the above information.
+The derivation of the initial center position shown in Equation~\ref{eq:initial_center_position}. $J$ denotes the number of joints per skeleton. $N$ equals $25$ in the current Kinect SDK. $T$ denotes the number of frames used for calibration. $T$ equals $120$ in both the Wei et al.\ and the current study. $S(X_s, Y_s, Z_s)$ denotes the the sum of the joints coordinates in all calibration frames. $A(X_a, Y_a, Z_a)$ denotes the average of the joints coordinates in all calibration frames. $C(X_c, Y_c, Z_c)$ can be derived from the above information.
 
-\begin{equation}[!h]
+\begin{equation}
 \label{eq:initial_center_position}
 \begin{gathered}
-S(x_s, y_s, z_s) = \sum_{t=1}^T (\sum_{j=1}^J (x_{t,j}, y_{t,j}, z_{t,j})) \\
-A(x_a, y_a, z_a) = A(x_a, y_a, z_a) / N \\
-C(x_c, y_c, z_c) = C(x_c, y_c, z_c) / T
+S(X_s, Y_s, Z_s) = \sum_{t=1}^T (\sum_{j=1}^J (X_{t,j}, Y_{t,j}, Z_{t,j})) \\
+A(X_a, Y_a, Z_a) = A(X_a, Y_a, Z_a) / N \\
+C(X_c, Y_c, Z_c) = C(X_c, Y_c, Z_c) / T
 \end{gathered}
 \end{equation}
 
 The derivation of the initial angle is shown in Equation~\ref{eq:initial_angle}. $Z_r$ is the right shoulder z coordinate. $Z_l$ is the left shoulder z coordinate. $X_r$ is the right shoulder x coordinate. $X_r$ is the left shoulder x coordinate.
 
-\begin{equation}[!h]
+\begin{equation}
 \label{eq:initial_angle}
 \begin{gathered}
 D = Z_r - Z_l \\
@@ -84,40 +84,105 @@ W = X_r - X_l \\
 \end{gathered}
 \end{equation}
 
-
-The system uses 120 Kinect BodyFrames for calibration, implying that the process will take at least four seconds, becasue the Kinect provides BodyFrames at 30 frames per second, and the system does not assume all Kinects start at the same time. The system will initiate the calibration process once it has received sufficient frames from all connected clients. If more frames were available from a connected Kinect, the system would use the latest 120 frames. The calibration procedure uses the coordinates in the Kinect Camera Space for all calculations.
+The system uses 120 Kinect BodyFrames for calibration, implying that the process will take at least four seconds, because the Kinect provides BodyFrames at 30 frames per second, and the system does not assume all Kinects start at the same time. The system will automatically start the calibration process once it has received sufficient frames from all connected Kinects. If more frames were available from a Kinect, the system will use the most recent frames for calibration. The calibration procedure uses the coordinates in the Kinect Camera Space for all calculations.
 
 \subsection{Coordinate transformation}
 
-After the system completes calibration, it can transform any calibrated skeleton into the World coordinate system. Skeletal joints in the new coordinate system can also be transformed back to any Kinect's field of view. The transformation process is the very first step of filling the missing joints of a skeleton during occlusion. The average skeleton represents a person' complete joint coordinates, joined from multiple Kinects fields of view. Unsurprisingly, the accuracy of the system depends on how well the transformation algorithm is implemented.
+Coordinate transformation is the very step in filling the missing joints of a skeleton during occlusion. After the system completes calibration, it can convert the coordinates of a calibrated skeleton into the World coordinate system. The skeletal joints in the new coordinate system can also be transformed back to any Kinect's field of view. The average skeleton represents a person whose joints are averaged over all actively tracked joints from the available fields of view. The efficacy of the tracking algorithm is determined by how close the average skeleton is away from the original skeletons from multiple views. Hence, the accuracy of the tracking system rests on the implementation of the coordinate transformation technique.
 
-Given the initial center position $C(X_C, Y_C, Z_C)$, initial angle $\theta$, and the number of joints per skeleton, a skeletal joint in the World coordinate system can be expressed as follows:
+Equation~\ref{eq:joint_worldview} shows the reduction of joint in a Kinect field of view to a joint in the World view. The equation uses the initial center position $C(X_c, Y_c, Z_c)$ and angle $\theta$ from Equation~\ref{eq:initial_center_position} and Equation~\ref{eq:initial_angle} using the joint's initial values in the resulting Kinect field of view. For instance, to transform joint A from the Kinect field of view $F_1$ to another Kinect field of view $F_2$, the system would use joint A's initial center position and angle in the view $F_2$. The joint in the current Kinect field of view to be transformed is represented by $K_j(X_{k,j}, Y_{k,j}, Z_{k,j})$, where $j$ is the joint type. $W_j(X_{w,j}, Y_{w,j}, Z_{w,j})$ is the final joint coordinate in the World view, calculated using unit quaternion demonstrated by Wei et al.~\cite{wei_kinect_calibration}. 
 
-\begin{equation}[!h]
-\label{eq:joint_translated}
-J_t (X_{Jt}, Y_{Jt}, Z_{Jt}) = (X_j - X_C, Y_j - Y_C, Z_j - Z_C)
-\end{equation}
-
-\begin{equation}[!h]
+\begin{equation}
 \label{eq:joint_worldview}
-J_w (X_{Jw}, Y_{Jw}, Z_{Jw}) = (X_{Jt}\cos\theta + Z_{Jt}\sin\theta, Y_{Jt}, Z_{Jt}\cos\theta - X_{Jt}\sin\theta)
+\begin{gathered}
+K'_j(X_{k',j}, Y_{k',j}, Z_{k',j}) = (X_{k,j}-X_c, Y_{k,j}-Y_c, Z_{k,j}-Z_c) \\
+W_j(X_{w,j}, Y_{w,j}, Z_{w,j}) = (X_{k',j}\cos\theta+Z_{k',j}\sin\theta, Y_{k',j}, Z_{k',j}\cos\theta-X_{k',j}\sin\theta)
+\end{gathered}
 \end{equation}
 
-% \begin{equation}
-% \label{eq:joint_backtokinect}
-% \end{gathered}
+A joint in the World view can be transformed back to the coordinate in a selected Kinect field of view using a simple matrix operation (See Equation~\ref{eq:joint_kinect_1}, Equation~\ref{eq:joint_kinect_2}, Equation~\ref{eq:joint_kinect_3}, and Equation~\ref{eq:joint_kinect_4}). It is worth noting that the initial center position and angle are from the same joint in final Kinect field of view.
 
-% \begin{bmatrix} X_{Jt} & Z_{Jt} \end{bmatrix} = 
-% \left[\begin{array}{c} X_{Jw} & Y_{Jw} \end{array} \right] \times
-% \left[\begin{array}{cc} z & w \end{array} \right]
+\begin{equation}
+\label{eq:joint_kinect_1}
+\begin{gathered}
+  A =
+  \begin{pmatrix}
+  \cos\theta & 0 & \sin\theta \\
+  0 & 1 & 0 \\
+  -\sin\theta & 0 &  \cos\theta
+  \end{pmatrix}, 
+  A *
+  \begin{pmatrix}
+  X_{k',j} \\
+  Y_{k',j} \\
+  Z_{k',j}
+  \end{pmatrix} =
+  \begin{pmatrix}
+  X_{w,j} \\
+  Y_{w,j} \\
+  Z_{w,j}
+  \end{pmatrix}
+\end{gathered}
+\end{equation}
 
-% \end{gathered}
-% \end{equation}
+\begin{equation}
+\label{eq:joint_kinect_2}
+\begin{gathered}
+  \inv{A} =
+  \begin{pmatrix}
+  A_1 & A_2 & A_3 \\
+  A_4 & A_5 & A_6 \\
+  A_7 & A_8 & A_9
+  \end{pmatrix}, 
+  \begin{pmatrix}
+  X_{k',j} \\
+  Y_{k',j} \\
+  Z_{k',j}
+  \end{pmatrix} =
+  \inv{A} *
+  \begin{pmatrix}
+  X_{w,j} \\
+  Y_{w,j} \\
+  Z_{w,j}
+  \end{pmatrix}
+\end{gathered}
+\end{equation}
 
+\begin{equation}
+\label{eq:joint_kinect_3}
+\begin{gathered}
+  \begin{pmatrix}
+  X_{k',j} \\
+  Y_{k',j} \\
+  Z_{k',j}
+  \end{pmatrix} =
+  \begin{pmatrix}
+  A_1*X_{W,j}+A_3*Z_{W,j} \\
+  Y_{W,j} \\
+  A_7*X_{W,j}+A_9*Z_{W,j}
+  \end{pmatrix}
+\end{gathered}
+\end{equation}
+
+\begin{equation}
+\label{eq:joint_kinect_4}
+\begin{gathered}
+ \begin{pmatrix}
+  X_{k,j} \\
+  Y_{k,j} \\
+  Z_{k,j}
+ \end{pmatrix} = 
+ \begin{pmatrix}
+  X_{k',j} + X_c\\
+  Y_{w,j} + Y_c\\
+  Z_{k',j} + Z_c
+ \end{pmatrix}
+\end{gathered}
+\end{equation}
 
 \subsection{Detecting interference}
 
-The system will automatically restart the calibration process if people move their joints over ten centimeters during calibration. The vaue of ten centimeters is chosen through trial and error by the researcher, below which the Kinect sensor may cause the tracking algorithm to recalibrate unecessarily due to sensor noise. The current implementation checks movements at the person's head, left hand, and right hand (S)
+The system will automatically restart the calibration process if people move their joints over ten centimeters during calibration. The value of ten centimeters is chosen through trial and error by the researcher, below which the Kinect sensor may cause the tracking algorithm to calibrate unnecessarily due to sensor noise. The current implementation checks movements at the person's head, left hand, and right hand (See Algorithm~\ref{algo:algo_interference}).
 
 \begin{algorithm}[!h,width=0.9\columnwidth]
     \caption{$\Function{IsStationary}(jt, c, p, msg)$}
@@ -130,7 +195,7 @@ The system will automatically restart the calibration process if people move the
     \\\algorithmicensure{
         \\Whether the person has moved the joint during calibration
     }
-    \label{algo:algo_defect}
+    \label{algo:algo_interference}
     \begin{algorithmic}[1]
         \setcounter{ALC@line}{0}
         \vspace*{1mm}
@@ -156,24 +221,19 @@ The system will automatically restart the calibration process if people move the
 \section{Tracking by detection}
 \label{sec:current_approach_tracking_by_detection}
 
-After calibration, all the system sees is a collection of skeletons with their initial position and angle. As aforementioned, the system can represent these skeletons in both the Kinect Camera Space and the world coordinate system. This information is not useful on its own, and the more people there are in the views of the Kinects, the larger this collection of skeletons would be. The tracking system should know which skeletons belong to which person, thus knowing about people's absolute position relative to any Kinect field of view.
+After calibration, the system knows a collection of skeletons, as well with their initial position and angle relative to each Kinect. As aforementioned, the system can represent these skeletons in both the Kinect Camera Space and the World coordinate system. The individual skeletons are not useful, and the size of the collection will increase with increasing number of people in the scene. The tracking system should know which skeletons belongs to which person, thus knowing their absolute possible relative any Kinect's field of view.
 
-The system construct models of tracked people by finding skeletons in different fields of view that have high proximity in the world coordinate system. The system performs the detection algorithm using joints in the world coordinate system, because using these coordinates would allow the system to compare skeletons' spatial positions regardless of perspectives. It assumes that skeletons from different Kinects field of view that have the highest proximity must belong to the same person. The system continues this process until it can no longer put skeletons in pair. The pseudocode is shown below \textbf{(todo: insert pseudocode)}.
+The system matches skeletons of the same person in different fields of view by group them based on their proximity in the World coordinate system. The system does the matching with joint information in the World coordinate system, because coordinates in this system do not relate to any sensor, which enables the system to compare the spatial positions of the skeletons regardless of their origin. The system assumes that skeletons that are closest together in the World coordinate system must belong to the same person. The grouping process continues until it can no longer pair skeletons in the World coordinate system. At this stage, the system outputs the initial detection result based on spatial information alone.
 
-The current implementation assumes that every person is visible to all Kinects. The system works fine when there is only one person who is occluded from all Kinects, because the person would only have one skeleton, leaving it to the last to be matched. The system would not detect people correctly in scenarios where several people are occluded from all Kinects in the calibration phase, because it would try to match skeletons from different Kinect fields of view even though they are far apart from each other. \textbf{(todo: add illustrations of a working scenario and a non-working scenario)}.
+The current implementation assumes that every person is visible to all Kinects during calibration. The system works fine even if there is one person in one camera occlusion, because system will leave it to the last to be matched, making it a single skeleton person. The system will not detect people correctly in scenarios where several people are occluded during the calibration phase, because it will continuously match skeletons as long as this more than one skeleton from multiple fields of view. For instance, the system will falsely match skeletons of two people who occluded
+by the sensor in different fields of view.
 
-Every calibration process follows a people detection result. It entails models of currently tracked people, where each model consists a number of potential skeletons, all from different Kinect perspectives. A potential skeleton represents one replica of a person from a Kinect field of view. The average skeleton of a person is the average body across all potential skeletons in the person's model. The average skeleton of a person can be seen as the system's view of that person. The result is permanent until the system recalibrates. That is, the same skeletons are always associated with the same person whom they were initially identified with. 
+The initial detection result consists of a collection of currently tracked people, where each person contains a number of potential skeletons from different Kinect fields of view. A potential skeleton a replica of a person from a single Kinect's field of view. The average skeleton of a person is the average of all potential skeletons representing the person. The average skeleton can be treated as the system's view of that person. The same skeletons are always associated with the same person whom they were initially identified with. The result is permanent until the system recalibrates. When a person is obstructed by an obstacle or by another person, the system will still try to update their joint coordinates if they are still in the viewing range of other cameras.
 
-The system performs tracking by updating every potential skeleton in the current result, propagating the changes to the skeleton visualization.
-
-\subsection{Detecting occlusion}
-
-When a person obstructs another person causing a Kinect sensor to partially or completely lose the sight of the masked person, the system would fill in the joints from other actively tracked potential skeletons. The average skeleton would be calculated using only the actively tracked joints from all potential skeletons. The effect would be visible on the application front-end; the visualization would display the latest average skeleton.
+The system performs tracking by updating the potential skeletons with joint information from all of the Kinects. When a person obstructs another person, causing a Kinect sensor to partially or completely lose the sight of the masked person, the system use the joints coordinates from other running Kinects that have the view of the person in occlusion, if possible. The average skeleton is always calculated using only actively tracked joints.
 
 \subsection{Detecting new and missing people}
 
-The system makes the assumption that people during calibration will be the only people in the scene throughout the lifetime of the system. This is because the system does not have any information about the new people entering the scene that would otherwise be obtained during calibration, such as their precise initial position and angle, which are needed to perform coordinate transformation. When the system detects intruders or zero people in the scene, it would automatically initiate calibration. \textbf{(todo: finish coding)} Scenarios where a number of skeletons, but not all, is missing from the system's available Kinects are unimportant, because the people possessing those skeletons may only be temporarily occluded.
-
-Since the positions of all potential skeletons are updated every frame, the system would know when the skeletons are missing. The scene is empty if and only if every potential skeleton in the scene is empty.
+The system makes another assumption that the people during calibration are the only people throughout the lifetime of the system. This limitation is introduced as an side effect of using coordinate transformation for calibration. Without knowing the initial center position and angle of new people, the current system cannot perform coordinate transformation their spatial position. When the system detects intruders and an empty scene, it will automatically start calibration from the beginning. The system knows the scene is empty when all the potential skeletons in the system lose spatial information in the current frame. However, the current system can cope with temporary occlusion caused by the Kinects using the ``filling the gaps'' strategy described.
 
 \end{document}
