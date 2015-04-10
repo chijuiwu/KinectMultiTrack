@@ -1,7 +1,7 @@
 ﻿<Application x:Class="MultiTrackClient.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             StartupUri="ClientUI.xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             <!--StartupUri="ClientUI.xaml">-->
     <Application.Resources>
          
     </Application.Resources>

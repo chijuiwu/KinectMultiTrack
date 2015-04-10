@@ -67,10 +67,9 @@ namespace KinectMultiTrack.UI
         private static readonly string CALIBRATION_FORMAT = "Calibrating...\n{0} frames remaining";
         private static readonly string RE_CALIBRATION_FORMAT = "Confused!!!\n{0}";
 
-        private const uint SEC_IN_MILLISEC = 1000;
-        //private const uint REFRESH_MULTIPLE_UI_INTERVAL = 1/25 * SEC_IN_MILLISEC;
-        //private const int DISPLAY_FRAME_INTERVAL = ;
-        //private readonly Stopwatch refreshMultipleUIStopwatch;
+
+        private const int SHOW_MULTI_UI_FRAME_INTERVAL = 3;
+        private int currentFrameCount = 1;
 
         public TrackingUI()
         {
@@ -301,28 +300,28 @@ namespace KinectMultiTrack.UI
             {
                 return;
             }
-            //if (this.refreshMultipleUIStopwatch.ElapsedMilliseconds > TrackingUI.REFRESH_MULTIPLE_UI_INTERVAL)
-            //{
-                this.TrackingUI_Viewbox.Child = this.trackingUIViewCopy;
-                this.RefreshTrackingUI(result);
-                //this.refreshMultipleUIStopwatch.Restart();
-            //}
+            this.TrackingUI_Viewbox.Child = this.trackingUIViewCopy;
+            this.RefreshTrackingUI(result);
+            // For writing to log file
             if (this.studyOn)
             {
                 if (scenarioId != Logger.NA)
                 {
-                    // For writing to log file
                     this.OnDisplayResult(result, scenarioId);
                 }
             }
             else if (!this.studyOn || this.userTasks.Equals(UserTask.TASK_FREE))
             {
-                //if (this.refreshMultipleUIStopwatch.ElapsedMilliseconds > TrackingUI.REFRESH_MULTIPLE_UI_INTERVAL)
-                //{
-                //    this.MultipleUI_Viewbox.Child = this.multipleUIViewCopy;
-                //    this.RefreshMultipleUI(result);
-                //    this.refreshMultipleUIStopwatch.Restart();
-                //}
+                if (this.currentFrameCount == TrackingUI.SHOW_MULTI_UI_FRAME_INTERVAL)
+                {
+                    this.MultipleUI_Viewbox.Child = this.multipleUIViewCopy;
+                    this.RefreshMultipleUI(result);
+                    this.currentFrameCount = 1;
+                }
+                else
+                {
+                    this.currentFrameCount++;
+                }
             }
         }
 

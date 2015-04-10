@@ -25,10 +25,6 @@ namespace MultiTrackClient
     /// </summary>
     public partial class ClientUI : Window, INotifyPropertyChanged
     {
-        private const string kinectServerAddress = "138.251.213.82";
-        private const string myLaptopIPAddress = "138.251.207.136";
-        private const string localhost = "127.0.0.1";
-        private const int kinectServerPort = 12345;
         private ClientSocket kinectSocket;
 
         // Kinect position and angle
@@ -53,16 +49,28 @@ namespace MultiTrackClient
         private readonly Brush inferredJointBrush = Brushes.Yellow;
         private readonly Pen inferredBonePen = new Pen(Brushes.Gray, 1);
 
-        public ClientUI()
+        //public ClientUI()
+        //{
+        //    this.InitializeComponent();
+
+        //    this.kinectSocket = new ClientSocket(ClientUI.kinectServerAddress, ClientUI.kinectServerPort);
+
+        //    this.DataContext = this;
+        //    this.KinectStatusText = Properties.Resources.KinectUninitialized;
+        //    this.InitializeKinect();
+        //}
+
+        public ClientUI(string serverAddress, int serverPort)
         {
             this.InitializeComponent();
 
-            this.kinectSocket = new ClientSocket(ClientUI.kinectServerAddress, ClientUI.kinectServerPort);
+            this.kinectSocket = new ClientSocket(serverAddress, serverPort);
 
             this.DataContext = this;
             this.KinectStatusText = Properties.Resources.KinectUninitialized;
             this.InitializeKinect();
         }
+
 
         public event PropertyChangedEventHandler PropertyChanged;
 
